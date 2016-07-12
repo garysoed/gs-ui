@@ -1,0 +1,129 @@
+// ThemeD: rgba(11,11,11
+// Theme: rgba(22,22,22
+// ThemeL: rgba(33,33,33
+// Accent: rgba(44,44,44
+@import 'https://fonts.googleapis.com/css?family=Ubuntu+Mono|Ubuntu:300,400,700';
+
+// General, non themed styles
+body {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 13px;
+  margin: 0;
+}
+
+a {
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 300;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+code {
+  font-family: 'Ubuntu Mono', monospace;
+}
+
+// Themed styles.
+.gs-theme-normal {
+  background-color: #fff;
+  color: #000;
+
+  &.gs-secondary,
+  .gs-secondary {
+    color: rgba(0,0,0, .54);
+  }
+
+  &.gs-action,
+  .gs-action,
+  a {
+    color: rgba(11,11,11,.99);
+
+    &:focus,
+    &:hover {
+      color: rgba(44,44,44,.99);
+    }
+  }
+
+  &.gs-hilite,
+  .gs-hilite {
+    background-color: rgba(22,22,22,.99);
+    color: #fff;
+
+    &.gs-secondary,
+    .gs-secondary {
+      color: rgba(255,255,255,.75);
+    }
+
+    &.gs-action,
+    .gs-action,
+    a {
+      color: rgba(255,255,255,.75);
+
+      &:focus,
+      &:hover {
+        color: rgba(44,44,44,.99);
+      }
+    }
+  }
+}
+
+.gs-theme-invert {
+  background-color: #000;
+  color: #fff;
+
+  &.gs-secondary,
+  .gs-secondary {
+    color: rgba(255,255,255,.62);
+  }
+
+  &.gs-action,
+  .gs-action,
+  a {
+    color: rgba(33,33,33,.99);
+
+    &:focus,
+    &:hover {
+      color: rgba(44,44,44,.99);
+    }
+  }
+
+  &.gs-hilite,
+  .gs-hilite {
+    background-color: rgba(33,33,33,.99);
+    color: #000;
+
+    &.gs-secondary,
+    .gs-secondary {
+      color: rgba(0,0,0,.62);
+    }
+
+    &.gs-action,
+    .gs-action,
+    a {
+      color: rgba(0,0,0,.62);
+
+      &:focus,
+      &:hover {
+        color: rgba(44,44,44,.99);
+      }
+    }
+  }
+}
+
+
+
