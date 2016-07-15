@@ -39,7 +39,7 @@ def gs_ui(deps = [], test_deps = []):
   # Prod files.
   ts_library(
       name = lib_name,
-      srcs = native.glob(["*.ts"]),
+      srcs = native.glob(["*.ts"], exclude = ["*_test.ts"]),
       deps = ["@gs_tools//declarations"] + deps
   )
 
@@ -50,6 +50,7 @@ def gs_ui(deps = [], test_deps = []):
 
   # Generate a template file for every html file.
   html_files = native.glob(["*.html"])
+  template_targets = []
   for html_file in html_files:
     name = html_file[:-5]
     css_file = "%s.scss" % name
@@ -60,12 +61,19 @@ def gs_ui(deps = [], test_deps = []):
         src = css_file,
     )
 
+    templatetarget_name = "%s_template" % name
     webc_gen_template(
-        name = "%s_template" % name,
+        name = templatetarget_name,
         css = ":%s" % sassbin_name,
         key = "%s/%s" % (PACKAGE_NAME, name),
         template = html_file,
     )
+    template_targets.append(":" + templatetarget_name)
+
+  native.filegroup(
+      name = "template",
+      srcs = template_targets,
+  )
 
   # Test files.
   test_srcs = native.glob(["*_test.ts"])

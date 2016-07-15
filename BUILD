@@ -39,3 +39,21 @@ test_suite(
       "//src/theming:test",
     ]
 )
+
+filegroup(
+    name = "pack_template",
+    srcs = [
+      "//src/button:template",
+      "//src/theming:template",
+    ]
+)
+
+genrule(
+    name = "pack",
+    srcs = [
+      "//:pack_js",
+      "//:pack_template",
+    ],
+    outs = ["pack.js"],
+    cmd = "cat $(SRCS) > $@",
+)
