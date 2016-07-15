@@ -72,7 +72,7 @@ def gs_ui(deps = [], test_deps = []):
   ts_library(
       name = testlib_name,
       srcs = test_srcs,
-      deps = [":" + lib_name],
+      deps = [":" + lib_name] + ["//src:test_base"],
   )
 
   # Generates a pack, karma run, and karma test file for every test.

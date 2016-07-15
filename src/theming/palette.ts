@@ -79,7 +79,7 @@ export class Palette {
         .orThrows(`Palette ${name} does not meet the recommended specs: \${value}`);
 
     if (!validationResult.passes) {
-      Log.warn(LOG, validationResult.errorMessage);
+      Log.warn(LOG, validationResult.errorMessage!);
     }
 
     return new Palette(accent, dark, normal, light);

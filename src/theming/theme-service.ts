@@ -15,7 +15,7 @@ export class ThemeService {
         .orThrows('Template for src/theming/theme-style not found')
         .assertValid();
 
-    let replacedTemplate = mainCssTemplate
+    let replacedTemplate = mainCssTemplate!
         .replace(
             /rgba\(11,11,11/g,
             `rgba(${theme.base.dark.red},${theme.base.dark.green},${theme.base.dark.blue}`)
