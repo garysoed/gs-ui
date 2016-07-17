@@ -13,7 +13,6 @@ body {
 
 a {
   color: var(--gsColorForeground);
-  font-weight: 700;
   text-decoration: none;
 
   &:hover {
@@ -39,6 +38,15 @@ code {
   font-family: 'Ubuntu Mono', monospace;
 }
 
+.gs-action {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.gs-action[disabled] {
+  cursor: default;
+}
+
 // Themed styles.
 .gs-theme-normal {
   --gsColorBackground: #fff;
@@ -58,7 +66,7 @@ code {
     --gsColorForeground: rgba(11,11,11,.99);
 
     &[disabled] {
-      --gsColorForeground: rgba(11,11,11,.75);
+      --gsColorForeground: rgba(0,0,0,.54);
     }
 
     &:not([disabled]) {
@@ -74,7 +82,7 @@ code {
 
       &[disabled] {
         --gsColorBackground: #fff;
-        --gsColorForeground: rgba(11,11,11,.75);
+        --gsColorForeground: rgba(0,0,0,.54);
       }
 
       &:not([disabled]) {
@@ -101,7 +109,7 @@ code {
     &.gs-action,
     .gs-action,
     a {
-      --gsColorForeground: rgba(255,255,255,.75);
+      --gsColorForeground: #fff;
 
       &[disabled] {
         --gsColorForeground: rgba(255,255,255,.62);
@@ -152,7 +160,7 @@ code {
     --gsColorForeground: rgba(33,33,33,.99);
 
     &[disabled] {
-      --gsColorForeground: rgba(33,33,33,.75);
+      --gsColorForeground: rgba(255,255,255,.62);
     }
 
     &:not([disabled]) {
@@ -168,7 +176,7 @@ code {
 
       &[disabled] {
         --gsColorBackground: #000;
-        --gsColorForeground: rgba(33,33,33,.75);
+        --gsColorForeground: rgba(255,255,255,.62);
       }
 
       &:not([disabled]) {
@@ -193,10 +201,10 @@ code {
     &.gs-action,
     .gs-action,
     a {
-      --gsColorForeground: rgba(0,0,0,.62);
+      --gsColorForeground: #000;
 
       &[disabled] {
-        --gsColorForeground: rgba(0,0,0,.54);
+        --gsColorForeground: rgba(0,0,0,.62);
       }
 
       &:not([disabled]) {
@@ -212,7 +220,7 @@ code {
 
         &[disabled] {
           --gsColorBackground: rgba(33,33,33,.99);
-          --gsColorForeground: rgba(0,0,0,.54);
+          --gsColorForeground: rgba(0,0,0,.62);
         }
 
         &:not([disabled]) {
