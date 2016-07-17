@@ -4,8 +4,5 @@ load("//:defs.bzl", "gs_ui")
 
 gs_ui(
     deps = [
-      "@gs_tools//src",
-      "//src/button",
-      "//src/theming",
-      "//src/tool",
+      "@gs_tools//src"
     ])

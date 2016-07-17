@@ -45,6 +45,7 @@ filegroup(
     srcs = [
         "//src/button:template",
         "//src/theming:template",
+        "//src/tool:template",
     ]
 )
 
