@@ -2,13 +2,51 @@
   <head>
     <script src="../../node_modules/x-tag/src/core.js"></script>
     <script src="../../bazel-genfiles/pack.js"></script>
+    <link href="../../bazel-genfiles/pack.css">
+    <style>
+      .row {
+        display: flex;
+        width: 60rem;
+      }
+
+      .cell {
+        flex: 1;
+        padding: 0 0 1.6rem 1.6rem;
+      }
+    </style>
   </head>
   <body>
-    <gs-button id="button">
-      Normal button
-    </gs-button>
+    <template id="template">
+      <gs-basic-button>Normal Button</gs-basic-button>
+    </template>
+
+    <section>
+      <section class="row">
+        <section class="cell gs-theme-normal"></section>
+        <section class="cell gs-theme-normal gs-hilite"></section>
+      </section>
+      <section class="row">
+        <section class="cell gs-theme-invert"></section>
+        <section class="cell gs-theme-invert gs-hilite"></section>
+      </section>
+    </section>
     <script>
-      gs.Main.newInstance().bootstrap();
+      var templateEl = document.querySelector('#template');
+      document.querySelectorAll('section.cell').forEach(function(el) {
+        el.innerHTML = templateEl.innerHTML;
+      });
+
+      var url = new URL(window.location);
+      var themeStr = url.searchParams.get('theme');
+      var theme = undefined;
+      if (!!themeStr) {
+        var parts = themeStr.split('-');
+        theme = gs.ui.Theme.newInstance(
+            gs.ui.DefaultPalettes[parts[0]],
+            gs.ui.DefaultPalettes[parts[1]]);
+      }
+
+      gs.ui.Main.newInstance().bootstrap(theme);
     </script>
   </body>
 </html>

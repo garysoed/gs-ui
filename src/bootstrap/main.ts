@@ -3,6 +3,7 @@ import {BasicButton} from '../button/basic-button';
 import {DefaultPalettes} from './default-palettes';
 import {BaseElement, ElementRegistrar} from '../../external/gs_tools/src/webc';
 import {Injector} from '../../external/gs_tools/src/inject';
+import {Templates} from '../../external/gs_tools/src/webc';
 import {Theme} from '../theming/theme';
 import {ThemeService} from '../theming/theme-service';
 
@@ -28,14 +29,24 @@ export class Main {
    * @param theme The theme to apply to the app.
    */
   bootstrap(theme: Theme = DEFAULT_THEME_): void {
+    let templates = Templates.newInstance(new Map<RegExp, string>([
+      [/rgba\(11,11,11/g, 'rgba(var(--gsRgbBaseDark)'],
+      [/rgba\(22,22,22/g, 'rgba(var(--gsRgbBaseNormal)'],
+      [/rgba\(33,33,33/g, 'rgba(var(--gsRgbBaseLight)'],
+      [/rgba\(44,44,44/g, 'rgba(var(--gsRgbAccent)'],
+    ]));
+    Injector.bindProvider(() => document, 'x.dom.document');
+    Injector.bindProvider(() => templates, 'x.gs_tools.templates');
     let injector = Injector.newInstance();
-    let registrar = ElementRegistrar.newInstance(injector);
+    let registrar = ElementRegistrar.newInstance(injector, templates);
     Arrays.of(DEFAULT_ELEMENTS_)
         .forEach((ctor: gs.ICtor<BaseElement>) => {
           registrar.register(ctor);
         });
 
-    ThemeService.install(theme);
+    let themeService = injector.instantiate<ThemeService>(ThemeService);
+    themeService.initialize();
+    themeService.install(theme);
   }
 
   /**

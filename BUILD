@@ -12,7 +12,7 @@ ts_library(
     name = "lib_js",
     srcs = [],
     deps = [
-      "//src/bootstrap",
+        "//src/bootstrap",
     ]
 )
 
@@ -34,26 +34,36 @@ filegroup(
 test_suite(
     name = "test",
     tests = [
-      "//src/bootstrap:test",
-      "//src/button:test",
-      "//src/theming:test",
+        "//src/bootstrap:test",
+        "//src/button:test",
+        "//src/theming:test",
     ]
 )
 
 filegroup(
     name = "pack_template",
     srcs = [
-      "//src/button:template",
-      "//src/theming:template",
+        "//src/button:template",
+        "//src/theming:template",
     ]
 )
 
 genrule(
     name = "pack",
     srcs = [
-      "//:pack_js",
-      "//:pack_template",
+        "//:pack_js",
+        "//:pack_template",
+        "//src/theming:theme-style_templatepack",
     ],
     outs = ["pack.js"],
+    cmd = "cat $(SRCS) > $@",
+)
+
+genrule(
+    name = "pack_css",
+    srcs = [
+        "//src/theming:theme-style_cssbin"
+    ],
+    outs = ["pack.css"],
     cmd = "cat $(SRCS) > $@",
 )

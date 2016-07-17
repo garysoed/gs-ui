@@ -42,6 +42,7 @@ code {
 .gs-theme-normal {
   background-color: #fff;
   color: #000;
+  --gsColorForeground: red;
 
   &.gs-secondary,
   .gs-secondary {
@@ -124,6 +125,3 @@ code {
     }
   }
 }
-
-
-

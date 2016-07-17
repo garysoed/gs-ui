@@ -2,60 +2,123 @@ import {TestBase} from '../test-base';
 TestBase.setup();
 
 import {Mocks} from '../../external/gs_tools/src/mock';
-import {Templates} from '../../external/gs_tools/src/webc';
 import {ThemeService} from './theme-service';
 
 
 describe('theming.ThemeService', () => {
+  let mockDocument;
+  let mockTemplates;
+  let service;
+
+  beforeEach(() => {
+    mockDocument = jasmine.createSpyObj('Document', ['createElement', 'querySelector']);
+    mockTemplates = jasmine.createSpyObj('Templates', ['getTemplate']);
+    service = new ThemeService(mockTemplates, mockDocument);
+  });
+
+  describe('initialize', () => {
+    it('should initialize the app correctly', () => {
+      let initialInnerHTML = 'initialInnerHTML';
+      let headEl = Mocks.object('headEl');
+      headEl.innerHTML = initialInnerHTML;
+
+      mockDocument.querySelector.and.returnValue(headEl);
+
+      let cssTemplate = 'cssTemplate';
+      mockTemplates.getTemplate.and.returnValue(cssTemplate);
+
+      service.initialize();
+
+      expect(headEl.innerHTML).toEqual(initialInnerHTML + cssTemplate);
+      expect(mockTemplates.getTemplate).toHaveBeenCalledWith('src/theming/theme');
+      expect(mockDocument.querySelector).toHaveBeenCalledWith('head');
+    });
+
+    it('should not initialize again if called the second time', () => {
+      let headEl = Mocks.object('headEl');
+      headEl.innerHTML = '';
+      mockDocument.querySelector.and.returnValue(headEl);
+
+      let cssTemplate = 'cssTemplate';
+      mockTemplates.getTemplate.and.returnValue(cssTemplate);
+
+      service.initialize();
+      service.initialize();
+
+      expect(headEl.innerHTML).toEqual(cssTemplate);
+    });
+
+    it('should throw error if the theme template cannot be found', () => {
+      mockTemplates.getTemplate.and.returnValue(null);
+
+      expect(() => {
+        service.initialize();
+      }).toThrowError(/not found/);
+    });
+  });
+
   describe('install', () => {
     it('should append the correct template to the header element', () => {
-      let mainCssTemplate = 'rgba(11,11,11-rgba(22,22,22-rgba(33,33,33-rgba(44,44,44';
-      spyOn(Templates, 'getTemplate').and.returnValue(mainCssTemplate);
+      let themeStyleEl = Mocks.object('themeStyleEl');
+      mockDocument.createElement.and.returnValue(themeStyleEl);
+
+      let mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
+      mockDocument.querySelector.and.callFake((query: string) => {
+        switch (query) {
+          case 'head':
+            return mockHeadEl;
+          default:
+            return null;
+        }
+      });
 
       let theme = Mocks.object('theme');
       theme['base'] = {
-        'dark': {
-          'red': 1,
-          'green': 2,
-          'blue': 3,
-        },
-        'light': {
-          'red': 4,
-          'green': 5,
-          'blue': 6,
-        },
-        'normal': {
-          'red': 7,
-          'green': 8,
-          'blue': 9,
-        },
+        'dark': {'red': 1, 'green': 2, 'blue': 3},
+        'light': {'red': 4, 'green': 5, 'blue': 6},
+        'normal': {'red': 7, 'green': 8, 'blue': 9},
       };
       theme['accent'] = {
-        'accent': {
-          'red': 10,
-          'green': 11,
-          'blue': 12,
-        },
+        'accent': {'red': 10, 'green': 11, 'blue': 12},
       };
 
-      let headEl = Mocks.object('headEl');
-      headEl.innerHTML = 'existingInnerHTML';
-      spyOn(document, 'querySelector').and.returnValue(headEl);
+      service.install(theme);
 
-      ThemeService.install(theme);
+      expect(themeStyleEl.innerHTML).toEqual(
+          'body{--gsRgbBaseDark:1,2,3;--gsRgbBaseNormal:7,8,9;' +
+          '--gsRgbBaseLight:4,5,6;--gsRgbAccent:10,11,12;}');
+      expect(themeStyleEl.id).toEqual('gs-theme');
 
-      expect(headEl.innerHTML)
-          .toEqual('existingInnerHTMLrgba(1,2,3-rgba(7,8,9-rgba(4,5,6-rgba(10,11,12');
-      expect(document.querySelector).toHaveBeenCalledWith('head');
-      expect(Templates.getTemplate).toHaveBeenCalledWith('src/theming/theme-style');
+      expect(mockHeadEl.appendChild).toHaveBeenCalledWith(themeStyleEl);
+      expect(mockDocument.querySelector).toHaveBeenCalledWith('head');
+      expect(mockDocument.querySelector).toHaveBeenCalledWith('style#gs-theme');
+      expect(mockDocument.createElement).toHaveBeenCalledWith('style');
     });
 
-    it('should throw error if the theme-style template cannot be found', () => {
-      spyOn(Templates, 'getTemplate').and.returnValue(null);
+    it('should reuse the previous style element', () => {
+      let themeStyleEl = Mocks.object('themeStyleEl');
+      themeStyleEl.innerHTML = 'oldInnerHTML';
 
-      expect(() => {
-        ThemeService.install(Mocks.object('theme'));
-      }).toThrowError(/not found/);
+      mockDocument.querySelector.and.returnValue(themeStyleEl);
+
+      let theme = Mocks.object('theme');
+      theme['base'] = {
+        'dark': {'red': 1, 'green': 2, 'blue': 3},
+        'light': {'red': 4, 'green': 5, 'blue': 6},
+        'normal': {'red': 7, 'green': 8, 'blue': 9},
+      };
+      theme['accent'] = {
+        'accent': {'red': 10, 'green': 11, 'blue': 12},
+      };
+
+      service.install(theme);
+
+      expect(themeStyleEl.innerHTML).toEqual(
+          'body{--gsRgbBaseDark:1,2,3;--gsRgbBaseNormal:7,8,9;' +
+          '--gsRgbBaseLight:4,5,6;--gsRgbAccent:10,11,12;}');
+
+      expect(mockDocument.querySelector).toHaveBeenCalledWith('style#gs-theme');
+      expect(mockDocument.createElement).not.toHaveBeenCalled();
     });
   });
 });

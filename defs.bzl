@@ -3,7 +3,6 @@ load("@gs_tools//bazel/ts:defs.bzl", "ts_binary", "ts_library")
 load("@gs_tools//bazel/tslint:defs.bzl", "tslint_test")
 load("@gs_tools//bazel/webc:defs.bzl", "webc_gen_template")
 load("@gs_tools//bazel/webpack:defs.bzl", "webpack_binary")
-load("@io_bazel_rules_sass//sass:sass.bzl", "sass_binary")
 
 def gs_ui(deps = [], test_deps = []):
   """Generic bazel target for all packages in gs-tools.
@@ -53,18 +52,10 @@ def gs_ui(deps = [], test_deps = []):
   template_targets = []
   for html_file in html_files:
     name = html_file[:-5]
-    css_file = "%s.scss" % name
-
-    sassbin_name = "%s_cssbin" % name
-    sass_binary(
-        name = sassbin_name,
-        src = css_file,
-    )
 
     templatetarget_name = "%s_template" % name
     webc_gen_template(
         name = templatetarget_name,
-        css = ":%s" % sassbin_name,
         key = "%s/%s" % (PACKAGE_NAME, name),
         template = html_file,
     )

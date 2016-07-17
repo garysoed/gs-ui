@@ -14,16 +14,17 @@
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
         "outDir": "out/",
-        "rootDir": "./"
+        "rootDir": "./",
+        "skipLibCheck": true
     },
-    "filesGlob": [
-        "**/*.ts",
-        "**/*.tsx",
-        "!external/**/bazel-*/**",
-        "!external/**/node_modules/**",
-        "!bazel-*/**",
-        "!node_modules/**",
-        "node_modules/typescript/lib/lib.es6.d.ts"
+    "exclude": [
+    ],
+    "include": [
+        "src/**/*.ts",
+        "external/gs_tools/declarations/**/*.d.ts",
+        "external/gs_tools/src/**/*.ts",
+        "node_modules/typescript/lib/lib.dom.d.ts",
+        "node_modules/typescript/lib/lib.es2015.d.ts"
     ],
     "compileOnSave": false,
     "buildOnSave": false,
