@@ -2,22 +2,24 @@
   <head>
     <script src="../../node_modules/x-tag/src/core.js"></script>
     <script src="../../bazel-genfiles/pack.js"></script>
-    <link href="../../bazel-genfiles/pack.css">
     <style>
       .row {
         display: flex;
-        width: 60rem;
+        width: 40rem;
       }
 
       .cell {
         flex: 1;
-        padding: 0 0 1.6rem 1.6rem;
+        padding: 1.6rem;
       }
     </style>
   </head>
   <body>
     <template id="template">
       <gs-basic-button>Normal Button</gs-basic-button>
+      <gs-basic-button disabled>Disabled Button</gs-basic-button>
+      <gs-basic-button class="gs-primary">Primary Button</gs-basic-button>
+      <gs-basic-button class="gs-primary" disabled>Disabled Primary Button</gs-basic-button>
     </template>
 
     <section>

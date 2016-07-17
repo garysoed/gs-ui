@@ -12,6 +12,7 @@ body {
 }
 
 a {
+  color: var(--gsColorForeground);
   font-weight: 700;
   text-decoration: none;
 
@@ -40,87 +41,186 @@ code {
 
 // Themed styles.
 .gs-theme-normal {
-  background-color: #fff;
-  color: #000;
-  --gsColorForeground: red;
+  --gsColorBackground: #fff;
+  --gsColorForeground: #000;
+  --gsColorBackgroundMask: transparent;
+  color: var(--gsColorForeground);
+  background-color: var(--gsColorBackground);
 
   &.gs-secondary,
   .gs-secondary {
-    color: rgba(0,0,0, .54);
+    --gsColorForeground: rgba(0,0,0,.54);
   }
 
   &.gs-action,
   .gs-action,
   a {
-    color: rgba(11,11,11,.99);
+    --gsColorForeground: rgba(11,11,11,.99);
 
-    &:focus,
-    &:hover {
-      color: rgba(44,44,44,.99);
+    &[disabled] {
+      --gsColorForeground: rgba(11,11,11,.75);
+    }
+
+    &:not([disabled]) {
+      &:focus,
+      &:hover {
+        --gsColorForeground: rgba(44,44,44,.99);
+      }
+    }
+
+    &.gs-primary {
+      --gsColorBackground: rgba(22,22,22,.99);
+      --gsColorForeground: #fff;
+
+      &[disabled] {
+        --gsColorBackground: #fff;
+        --gsColorForeground: rgba(11,11,11,.75);
+      }
+
+      &:not([disabled]) {
+        &:focus,
+        &:hover {
+          --gsColorForeground: rgba(44,44,44,.99);
+        }
+      }
     }
   }
 
   &.gs-hilite,
   .gs-hilite {
-    background-color: rgba(22,22,22,.99);
-    color: #fff;
+    --gsColorBackground: rgba(22,22,22,.99);
+    --gsColorForeground: #fff;
+    color: var(--gsColorForeground);
+    background-color: var(--gsColorBackground);
 
     &.gs-secondary,
     .gs-secondary {
-      color: rgba(255,255,255,.75);
+      --gsColorForeground: rgba(255,255,255,.75);
     }
 
     &.gs-action,
     .gs-action,
     a {
-      color: rgba(255,255,255,.75);
+      --gsColorForeground: rgba(255,255,255,.75);
 
-      &:focus,
-      &:hover {
-        color: rgba(44,44,44,.99);
+      &[disabled] {
+        --gsColorForeground: rgba(255,255,255,.62);
+      }
+
+      &:not([disabled]) {
+        &:focus,
+        &:hover {
+          --gsColorForeground: rgba(44,44,44,.99);
+        }
+      }
+
+      &.gs-primary {
+        --gsColorBackground: #fff;
+        --gsColorForeground: rgba(11,11,11,.99);
+
+        &[disabled] {
+          --gsColorBackground: rgba(22,22,22,.99);
+          --gsColorForeground: rgba(255,255,255,.62);
+        }
+
+        &:not([disabled]) {
+          &:focus,
+          &:hover {
+            --gsColorForeground: rgba(44,44,44,.99);
+          }
+        }
       }
     }
   }
 }
 
 .gs-theme-invert {
-  background-color: #000;
-  color: #fff;
+  --gsColorBackground: #000;
+  --gsColorForeground: #fff;
+  --gsColorBackgroundMask: transparent;
+  color: var(--gsColorForeground);
+  background-color: var(--gsColorBackground);
 
   &.gs-secondary,
   .gs-secondary {
-    color: rgba(255,255,255,.62);
+    --gsColorForeground: rgba(255,255,255,.62);
   }
 
   &.gs-action,
   .gs-action,
   a {
-    color: rgba(33,33,33,.99);
+    --gsColorForeground: rgba(33,33,33,.99);
 
-    &:focus,
-    &:hover {
-      color: rgba(44,44,44,.99);
+    &[disabled] {
+      --gsColorForeground: rgba(33,33,33,.75);
+    }
+
+    &:not([disabled]) {
+      &:focus,
+      &:hover {
+        --gsColorForeground: rgba(44,44,44,.99);
+      }
+    }
+
+    &.gs-primary {
+      --gsColorBackground: rgba(33,33,33,.99);
+      --gsColorForeground: #000;
+
+      &[disabled] {
+        --gsColorBackground: #000;
+        --gsColorForeground: rgba(33,33,33,.75);
+      }
+
+      &:not([disabled]) {
+        &:focus,
+        &:hover {
+          --gsColorForeground: rgba(44,44,44,.99);
+        }
+      }
     }
   }
 
   &.gs-hilite,
   .gs-hilite {
-    background-color: rgba(33,33,33,.99);
-    color: #000;
+    --gsColorBackground: rgba(33,33,33,.99);
+    --gsColorForeground: #000;
 
     &.gs-secondary,
     .gs-secondary {
-      color: rgba(0,0,0,.62);
+      --gsColorForeground: rgba(0,0,0,.62);
     }
 
     &.gs-action,
     .gs-action,
     a {
-      color: rgba(0,0,0,.62);
+      --gsColorForeground: rgba(0,0,0,.62);
 
-      &:focus,
-      &:hover {
-        color: rgba(44,44,44,.99);
+      &[disabled] {
+        --gsColorForeground: rgba(0,0,0,.54);
+      }
+
+      &:not([disabled]) {
+        &:focus,
+        &:hover {
+          --gsColorForeground: rgba(44,44,44,.99);
+        }
+      }
+
+      &.gs-primary {
+        --gsColorBackground: #000;
+        --gsColorForeground: rgba(33,33,33,.99);
+
+        &[disabled] {
+          --gsColorBackground: rgba(33,33,33,.99);
+          --gsColorForeground: rgba(0,0,0,.54);
+        }
+
+        &:not([disabled]) {
+          &:focus,
+          &:hover {
+            --gsColorForeground: rgba(44,44,44,.99);
+          }
+        }
       }
     }
   }

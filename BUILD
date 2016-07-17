@@ -58,12 +58,3 @@ genrule(
     outs = ["pack.js"],
     cmd = "cat $(SRCS) > $@",
 )
-
-genrule(
-    name = "pack_css",
-    srcs = [
-        "//src/theming:theme-style_cssbin"
-    ],
-    outs = ["pack.css"],
-    cmd = "cat $(SRCS) > $@",
-)
