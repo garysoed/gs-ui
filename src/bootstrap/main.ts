@@ -4,6 +4,8 @@ import {BaseElement, ElementRegistrar} from '../../external/gs_tools/src/webc';
 import {DefaultPalettes} from './default-palettes';
 import {Icon} from '../tool/icon';
 import {Injector} from '../../external/gs_tools/src/inject';
+import {Menu} from '../tool/menu';
+import {MenuContainer} from '../tool/menu-container';
 import {Templates} from '../../external/gs_tools/src/webc';
 import {Theme} from '../theming/theme';
 import {ThemeService} from '../theming/theme-service';
@@ -12,6 +14,8 @@ import {ThemeService} from '../theming/theme-service';
 const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   BasicButton,
   Icon,
+  Menu,
+  MenuContainer,
 ];
 
 const DEFAULT_THEME_: Theme = Theme.newInstance(
@@ -38,6 +42,7 @@ export class Main {
       [/rgba\(44,44,44/g, 'rgba(var(--gsRgbAccent)'],
     ]));
     Injector.bindProvider(() => document, 'x.dom.document');
+    Injector.bindProvider(() => window, 'x.dom.window');
     Injector.bindProvider(() => templates, 'x.gs_tools.templates');
     let injector = Injector.newInstance();
     let registrar = ElementRegistrar.newInstance(injector, templates);

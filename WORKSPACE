@@ -21,6 +21,13 @@ new_local_repository(
     build_file = "node_modules/gs-tools/bazel/ts/typescript.BUILD",
 )
 
+# Web Animations Polyfill
+new_local_repository(
+    name = "web_animations_js",
+    path = "./node_modules/web-animations-js",
+    build_file = "web_animations_js.BUILD",
+)
+
 new_local_repository(
     name = "webpack",
     path = "./node_modules/webpack",

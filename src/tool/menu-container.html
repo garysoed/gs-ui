@@ -1,0 +1,27 @@
+<style>
+  .root {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--gsZIndexMenuBackdrop);
+  }
+
+  .root.show {
+    display: block;
+  }
+
+  .container {
+    position: fixed;
+    overflow: hidden;
+    box-shadow: var(--gsBoxShadowAbove);
+  }
+</style>
+
+<div class="root">
+  <div class="container">
+    <content select=".gs-content"></content>
+  </div>
+</div>

@@ -39,6 +39,7 @@ describe('bootstrap.Main', () => {
       expect(mockRegistrar.register).toHaveBeenCalled();
       expect(ElementRegistrar.newInstance).toHaveBeenCalledWith(mockInjector, templates);
       expect(TestInject.getBoundValue('x.dom.document')()).toEqual(document);
+      expect(TestInject.getBoundValue('x.dom.window')()).toEqual(window);
       expect(TestInject.getBoundValue('x.gs_tools.templates')()).toEqual(templates);
 
       expect(Templates.newInstance).toHaveBeenCalledWith(jasmine.any(Map));

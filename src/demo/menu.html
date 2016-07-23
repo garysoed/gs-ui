@@ -17,16 +17,28 @@
   <body>
     <template id="template">
       <gs-basic-button>
-        <div class="content">Normal Button</div>
+        <gs-icon class="content">settings</gs-icon>
+        <gs-menu>
+          <div class="content">Menu content</div>
+        </gs-menu>
       </gs-basic-button>
       <gs-basic-button disabled>
-        <div class="content">Disabled Button</div>
+        <gs-icon class="content">settings</gs-icon>
+        <gs-menu>
+          <div class="content">Menu content</div>
+        </gs-menu>
       </gs-basic-button>
       <gs-basic-button class="gs-primary">
-        <div class="content">Primary Button</div>
+        <gs-icon class="content">settings</gs-icon>
+        <gs-menu>
+          <div class="content">Menu content</div>
+        </gs-menu>
       </gs-basic-button>
       <gs-basic-button class="gs-primary" disabled>
-        <div class="content">Disabled Primary Button</div>
+        <gs-icon class="content">settings</gs-icon>
+        <gs-menu>
+          <div class="content">Menu content</div>
+        </gs-menu>
       </gs-basic-button>
     </template>
 
@@ -40,6 +52,9 @@
         <section class="cell gs-theme-invert gs-hilite"></section>
       </section>
     </section>
+    <gs-menu-container gs-anchor-point="bottom_right" gs-anchor-target-x="100" gs-anchor-target-y="100">
+      <div class="gs-content" style="background-color: green; width: 50px; height: 50px;"></div>
+    </gs-menu-container>
     <script>
       var templateEl = document.querySelector('#template');
       document.querySelectorAll('section.cell').forEach(function(el) {

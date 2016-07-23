@@ -52,10 +52,11 @@ filegroup(
 genrule(
     name = "pack",
     srcs = [
+        "@web_animations_js//:next",
         "//:pack_js",
         "//:pack_template",
         "//src/theming:theme-style_templatepack",
     ],
     outs = ["pack.js"],
-    cmd = "cat $(SRCS) > $@",
+    cmd = "awk 'FNR==1{print \"\"}1' $(SRCS) > $@",
 )

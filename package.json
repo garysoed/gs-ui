@@ -18,6 +18,7 @@
   "homepage": "https://github.com/garysoed/gs-ui#readme",
   "dependencies": {
     "gs-tools": "garysoed/gs-tools",
+    "web-animations-js": "^2.2.1",
     "x-tag": "^1.5.11"
   },
   "devDependencies": {
