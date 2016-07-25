@@ -13,8 +13,11 @@ export const AnchorLocationParser: IAttributeParser<AnchorLocation> = {
    * @param stringValue The string to parse.
    * @return The anchor location corresponding to the string.
    */
-  parse(stringValue: string): AnchorLocation | null {
-    let parsedValue = Enums.fromLowerCaseString<AnchorLocation>(stringValue, AnchorLocation);
+  parse(stringValue: string | null): AnchorLocation | null {
+    if (stringValue === null) {
+      return null;
+    }
+    let parsedValue = Enums.fromLowerCaseString<AnchorLocation>(stringValue!, AnchorLocation);
     return parsedValue === undefined ? null : parsedValue;
   },
 

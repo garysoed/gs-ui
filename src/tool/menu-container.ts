@@ -6,6 +6,7 @@ import {
   BaseElement,
   CustomElement,
   FloatParser} from '../../external/gs_tools/src/webc';
+import {Anchors} from './anchors';
 import {DomEvent, ListenableDom} from '../../external/gs_tools/src/event';
 import {Inject} from '../../external/gs_tools/src/inject';
 import {Jsons} from '../../external/gs_tools/src/collection';
@@ -21,6 +22,9 @@ import {Jsons} from '../../external/gs_tools/src/collection';
   templateKey: 'src/tool/menu-container',
 })
 export class MenuContainer extends BaseElement {
+  static HIDE_EVENT: string = 'gs-hide';
+  static SHOW_EVENT: string = 'gs-show';
+
   private static BASE_SHOW_ANIMATION_: Animation = Animation.newInstance(
       [
         {height: '0px', opacity: 0, width: '0px'},
@@ -36,15 +40,19 @@ export class MenuContainer extends BaseElement {
 
   private static SHOW_CLASS_: string = 'show';
 
-  private containerEl_: HTMLElement;
-  private contentEl_: HTMLElement;
-  private document_: Document;
-  private element_: HTMLElement;
-  private rootEl_: HTMLElement;
+  private backdropEl_: ListenableDom<HTMLElement>;
+  private containerEl_: ListenableDom<HTMLElement>;
+  private contentEl_: ListenableDom<HTMLElement>;
+  private document_: ListenableDom<Document>;
+  private element_: ListenableDom<HTMLElement>;
+  private rootEl_: ListenableDom<HTMLElement>;
+  private windowEl_: ListenableDom<Window>;
 
   constructor(
-      @Inject('x.dom.window') private windowEl_: Window = window) {
+      @Inject('x.dom.window') windowEl: Window = window) {
     super();
+    this.windowEl_ = ListenableDom.of(windowEl);
+    this.addDisposable(this.windowEl_);
   }
 
   /**
@@ -56,26 +64,15 @@ export class MenuContainer extends BaseElement {
    * @return The anchor point based on the attribute set in the element.
    */
   private getAnchorPoint_(): AnchorLocation {
-    let anchorPoint = this.element_['gsAnchorPoint'];
-    if (this.element_['gsAnchorPoint'] !== AnchorLocation.AUTO) {
+    let element = this.element_.eventTarget;
+    let anchorPoint = element['gsAnchorPoint'];
+    if (element['gsAnchorPoint'] !== AnchorLocation.AUTO) {
       return anchorPoint;
-    }
-
-    let normalizedX = this.element_['gsAnchorTargetX'] / this.document_.documentElement.clientWidth;
-    let normalizedY = this.element_['gsAnchorTargetY'] /
-        this.document_.documentElement.clientHeight;
-    if (normalizedX > 0.5) {
-      if (normalizedY > 0.5) {
-        return AnchorLocation.BOTTOM_RIGHT;
-      } else {
-        return AnchorLocation.TOP_RIGHT;
-      }
     } else {
-      if (normalizedY > 0.5) {
-        return AnchorLocation.BOTTOM_LEFT;
-      } else {
-        return AnchorLocation.TOP_LEFT;
-      }
+      return Anchors.resolveAutoLocation(
+          element['gsAnchorTargetX'],
+          element['gsAnchorTargetY'],
+          this.windowEl_.eventTarget);
     }
   }
 
@@ -83,15 +80,24 @@ export class MenuContainer extends BaseElement {
    * Hides the menu container.
    */
   private hide_(): void {
-    let animate = MenuContainer.HIDE_ANIMATION_.applyTo(this.containerEl_);
+    let animate = MenuContainer.HIDE_ANIMATION_.applyTo(this.containerEl_.eventTarget);
     let listenableAnimate = ListenableDom.of(animate);
     this.addDisposable(listenableAnimate);
-    this.addDisposable(listenableAnimate
-        .once(
-            DomEvent.FINISH,
-            () => {
-              this.rootEl_.classList.remove(MenuContainer.SHOW_CLASS_);
-            }));
+
+    this.element_.dispatch(
+        MenuContainer.HIDE_EVENT,
+        () => {
+          this.addDisposable(listenableAnimate
+              .once(
+                  DomEvent.FINISH,
+                  () => {
+                    this.rootEl_.eventTarget.classList.remove(MenuContainer.SHOW_CLASS_);
+                  }));
+        });
+  }
+
+  private onBackdropClick_(): void {
+    this.hide_();
   }
 
   /**
@@ -107,7 +113,7 @@ export class MenuContainer extends BaseElement {
   private show_(): void {
     let contentHeight = 0;
     let contentWidth = 0;
-    let distributedNodes = this.contentEl_.getDistributedNodes();
+    let distributedNodes = this.contentEl_.eventTarget.getDistributedNodes();
     if (distributedNodes.length <= 0) {
       return;
     }
@@ -115,7 +121,7 @@ export class MenuContainer extends BaseElement {
 
     // Temporarily displays the root element for measurement.
     Jsons.setTemporaryValue(
-        this.rootEl_,
+        this.rootEl_.eventTarget,
         {
           'style.display': 'block',
           'style.visibility': 'hidden',
@@ -124,19 +130,28 @@ export class MenuContainer extends BaseElement {
           contentHeight = distributedElement.clientHeight;
           contentWidth = distributedElement.clientWidth;
         });
-    MenuContainer.BASE_SHOW_ANIMATION_
-        .appendKeyframe({height: `${contentHeight}px`, opacity: 1, width: `${contentWidth}px`})
-        .applyTo(this.containerEl_);
 
-    this.rootEl_.classList.add(MenuContainer.SHOW_CLASS_);
+    this.element_.dispatch(
+        MenuContainer.SHOW_EVENT,
+        () => {
+          MenuContainer.BASE_SHOW_ANIMATION_
+              .appendKeyframe({
+                height: `${contentHeight}px`,
+                opacity: 1,
+                width: `${contentWidth}px`,
+              })
+              .applyTo(this.containerEl_.eventTarget);
+
+          this.rootEl_.eventTarget.classList.add(MenuContainer.SHOW_CLASS_);
+        });
   }
 
   /**
    * Resets the location of the container element based on the anchor point and the anchor target.
    */
   private updateContent_(): void {
-    let anchorTargetX = this.element_['gsAnchorTargetX'];
-    let anchorTargetY = this.element_['gsAnchorTargetY'];
+    let anchorTargetX = this.element_.eventTarget['gsAnchorTargetX'];
+    let anchorTargetY = this.element_.eventTarget['gsAnchorTargetY'];
 
     if (anchorTargetX === null || anchorTargetY === null) {
       // Do nothing if the anchor target is not defined.
@@ -144,24 +159,26 @@ export class MenuContainer extends BaseElement {
     }
 
     // Resets the location of the container.
-    this.containerEl_.style.top = '';
-    this.containerEl_.style.right = '';
-    this.containerEl_.style.bottom = '';
-    this.containerEl_.style.left = '';
+    let containerEl = this.containerEl_.eventTarget;
+    containerEl.style.top = '';
+    containerEl.style.right = '';
+    containerEl.style.bottom = '';
+    containerEl.style.left = '';
 
-    let viewportHeight = this.windowEl_.innerHeight;
-    let viewportWidth = this.windowEl_.innerWidth;
+    let windowEl = this.windowEl_.eventTarget;
+    let viewportHeight = windowEl.innerHeight;
+    let viewportWidth = windowEl.innerWidth;
     let anchorPoint = this.getAnchorPoint_();
 
     // Vertical offset
     switch (anchorPoint) {
       case AnchorLocation.BOTTOM_LEFT:
       case AnchorLocation.BOTTOM_RIGHT:
-        this.containerEl_.style.bottom = `${viewportHeight - anchorTargetY}px`;
+        containerEl.style.bottom = `${Math.max(viewportHeight - anchorTargetY, 0)}px`;
         break;
       case AnchorLocation.TOP_LEFT:
       case AnchorLocation.TOP_RIGHT:
-        this.containerEl_.style.top = `${anchorTargetY}px`;
+        containerEl.style.top = `${Math.max(anchorTargetY, 0)}px`;
         break;
     }
 
@@ -169,11 +186,11 @@ export class MenuContainer extends BaseElement {
     switch (anchorPoint) {
       case AnchorLocation.BOTTOM_LEFT:
       case AnchorLocation.TOP_LEFT:
-        this.containerEl_.style.left = `${anchorTargetX}px`;
+        containerEl.style.left = `${Math.max(anchorTargetX, 0)}px`;
         break;
       case AnchorLocation.BOTTOM_RIGHT:
       case AnchorLocation.TOP_RIGHT:
-        this.containerEl_.style.right = `${viewportWidth - anchorTargetX}px`;
+        containerEl.style.right = `${Math.max(viewportWidth - anchorTargetX, 0)}px`;
         break;
     }
   }
@@ -195,23 +212,38 @@ export class MenuContainer extends BaseElement {
    * @override
    */
   onCreated(element: HTMLElement): void {
-    this.containerEl_ = <HTMLElement> element.shadowRoot.querySelector('.container');
-    this.contentEl_ = <HTMLElement> element.shadowRoot.querySelector('content');
-    this.document_ = element.ownerDocument;
-    this.element_ = element;
-    this.rootEl_ = <HTMLElement> element.shadowRoot.querySelector('.root');
+    this.backdropEl_ = ListenableDom.of(
+        <HTMLElement> element.shadowRoot.querySelector('.backdrop'));
+    this.containerEl_ = ListenableDom.of(
+        <HTMLElement> element.shadowRoot.querySelector('.container'));
+    this.contentEl_ = ListenableDom.of(
+        <HTMLElement> element.shadowRoot.querySelector('content'));
+    this.document_ = ListenableDom.of(element.ownerDocument);
+    this.element_ = ListenableDom.of(element);
+    this.rootEl_ = ListenableDom.of(<HTMLElement> element.shadowRoot.querySelector('.root'));
+
+    this.addDisposable(
+        this.backdropEl_,
+        this.containerEl_,
+        this.contentEl_,
+        this.document_,
+        this.element_,
+        this.rootEl_);
 
     element['hide'] = this.hide_.bind(this);
     element['show'] = this.show_.bind(this);
+
+    if (element['gsAnchorPoint'] === null) {
+      element['gsAnchorPoint'] = AnchorLocation.AUTO;
+    }
   }
 
   /**
    * @override
    */
   onInserted(): void {
-    let listenableWindow = ListenableDom.of(this.windowEl_);
-    this.addDisposable(listenableWindow);
-    this.addDisposable(listenableWindow.on(DomEvent.RESIZE, this.onWindowResize_.bind(this)));
+    this.addDisposable(this.windowEl_.on(DomEvent.RESIZE, this.onWindowResize_.bind(this)));
+    this.addDisposable(this.backdropEl_.on(DomEvent.CLICK, this.onBackdropClick_.bind(this)));
     this.updateContent_();
   }
 }

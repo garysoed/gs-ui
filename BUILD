@@ -37,6 +37,7 @@ test_suite(
         "//src/bootstrap:test",
         "//src/button:test",
         "//src/theming:test",
+        "//src/tool:test",
     ]
 )
 

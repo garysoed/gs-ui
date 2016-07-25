@@ -13,6 +13,14 @@
     display: block;
   }
 
+  .backdrop {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
   .container {
     position: fixed;
     overflow: hidden;
@@ -21,6 +29,7 @@
 </style>
 
 <div class="root">
+  <div class="backdrop"></div>
   <div class="container">
     <content select=".gs-content"></content>
   </div>

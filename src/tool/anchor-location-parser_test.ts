@@ -6,13 +6,17 @@ import {AnchorLocationParser} from './anchor-location-parser';
 
 
 describe('tool.AnchorLocationParser', () => {
-  describe('parser', () => {
+  describe('parse', () => {
     it('should return the correct enum', () => {
       expect(AnchorLocationParser.parse('bottom_right')).toEqual(AnchorLocation.BOTTOM_RIGHT);
     });
 
     it('should return null if the string is invalid', () => {
       expect(AnchorLocationParser.parse('invalid')).toEqual(null);
+    });
+
+    it('should return null if the string is null', () => {
+      expect(AnchorLocationParser.parse(null)).toEqual(null);
     });
   });
 

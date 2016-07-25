@@ -15,7 +15,8 @@
         "suppressImplicitAnyIndexErrors": true,
         "outDir": "out/",
         "rootDir": "./",
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "strictNullChecks": true
     },
     "exclude": [
     ],

@@ -2,6 +2,7 @@ import {TestBase} from '../test-base';
 TestBase.setup();
 
 import {AnchorLocation} from './anchor-location';
+import {Anchors} from './anchors';
 import {DomEvent, ListenableDom} from '../../external/gs_tools/src/event';
 import {Jsons} from '../../external/gs_tools/src/collection';
 import {MenuContainer} from './menu-container';
@@ -21,102 +22,80 @@ describe('tool.MenuContainer', () => {
   });
 
   describe('getAnchorPoint_', () => {
-    let containerEl;
-    let document;
-    let element;
+    it('should return the location resolved by Anchors if the anchor point is AUTO', () => {
+      let anchorTargetX = 12;
+      let anchorTargetY = 34;
 
-    beforeEach(() => {
-      containerEl = Mocks.object('containerEl');
-      document = Mocks.object('document');
-      element = Mocks.object('element');
-
-      container['containerEl_'] = containerEl;
-      container['document_'] = document;
-      container['element_'] = element;
-    });
-
-    it('should return TOP_LEFT if the anchor target is at the top left of the screen', () => {
-      document.documentElement = {
-        clientHeight: 100,
-        clientWidth: 100,
-      };
+      let element = Mocks.object('element');
       element['gsAnchorPoint'] = AnchorLocation.AUTO;
-      element['gsAnchorTargetX'] = 25;
-      element['gsAnchorTargetY'] = 25;
+      element['gsAnchorTargetX'] = anchorTargetX;
+      element['gsAnchorTargetY'] = anchorTargetY;
+      container['element_'] = {eventTarget: element};
 
-      expect(container['getAnchorPoint_']()).toEqual(AnchorLocation.TOP_LEFT);
+      let window = Mocks.object('window');
+      container['windowEl_'] = {eventTarget: window};
+
+      let anchorLocation = AnchorLocation.TOP_LEFT;
+      spyOn(Anchors, 'resolveAutoLocation').and.returnValue(anchorLocation);
+
+      expect(container['getAnchorPoint_']()).toEqual(anchorLocation);
+      expect(Anchors.resolveAutoLocation)
+          .toHaveBeenCalledWith(anchorTargetX, anchorTargetY, window);
     });
-
-    it('should return TOP_RIGHT if the anchor target is at the top right of the screen', () => {
-      document.documentElement = {
-        clientHeight: 100,
-        clientWidth: 100,
-      };
-      element['gsAnchorPoint'] = AnchorLocation.AUTO;
-      element['gsAnchorTargetX'] = 75;
-      element['gsAnchorTargetY'] = 25;
-
-      expect(container['getAnchorPoint_']()).toEqual(AnchorLocation.TOP_RIGHT);
-    });
-
-    it('should return BOTTOM_RIGHT if the anchor target is at the bottom right of the screen',
-        () => {
-          document.documentElement = {
-            clientHeight: 100,
-            clientWidth: 100,
-          };
-          element['gsAnchorPoint'] = AnchorLocation.AUTO;
-          element['gsAnchorTargetX'] = 75;
-          element['gsAnchorTargetY'] = 75;
-
-          expect(container['getAnchorPoint_']()).toEqual(AnchorLocation.BOTTOM_RIGHT);
-        });
-
-    it('should return BOTTOM_LEFT if the anchor target is at the bottom left of the screen',
-        () => {
-          document.documentElement = {
-            clientHeight: 100,
-            clientWidth: 100,
-          };
-          element['gsAnchorPoint'] = AnchorLocation.AUTO;
-          element['gsAnchorTargetX'] = 25;
-          element['gsAnchorTargetY'] = 75;
-
-          expect(container['getAnchorPoint_']()).toEqual(AnchorLocation.BOTTOM_LEFT);
-        });
 
     it('should return the set anchor point if it is not AUTO', () => {
+      let element = Mocks.object('element');
       element['gsAnchorPoint'] = AnchorLocation.TOP_RIGHT;
+      container['element_'] = {eventTarget: element};
 
       expect(container['getAnchorPoint_']()).toEqual(AnchorLocation.TOP_RIGHT);
     });
   });
 
   describe('hide_', () => {
-    it('should play the hide animation and remove the "show" class', () => {
-      let mockClassList = jasmine.createSpyObj('ClassList', ['remove']);
-      let rootEl = Mocks.object('rootEl');
-      rootEl.classList = mockClassList;
-      container['rootEl_'] = rootEl;
+    it('should play the hide animation, remove the "show" class, and dispatches the HIDE event',
+        () => {
+          let mockClassList = jasmine.createSpyObj('ClassList', ['remove']);
+          let rootEl = Mocks.object('rootEl');
+          rootEl.classList = mockClassList;
+          container['rootEl_'] = {eventTarget: rootEl};
 
-      let containerEl = Mocks.object('containerEl');
-      container['containerEl_'] = containerEl;
+          let containerEl = Mocks.object('containerEl');
+          container['containerEl_'] = {eventTarget: containerEl};
 
-      let animate = Mocks.object('animate');
-      spyOn(MenuContainer['HIDE_ANIMATION_'], 'applyTo').and.returnValue(animate);
+          let animate = Mocks.object('animate');
+          spyOn(MenuContainer['HIDE_ANIMATION_'], 'applyTo').and.returnValue(animate);
 
-      let mockListenableDom = jasmine.createSpyObj('ListenableDom', ['dispose', 'once']);
-      mockListenableDom.once.and.returnValue(Mocks.disposable('ListenableDom.once'));
-      spyOn(ListenableDom, 'of').and.returnValue(mockListenableDom);
+          let mockListenableAnimate =
+              jasmine.createSpyObj('ListenableAnimate', ['dispose', 'once']);
+          mockListenableAnimate.once.and.returnValue(Mocks.disposable('ListenableAnimate.once'));
+          spyOn(ListenableDom, 'of').and.returnValue(mockListenableAnimate);
 
-      container['hide_']();
+          let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['dispatch']);
+          container['element_'] = mockListenableElement;
 
-      expect(MenuContainer['HIDE_ANIMATION_'].applyTo).toHaveBeenCalledWith(containerEl);
-      expect(ListenableDom.of).toHaveBeenCalledWith(animate);
-      expect(mockListenableDom.once).toHaveBeenCalledWith(DomEvent.FINISH, jasmine.any(Function));
+          container['hide_']();
 
-      mockListenableDom['once'].calls.argsFor(0)[1]();
-      expect(mockClassList.remove).toHaveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
+          expect(mockListenableElement.dispatch).toHaveBeenCalledWith(
+              MenuContainer.HIDE_EVENT,
+              jasmine.any(Function));
+          mockListenableElement.dispatch.calls.argsFor(0)[1]();
+
+          expect(mockListenableAnimate.once)
+              .toHaveBeenCalledWith(DomEvent.FINISH, jasmine.any(Function));
+          mockListenableAnimate['once'].calls.argsFor(0)[1]();
+          expect(mockClassList.remove).toHaveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
+
+          expect(MenuContainer['HIDE_ANIMATION_'].applyTo).toHaveBeenCalledWith(containerEl);
+          expect(ListenableDom.of).toHaveBeenCalledWith(animate);
+        });
+      });
+
+  describe('onBackdropClick_', () => {
+    it('should hide the menu', () => {
+      spyOn(container, 'hide_');
+      container['onBackdropClick_']();
+      expect(container['hide_']).toHaveBeenCalledWith();
     });
   });
 
@@ -131,20 +110,23 @@ describe('tool.MenuContainer', () => {
   describe('show_', () => {
     let containerEl;
     let mockContentEl;
+    let mockListenableElement;
     let rootEl;
 
     beforeEach(() => {
       containerEl = Mocks.object('containerEl');
+      mockListenableElement = jasmine.createSpyObj('ListenableElement', ['dispatch']);
       mockContentEl = jasmine.createSpyObj('ContentEl', ['getDistributedNodes']);
       rootEl = Mocks.object('rootEl');
 
-      container['containerEl_'] = containerEl;
-      container['contentEl_'] = mockContentEl;
-      container['rootEl_'] = rootEl;
+      container['containerEl_'] = {eventTarget: containerEl};
+      container['contentEl_'] = {eventTarget: mockContentEl};
+      container['element_'] = mockListenableElement;
+      container['rootEl_'] = {eventTarget: rootEl};
     });
 
-    it('should measure the size of the first distributed element, play the show animation, and ' +
-        'add the "show" class',
+    it('should measure the size of the first distributed element, play the show animation, add ' +
+        'the "show" class, and dispatch the show event.',
         () => {
           let height = 123;
           let width = 456;
@@ -167,6 +149,11 @@ describe('tool.MenuContainer', () => {
 
           container['show_']();
 
+          expect(mockListenableElement.dispatch).toHaveBeenCalledWith(
+              MenuContainer.SHOW_EVENT,
+              jasmine.any(Function));
+
+          mockListenableElement.dispatch.calls.argsFor(0)[1]();
           expect(mockClassList.add).toHaveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
           expect(mockAnimation.applyTo).toHaveBeenCalledWith(containerEl);
           expect(MenuContainer['BASE_SHOW_ANIMATION_'].appendKeyframe).toHaveBeenCalledWith(
@@ -174,6 +161,7 @@ describe('tool.MenuContainer', () => {
                 height: `${height}px`,
                 width: `${width}px`,
               }));
+
           expect(Jsons.setTemporaryValue).toHaveBeenCalledWith(
               rootEl,
               {
@@ -203,8 +191,8 @@ describe('tool.MenuContainer', () => {
       containerEl.style = {};
       element = Mocks.object('element');
 
-      container['containerEl_'] = containerEl;
-      container['element_'] = element;
+      container['containerEl_'] = {eventTarget: containerEl};
+      container['element_'] = {eventTarget: element};
     });
 
     it('should set the location of the container element correctly for TOP_LEFT anchor point',
@@ -314,6 +302,7 @@ describe('tool.MenuContainer', () => {
 
   describe('onCreated', () => {
     it('should initialize correctly', () => {
+      let backdropEl = Mocks.object('backdropEl');
       let containerEl = Mocks.object('containerEl');
       let contentEl = Mocks.object('contentEl');
       let document = Mocks.object('document');
@@ -322,6 +311,8 @@ describe('tool.MenuContainer', () => {
       let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.callFake((query: string) => {
         switch (query) {
+          case '.backdrop':
+            return backdropEl;
           case '.container':
             return containerEl;
           case '.root':
@@ -335,43 +326,72 @@ describe('tool.MenuContainer', () => {
       let element = Mocks.object('element');
       element.ownerDocument = document;
       element.shadowRoot = mockShadowRoot;
+      element['gsAnchorPoint'] = null;
 
       spyOn(container, 'hide_');
       spyOn(container, 'show_');
 
       container.onCreated(element);
 
-      expect(container['containerEl_']).toEqual(containerEl);
-      expect(container['contentEl_']).toEqual(contentEl);
-      expect(container['document_']).toEqual(document);
-      expect(container['element_']).toEqual(element);
-      expect(container['rootEl_']).toEqual(rootEl);
+      expect(container['backdropEl_'].eventTarget).toEqual(backdropEl);
+      expect(container['containerEl_'].eventTarget).toEqual(containerEl);
+      expect(container['contentEl_'].eventTarget).toEqual(contentEl);
+      expect(container['document_'].eventTarget).toEqual(document);
+      expect(container['element_'].eventTarget).toEqual(element);
+      expect(container['rootEl_'].eventTarget).toEqual(rootEl);
 
       element.hide();
       expect(container['hide_']).toHaveBeenCalledWith();
 
       element.show();
       expect(container['show_']).toHaveBeenCalledWith();
+
+      expect(element['gsAnchorPoint']).toEqual(AnchorLocation.AUTO);
+    });
+
+    it('should use the existing anchor point if given', () => {
+      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
+      mockShadowRoot.querySelector.and.returnValue(Mocks.object('queryResult'));
+
+      let anchorPoint = AnchorLocation.BOTTOM_RIGHT;
+      let element = Mocks.object('element');
+      element.ownerDocument = Mocks.object('document');
+      element.shadowRoot = mockShadowRoot;
+      element['gsAnchorPoint'] = anchorPoint;
+
+      container.onCreated(element);
+
+      expect(element['gsAnchorPoint']).toEqual(anchorPoint);
     });
   });
 
   describe('onInserted', () => {
     it('should listen to window resize event and update the content', () => {
-      let mockListenableDom = jasmine.createSpyObj('ListenableDom', ['dispose', 'on']);
-      mockListenableDom.on.and.returnValue(Mocks.disposable('ListenableDom.on'));
-      spyOn(ListenableDom, 'of').and.returnValue(mockListenableDom);
+      let mockListenableWindow = jasmine.createSpyObj('ListenableWindow', ['on']);
+      mockListenableWindow.on.and.returnValue(Mocks.disposable('ListenableWindow.on'));
+      container['windowEl_'] = mockListenableWindow;
 
+      let mockListenableBackdrop = jasmine.createSpyObj('ListenableBackdrop', ['on']);
+      mockListenableBackdrop.on.and.returnValue(Mocks.disposable('ListenableBackdrop.on'));
+      container['backdropEl_'] = mockListenableBackdrop;
+
+      spyOn(container, 'onBackdropClick_');
       spyOn(container, 'onWindowResize_');
       spyOn(container, 'updateContent_');
 
       container.onInserted();
 
       expect(container['updateContent_']).toHaveBeenCalledWith();
-      expect(mockListenableDom.on).toHaveBeenCalledWith(DomEvent.RESIZE, jasmine.any(Function));
-      mockListenableDom.on.calls.argsFor(0)[1]();
-      expect(container['onWindowResize_']).toHaveBeenCalledWith();
 
-      expect(ListenableDom.of).toHaveBeenCalledWith(window);
+      expect(mockListenableBackdrop.on)
+          .toHaveBeenCalledWith(DomEvent.CLICK, jasmine.any(Function));
+      mockListenableBackdrop.on.calls.argsFor(0)[1]();
+      expect(container['onBackdropClick_']).toHaveBeenCalledWith();
+
+      expect(mockListenableWindow.on)
+          .toHaveBeenCalledWith(DomEvent.RESIZE, jasmine.any(Function));
+      mockListenableWindow.on.calls.argsFor(0)[1]();
+      expect(container['onWindowResize_']).toHaveBeenCalledWith();
     });
   });
 });
