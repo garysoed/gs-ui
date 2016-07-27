@@ -1,0 +1,76 @@
+<html>
+  <head>
+    <script src="../../node_modules/x-tag/src/core.js"></script>
+    <script src="../../bazel-genfiles/pack.js"></script>
+    <style>
+      .cell {
+        display: flex;
+        justify-content: center;
+      }
+
+      .menu-content {
+        background-color: white;
+        box-sizing: border-box;
+        padding: 1rem;
+        width: 10rem;
+      }
+
+      gs-basic-button > div {
+        width: 6rem;
+      }
+    </style>
+  </head>
+  <body>
+    <template id="template">
+      <gs-horizontal-tab gs-selected-tab="tab2">
+        <gs-basic-button gs-tab-id="tab1">
+          <div class="gs-content">Tab 1</div>
+        </gs-basic-button>
+        <gs-basic-button gs-tab-id="tab2">
+          <div class="gs-content">Tab 2</div>
+        </gs-basic-button>
+        <gs-basic-button gs-tab-id="tab3">
+          <div class="gs-content">Tab 3</div>
+        </gs-basic-button>
+        <gs-basic-button gs-tab-id="tab3" disabled>
+          <div class="gs-content">Disabled tab</div>
+        </gs-basic-button>
+      </gs-horizontal-tab>
+    </template>
+
+    <section>
+      <section class="cell gs-theme-normal"></section>
+      <section class="cell gs-theme-normal gs-hilite"></section>
+      <section class="cell gs-theme-invert"></section>
+      <section class="cell gs-theme-invert gs-hilite"></section>
+    </section>
+    <gs-menu-container gs-anchor-point="bottom_right" gs-anchor-target-x="100" gs-anchor-target-y="100">
+    </gs-menu-container>
+    <script>
+      var templateEl = document.querySelector('#template');
+      document.querySelectorAll('section.cell').forEach(function(el) {
+        el.innerHTML = templateEl.innerHTML;
+      });
+
+      var url = new URL(window.location);
+      var themeStr = url.searchParams.get('theme');
+      var theme = undefined;
+      if (!!themeStr) {
+        var parts = themeStr.split('-');
+        theme = gs.ui.Theme.newInstance(
+            gs.ui.DefaultPalettes[parts[0]],
+            gs.ui.DefaultPalettes[parts[1]]);
+      }
+
+      // Program the tabs.
+      var tabs = document.querySelectorAll('gs-horizontal-tab');
+      tabs.forEach(function(tab) {
+        tab.addEventListener('gse-action', function(event) {
+          tab.gsSelectedTab = event.target.getAttribute('gs-tab-id');
+        });
+      });
+
+      gs.ui.Main.newInstance().bootstrap(theme);
+    </script>
+  </body>
+</html>

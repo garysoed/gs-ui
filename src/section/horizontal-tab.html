@@ -1,0 +1,29 @@
+<style>
+  content::content > * {
+    display: inline-block;
+  }
+
+  .highlight-container {
+    height: .4rem;
+    position: relative;
+  }
+
+  .highlight {
+    background-color: rgb(var(--gsRgbAccent));
+    height: .4rem;
+    position: absolute;
+  }
+
+  .root {
+    display: inline-block;
+    position: relative;
+  }
+</style>
+<div class="root">
+  <div>
+    <content select="[gs-tab-id]"></content>
+  </div>
+  <div class="highlight-container">
+    <div class="highlight"></div>
+  </div>
+</div>

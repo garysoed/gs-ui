@@ -2,6 +2,7 @@ import {Arrays} from '../../external/gs_tools/src/collection';
 import {BasicButton} from '../button/basic-button';
 import {BaseElement, ElementRegistrar} from '../../external/gs_tools/src/webc';
 import {DefaultPalettes} from './default-palettes';
+import {HorizontalTab} from '../section/horizontal-tab';
 import {Icon} from '../tool/icon';
 import {Injector} from '../../external/gs_tools/src/inject';
 import {Menu} from '../tool/menu';
@@ -13,6 +14,7 @@ import {ThemeService} from '../theming/theme-service';
 
 const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   BasicButton,
+  HorizontalTab,
   Icon,
   Menu,
   MenuContainer,

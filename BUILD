@@ -36,6 +36,7 @@ test_suite(
     tests = [
         "//src/bootstrap:test",
         "//src/button:test",
+        "//src/section:test",
         "//src/theming:test",
         "//src/tool:test",
     ]
@@ -45,6 +46,7 @@ filegroup(
     name = "pack_template",
     srcs = [
         "//src/button:template",
+        "//src/section:template",
         "//src/theming:template",
         "//src/tool:template",
     ]
