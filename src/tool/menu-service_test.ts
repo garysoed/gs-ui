@@ -271,7 +271,7 @@ describe('tool.MenuService', () => {
             expect(Interval.newInstance)
                 .toHaveBeenCalledWith(MenuService['ANCHOR_TARGET_INTERVAL_']);
 
-            expect(mockMenu.querySelector).toHaveBeenCalledWith('.gs-content');
+            expect(mockMenu.querySelector).toHaveBeenCalledWith('[gs-content]');
             done();
           }, done.fail);
     });

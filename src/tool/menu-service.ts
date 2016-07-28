@@ -100,7 +100,7 @@ export class MenuService extends BaseDisposable {
       anchorElement: HTMLElement,
       anchorTarget: AnchorLocation,
       anchorPoint: AnchorLocation): Promise<void> {
-    let menuContent = menu.querySelector('.gs-content');
+    let menuContent = menu.querySelector('[gs-content]');
     if (menuContent === null) {
       return Promise.resolve();
     }
