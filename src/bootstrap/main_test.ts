@@ -11,13 +11,27 @@ import {ThemeService} from '../theming/theme-service';
 
 
 describe('bootstrap.Main', () => {
+  let mockThemeService;
+  let mockRegistrar;
   let main;
 
   beforeEach(() => {
-    main = new Main();
+    let injector = Mocks.object('injector');
+    mockThemeService = jasmine.createSpyObj('ThemeService', ['install']);
+    mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
+    main = new Main(injector, mockThemeService, mockRegistrar);
   });
 
   describe('bootstrap', () => {
+    it('should set up correctly', () => {
+      let theme = Mocks.object('theme');
+      main.bootstrap(theme);
+      expect(mockRegistrar.register).toHaveBeenCalled();
+      expect(mockThemeService.install).toHaveBeenCalledWith(theme);
+    });
+  });
+
+  describe('newInstance', () => {
     it('should set up correctly', () => {
       let templates = Mocks.object('templates');
       spyOn(Templates, 'newInstance').and.returnValue(templates);
@@ -27,16 +41,18 @@ describe('bootstrap.Main', () => {
       mockInjector.instantiate.and.returnValue(mockThemeService);
       spyOn(Injector, 'newInstance').and.returnValue(mockInjector);
 
-      let theme = Mocks.object('theme');
       let mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
 
       spyOn(ElementRegistrar, 'newInstance').and.returnValue(mockRegistrar);
-      main.bootstrap(theme);
 
-      expect(mockThemeService.install).toHaveBeenCalledWith(theme);
+      let main = Main.newInstance();
+
+      expect(main['injector_']).toEqual(mockInjector);
+      expect(main['themeService_']).toEqual(mockThemeService);
+      expect(main['registrar']).toEqual(mockRegistrar);
+
       expect(mockThemeService.initialize).toHaveBeenCalledWith();
       expect(mockInjector.instantiate).toHaveBeenCalledWith(ThemeService);
-      expect(mockRegistrar.register).toHaveBeenCalled();
       expect(ElementRegistrar.newInstance).toHaveBeenCalledWith(mockInjector, templates);
       expect(TestInject.getBoundValue('x.dom.document')()).toEqual(document);
       expect(TestInject.getBoundValue('x.dom.window')()).toEqual(window);

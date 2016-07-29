@@ -12,6 +12,54 @@
         flex: 1;
         padding: 1rem;
       }
+
+      .colorPicker {
+        bottom: 1rem;
+        position: fixed;
+        left: 1rem;
+      }
+
+      .colorPickerCell {
+        cursor: pointer;
+        height: 3rem;
+        width: 3rem;
+      }
+
+      .colorPickerCell[data-selected="true"] {
+        outline: 2px solid black;
+        outline-offset: -2px;
+      }
+
+      .colorPickerCell.base > div {
+        height: 0;
+        transition: all .3s;
+        user-select: none;
+      }
+
+      .colorPickerCell.base:hover > div {
+        height: 1rem;
+        transition: all .3s;
+      }
+
+      .colorPickerCell.base > div.light {
+        height: 1rem;
+        margin-top: 3rem;
+      }
+
+      .colorPickerCell.base:hover > div.light {
+        margin-top: 1rem;
+      }
+
+      .colorPickerMenu {
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .colorPickerMenu > div {
+        display: flex;
+        flex-direction: row;
+      }
     </style>
   </head>
   <body>
@@ -40,23 +88,93 @@
         <section class="cell gs-theme-invert gs-hilite"></section>
       </section>
     </section>
+
+    <gs-basic-button class="colorPicker gs-theme-normal">
+      <div gs-content><gs-icon>color_lens</gs-icon></div>
+      <gs-menu>
+        <div class="colorPickerMenu" gs-content></div>
+      </gs-menu>
+    </gs-basic-button>
+
     <script>
+      var base = 'crimson';
+      var accent = 'cerulian';
+
+      var colorPickerMenu = document.querySelector('.colorPickerMenu');
+      var palettes = [];
+      for (var name in gs.ui.DefaultPalettes) {
+        palettes.push({name: name, palette: gs.ui.DefaultPalettes[name]});
+      }
+      var main = gs.ui.Main.newInstance();
+
+      function updateTheme() {
+        var theme = gs.ui.Theme.newInstance(
+            gs.ui.DefaultPalettes[base],
+            gs.ui.DefaultPalettes[accent]);
+        main.setTheme(theme);
+      }
+
+      function updateCells() {
+        var cells = document.querySelectorAll('.colorPickerCell');
+        for (var i = 0; i < cells.length; i++) {
+          var cellEl = cells.item(i);
+          cellEl.setAttribute('data-selected', cellEl.getAttribute('data-name') === base);
+        }
+      }
+
+      function onClick(name) {
+        base = name;
+        updateCells();
+        updateTheme();
+        main.injector.getBoundValue('tool.MenuService').hideMenu();
+      }
+
+      // Create the base color picker.
+      for (var r = 0; r < 5; r++) {
+        var rowEl = document.createElement('div');
+        colorPickerMenu.appendChild(rowEl);
+        for (var c = 0; c < 5; c++) {
+          var i = r * 5 + c;
+          var palette = palettes[i].palette;
+          var name = palettes[i].name;
+
+          var normal = palette.normal;
+          var cellEl = document.createElement('div');
+          cellEl.style.backgroundColor =
+              'rgb(' + [normal.red, normal.green, normal.blue].join(',') +')';
+          cellEl.classList.add('colorPickerCell');
+          cellEl.classList.add('base');
+          cellEl.setAttribute('data-name', name);
+          cellEl.addEventListener('click', onClick.bind(null, name));
+
+          var dark = palette.dark;
+          var darkCell = document.createElement('div');
+          darkCell.style.backgroundColor =
+              'rgb(' + [dark.red, dark.green, dark.blue].join(',') + ')';
+          cellEl.appendChild(darkCell);
+
+          var light = palette.light;
+          var lightCell = document.createElement('div');
+          lightCell.style.backgroundColor =
+              'rgb(' + [light.red, light.green, light.blue].join(',') + ')';
+          lightCell.classList.add('light');
+          cellEl.appendChild(lightCell);
+
+          rowEl.appendChild(cellEl);
+        }
+      }
+
+      updateCells();
+
       var templateEl = document.querySelector('#template');
       document.querySelectorAll('section.cell').forEach(function(el) {
         el.innerHTML = templateEl.innerHTML;
       });
 
-      var url = new URL(window.location);
-      var themeStr = url.searchParams.get('theme');
-      var theme = undefined;
-      if (!!themeStr) {
-        var parts = themeStr.split('-');
-        theme = gs.ui.Theme.newInstance(
-            gs.ui.DefaultPalettes[parts[0]],
-            gs.ui.DefaultPalettes[parts[1]]);
-      }
-
-      gs.ui.Main.newInstance().bootstrap(theme);
+      var theme = gs.ui.Theme.newInstance(
+          gs.ui.DefaultPalettes[base],
+          gs.ui.DefaultPalettes[accent]);
+      main.bootstrap(theme);
     </script>
   </body>
 </html>

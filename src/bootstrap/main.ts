@@ -29,7 +29,10 @@ const DEFAULT_THEME_: Theme = Theme.newInstance(
  * Main entry class to the app.
  */
 export class Main {
-  constructor() { }
+  constructor(
+      private injector_: Injector,
+      private themeService_: ThemeService,
+      private registrar_: ElementRegistrar) { }
 
   /**
    * Bootstraps the app.
@@ -37,6 +40,26 @@ export class Main {
    * @param theme The theme to apply to the app.
    */
   bootstrap(theme: Theme = DEFAULT_THEME_): void {
+    Arrays.of(DEFAULT_ELEMENTS_)
+        .forEach((ctor: gs.ICtor<BaseElement>) => {
+          this.registrar_.register(ctor);
+        });
+
+    this.themeService_.install(theme);
+  }
+
+  get injector(): Injector {
+    return this.injector_;
+  }
+
+  setTheme(theme: Theme): void {
+    this.themeService_.install(theme);
+  }
+
+  /**
+   * Creates a new instance of the app.
+   */
+  static newInstance(): Main {
     let templates = Templates.newInstance(new Map<RegExp, string>([
       [/rgba\(11,11,11/g, 'rgba(var(--gsRgbBaseDark)'],
       [/rgba\(22,22,22/g, 'rgba(var(--gsRgbBaseNormal)'],
@@ -46,22 +69,13 @@ export class Main {
     Injector.bindProvider(() => document, 'x.dom.document');
     Injector.bindProvider(() => window, 'x.dom.window');
     Injector.bindProvider(() => templates, 'x.gs_tools.templates');
-    let injector = Injector.newInstance();
-    let registrar = ElementRegistrar.newInstance(injector, templates);
-    Arrays.of(DEFAULT_ELEMENTS_)
-        .forEach((ctor: gs.ICtor<BaseElement>) => {
-          registrar.register(ctor);
-        });
 
+    let injector = Injector.newInstance();
     let themeService = injector.instantiate<ThemeService>(ThemeService);
     themeService.initialize();
-    themeService.install(theme);
-  }
-
-  /**
-   * Creates a new instance of the app.
-   */
-  static newInstance(): Main {
-    return new Main();
+    return new Main(
+        injector,
+        themeService,
+        ElementRegistrar.newInstance(injector, templates));
   }
 }
