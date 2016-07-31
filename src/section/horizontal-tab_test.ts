@@ -17,6 +17,22 @@ describe('section.HorizontalTab', () => {
     TestDispose.add(tab);
   });
 
+  describe('onAction_', () => {
+    it('should update the selected tab', () => {
+      let attribute = 'attribute';
+      let mockTarget = jasmine.createSpyObj('Target', ['getAttribute']);
+      mockTarget.getAttribute.and.returnValue(attribute);
+
+      let element = Mocks.object('element');
+      tab['element_'] = {eventTarget: element};
+
+      tab['onAction_']({target: mockTarget});
+
+      expect(element['gsSelectedTab']).toEqual(attribute);
+      expect(mockTarget.getAttribute).toHaveBeenCalledWith('gs-tab-id');
+    });
+  });
+
   describe('onMutate_', () => {
     it('should update the highlight', () => {
       spyOn(tab, 'updateHighlight_');
@@ -34,7 +50,7 @@ describe('section.HorizontalTab', () => {
   });
 
   describe('setHighlight_', () => {
-    it('should update the highlight element correctly', () => {
+    it('should update the highlight element correctly', (done: any) => {
       let left = 12;
       let width = 34;
       let targetLeft = 56;
@@ -56,24 +72,27 @@ describe('section.HorizontalTab', () => {
       highlightEl.style = {};
       tab['highlightEl_'] = {eventTarget: highlightEl};
 
-      tab['setHighlight_'](targetLeft, targetWidth);
+      tab['setHighlight_'](targetLeft, targetWidth)
+          .then(() => {
+
+            expect(highlightEl.style).toEqual({left: `${targetLeft}px`, width: `${targetWidth}px`});
+            expect(tab['highlightLeft_']).toEqual(targetLeft);
+            expect(tab['highlightWidth_']).toEqual(targetWidth);
+
+            expect(ListenableDom.of).toHaveBeenCalledWith(animate);
+            expect(mockAnimation.applyTo).toHaveBeenCalledWith(highlightEl);
+            expect(Animation.newInstance).toHaveBeenCalledWith(
+                [
+                  {left: `${left}px`, width: `${width}px`},
+                  {left: `${targetLeft}px`, width: `${targetWidth}px`},
+                ],
+                jasmine.any(Object));
+            done();
+          }, done.fail);
 
       expect(mockListenableAnimate.once)
           .toHaveBeenCalledWith(DomEvent.FINISH, jasmine.any(Function));
       mockListenableAnimate.once.calls.argsFor(0)[1]();
-
-      expect(highlightEl.style).toEqual({left: `${targetLeft}px`, width: `${targetWidth}px`});
-      expect(tab['highlightLeft_']).toEqual(targetLeft);
-      expect(tab['highlightWidth_']).toEqual(targetWidth);
-
-      expect(ListenableDom.of).toHaveBeenCalledWith(animate);
-      expect(mockAnimation.applyTo).toHaveBeenCalledWith(highlightEl);
-      expect(Animation.newInstance).toHaveBeenCalledWith(
-          [
-            {left: `${left}px`, width: `${width}px`},
-            {left: `${targetLeft}px`, width: `${targetWidth}px`},
-          ],
-          jasmine.any(Object));
     });
 
     it('should set the left to the destination midpoint if the current width is 0', () => {
@@ -121,7 +140,7 @@ describe('section.HorizontalTab', () => {
   });
 
   describe('updateHighlight_', () => {
-    it('should grab the destination width and left correctly', () => {
+    it('should grab the destination width and left correctly', (done: any) => {
       let left = 12;
       let width = 34;
       let selectedId = 'selectedId';
@@ -135,15 +154,17 @@ describe('section.HorizontalTab', () => {
       mockElement['gsSelectedTab'] = selectedId;
       tab['element_'] = {eventTarget: mockElement};
 
-      spyOn(tab, 'setHighlight_');
+      spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
 
-      tab['updateHighlight_']();
-
-      expect(tab['setHighlight_']).toHaveBeenCalledWith(left, width);
-      expect(mockElement.querySelector).toHaveBeenCalledWith(`[gs-tab-id="${selectedId}"]`);
+      tab['updateHighlight_']()
+          .then(() => {
+            expect(tab['setHighlight_']).toHaveBeenCalledWith(left, width);
+            expect(mockElement.querySelector).toHaveBeenCalledWith(`[gs-tab-id="${selectedId}"]`);
+            done();
+          }, done.fail);
     });
 
-    it('should shrink to 0 width if there are no selected Ids', () => {
+    it('should shrink to 0 width if there are no selected Ids', (done: any) => {
       let left = 12;
       let width = 34;
 
@@ -153,11 +174,40 @@ describe('section.HorizontalTab', () => {
       let element = Mocks.object('element');
       tab['element_'] = {eventTarget: element};
 
-      spyOn(tab, 'setHighlight_');
+      spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
 
-      tab['updateHighlight_']();
+      tab['updateHighlight_']()
+          .then(() => {
+            expect(tab['setHighlight_']).toHaveBeenCalledWith(29, 34);
+            done();
+          }, done.fail);
+    });
+  });
 
-      expect(tab['setHighlight_']).toHaveBeenCalledWith(29, 34);
+  describe('onAttributeChanged', () => {
+    it('should dispatch the tab change event and update the highlight if the gs-selected-tab' +
+        ' attribute changed',
+        () => {
+          let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+          tab['element_'] = mockElement;
+          spyOn(tab, 'updateHighlight_');
+
+          tab.onAttributeChanged('gs-selected-tab');
+
+          expect(mockElement.dispatch)
+              .toHaveBeenCalledWith(HorizontalTab.CHANGE_EVENT, jasmine.any(Function));
+          expect(tab['updateHighlight_']).toHaveBeenCalledWith();
+        });
+
+    it('should do nothing if other attributes was changed', () => {
+      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+      tab['element_'] = mockElement;
+      spyOn(tab, 'updateHighlight_');
+
+      tab.onAttributeChanged('other-attribute');
+
+      expect(mockElement.dispatch).not.toHaveBeenCalled();
+      expect(tab['updateHighlight_']).not.toHaveBeenCalled();
     });
   });
 
@@ -198,6 +248,21 @@ describe('section.HorizontalTab', () => {
       expect(tab['tabContainer_'].eventTarget).toEqual(tabContainer);
       expect(tab['highlightEl_'].eventTarget).toEqual(highlightEl);
       expect(tab['highlightContainerEl_'].eventTarget).toEqual(highlightContainer);
+    });
+  });
+
+  describe('onInserted', () => {
+    it('should listen to the gse-action event', () => {
+      let mockElement = jasmine.createSpyObj('Element', ['on']);
+      tab['element_'] = mockElement;
+
+      spyOn(tab, 'onAction_');
+
+      tab.onInserted();
+
+      expect(tab['element_'].on).toHaveBeenCalledWith('gse-action', jasmine.any(Function));
+      tab['element_'].on.calls.argsFor(0)[1]();
+      expect(tab['onAction_']).toHaveBeenCalledWith();
     });
   });
 });

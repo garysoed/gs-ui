@@ -49,7 +49,7 @@ describe('bootstrap.Main', () => {
 
       expect(main['injector_']).toEqual(mockInjector);
       expect(main['themeService_']).toEqual(mockThemeService);
-      expect(main['registrar']).toEqual(mockRegistrar);
+      expect(main['registrar_']).toEqual(mockRegistrar);
 
       expect(mockThemeService.initialize).toHaveBeenCalledWith();
       expect(mockInjector.instantiate).toHaveBeenCalledWith(ThemeService);

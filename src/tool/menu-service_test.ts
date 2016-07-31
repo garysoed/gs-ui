@@ -24,7 +24,7 @@ describe('tool.MenuService', () => {
   });
 
   describe('getMenuContainerEl_', () => {
-    fit('should create the menu container element correctly', () => {
+    it('should create the menu container element correctly', () => {
       mockDocument.querySelector.and.returnValue(null);
 
       let menuContainerEl = Mocks.object('menuContainerEl');
@@ -43,7 +43,7 @@ describe('tool.MenuService', () => {
       expect(mockDocument.querySelector).toHaveBeenCalledWith('gs-menu-container');
     });
 
-    fit('should grab the menu container element if one already exists', () => {
+    it('should grab the menu container element if one already exists', () => {
       let menuContainerEl = Mocks.object('menuContainerEl');
       mockDocument.querySelector.and.returnValue(menuContainerEl);
 
@@ -59,7 +59,7 @@ describe('tool.MenuService', () => {
       expect(mockDocument.querySelector).toHaveBeenCalledWith('gs-menu-container');
     });
 
-    fit('should return the existing menu container element', () => {
+    it('should return the existing menu container element', () => {
       let listenableContainer = Mocks.disposable('listenableContainer');
       TestDispose.add(listenableContainer);
       service['menuContainerEl_'] = listenableContainer;
@@ -70,7 +70,7 @@ describe('tool.MenuService', () => {
   });
 
   describe('onTick_', () => {
-    fit('should set the anchor target', () => {
+    it('should set the anchor target', () => {
       let menuContainerEl = Mocks.object('menuContainerEl');
       let anchorTarget = Mocks.object('anchorTarget');
       let anchorElement = Mocks.object('anchorElement');
@@ -91,7 +91,7 @@ describe('tool.MenuService', () => {
       mockParentElement = jasmine.createSpyObj('ParentElement', ['getBoundingClientRect']);
     });
 
-    fit('should set the correct X and Y for TOP_LEFT', () => {
+    it('should set the correct X and Y for TOP_LEFT', () => {
       let menuContainerEl = Mocks.object('menuContainerEl');
       let left = 12;
       let top = 34;
@@ -110,7 +110,7 @@ describe('tool.MenuService', () => {
       expect(menuContainerEl['gsAnchorTargetY']).toEqual(top);
     });
 
-    fit('should set the correct X and Y for TOP_RIGHT', () => {
+    it('should set the correct X and Y for TOP_RIGHT', () => {
       let menuContainerEl = Mocks.object('menuContainerEl');
       let left = 12;
       let top = 34;
@@ -131,7 +131,7 @@ describe('tool.MenuService', () => {
       expect(menuContainerEl['gsAnchorTargetY']).toEqual(top);
     });
 
-    fit('should set the correct X and Y for BOTTOM_RIGHT', () => {
+    it('should set the correct X and Y for BOTTOM_RIGHT', () => {
       let menuContainerEl = Mocks.object('menuContainerEl');
       let left = 12;
       let top = 34;
@@ -154,7 +154,7 @@ describe('tool.MenuService', () => {
       expect(menuContainerEl['gsAnchorTargetY']).toEqual(112);
     });
 
-    fit('should set the correct X and T for BOTTOM_LEFT', () => {
+    it('should set the correct X and T for BOTTOM_LEFT', () => {
       let menuContainerEl = Mocks.object('menuContainerEl');
       let left = 12;
       let top = 34;
@@ -175,7 +175,7 @@ describe('tool.MenuService', () => {
       expect(menuContainerEl['gsAnchorTargetY']).toEqual(112);
     });
 
-    fit('should resolve auto location if the anchor target is AUTO', () => {
+    it('should resolve auto location if the anchor target is AUTO', () => {
       let menuContainerEl = Mocks.object('menuContainerEl');
       let left = 12;
       let top = 34;
@@ -203,7 +203,7 @@ describe('tool.MenuService', () => {
   });
 
   describe('hideMenu', () => {
-    fit('should hide the menu container', () => {
+    it('should hide the menu container', () => {
       let mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['hide']);
       spyOn(service, 'getMenuContainerEl_').and.returnValue({eventTarget: mockMenuContainer});
       service.hideMenu();

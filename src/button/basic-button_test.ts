@@ -23,7 +23,7 @@ describe('button.BasicButton', () => {
       mockListenableElement = jasmine.createSpyObj('ListenableElement', ['dispatch']);
     });
 
-    fit('should dispatch the ACTION vent if the element is not disabled', () => {
+    it('should dispatch the ACTION vent if the element is not disabled', () => {
       let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
       mockEventTarget.getAttribute.and.returnValue(null);
       mockListenableElement.eventTarget = mockEventTarget;

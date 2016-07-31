@@ -15,10 +15,11 @@
         width: 10rem;
       }
 
-      gs-basic-button > div {
+      .cell gs-basic-button > div {
         width: 6rem;
       }
     </style>
+    <link rel="stylesheet" href="demo.css">
   </head>
   <body>
     <template id="template">
@@ -44,33 +45,25 @@
       <section class="cell gs-theme-invert"></section>
       <section class="cell gs-theme-invert gs-hilite"></section>
     </section>
-    <gs-menu-container gs-anchor-point="bottom_right" gs-anchor-target-x="100" gs-anchor-target-y="100">
-    </gs-menu-container>
-    <script>
-      var templateEl = document.querySelector('#template');
-      document.querySelectorAll('section.cell').forEach(function(el) {
-        el.innerHTML = templateEl.innerHTML;
-      });
 
-      var url = new URL(window.location);
-      var themeStr = url.searchParams.get('theme');
-      var theme = undefined;
-      if (!!themeStr) {
-        var parts = themeStr.split('-');
-        theme = gs.ui.Theme.newInstance(
-            gs.ui.DefaultPalettes[parts[0]],
-            gs.ui.DefaultPalettes[parts[1]]);
-      }
+    <gs-basic-button class="colorPicker gs-theme-normal gs-hilite">
+      <div gs-content><gs-icon>color_lens</gs-icon></div>
+      <gs-menu>
+        <div class="menuRoot" gs-content selected-tab="base">
+          <div class="colorPickerMenu base"></div>
+          <div class="colorPickerMenu accent"></div>
+          <gs-horizontal-tab gs-selected-tab="base">
+            <gs-basic-button gs-tab-id="base">
+              <div gs-content>Base</div>
+            </gs-basic-button>
+            <gs-basic-button gs-tab-id="accent">
+              <div gs-content>Accent</div>
+            </gs-basic-button>
+          </gs-horizontal-tab>
+        </div>
+      </gs-menu>
+    </gs-basic-button>
 
-      // Program the tabs.
-      var tabs = document.querySelectorAll('gs-horizontal-tab');
-      tabs.forEach(function(tab) {
-        tab.addEventListener('gse-action', function(event) {
-          tab.gsSelectedTab = event.target.getAttribute('gs-tab-id');
-        });
-      });
-
-      gs.ui.Main.newInstance().bootstrap(theme);
-    </script>
+    <script src="demo.js"></script>
   </body>
 </html>

@@ -1,0 +1,59 @@
+.colorPicker {
+  bottom: 0;
+  position: fixed;
+  left: 0;
+}
+
+.colorPickerCell {
+  cursor: pointer;
+  height: 3rem;
+  width: 3rem;
+}
+
+.colorPickerCell[data-selected="true"] {
+  outline: .2rem solid black;
+  outline-offset: -.2rem;
+}
+
+.colorPickerCell.base > div {
+  height: 0;
+  transition: all .3s;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.colorPickerCell.base:hover > div {
+  height: 1rem;
+  transition: all .3s;
+}
+
+.colorPickerCell.base > div.dark {
+  height: 1rem;
+  margin-top: 3rem;
+}
+
+.colorPickerCell.base:hover > div.dark {
+  margin-top: 1rem;
+}
+
+.colorPickerMenu {
+  background-color: white;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.colorPickerMenu > div {
+  display: flex;
+  flex-direction: row;
+}
+
+.menuRoot {
+  background-color: white;
+}
+
+.menuRoot[selected-tab="base"] > .colorPickerMenu.base,
+.menuRoot[selected-tab="accent"] > .colorPickerMenu.accent {
+  display: flex;
+}

@@ -1,6 +1,7 @@
 <style>
   content::content > * {
     display: inline-block;
+    flex: 1;
   }
 
   .highlight-container {
@@ -17,10 +18,15 @@
   .root {
     display: inline-block;
     position: relative;
+    width: 100%;
+  }
+
+  .tabs {
+    display: flex;
   }
 </style>
 <div class="root">
-  <div>
+  <div class="tabs">
     <content select="[gs-tab-id]"></content>
   </div>
   <div class="highlight-container">

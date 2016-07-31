@@ -21,8 +21,8 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
 ];
 
 const DEFAULT_THEME_: Theme = Theme.newInstance(
-    DefaultPalettes['cerulian'],
-    DefaultPalettes['vermilion']);
+    DefaultPalettes['vermilion'],
+    DefaultPalettes['harlequin']);
 
 
 /**
