@@ -7,6 +7,7 @@ import {Icon} from '../tool/icon';
 import {Injector} from '../../external/gs_tools/src/inject';
 import {Menu} from '../tool/menu';
 import {MenuContainer} from '../tool/menu-container';
+import {RadioButton} from '../input/radio-button';
 import {Templates} from '../../external/gs_tools/src/webc';
 import {Theme} from '../theming/theme';
 import {ThemeService} from '../theming/theme-service';
@@ -18,6 +19,7 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   Icon,
   Menu,
   MenuContainer,
+  RadioButton,
 ];
 
 const DEFAULT_THEME_: Theme = Theme.newInstance(

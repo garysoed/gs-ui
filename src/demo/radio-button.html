@@ -12,43 +12,27 @@
         flex: 1;
         padding: 1rem;
       }
-
-      .menu-content {
-        background-color: white;
-        box-sizing: border-box;
-        height: 10rem;
-        padding: 1rem;
-        width: 10rem;
-      }
     </style>
     <link rel="stylesheet" href="demo.css">
   </head>
   <body>
     <template id="template">
-      <gs-basic-button>
-        <gs-icon gs-content>settings</gs-icon>
-        <gs-menu>
-          <div class="menu-content" gs-content>Menu content</div>
-        </gs-menu>
-      </gs-basic-button>
-      <gs-basic-button disabled>
-        <gs-icon gs-content>settings</gs-icon>
-        <gs-menu>
-          <div class="menu-content" gs-content>Menu content</div>
-        </gs-menu>
-      </gs-basic-button>
-      <gs-basic-button class="gs-primary">
-        <gs-icon gs-content>settings</gs-icon>
-        <gs-menu>
-          <div class="menu-content" gs-content>Menu content</div>
-        </gs-menu>
-      </gs-basic-button>
-      <gs-basic-button class="gs-primary" disabled>
-        <gs-icon gs-content>settings</gs-icon>
-        <gs-menu>
-          <div class="menu-content" gs-content>Menu content</div>
-        </gs-menu>
-      </gs-basic-button>
+      <div>
+        <gs-radio-button gs-checked="true"></gs-radio-button>
+        <span>Radio Button</span>
+      </div>
+      <div>
+        <gs-radio-button disabled></gs-radio-button>
+        <span>Radio Button (Disabled)</span>
+      </div>
+      <div>
+        <gs-radio-button></gs-radio-button>
+        <span>Radio Button 2</span>
+      </div>
+      <div>
+        <gs-radio-button></gs-radio-button>
+        <span>Radio Button 3</span>
+      </div>
     </template>
 
     <section>
@@ -81,5 +65,16 @@
     </gs-basic-button>
 
     <script src="demo.js"></script>
+    <script>
+      var sections = document.querySelectorAll('section.cell');
+      for (var i = 0; i < sections.length; i++) {
+        var section = sections.item(i);
+        var radios = section.querySelectorAll('gs-radio-button');
+        for (var j = 0; j < radios.length; j++) {
+          var radio = radios.item(j);
+          radio.gsGroup = 'group' + i;
+        }
+      }
+    </script>
   </body>
 </html>

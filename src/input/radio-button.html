@@ -1,0 +1,32 @@
+<style>
+  .root {
+    border-radius: 50%;
+    border: .2rem solid var(--gsColorForeground);
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    position: relative;
+  }
+
+  .selection {
+    background-color: var(--gsColorForeground);
+    border-radius: 50%;
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: .5rem;
+    left: .5rem;
+    transition: all .2s;
+  }
+
+  :host([gs-checked="true"]) .selection {
+    width: .6rem;
+    height: .6rem;
+    top: .2rem;
+    left: .2rem;
+    transition: all .2s;
+  }
+</style>
+<div class="root">
+  <div class="selection"></div>
+</div>

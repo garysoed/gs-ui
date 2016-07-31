@@ -112,6 +112,7 @@ tab.addEventListener('gse-tab-change', function() {
 
 updateCells();
 
+// Set the templates.
 var templateEl = document.querySelector('#template');
 document.querySelectorAll('section.cell').forEach(function(el) {
   el.innerHTML = templateEl.innerHTML;

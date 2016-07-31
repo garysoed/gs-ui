@@ -1,22 +1,22 @@
 import {TestBase} from '../test-base';
 TestBase.setup();
 
-import {BasicButton} from './basic-button';
+import {BaseActionElement} from './base-action-element';
 import {DomEvent, ListenableDom} from '../../external/gs_tools/src/event';
 import {Event} from '../const/event';
 import {Mocks} from '../../external/gs_tools/src/mock';
 import {TestDispose} from '../../external/gs_tools/src/testing';
 
 
-describe('button.BasicButton', () => {
-  let button;
+describe('common.BaseActionElement', () => {
+  let actionElement;
 
   beforeEach(() => {
-    button = new BasicButton();
-    TestDispose.add(button);
+    actionElement = new BaseActionElement();
+    TestDispose.add(actionElement);
   });
 
-  describe('onElementClick_', () => {
+  describe('onClick_', () => {
     let mockListenableElement;
 
     beforeEach(() => {
@@ -28,11 +28,12 @@ describe('button.BasicButton', () => {
       mockEventTarget.getAttribute.and.returnValue(null);
       mockListenableElement.eventTarget = mockEventTarget;
 
-      button['onElementClick_'](mockListenableElement);
+      Mocks.getter(actionElement, 'isDisabled', false);
+      Mocks.getter(actionElement, 'element', mockListenableElement);
+      actionElement['onClick_']();
 
       expect(mockListenableElement.dispatch)
           .toHaveBeenCalledWith(Event.ACTION, jasmine.any(Function));
-      expect(mockEventTarget.getAttribute).toHaveBeenCalledWith('disabled');
     });
 
     it('should do nothing if the element is disabled', () => {
@@ -40,9 +41,26 @@ describe('button.BasicButton', () => {
       mockEventTarget.getAttribute.and.returnValue('');
       mockListenableElement.eventTarget = mockEventTarget;
 
-      button['onElementClick_'](mockListenableElement);
+      Mocks.getter(actionElement, 'element', mockListenableElement);
+      actionElement['onClick_']();
 
       expect(mockListenableElement.dispatch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('isDisabled', () => {
+    it('should return true if the element is disabled', () => {
+      let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
+      mockEventTarget.getAttribute.and.returnValue('');
+      Mocks.getter(actionElement, 'element', {eventTarget: mockEventTarget});
+      expect(actionElement.isDisabled).toEqual(true);
+    });
+
+    it('should return false if the element is not disabled', () => {
+      let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
+      mockEventTarget.getAttribute.and.returnValue(null);
+      Mocks.getter(actionElement, 'element', {eventTarget: mockEventTarget});
+      expect(actionElement.isDisabled).toEqual(false);
     });
   });
 
@@ -56,16 +74,15 @@ describe('button.BasicButton', () => {
       mockListenableDom.on.and.returnValue(Mocks.disposable('ListenableDom.on'));
 
       spyOn(ListenableDom, 'of').and.returnValue(mockListenableDom);
-      spyOn(button, 'onElementClick_');
+      spyOn(actionElement, 'onClick_');
 
-      button.onCreated(element);
+      actionElement.onCreated(element);
 
       expect(mockListenableDom.on).toHaveBeenCalledWith(DomEvent.CLICK, jasmine.any(Function));
 
       mockListenableDom.on.calls.argsFor(0)[1]();
-      expect(button['onElementClick_']).toHaveBeenCalledWith(mockListenableDom);
+      expect(actionElement['onClick_']).toHaveBeenCalledWith();
 
-      expect(ListenableDom.of).toHaveBeenCalledWith(element);
       expect(mockClassList.add).toHaveBeenCalledWith('gs-action');
     });
   });

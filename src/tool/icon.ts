@@ -1,7 +1,7 @@
-import {BaseElement, CustomElement} from '../../external/gs_tools/src/webc';
+import {BaseElement, customElement} from '../../external/gs_tools/src/webc';
 
 
-@CustomElement({
+@customElement({
   tag: 'gs-icon',
   templateKey: 'src/tool/icon',
 })

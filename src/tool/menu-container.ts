@@ -4,15 +4,15 @@ import {
   Animation,
   AnimationEasing,
   BaseElement,
-  CustomElement,
+  customElement,
   FloatParser} from '../../external/gs_tools/src/webc';
 import {Anchors} from './anchors';
 import {DomEvent, ListenableDom} from '../../external/gs_tools/src/event';
-import {Inject} from '../../external/gs_tools/src/inject';
+import {inject} from '../../external/gs_tools/src/inject';
 import {Jsons} from '../../external/gs_tools/src/collection';
 
 
-@CustomElement({
+@customElement({
   attributes: {
     'gsAnchorTargetX': FloatParser,
     'gsAnchorTargetY': FloatParser,
@@ -35,7 +35,7 @@ export class MenuContainer extends BaseElement {
         {opacity: 1},
         {opacity: 0},
       ],
-      {duration: 100, easing: AnimationEasing.LINEAR});
+      {duration: 200, easing: AnimationEasing.LINEAR});
 
 
   private static SHOW_CLASS_: string = 'show';
@@ -44,12 +44,11 @@ export class MenuContainer extends BaseElement {
   private containerEl_: ListenableDom<HTMLElement>;
   private contentEl_: ListenableDom<HTMLElement>;
   private document_: ListenableDom<Document>;
-  private element_: ListenableDom<HTMLElement>;
   private rootEl_: ListenableDom<HTMLElement>;
   private windowEl_: ListenableDom<Window>;
 
   constructor(
-      @Inject('x.dom.window') windowEl: Window = window) {
+      @inject('x.dom.window') windowEl: Window = window) {
     super();
     this.windowEl_ = ListenableDom.of(windowEl);
     this.addDisposable(this.windowEl_);
@@ -64,7 +63,7 @@ export class MenuContainer extends BaseElement {
    * @return The anchor point based on the attribute set in the element.
    */
   private getAnchorPoint_(): AnchorLocation {
-    let element = this.element_.eventTarget;
+    let element = this.element.eventTarget;
     let anchorPoint = element['gsAnchorPoint'];
     if (element['gsAnchorPoint'] !== AnchorLocation.AUTO) {
       return anchorPoint;
@@ -84,16 +83,13 @@ export class MenuContainer extends BaseElement {
     let listenableAnimate = ListenableDom.of(animate);
     this.addDisposable(listenableAnimate);
 
-    this.element_.dispatch(
-        MenuContainer.HIDE_EVENT,
-        () => {
-          this.addDisposable(listenableAnimate
-              .once(
-                  DomEvent.FINISH,
-                  () => {
-                    this.rootEl_.eventTarget.classList.remove(MenuContainer.SHOW_CLASS_);
-                  }));
-        });
+    this.addDisposable(listenableAnimate
+        .once(
+            DomEvent.FINISH,
+            () => {
+              this.rootEl_.eventTarget.classList.remove(MenuContainer.SHOW_CLASS_);
+              this.element.dispatch(MenuContainer.HIDE_EVENT, () => {});
+            }));
   }
 
   private onBackdropClick_(): void {
@@ -131,7 +127,7 @@ export class MenuContainer extends BaseElement {
           contentWidth = distributedElement.clientWidth;
         });
 
-    this.element_.dispatch(
+    this.element.dispatch(
         MenuContainer.SHOW_EVENT,
         () => {
           MenuContainer.BASE_SHOW_ANIMATION_
@@ -150,8 +146,8 @@ export class MenuContainer extends BaseElement {
    * Resets the location of the container element based on the anchor point and the anchor target.
    */
   private updateContent_(): void {
-    let anchorTargetX = this.element_.eventTarget['gsAnchorTargetX'];
-    let anchorTargetY = this.element_.eventTarget['gsAnchorTargetY'];
+    let anchorTargetX = this.element.eventTarget['gsAnchorTargetX'];
+    let anchorTargetY = this.element.eventTarget['gsAnchorTargetY'];
 
     if (anchorTargetX === null || anchorTargetY === null) {
       // Do nothing if the anchor target is not defined.
@@ -199,6 +195,7 @@ export class MenuContainer extends BaseElement {
    * @override
    */
   onAttributeChanged(attrName: string, oldValue: string, newValue: string): void {
+    super.onAttributeChanged(attrName, oldValue, newValue);
     switch (attrName) {
       case 'gs-anchor-point':
       case 'gs-anchor-target-x':
@@ -212,6 +209,7 @@ export class MenuContainer extends BaseElement {
    * @override
    */
   onCreated(element: HTMLElement): void {
+    super.onCreated(element);
     this.backdropEl_ = ListenableDom.of(
         <HTMLElement> element.shadowRoot.querySelector('.backdrop'));
     this.containerEl_ = ListenableDom.of(
@@ -219,7 +217,6 @@ export class MenuContainer extends BaseElement {
     this.contentEl_ = ListenableDom.of(
         <HTMLElement> element.shadowRoot.querySelector('content'));
     this.document_ = ListenableDom.of(element.ownerDocument);
-    this.element_ = ListenableDom.of(element);
     this.rootEl_ = ListenableDom.of(<HTMLElement> element.shadowRoot.querySelector('.root'));
 
     this.addDisposable(
@@ -227,7 +224,6 @@ export class MenuContainer extends BaseElement {
         this.containerEl_,
         this.contentEl_,
         this.document_,
-        this.element_,
         this.rootEl_);
 
     element['hide'] = this.hide_.bind(this);
@@ -242,6 +238,7 @@ export class MenuContainer extends BaseElement {
    * @override
    */
   onInserted(): void {
+    super.onInserted();
     this.addDisposable(this.windowEl_.on(DomEvent.RESIZE, this.onWindowResize_.bind(this)));
     this.addDisposable(this.backdropEl_.on(DomEvent.CLICK, this.onBackdropClick_.bind(this)));
     this.updateContent_();

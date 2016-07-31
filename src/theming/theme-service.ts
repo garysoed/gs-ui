@@ -1,18 +1,18 @@
 import {IColor} from '../../external/gs_tools/src/color';
-import {Bind, Inject} from '../../external/gs_tools/src/inject';
+import {bind, inject} from '../../external/gs_tools/src/inject';
 import {Maps} from '../../external/gs_tools/src/collection';
 import {Templates} from '../../external/gs_tools/src/webc';
 import {Theme} from './theme';
 import {Validate} from '../../external/gs_tools/src/valid';
 
 
-@Bind('theming.ThemeService')
+@bind('theming.ThemeService')
 export class ThemeService {
   private initialized_: boolean = false;
 
   constructor(
-      @Inject('x.gs_tools.templates') private templates_: Templates,
-      @Inject('x.dom.document') private document_: Document = window.document) { }
+      @inject('x.gs_tools.templates') private templates_: Templates,
+      @inject('x.dom.document') private document_: Document = window.document) { }
 
   /**
    * Initializes the app.

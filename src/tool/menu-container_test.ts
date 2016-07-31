@@ -76,15 +76,13 @@ describe('tool.MenuContainer', () => {
 
           container['hide_']();
 
-          expect(mockListenableElement.dispatch).toHaveBeenCalledWith(
-              MenuContainer.HIDE_EVENT,
-              jasmine.any(Function));
-          mockListenableElement.dispatch.calls.argsFor(0)[1]();
-
           expect(mockListenableAnimate.once)
               .toHaveBeenCalledWith(DomEvent.FINISH, jasmine.any(Function));
           mockListenableAnimate['once'].calls.argsFor(0)[1]();
           expect(mockClassList.remove).toHaveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
+          expect(mockListenableElement.dispatch).toHaveBeenCalledWith(
+              MenuContainer.HIDE_EVENT,
+              jasmine.any(Function));
 
           expect(MenuContainer['HIDE_ANIMATION_'].applyTo).toHaveBeenCalledWith(containerEl);
           expect(ListenableDom.of).toHaveBeenCalledWith(animate);

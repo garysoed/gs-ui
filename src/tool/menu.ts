@@ -1,13 +1,13 @@
 import {AnchorLocation} from './anchor-location';
 import {AnchorLocationParser} from './anchor-location-parser';
-import {BaseElement, CustomElement} from '../../external/gs_tools/src/webc';
+import {BaseElement, customElement} from '../../external/gs_tools/src/webc';
 import {Event} from '../const/event';
 import {ListenableDom} from '../../external/gs_tools/src/event';
-import {Inject} from '../../external/gs_tools/src/inject';
+import {inject} from '../../external/gs_tools/src/inject';
 import {MenuService} from './menu-service';
 
 
-@CustomElement({
+@customElement({
   attributes: {
     'gsAnchorPoint': AnchorLocationParser,
     'gsAnchorTarget': AnchorLocationParser,
@@ -19,15 +19,14 @@ import {MenuService} from './menu-service';
   templateKey: 'src/tool/menu',
 })
 export class Menu extends BaseElement {
-  private element_: ListenableDom<HTMLElement>;
   private menuRoot_: HTMLElement;
 
-  constructor(@Inject('tool.MenuService') private menuService_: MenuService) {
+  constructor(@inject('tool.MenuService') private menuService_: MenuService) {
     super();
   }
 
   private onAction_(): void {
-    let element = this.element_.eventTarget;
+    let element = this.element.eventTarget;
     this.menuService_.showMenu(
         element,
         element.parentElement,
@@ -36,9 +35,7 @@ export class Menu extends BaseElement {
   }
 
   onCreated(element: HTMLElement): void {
-    this.element_ = ListenableDom.of(element);
-    this.addDisposable(this.element_);
-
+    super.onCreated(element);
     this.menuRoot_ = <HTMLElement> element.shadowRoot.querySelector('.root');
 
     let listenableParentElement = ListenableDom.of(element.parentElement);

@@ -1,21 +1,21 @@
 import {AnchorLocation} from './anchor-location';
 import {Anchors} from './anchors';
 import {BaseDisposable} from '../../external/gs_tools/src/dispose';
-import {Bind, Inject} from '../../external/gs_tools/src/inject';
+import {bind, inject} from '../../external/gs_tools/src/inject';
 import {Interval} from '../../external/gs_tools/src/async';
 import {ListenableDom} from '../../external/gs_tools/src/event';
 import {MenuContainer} from './menu-container';
 
 
-@Bind('tool.MenuService', [MenuContainer])
+@bind('tool.MenuService', [MenuContainer])
 export class MenuService extends BaseDisposable {
   private static ANCHOR_TARGET_INTERVAL_: number = 500;
 
   private menuContainerEl_: ListenableDom<HTMLElement> | null = null;
 
   constructor(
-      @Inject('x.dom.document') private document_: Document,
-      @Inject('x.dom.window') private window_: Window) {
+      @inject('x.dom.document') private document_: Document,
+      @inject('x.dom.window') private window_: Window) {
     super();
   }
 
