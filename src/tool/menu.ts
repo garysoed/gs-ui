@@ -26,7 +26,7 @@ export class Menu extends BaseElement {
   }
 
   private onAction_(): void {
-    let element = this.element.eventTarget;
+    let element = this.getElement().getEventTarget();
     this.menuService_.showMenu(
         element,
         element.parentElement,

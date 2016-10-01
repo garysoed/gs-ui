@@ -2,7 +2,6 @@ import {TestBase} from '../test-base';
 TestBase.setup();
 
 import {Log} from '../../external/gs_tools/src/util';
-import {Mocks} from '../../external/gs_tools/src/mock';
 import {Palette} from './palette';
 
 
@@ -15,10 +14,10 @@ describe('theming.Palette', () => {
     let name;
 
     beforeEach(() => {
-      accent = Mocks.object('accent');
-      dark = Mocks.object('dark');
-      normal = Mocks.object('normal');
-      light = Mocks.object('light');
+      accent = jasmine.createSpyObj('accent', ['getLuminance']);
+      dark = jasmine.createSpyObj('dark', ['getLuminance']);
+      normal = jasmine.createSpyObj('normal', ['getLuminance']);
+      light = jasmine.createSpyObj('light', ['getLuminance']);
       name = 'name';
     });
 
@@ -31,7 +30,7 @@ describe('theming.Palette', () => {
     });
 
     it('should warn if the dark color luminance is too high', () => {
-      dark.luminance = 0.1;
+      dark.getLuminance.and.returnValue(0.1);
       spyOn(Log, 'warn');
       Palette.newInstance(accent, dark, normal, light, name);
       expect(Log.warn).toHaveBeenCalledWith(
@@ -40,7 +39,7 @@ describe('theming.Palette', () => {
     });
 
     it('should warn if the normal color luminance is too high', () => {
-      normal.luminance = 0.3;
+      normal.getLuminance.and.returnValue(0.3);
       spyOn(Log, 'warn');
       Palette.newInstance(accent, dark, normal, light, name);
       expect(Log.warn).toHaveBeenCalledWith(
@@ -49,7 +48,7 @@ describe('theming.Palette', () => {
     });
 
     it('should warn if the light color luminance is too low', () => {
-      light.luminance = 0.4;
+      light.getLuminance.and.returnValue(0.4);
       spyOn(Log, 'warn');
       Palette.newInstance(accent, dark, normal, light, name);
       expect(Log.warn).toHaveBeenCalledWith(

@@ -83,7 +83,7 @@ export class MenuService extends BaseDisposable {
    * Hides the menu.
    */
   hideMenu(): void {
-    this.getMenuContainerEl_().eventTarget['hide']();
+    this.getMenuContainerEl_().getEventTarget()['hide']();
   }
 
   /**
@@ -109,12 +109,12 @@ export class MenuService extends BaseDisposable {
     let anchorTargetWatcher = Interval.newInstance(MenuService.ANCHOR_TARGET_INTERVAL_);
     anchorTargetWatcher.on(
         Interval.TICK_EVENT,
-        this.onTick_.bind(this, menuContainerEl.eventTarget, anchorTarget, anchorElement));
+        this.onTick_.bind(this, menuContainerEl.getEventTarget(), anchorTarget, anchorElement));
     anchorTargetWatcher.start();
 
-    menuContainerEl.eventTarget.appendChild(menuContent);
-    menuContainerEl.eventTarget['gsAnchorPoint'] = anchorPoint;
-    this.setAnchorTarget_(menuContainerEl.eventTarget, anchorTarget, anchorElement);
+    menuContainerEl.getEventTarget().appendChild(menuContent);
+    menuContainerEl.getEventTarget()['gsAnchorPoint'] = anchorPoint;
+    this.setAnchorTarget_(menuContainerEl.getEventTarget(), anchorTarget, anchorElement);
 
     return new Promise((resolve: () => void, reject: () => void): void => {
       this.addDisposable(menuContainerEl.once(
@@ -125,7 +125,7 @@ export class MenuService extends BaseDisposable {
             resolve();
           },
           false));
-      menuContainerEl.eventTarget['show']();
+      menuContainerEl.getEventTarget()['show']();
     });
   }
 }

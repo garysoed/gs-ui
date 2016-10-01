@@ -24,7 +24,7 @@ describe('section.HorizontalTab', () => {
       mockTarget.getAttribute.and.returnValue(attribute);
 
       let element = Mocks.object('element');
-      tab['element_'] = {eventTarget: element};
+      tab['element_'] = {getEventTarget: () => element};
 
       tab['onAction_']({target: mockTarget});
 
@@ -70,7 +70,7 @@ describe('section.HorizontalTab', () => {
 
       let highlightEl = Mocks.object('highlightEl');
       highlightEl.style = {};
-      tab['highlightEl_'] = {eventTarget: highlightEl};
+      tab['highlightEl_'] = {getEventTarget: () => highlightEl};
 
       tab['setHighlight_'](targetLeft, targetWidth)
           .then(() => {
@@ -112,7 +112,7 @@ describe('section.HorizontalTab', () => {
 
       let highlightEl = Mocks.object('highlightEl');
       highlightEl.style = {};
-      tab['highlightEl_'] = {eventTarget: highlightEl};
+      tab['highlightEl_'] = {getEventTarget: () => highlightEl};
 
       tab['setHighlight_'](targetLeft, targetWidth);
 
@@ -152,7 +152,7 @@ describe('section.HorizontalTab', () => {
       let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(selectedTab);
       mockElement['gsSelectedTab'] = selectedId;
-      tab['element_'] = {eventTarget: mockElement};
+      tab['element_'] = {getEventTarget: () => mockElement};
 
       spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
 
@@ -172,7 +172,7 @@ describe('section.HorizontalTab', () => {
       tab['highlightWidth_'] = width;
 
       let element = Mocks.object('element');
-      tab['element_'] = {eventTarget: element};
+      tab['element_'] = {getEventTarget: () => element};
 
       spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
 
@@ -245,9 +245,9 @@ describe('section.HorizontalTab', () => {
       tab['interval_']['on'].calls.argsFor(0)[1]();
       expect(tab['onTick_']).toHaveBeenCalledWith();
 
-      expect(tab['tabContainer_'].eventTarget).toEqual(tabContainer);
-      expect(tab['highlightEl_'].eventTarget).toEqual(highlightEl);
-      expect(tab['highlightContainerEl_'].eventTarget).toEqual(highlightContainer);
+      expect(tab['tabContainer_'].getEventTarget()).toEqual(tabContainer);
+      expect(tab['highlightEl_'].getEventTarget()).toEqual(highlightEl);
+      expect(tab['highlightContainerEl_'].getEventTarget()).toEqual(highlightContainer);
     });
   });
 

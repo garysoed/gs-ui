@@ -29,7 +29,7 @@ describe('tool.Menu', () => {
       eventTarget['gsAnchorPoint'] = anchorPoint;
       eventTarget['gsAnchorTarget'] = anchorTarget;
 
-      menu['element_'] = {eventTarget: eventTarget};
+      menu['element_'] = {getEventTarget: () => eventTarget};
       menu['onAction_']();
 
       expect(mockMenuService.showMenu)

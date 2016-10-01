@@ -67,19 +67,19 @@ export class Palette {
       name: string): Palette {
     let validationResult = Validate
         .batch({
-          'DARK_LUMINANCE': Validate.number(dark.luminance).toNot.beGreaterThan(0.06)
+          'DARK_LUMINANCE': Validate.number(dark.getLuminance()).toNot.beGreaterThan(0.06)
               .orThrows('"dark" color is recommended to have luminance <= 0.06, but was ${value}'),
-          'NORMAL_LUMINANCE': Validate.number(normal.luminance).toNot.beGreaterThan(0.22)
+          'NORMAL_LUMINANCE': Validate.number(normal.getLuminance()).toNot.beGreaterThan(0.22)
               .orThrows('"normal" color is recommended to have luminance <= 0.22,'
                   + ' but was ${value}'),
-          'LIGHT_LUMINANCE': Validate.number(light.luminance).to.beGreaterThanOrEqualTo(0.42)
+          'LIGHT_LUMINANCE': Validate.number(light.getLuminance()).to.beGreaterThanOrEqualTo(0.42)
               .orThrows('"light" color is recommended to have luminance >= 0.42, but was ${value}'),
         })
         .to.allBeValid()
         .orThrows(`Palette ${name} does not meet the recommended specs: \${value}`);
 
-    if (!validationResult.passes) {
-      Log.warn(LOG, validationResult.errorMessage!);
+    if (!validationResult.isValid()) {
+      Log.warn(LOG, validationResult.getErrorMessage()!);
     }
 
     return new Palette(accent, dark, normal, light);

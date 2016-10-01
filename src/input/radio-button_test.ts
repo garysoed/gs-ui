@@ -9,7 +9,7 @@ import {TestDispose} from '../../external/gs_tools/src/testing';
 
 describe('input.RadioButton', () => {
   let mockRadioButtonService;
-  let button;
+  let button: RadioButton;
 
   beforeEach(() => {
     mockRadioButtonService = jasmine.createSpyObj('RadioButtonService', ['setSelected']);
@@ -25,15 +25,15 @@ describe('input.RadioButton', () => {
   describe('onClick_', () => {
     it('should set itself as selected if it is not disabled', () => {
       let element = Mocks.object('element');
-      Mocks.getter(button, 'isDisabled', false);
-      Mocks.getter(button, 'element', {eventTarget: element});
+      spyOn(button, 'isDisabled').and.returnValue(false);
+      spyOn(button, 'getElement').and.returnValue({getEventTarget: () => element});
 
       button['onClick_']();
       expect(mockRadioButtonService.setSelected).toHaveBeenCalledWith(element, true);
     });
 
     it('should do nothing if it is disabled', () => {
-      Mocks.getter(button, 'isDisabled', true);
+      spyOn(button, 'isDisabled').and.returnValue(true);
 
       button['onClick_']();
       expect(mockRadioButtonService.setSelected).not.toHaveBeenCalled();
@@ -46,9 +46,9 @@ describe('input.RadioButton', () => {
       let element = Mocks.object('element');
       element['gsChecked'] = checked;
 
-      Mocks.getter(button, 'element', {eventTarget: element});
+      spyOn(button, 'getElement').and.returnValue({getEventTarget: () => element});
 
-      button.onAttributeChanged('gs-group');
+      button.onAttributeChanged('gs-group', 'oldValue', 'newValue');
 
       expect(mockRadioButtonService.setSelected).toHaveBeenCalledWith(element, checked);
     });
@@ -58,15 +58,15 @@ describe('input.RadioButton', () => {
       let element = Mocks.object('element');
       element['gsChecked'] = checked;
 
-      Mocks.getter(button, 'element', {eventTarget: element});
+      spyOn(button, 'getElement').and.returnValue({getEventTarget: () => element});
 
-      button.onAttributeChanged('gs-checked');
+      button.onAttributeChanged('gs-checked', 'oldValue', 'newValue');
 
       expect(mockRadioButtonService.setSelected).toHaveBeenCalledWith(element, checked);
     });
 
     it('should do nothing if other attributes changed', () => {
-      button.onAttributeChanged('other');
+      button.onAttributeChanged('other', 'oldValue', 'newValue');
 
       expect(mockRadioButtonService.setSelected).not.toHaveBeenCalled();
     });

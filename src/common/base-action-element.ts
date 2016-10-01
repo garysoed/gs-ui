@@ -5,13 +5,13 @@ import {DomEvent} from '../../external/gs_tools/src/event';
 
 export class BaseActionElement extends BaseElement {
   protected onClick_(): void {
-    if (!this.isDisabled) {
-      this.element.dispatch(Event.ACTION, () => {});
+    if (!this.isDisabled()) {
+      this.getElement().dispatch(Event.ACTION, () => {});
     }
   }
 
-  get isDisabled(): boolean {
-    return this.element.eventTarget.getAttribute('disabled') !== null;
+  isDisabled(): boolean {
+    return this.getElement().getEventTarget().getAttribute('disabled') !== null;
   }
 
   /**
@@ -21,6 +21,6 @@ export class BaseActionElement extends BaseElement {
     super.onCreated(element);
     element.classList.add('gs-action');
 
-    this.addDisposable(this.element.on(DomEvent.CLICK, this.onClick_.bind(this)));
+    this.addDisposable(this.getElement().on(DomEvent.CLICK, this.onClick_.bind(this)));
   }
 }

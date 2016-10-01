@@ -35,7 +35,7 @@ export class HorizontalTab extends BaseElement {
 
   private onAction_(event: Event): void {
     let target = <HTMLElement> event.target;
-    this.element.eventTarget['gsSelectedTab'] = target.getAttribute('gs-tab-id');
+    this.getElement().getEventTarget()['gsSelectedTab'] = target.getAttribute('gs-tab-id');
   }
 
   private onMutate_(): void {
@@ -60,7 +60,7 @@ export class HorizontalTab extends BaseElement {
           {left: `${left}px`, width: `${width}px`},
         ],
         {duration: 300, easing: AnimationEasing.EASE_OUT_EXPO});
-    let highlightEl = this.highlightEl_.eventTarget;
+    let highlightEl = this.highlightEl_.getEventTarget();
     let animate = ListenableDom.of(animation.applyTo(highlightEl));
     this.addDisposable(animate);
     return new Promise<void>((resolve: () => void) => {
@@ -76,11 +76,11 @@ export class HorizontalTab extends BaseElement {
 
   @sequenced()
   private updateHighlight_(): Promise<void> {
-    let selectedId = this.element.eventTarget['gsSelectedTab'];
+    let selectedId = this.getElement().getEventTarget()['gsSelectedTab'];
     let destinationLeft;
     let destinationWidth;
     if (selectedId) {
-      let selectedTab = <HTMLElement> this.element.eventTarget
+      let selectedTab = <HTMLElement> this.getElement().getEventTarget()
           .querySelector(`[gs-tab-id="${selectedId}"]`);
       destinationLeft = selectedTab.offsetLeft;
       destinationWidth = selectedTab.clientWidth;
@@ -99,7 +99,7 @@ export class HorizontalTab extends BaseElement {
     super.onAttributeChanged(attrName, oldValue, newValue);
     switch (attrName) {
       case 'gs-selected-tab':
-        this.element.dispatch(HorizontalTab.CHANGE_EVENT, () => {});
+        this.getElement().dispatch(HorizontalTab.CHANGE_EVENT, () => {});
         this.updateHighlight_();
         break;
     }
@@ -122,7 +122,7 @@ export class HorizontalTab extends BaseElement {
     this.mutationObserver_.observe(element, {childList: true});
 
     this.addDisposable(
-        this.element,
+        this.getElement(),
         this.highlightContainerEl_,
         this.highlightEl_,
         this.tabContainer_);
@@ -132,6 +132,6 @@ export class HorizontalTab extends BaseElement {
    * @override
    */
   onInserted(): void {
-    this.element.on(Event.ACTION, this.onAction_.bind(this));
+    this.getElement().on(Event.ACTION, this.onAction_.bind(this));
   }
 }

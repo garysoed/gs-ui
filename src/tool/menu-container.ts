@@ -63,7 +63,7 @@ export class MenuContainer extends BaseElement {
    * @return The anchor point based on the attribute set in the element.
    */
   private getAnchorPoint_(): AnchorLocation {
-    let element = this.element.eventTarget;
+    let element = this.getElement().getEventTarget();
     let anchorPoint = element['gsAnchorPoint'];
     if (element['gsAnchorPoint'] !== AnchorLocation.AUTO) {
       return anchorPoint;
@@ -71,7 +71,7 @@ export class MenuContainer extends BaseElement {
       return Anchors.resolveAutoLocation(
           element['gsAnchorTargetX'],
           element['gsAnchorTargetY'],
-          this.windowEl_.eventTarget);
+          this.windowEl_.getEventTarget());
     }
   }
 
@@ -79,7 +79,7 @@ export class MenuContainer extends BaseElement {
    * Hides the menu container.
    */
   private hide_(): void {
-    let animate = MenuContainer.HIDE_ANIMATION_.applyTo(this.containerEl_.eventTarget);
+    let animate = MenuContainer.HIDE_ANIMATION_.applyTo(this.containerEl_.getEventTarget());
     let listenableAnimate = ListenableDom.of(animate);
     this.addDisposable(listenableAnimate);
 
@@ -87,8 +87,8 @@ export class MenuContainer extends BaseElement {
         .once(
             DomEvent.FINISH,
             () => {
-              this.rootEl_.eventTarget.classList.remove(MenuContainer.SHOW_CLASS_);
-              this.element.dispatch(MenuContainer.HIDE_EVENT, () => {});
+              this.rootEl_.getEventTarget().classList.remove(MenuContainer.SHOW_CLASS_);
+              this.getElement().dispatch(MenuContainer.HIDE_EVENT, () => {});
             }));
   }
 
@@ -109,7 +109,7 @@ export class MenuContainer extends BaseElement {
   private show_(): void {
     let contentHeight = 0;
     let contentWidth = 0;
-    let distributedNodes = this.contentEl_.eventTarget.getDistributedNodes();
+    let distributedNodes = this.contentEl_.getEventTarget().getDistributedNodes();
     if (distributedNodes.length <= 0) {
       return;
     }
@@ -117,7 +117,7 @@ export class MenuContainer extends BaseElement {
 
     // Temporarily displays the root element for measurement.
     Jsons.setTemporaryValue(
-        this.rootEl_.eventTarget,
+        this.rootEl_.getEventTarget(),
         {
           'style.display': 'block',
           'style.visibility': 'hidden',
@@ -127,7 +127,7 @@ export class MenuContainer extends BaseElement {
           contentWidth = distributedElement.clientWidth;
         });
 
-    this.element.dispatch(
+    this.getElement().dispatch(
         MenuContainer.SHOW_EVENT,
         () => {
           MenuContainer.BASE_SHOW_ANIMATION_
@@ -136,9 +136,9 @@ export class MenuContainer extends BaseElement {
                 opacity: 1,
                 width: `${contentWidth}px`,
               })
-              .applyTo(this.containerEl_.eventTarget);
+              .applyTo(this.containerEl_.getEventTarget());
 
-          this.rootEl_.eventTarget.classList.add(MenuContainer.SHOW_CLASS_);
+          this.rootEl_.getEventTarget().classList.add(MenuContainer.SHOW_CLASS_);
         });
   }
 
@@ -146,8 +146,8 @@ export class MenuContainer extends BaseElement {
    * Resets the location of the container element based on the anchor point and the anchor target.
    */
   private updateContent_(): void {
-    let anchorTargetX = this.element.eventTarget['gsAnchorTargetX'];
-    let anchorTargetY = this.element.eventTarget['gsAnchorTargetY'];
+    let anchorTargetX = this.getElement().getEventTarget()['gsAnchorTargetX'];
+    let anchorTargetY = this.getElement().getEventTarget()['gsAnchorTargetY'];
 
     if (anchorTargetX === null || anchorTargetY === null) {
       // Do nothing if the anchor target is not defined.
@@ -155,13 +155,13 @@ export class MenuContainer extends BaseElement {
     }
 
     // Resets the location of the container.
-    let containerEl = this.containerEl_.eventTarget;
+    let containerEl = this.containerEl_.getEventTarget();
     containerEl.style.top = '';
     containerEl.style.right = '';
     containerEl.style.bottom = '';
     containerEl.style.left = '';
 
-    let windowEl = this.windowEl_.eventTarget;
+    let windowEl = this.windowEl_.getEventTarget();
     let viewportHeight = windowEl.innerHeight;
     let viewportWidth = windowEl.innerWidth;
     let anchorPoint = this.getAnchorPoint_();

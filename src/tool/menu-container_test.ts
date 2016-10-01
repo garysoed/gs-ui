@@ -30,10 +30,10 @@ describe('tool.MenuContainer', () => {
       element['gsAnchorPoint'] = AnchorLocation.AUTO;
       element['gsAnchorTargetX'] = anchorTargetX;
       element['gsAnchorTargetY'] = anchorTargetY;
-      container['element_'] = {eventTarget: element};
+      container['element_'] = {getEventTarget: () => element};
 
       let window = Mocks.object('window');
-      container['windowEl_'] = {eventTarget: window};
+      container['windowEl_'] = {getEventTarget: () => window};
 
       let anchorLocation = AnchorLocation.TOP_LEFT;
       spyOn(Anchors, 'resolveAutoLocation').and.returnValue(anchorLocation);
@@ -46,7 +46,7 @@ describe('tool.MenuContainer', () => {
     it('should return the set anchor point if it is not AUTO', () => {
       let element = Mocks.object('element');
       element['gsAnchorPoint'] = AnchorLocation.TOP_RIGHT;
-      container['element_'] = {eventTarget: element};
+      container['element_'] = {getEventTarget: () => element};
 
       expect(container['getAnchorPoint_']()).toEqual(AnchorLocation.TOP_RIGHT);
     });
@@ -58,10 +58,10 @@ describe('tool.MenuContainer', () => {
           let mockClassList = jasmine.createSpyObj('ClassList', ['remove']);
           let rootEl = Mocks.object('rootEl');
           rootEl.classList = mockClassList;
-          container['rootEl_'] = {eventTarget: rootEl};
+          container['rootEl_'] = {getEventTarget: () => rootEl};
 
           let containerEl = Mocks.object('containerEl');
-          container['containerEl_'] = {eventTarget: containerEl};
+          container['containerEl_'] = {getEventTarget: () => containerEl};
 
           let animate = Mocks.object('animate');
           spyOn(MenuContainer['HIDE_ANIMATION_'], 'applyTo').and.returnValue(animate);
@@ -87,7 +87,7 @@ describe('tool.MenuContainer', () => {
           expect(MenuContainer['HIDE_ANIMATION_'].applyTo).toHaveBeenCalledWith(containerEl);
           expect(ListenableDom.of).toHaveBeenCalledWith(animate);
         });
-      });
+  });
 
   describe('onBackdropClick_', () => {
     it('should hide the menu', () => {
@@ -117,10 +117,10 @@ describe('tool.MenuContainer', () => {
       mockContentEl = jasmine.createSpyObj('ContentEl', ['getDistributedNodes']);
       rootEl = Mocks.object('rootEl');
 
-      container['containerEl_'] = {eventTarget: containerEl};
-      container['contentEl_'] = {eventTarget: mockContentEl};
+      container['containerEl_'] = {getEventTarget: () => containerEl};
+      container['contentEl_'] = {getEventTarget: () => mockContentEl};
       container['element_'] = mockListenableElement;
-      container['rootEl_'] = {eventTarget: rootEl};
+      container['rootEl_'] = {getEventTarget: () => rootEl};
     });
 
     it('should measure the size of the first distributed element, play the show animation, add ' +
@@ -189,8 +189,8 @@ describe('tool.MenuContainer', () => {
       containerEl.style = {};
       element = Mocks.object('element');
 
-      container['containerEl_'] = {eventTarget: containerEl};
-      container['element_'] = {eventTarget: element};
+      container['containerEl_'] = {getEventTarget: () => containerEl};
+      container['element_'] = {getEventTarget: () => element};
     });
 
     it('should set the location of the container element correctly for TOP_LEFT anchor point',
@@ -331,12 +331,12 @@ describe('tool.MenuContainer', () => {
 
       container.onCreated(element);
 
-      expect(container['backdropEl_'].eventTarget).toEqual(backdropEl);
-      expect(container['containerEl_'].eventTarget).toEqual(containerEl);
-      expect(container['contentEl_'].eventTarget).toEqual(contentEl);
-      expect(container['document_'].eventTarget).toEqual(document);
-      expect(container['element_'].eventTarget).toEqual(element);
-      expect(container['rootEl_'].eventTarget).toEqual(rootEl);
+      expect(container['backdropEl_'].getEventTarget()).toEqual(backdropEl);
+      expect(container['containerEl_'].getEventTarget()).toEqual(containerEl);
+      expect(container['contentEl_'].getEventTarget()).toEqual(contentEl);
+      expect(container['document_'].getEventTarget()).toEqual(document);
+      expect(container['element_'].getEventTarget()).toEqual(element);
+      expect(container['rootEl_'].getEventTarget()).toEqual(rootEl);
 
       element.hide();
       expect(container['hide_']).toHaveBeenCalledWith();

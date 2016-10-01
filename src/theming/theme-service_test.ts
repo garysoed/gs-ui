@@ -74,12 +74,12 @@ describe('theming.ThemeService', () => {
 
       let theme = Mocks.object('theme');
       theme['base'] = {
-        'dark': {'red': 1, 'green': 2, 'blue': 3},
-        'light': {'red': 4, 'green': 5, 'blue': 6},
-        'normal': {'red': 7, 'green': 8, 'blue': 9},
+        'dark': {getBlue: () => 3, getGreen: () => 2, getRed: () => 1},
+        'light': {getBlue: () => 6, getGreen: () => 5, getRed: () => 4},
+        'normal': {getBlue: () => 9, getGreen: () => 8, getRed: () => 7},
       };
       theme['accent'] = {
-        'accent': {'red': 10, 'green': 11, 'blue': 12},
+        'accent': {getBlue: () => 12, getGreen: () => 11, getRed: () => 10},
       };
 
       service.install(theme);
@@ -103,12 +103,12 @@ describe('theming.ThemeService', () => {
 
       let theme = Mocks.object('theme');
       theme['base'] = {
-        'dark': {'red': 1, 'green': 2, 'blue': 3},
-        'light': {'red': 4, 'green': 5, 'blue': 6},
-        'normal': {'red': 7, 'green': 8, 'blue': 9},
+        'dark': {getBlue: () => 3, getGreen: () => 2, getRed: () => 1},
+        'light': {getBlue: () => 6, getGreen: () => 5, getRed: () => 4},
+        'normal': {getBlue: () => 9, getGreen: () => 8, getRed: () => 7},
       };
       theme['accent'] = {
-        'accent': {'red': 10, 'green': 11, 'blue': 12},
+        'accent': {getBlue: () => 12, getGreen: () => 11, getRed: () => 10},
       };
 
       service.install(theme);

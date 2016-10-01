@@ -39,7 +39,7 @@ export class Theme {
    */
   static newInstance(base: Palette, accent: Palette): Theme {
     let validationResult = Validate.any(base).toNot.beEqualTo(accent);
-    if (!validationResult.passes) {
+    if (!validationResult.isValid()) {
       Log.warn(LOG, 'base and accent palettes are recommended to not be equal');
     }
     return new Theme(base, accent);

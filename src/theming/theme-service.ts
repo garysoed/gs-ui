@@ -55,7 +55,7 @@ export class ThemeService {
         })
         .entries()
         .map(([name, color]: [string, IColor]) => {
-          return `--${name}:${color.red},${color.green},${color.blue};`;
+          return `--${name}:${color.getRed()},${color.getGreen()},${color.getBlue()};`;
         })
         .asArray()
         .join('');

@@ -20,7 +20,8 @@ describe('common.BaseActionElement', () => {
     let mockListenableElement;
 
     beforeEach(() => {
-      mockListenableElement = jasmine.createSpyObj('ListenableElement', ['dispatch']);
+      mockListenableElement = jasmine.createSpyObj(
+          'ListenableElement', ['dispatch', 'getEventTarget']);
     });
 
     it('should dispatch the ACTION vent if the element is not disabled', () => {
@@ -28,8 +29,8 @@ describe('common.BaseActionElement', () => {
       mockEventTarget.getAttribute.and.returnValue(null);
       mockListenableElement.eventTarget = mockEventTarget;
 
-      Mocks.getter(actionElement, 'isDisabled', false);
-      Mocks.getter(actionElement, 'element', mockListenableElement);
+      spyOn(actionElement, 'isDisabled').and.returnValue(false);
+      spyOn(actionElement, 'getElement').and.returnValue(mockListenableElement);
       actionElement['onClick_']();
 
       expect(mockListenableElement.dispatch)
@@ -39,9 +40,9 @@ describe('common.BaseActionElement', () => {
     it('should do nothing if the element is disabled', () => {
       let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
       mockEventTarget.getAttribute.and.returnValue('');
-      mockListenableElement.eventTarget = mockEventTarget;
+      mockListenableElement.getEventTarget.and.returnValue(mockEventTarget);
 
-      Mocks.getter(actionElement, 'element', mockListenableElement);
+      spyOn(actionElement, 'getElement').and.returnValue(mockListenableElement);
       actionElement['onClick_']();
 
       expect(mockListenableElement.dispatch).not.toHaveBeenCalled();
@@ -52,15 +53,15 @@ describe('common.BaseActionElement', () => {
     it('should return true if the element is disabled', () => {
       let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
       mockEventTarget.getAttribute.and.returnValue('');
-      Mocks.getter(actionElement, 'element', {eventTarget: mockEventTarget});
-      expect(actionElement.isDisabled).toEqual(true);
+      spyOn(actionElement, 'getElement').and.returnValue({getEventTarget: () => mockEventTarget});
+      expect(actionElement.isDisabled()).toEqual(true);
     });
 
     it('should return false if the element is not disabled', () => {
       let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
       mockEventTarget.getAttribute.and.returnValue(null);
-      Mocks.getter(actionElement, 'element', {eventTarget: mockEventTarget});
-      expect(actionElement.isDisabled).toEqual(false);
+      spyOn(actionElement, 'getElement').and.returnValue({getEventTarget: () => mockEventTarget});
+      expect(actionElement.isDisabled()).toEqual(false);
     });
   });
 

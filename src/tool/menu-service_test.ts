@@ -205,7 +205,8 @@ describe('tool.MenuService', () => {
   describe('hideMenu', () => {
     it('should hide the menu container', () => {
       let mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['hide']);
-      spyOn(service, 'getMenuContainerEl_').and.returnValue({eventTarget: mockMenuContainer});
+      spyOn(service, 'getMenuContainerEl_').and
+          .returnValue({getEventTarget: () => mockMenuContainer});
       service.hideMenu();
       expect(mockMenuContainer.hide).toHaveBeenCalledWith();
     });
@@ -227,9 +228,13 @@ describe('tool.MenuService', () => {
       let anchorTarget = AnchorLocation.TOP_LEFT;
       let anchorPoint = AnchorLocation.BOTTOM_RIGHT;
 
-      let mockMenuContainerEl = jasmine.createSpyObj('MenuContainerEl', ['appendChild', 'show']);
-      let mockListenableMenuContainer = jasmine.createSpyObj('ListenableMenuContainer', ['once']);
-      mockListenableMenuContainer.eventTarget = mockMenuContainerEl;
+      let mockMenuContainerEl = jasmine.createSpyObj(
+          'MenuContainerEl',
+          ['appendChild', 'show']);
+      let mockListenableMenuContainer = jasmine.createSpyObj(
+          'ListenableMenuContainer',
+          ['getEventTarget', 'once']);
+      mockListenableMenuContainer.getEventTarget.and.returnValue(mockMenuContainerEl);
       mockListenableMenuContainer.once.and
           .callFake((eventType: any, handler: () => void, useCapture: any) => {
             handler();
