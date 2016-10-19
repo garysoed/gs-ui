@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
 import {Animation} from '../../external/gs_tools/src/webc';
@@ -28,8 +28,8 @@ describe('section.HorizontalTab', () => {
 
       tab['onAction_']({target: mockTarget});
 
-      expect(element['gsSelectedTab']).toEqual(attribute);
-      expect(mockTarget.getAttribute).toHaveBeenCalledWith('gs-tab-id');
+      assert(element['gsSelectedTab']).to.equal(attribute);
+      assert(mockTarget.getAttribute).to.haveBeenCalledWith('gs-tab-id');
     });
   });
 
@@ -37,7 +37,7 @@ describe('section.HorizontalTab', () => {
     it('should update the highlight', () => {
       spyOn(tab, 'updateHighlight_');
       tab['onMutate_']();
-      expect(tab['updateHighlight_']).toHaveBeenCalledWith();
+      assert(tab['updateHighlight_']).to.haveBeenCalledWith();
     });
   });
 
@@ -45,7 +45,7 @@ describe('section.HorizontalTab', () => {
     it('should update the highlight', () => {
       spyOn(tab, 'updateHighlight_');
       tab['onTick_']();
-      expect(tab['updateHighlight_']).toHaveBeenCalledWith();
+      assert(tab['updateHighlight_']).to.haveBeenCalledWith();
     });
   });
 
@@ -74,24 +74,24 @@ describe('section.HorizontalTab', () => {
 
       tab['setHighlight_'](targetLeft, targetWidth)
           .then(() => {
+            assert(highlightEl.style)
+                .to.equal({left: `${targetLeft}px`, width: `${targetWidth}px`});
+            assert(tab['highlightLeft_']).to.equal(targetLeft);
+            assert(tab['highlightWidth_']).to.equal(targetWidth);
 
-            expect(highlightEl.style).toEqual({left: `${targetLeft}px`, width: `${targetWidth}px`});
-            expect(tab['highlightLeft_']).toEqual(targetLeft);
-            expect(tab['highlightWidth_']).toEqual(targetWidth);
-
-            expect(ListenableDom.of).toHaveBeenCalledWith(animate);
-            expect(mockAnimation.applyTo).toHaveBeenCalledWith(highlightEl);
-            expect(Animation.newInstance).toHaveBeenCalledWith(
+            assert(ListenableDom.of).to.haveBeenCalledWith(animate);
+            assert(mockAnimation.applyTo).to.haveBeenCalledWith(highlightEl);
+            assert(Animation.newInstance).to.haveBeenCalledWith(
                 [
                   {left: `${left}px`, width: `${width}px`},
                   {left: `${targetLeft}px`, width: `${targetWidth}px`},
                 ],
-                jasmine.any(Object));
+                Matchers.any(Object));
             done();
           }, done.fail);
 
-      expect(mockListenableAnimate.once)
-          .toHaveBeenCalledWith(DomEvent.FINISH, jasmine.any(Function));
+      assert(mockListenableAnimate.once)
+          .to.haveBeenCalledWith(DomEvent.FINISH, Matchers.any(Function));
       mockListenableAnimate.once.calls.argsFor(0)[1]();
     });
 
@@ -116,12 +116,12 @@ describe('section.HorizontalTab', () => {
 
       tab['setHighlight_'](targetLeft, targetWidth);
 
-      expect(Animation.newInstance).toHaveBeenCalledWith(
+      assert(Animation.newInstance).to.haveBeenCalledWith(
           [
             {left: '95px', width: '0px'},
-            jasmine.any(Object),
+            Matchers.any(Object),
           ],
-          jasmine.any(Object));
+          Matchers.any(Object));
     });
 
     it('should not update if the highlight is up to date', () => {
@@ -135,7 +135,7 @@ describe('section.HorizontalTab', () => {
 
       tab['setHighlight_'](targetLeft, targetWidth);
 
-      expect(Animation.newInstance).not.toHaveBeenCalled();
+      assert(Animation.newInstance).toNot.haveBeenCalled();
     });
   });
 
@@ -158,8 +158,8 @@ describe('section.HorizontalTab', () => {
 
       tab['updateHighlight_']()
           .then(() => {
-            expect(tab['setHighlight_']).toHaveBeenCalledWith(left, width);
-            expect(mockElement.querySelector).toHaveBeenCalledWith(`[gs-tab-id="${selectedId}"]`);
+            assert(tab['setHighlight_']).to.haveBeenCalledWith(left, width);
+            assert(mockElement.querySelector).to.haveBeenCalledWith(`[gs-tab-id="${selectedId}"]`);
             done();
           }, done.fail);
     });
@@ -178,7 +178,7 @@ describe('section.HorizontalTab', () => {
 
       tab['updateHighlight_']()
           .then(() => {
-            expect(tab['setHighlight_']).toHaveBeenCalledWith(29, 34);
+            assert(tab['setHighlight_']).to.haveBeenCalledWith(29, 34);
             done();
           }, done.fail);
     });
@@ -194,9 +194,9 @@ describe('section.HorizontalTab', () => {
 
           tab.onAttributeChanged('gs-selected-tab');
 
-          expect(mockElement.dispatch)
-              .toHaveBeenCalledWith(HorizontalTab.CHANGE_EVENT, jasmine.any(Function));
-          expect(tab['updateHighlight_']).toHaveBeenCalledWith();
+          assert(mockElement.dispatch)
+              .to.haveBeenCalledWith(HorizontalTab.CHANGE_EVENT, Matchers.any(Function));
+          assert(tab['updateHighlight_']).to.haveBeenCalledWith();
         });
 
     it('should do nothing if other attributes was changed', () => {
@@ -206,8 +206,8 @@ describe('section.HorizontalTab', () => {
 
       tab.onAttributeChanged('other-attribute');
 
-      expect(mockElement.dispatch).not.toHaveBeenCalled();
-      expect(tab['updateHighlight_']).not.toHaveBeenCalled();
+      assert(mockElement.dispatch).toNot.haveBeenCalled();
+      assert(tab['updateHighlight_']).toNot.haveBeenCalled();
     });
   });
 
@@ -238,16 +238,17 @@ describe('section.HorizontalTab', () => {
 
       tab.onCreated(element);
 
-      expect(tab['mutationObserver_']['observe']).toHaveBeenCalledWith(element, {childList: true});
+      assert(tab['mutationObserver_']['observe']).to.haveBeenCalledWith(element, {childList: true});
 
-      expect(tab['interval_'].start).toHaveBeenCalledWith();
-      expect(tab['interval_'].on) .toHaveBeenCalledWith(Interval.TICK_EVENT, jasmine.any(Function));
+      assert(tab['interval_'].start).to.haveBeenCalledWith();
+      assert(tab['interval_'].on)
+          .to.haveBeenCalledWith(Interval.TICK_EVENT, Matchers.any(Function));
       tab['interval_']['on'].calls.argsFor(0)[1]();
-      expect(tab['onTick_']).toHaveBeenCalledWith();
+      assert(tab['onTick_']).to.haveBeenCalledWith();
 
-      expect(tab['tabContainer_'].getEventTarget()).toEqual(tabContainer);
-      expect(tab['highlightEl_'].getEventTarget()).toEqual(highlightEl);
-      expect(tab['highlightContainerEl_'].getEventTarget()).toEqual(highlightContainer);
+      assert(tab['tabContainer_'].getEventTarget()).to.equal(tabContainer);
+      assert(tab['highlightEl_'].getEventTarget()).to.equal(highlightEl);
+      assert(tab['highlightContainerEl_'].getEventTarget()).to.equal(highlightContainer);
     });
   });
 
@@ -260,9 +261,9 @@ describe('section.HorizontalTab', () => {
 
       tab.onInserted();
 
-      expect(tab['element_'].on).toHaveBeenCalledWith('gse-action', jasmine.any(Function));
+      assert(tab['element_'].on).to.haveBeenCalledWith('gse-action', Matchers.any(Function));
       tab['element_'].on.calls.argsFor(0)[1]();
-      expect(tab['onAction_']).toHaveBeenCalledWith();
+      assert(tab['onAction_']).to.haveBeenCalledWith();
     });
   });
 });

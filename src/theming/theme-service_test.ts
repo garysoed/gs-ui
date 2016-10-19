@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
 import {Mocks} from '../../external/gs_tools/src/mock';
@@ -29,9 +29,9 @@ describe('theming.ThemeService', () => {
 
       service.initialize();
 
-      expect(headEl.innerHTML).toEqual(initialInnerHTML + cssTemplate);
-      expect(mockTemplates.getTemplate).toHaveBeenCalledWith('src/theming/theme');
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('head');
+      assert(headEl.innerHTML).to.equal(initialInnerHTML + cssTemplate);
+      assert(mockTemplates.getTemplate).to.haveBeenCalledWith('src/theming/theme');
+      assert(mockDocument.querySelector).to.haveBeenCalledWith('head');
     });
 
     it('should not initialize again if called the second time', () => {
@@ -45,15 +45,15 @@ describe('theming.ThemeService', () => {
       service.initialize();
       service.initialize();
 
-      expect(headEl.innerHTML).toEqual(cssTemplate);
+      assert(headEl.innerHTML).to.equal(cssTemplate);
     });
 
     it('should throw error if the theme template cannot be found', () => {
       mockTemplates.getTemplate.and.returnValue(null);
 
-      expect(() => {
+      assert(() => {
         service.initialize();
-      }).toThrowError(/not found/);
+      }).to.throwError(/not found/);
     });
   });
 
@@ -84,15 +84,15 @@ describe('theming.ThemeService', () => {
 
       service.install(theme);
 
-      expect(themeStyleEl.innerHTML).toEqual(
+      assert(themeStyleEl.innerHTML).to.equal(
           'body{--gsRgbBaseDark:1,2,3;--gsRgbBaseNormal:7,8,9;' +
           '--gsRgbBaseLight:4,5,6;--gsRgbAccent:10,11,12;}');
-      expect(themeStyleEl.id).toEqual('gs-theme');
+      assert(themeStyleEl.id).to.equal('gs-theme');
 
-      expect(mockHeadEl.appendChild).toHaveBeenCalledWith(themeStyleEl);
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('head');
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('style#gs-theme');
-      expect(mockDocument.createElement).toHaveBeenCalledWith('style');
+      assert(mockHeadEl.appendChild).to.haveBeenCalledWith(themeStyleEl);
+      assert(mockDocument.querySelector).to.haveBeenCalledWith('head');
+      assert(mockDocument.querySelector).to.haveBeenCalledWith('style#gs-theme');
+      assert(mockDocument.createElement).to.haveBeenCalledWith('style');
     });
 
     it('should reuse the previous style element', () => {
@@ -113,12 +113,12 @@ describe('theming.ThemeService', () => {
 
       service.install(theme);
 
-      expect(themeStyleEl.innerHTML).toEqual(
+      assert(themeStyleEl.innerHTML).to.equal(
           'body{--gsRgbBaseDark:1,2,3;--gsRgbBaseNormal:7,8,9;' +
           '--gsRgbBaseLight:4,5,6;--gsRgbAccent:10,11,12;}');
 
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('style#gs-theme');
-      expect(mockDocument.createElement).not.toHaveBeenCalled();
+      assert(mockDocument.querySelector).to.haveBeenCalledWith('style#gs-theme');
+      assert(mockDocument.createElement).toNot.haveBeenCalled();
     });
   });
 });

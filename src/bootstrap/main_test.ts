@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
 import {ElementRegistrar} from '../../external/gs_tools/src/webc';
@@ -26,8 +26,8 @@ describe('bootstrap.Main', () => {
     it('should set up correctly', () => {
       let theme = Mocks.object('theme');
       main.bootstrap(theme);
-      expect(mockRegistrar.register).toHaveBeenCalled();
-      expect(mockThemeService.install).toHaveBeenCalledWith(theme);
+      assert(mockRegistrar.register).to.haveBeenCalled();
+      assert(mockThemeService.install).to.haveBeenCalledWith(theme);
     });
   });
 
@@ -47,18 +47,18 @@ describe('bootstrap.Main', () => {
 
       let main = Main.newInstance();
 
-      expect(main['injector_']).toEqual(mockInjector);
-      expect(main['themeService_']).toEqual(mockThemeService);
-      expect(main['registrar_']).toEqual(mockRegistrar);
+      assert(main['injector_']).to.equal(mockInjector);
+      assert(main['themeService_']).to.equal(mockThemeService);
+      assert(main['registrar_']).to.equal(mockRegistrar);
 
-      expect(mockThemeService.initialize).toHaveBeenCalledWith();
-      expect(mockInjector.instantiate).toHaveBeenCalledWith(ThemeService);
-      expect(ElementRegistrar.newInstance).toHaveBeenCalledWith(mockInjector, templates);
-      expect(TestInject.getBoundValue('x.dom.document')()).toEqual(document);
-      expect(TestInject.getBoundValue('x.dom.window')()).toEqual(window);
-      expect(TestInject.getBoundValue('x.gs_tools.templates')()).toEqual(templates);
+      assert(mockThemeService.initialize).to.haveBeenCalledWith();
+      assert(mockInjector.instantiate).to.haveBeenCalledWith(ThemeService);
+      assert(ElementRegistrar.newInstance).to.haveBeenCalledWith(mockInjector, templates);
+      assert(TestInject.getBoundValue('x.dom.document')()).to.equal(document);
+      assert(TestInject.getBoundValue('x.dom.window')()).to.equal(window);
+      assert(TestInject.getBoundValue('x.gs_tools.templates')()).to.equal(templates);
 
-      expect(Templates.newInstance).toHaveBeenCalledWith(jasmine.any(Map));
+      assert(Templates.newInstance).to.haveBeenCalledWith(Matchers.any(Map));
     });
   });
 });

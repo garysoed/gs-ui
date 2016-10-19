@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
 import {AnchorLocation} from './anchor-location';
@@ -38,9 +38,9 @@ describe('tool.MenuContainer', () => {
       let anchorLocation = AnchorLocation.TOP_LEFT;
       spyOn(Anchors, 'resolveAutoLocation').and.returnValue(anchorLocation);
 
-      expect(container['getAnchorPoint_']()).toEqual(anchorLocation);
-      expect(Anchors.resolveAutoLocation)
-          .toHaveBeenCalledWith(anchorTargetX, anchorTargetY, window);
+      assert(container['getAnchorPoint_']()).to.equal(anchorLocation);
+      assert(Anchors.resolveAutoLocation)
+          .to.haveBeenCalledWith(anchorTargetX, anchorTargetY, window);
     });
 
     it('should return the set anchor point if it is not AUTO', () => {
@@ -48,7 +48,7 @@ describe('tool.MenuContainer', () => {
       element['gsAnchorPoint'] = AnchorLocation.TOP_RIGHT;
       container['element_'] = {getEventTarget: () => element};
 
-      expect(container['getAnchorPoint_']()).toEqual(AnchorLocation.TOP_RIGHT);
+      assert(container['getAnchorPoint_']()).to.equal(AnchorLocation.TOP_RIGHT);
     });
   });
 
@@ -76,16 +76,16 @@ describe('tool.MenuContainer', () => {
 
           container['hide_']();
 
-          expect(mockListenableAnimate.once)
-              .toHaveBeenCalledWith(DomEvent.FINISH, jasmine.any(Function));
+          assert(mockListenableAnimate.once)
+              .to.haveBeenCalledWith(DomEvent.FINISH, Matchers.any(Function));
           mockListenableAnimate['once'].calls.argsFor(0)[1]();
-          expect(mockClassList.remove).toHaveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
-          expect(mockListenableElement.dispatch).toHaveBeenCalledWith(
+          assert(mockClassList.remove).to.haveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
+          assert(mockListenableElement.dispatch).to.haveBeenCalledWith(
               MenuContainer.HIDE_EVENT,
-              jasmine.any(Function));
+              Matchers.any(Function));
 
-          expect(MenuContainer['HIDE_ANIMATION_'].applyTo).toHaveBeenCalledWith(containerEl);
-          expect(ListenableDom.of).toHaveBeenCalledWith(animate);
+          assert(MenuContainer['HIDE_ANIMATION_'].applyTo).to.haveBeenCalledWith(containerEl);
+          assert(ListenableDom.of).to.haveBeenCalledWith(animate);
         });
   });
 
@@ -93,7 +93,7 @@ describe('tool.MenuContainer', () => {
     it('should hide the menu', () => {
       spyOn(container, 'hide_');
       container['onBackdropClick_']();
-      expect(container['hide_']).toHaveBeenCalledWith();
+      assert(container['hide_']).to.haveBeenCalledWith();
     });
   });
 
@@ -101,7 +101,7 @@ describe('tool.MenuContainer', () => {
     it('should update the content', () => {
       spyOn(container, 'updateContent_');
       container['onWindowResize_']();
-      expect(container['updateContent_']).toHaveBeenCalledWith();
+      assert(container['updateContent_']).to.haveBeenCalledWith();
     });
   });
 
@@ -147,26 +147,26 @@ describe('tool.MenuContainer', () => {
 
           container['show_']();
 
-          expect(mockListenableElement.dispatch).toHaveBeenCalledWith(
+          assert(mockListenableElement.dispatch).to.haveBeenCalledWith(
               MenuContainer.SHOW_EVENT,
-              jasmine.any(Function));
+              Matchers.any(Function));
 
           mockListenableElement.dispatch.calls.argsFor(0)[1]();
-          expect(mockClassList.add).toHaveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
-          expect(mockAnimation.applyTo).toHaveBeenCalledWith(containerEl);
-          expect(MenuContainer['BASE_SHOW_ANIMATION_'].appendKeyframe).toHaveBeenCalledWith(
+          assert(mockClassList.add).to.haveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
+          assert(mockAnimation.applyTo).to.haveBeenCalledWith(containerEl);
+          assert(MenuContainer['BASE_SHOW_ANIMATION_'].appendKeyframe).to.haveBeenCalledWith(
               jasmine.objectContaining({
                 height: `${height}px`,
                 width: `${width}px`,
               }));
 
-          expect(Jsons.setTemporaryValue).toHaveBeenCalledWith(
+          assert(Jsons.setTemporaryValue).to.haveBeenCalledWith(
               rootEl,
               {
                 'style.display': 'block',
                 'style.visibility': 'hidden',
               },
-              jasmine.any(Function));
+              <any> Matchers.any(Function));
         });
 
     it('should do nothing if the distributed element cannot be found', () => {
@@ -176,7 +176,7 @@ describe('tool.MenuContainer', () => {
 
       container['show_']();
 
-      expect(mockClassList.add).not.toHaveBeenCalled();
+      assert(mockClassList.add).toNot.haveBeenCalled();
     });
   });
 
@@ -205,10 +205,10 @@ describe('tool.MenuContainer', () => {
 
           container['updateContent_']();
 
-          expect(containerEl.style.top).toEqual('34px');
-          expect(containerEl.style.right).toEqual('');
-          expect(containerEl.style.bottom).toEqual('');
-          expect(containerEl.style.left).toEqual('12px');
+          assert(containerEl.style.top).to.equal('34px');
+          assert(containerEl.style.right).to.equal('');
+          assert(containerEl.style.bottom).to.equal('');
+          assert(containerEl.style.left).to.equal('12px');
         });
 
     it('should set the location of the container element correctly for TOP_RIGHT anchor point',
@@ -223,10 +223,10 @@ describe('tool.MenuContainer', () => {
 
           container['updateContent_']();
 
-          expect(containerEl.style.top).toEqual('34px');
-          expect(containerEl.style.right).toEqual('188px');
-          expect(containerEl.style.bottom).toEqual('');
-          expect(containerEl.style.left).toEqual('');
+          assert(containerEl.style.top).to.equal('34px');
+          assert(containerEl.style.right).to.equal('188px');
+          assert(containerEl.style.bottom).to.equal('');
+          assert(containerEl.style.left).to.equal('');
         });
 
     it('should set the location of the container element correctly for BOTTOM_RIGHT anchor point',
@@ -241,10 +241,10 @@ describe('tool.MenuContainer', () => {
 
           container['updateContent_']();
 
-          expect(containerEl.style.top).toEqual('');
-          expect(containerEl.style.right).toEqual('188px');
-          expect(containerEl.style.bottom).toEqual('66px');
-          expect(containerEl.style.left).toEqual('');
+          assert(containerEl.style.top).to.equal('');
+          assert(containerEl.style.right).to.equal('188px');
+          assert(containerEl.style.bottom).to.equal('66px');
+          assert(containerEl.style.left).to.equal('');
         });
 
     it('should set the location of the container element correctly for BOTTOM_LEFT anchor point',
@@ -259,10 +259,10 @@ describe('tool.MenuContainer', () => {
 
           container['updateContent_']();
 
-          expect(containerEl.style.top).toEqual('');
-          expect(containerEl.style.right).toEqual('');
-          expect(containerEl.style.bottom).toEqual('66px');
-          expect(containerEl.style.left).toEqual('12px');
+          assert(containerEl.style.top).to.equal('');
+          assert(containerEl.style.right).to.equal('');
+          assert(containerEl.style.bottom).to.equal('66px');
+          assert(containerEl.style.left).to.equal('12px');
         });
 
     it('should do nothing if anchorTargetX is not set', () => {
@@ -273,7 +273,7 @@ describe('tool.MenuContainer', () => {
 
       container['updateContent_']();
 
-      expect(container['getAnchorPoint_']).not.toHaveBeenCalled();
+      assert(container['getAnchorPoint_']).toNot.haveBeenCalled();
     });
 
     it('should do nothing if anchorTargetY is not set', () => {
@@ -284,7 +284,7 @@ describe('tool.MenuContainer', () => {
 
       container['updateContent_']();
 
-      expect(container['getAnchorPoint_']).not.toHaveBeenCalled();
+      assert(container['getAnchorPoint_']).toNot.haveBeenCalled();
     });
   });
 
@@ -294,7 +294,7 @@ describe('tool.MenuContainer', () => {
 
       container.onAttributeChanged('gs-anchor-target-x', 12, 23);
 
-      expect(container['updateContent_']).toHaveBeenCalledWith();
+      assert(container['updateContent_']).to.haveBeenCalledWith();
     });
   });
 
@@ -331,20 +331,20 @@ describe('tool.MenuContainer', () => {
 
       container.onCreated(element);
 
-      expect(container['backdropEl_'].getEventTarget()).toEqual(backdropEl);
-      expect(container['containerEl_'].getEventTarget()).toEqual(containerEl);
-      expect(container['contentEl_'].getEventTarget()).toEqual(contentEl);
-      expect(container['document_'].getEventTarget()).toEqual(document);
-      expect(container['element_'].getEventTarget()).toEqual(element);
-      expect(container['rootEl_'].getEventTarget()).toEqual(rootEl);
+      assert(container['backdropEl_'].getEventTarget()).to.equal(backdropEl);
+      assert(container['containerEl_'].getEventTarget()).to.equal(containerEl);
+      assert(container['contentEl_'].getEventTarget()).to.equal(contentEl);
+      assert(container['document_'].getEventTarget()).to.equal(document);
+      assert(container['element_'].getEventTarget()).to.equal(element);
+      assert(container['rootEl_'].getEventTarget()).to.equal(rootEl);
 
       element.hide();
-      expect(container['hide_']).toHaveBeenCalledWith();
+      assert(container['hide_']).to.haveBeenCalledWith();
 
       element.show();
-      expect(container['show_']).toHaveBeenCalledWith();
+      assert(container['show_']).to.haveBeenCalledWith();
 
-      expect(element['gsAnchorPoint']).toEqual(AnchorLocation.AUTO);
+      assert(element['gsAnchorPoint']).to.equal(AnchorLocation.AUTO);
     });
 
     it('should use the existing anchor point if given', () => {
@@ -359,7 +359,7 @@ describe('tool.MenuContainer', () => {
 
       container.onCreated(element);
 
-      expect(element['gsAnchorPoint']).toEqual(anchorPoint);
+      assert(element['gsAnchorPoint']).to.equal(anchorPoint);
     });
   });
 
@@ -379,17 +379,17 @@ describe('tool.MenuContainer', () => {
 
       container.onInserted();
 
-      expect(container['updateContent_']).toHaveBeenCalledWith();
+      assert(container['updateContent_']).to.haveBeenCalledWith();
 
-      expect(mockListenableBackdrop.on)
-          .toHaveBeenCalledWith(DomEvent.CLICK, jasmine.any(Function));
+      assert(mockListenableBackdrop.on)
+          .to.haveBeenCalledWith(DomEvent.CLICK, Matchers.any(Function));
       mockListenableBackdrop.on.calls.argsFor(0)[1]();
-      expect(container['onBackdropClick_']).toHaveBeenCalledWith();
+      assert(container['onBackdropClick_']).to.haveBeenCalledWith();
 
-      expect(mockListenableWindow.on)
-          .toHaveBeenCalledWith(DomEvent.RESIZE, jasmine.any(Function));
+      assert(mockListenableWindow.on)
+          .to.haveBeenCalledWith(DomEvent.RESIZE, Matchers.any(Function));
       mockListenableWindow.on.calls.argsFor(0)[1]();
-      expect(container['onWindowResize_']).toHaveBeenCalledWith();
+      assert(container['onWindowResize_']).to.haveBeenCalledWith();
     });
   });
 });

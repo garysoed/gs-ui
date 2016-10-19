@@ -4,6 +4,7 @@ import {
   TestInject,
   TestEvent,
   TestSetup} from '../external/gs_tools/src/testing';
+export {assert, Matchers} from '../external/gs_tools/src/jasmine';
 
 
 const TEST_SETUP = new TestSetup([

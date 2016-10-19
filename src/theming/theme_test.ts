@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
 import {Log} from '../../external/gs_tools/src/util';
@@ -12,8 +12,8 @@ describe('theming.Theme', () => {
       let base = Mocks.object('base');
       let accent = Mocks.object('accent');
       let theme = Theme.newInstance(base, accent);
-      expect(theme.base).toEqual(base);
-      expect(theme.accent).toEqual(accent);
+      assert(theme.base).to.equal(base);
+      assert(theme.accent).to.equal(accent);
     });
 
     it('should warn if the base and accent palettes are the same', () => {
@@ -22,9 +22,9 @@ describe('theming.Theme', () => {
       spyOn(Log, 'warn');
       Theme.newInstance(palette, palette);
 
-      expect(Log.warn).toHaveBeenCalledWith(
-          jasmine.any(Log),
-          jasmine.stringMatching(/base and accent palettes/));
+      assert(Log.warn).to.haveBeenCalledWith(
+          Matchers.any(Log),
+          Matchers.stringMatching(/base and accent palettes/));
     });
   });
 });

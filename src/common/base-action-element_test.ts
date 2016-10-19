@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
 import {BaseActionElement} from './base-action-element';
@@ -9,7 +9,7 @@ import {TestDispose} from '../../external/gs_tools/src/testing';
 
 
 describe('common.BaseActionElement', () => {
-  let actionElement;
+  let actionElement: BaseActionElement;
 
   beforeEach(() => {
     actionElement = new BaseActionElement();
@@ -33,8 +33,8 @@ describe('common.BaseActionElement', () => {
       spyOn(actionElement, 'getElement').and.returnValue(mockListenableElement);
       actionElement['onClick_']();
 
-      expect(mockListenableElement.dispatch)
-          .toHaveBeenCalledWith(Event.ACTION, jasmine.any(Function));
+      assert(mockListenableElement.dispatch)
+          .to.haveBeenCalledWith(Event.ACTION, Matchers.any(Function));
     });
 
     it('should do nothing if the element is disabled', () => {
@@ -45,7 +45,7 @@ describe('common.BaseActionElement', () => {
       spyOn(actionElement, 'getElement').and.returnValue(mockListenableElement);
       actionElement['onClick_']();
 
-      expect(mockListenableElement.dispatch).not.toHaveBeenCalled();
+      assert(mockListenableElement.dispatch).toNot.haveBeenCalled();
     });
   });
 
@@ -54,14 +54,14 @@ describe('common.BaseActionElement', () => {
       let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
       mockEventTarget.getAttribute.and.returnValue('');
       spyOn(actionElement, 'getElement').and.returnValue({getEventTarget: () => mockEventTarget});
-      expect(actionElement.isDisabled()).toEqual(true);
+      assert(actionElement.isDisabled()).to.beTrue();
     });
 
     it('should return false if the element is not disabled', () => {
       let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
       mockEventTarget.getAttribute.and.returnValue(null);
       spyOn(actionElement, 'getElement').and.returnValue({getEventTarget: () => mockEventTarget});
-      expect(actionElement.isDisabled()).toEqual(false);
+      assert(actionElement.isDisabled()).to.beFalse();
     });
   });
 
@@ -79,12 +79,12 @@ describe('common.BaseActionElement', () => {
 
       actionElement.onCreated(element);
 
-      expect(mockListenableDom.on).toHaveBeenCalledWith(DomEvent.CLICK, jasmine.any(Function));
+      assert(mockListenableDom.on).to.haveBeenCalledWith(DomEvent.CLICK, Matchers.any(Function));
 
       mockListenableDom.on.calls.argsFor(0)[1]();
-      expect(actionElement['onClick_']).toHaveBeenCalledWith();
+      assert(actionElement['onClick_']).to.haveBeenCalledWith();
 
-      expect(mockClassList.add).toHaveBeenCalledWith('gs-action');
+      assert(mockClassList.add).to.haveBeenCalledWith('gs-action');
     });
   });
 });

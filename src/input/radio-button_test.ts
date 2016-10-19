@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
 import {BaseActionElement} from '../common/base-action-element';
@@ -29,14 +29,14 @@ describe('input.RadioButton', () => {
       spyOn(button, 'getElement').and.returnValue({getEventTarget: () => element});
 
       button['onClick_']();
-      expect(mockRadioButtonService.setSelected).toHaveBeenCalledWith(element, true);
+      assert(mockRadioButtonService.setSelected).to.haveBeenCalledWith(element, true);
     });
 
     it('should do nothing if it is disabled', () => {
       spyOn(button, 'isDisabled').and.returnValue(true);
 
       button['onClick_']();
-      expect(mockRadioButtonService.setSelected).not.toHaveBeenCalled();
+      assert(mockRadioButtonService.setSelected).toNot.haveBeenCalled();
     });
   });
 
@@ -50,7 +50,7 @@ describe('input.RadioButton', () => {
 
       button.onAttributeChanged('gs-group', 'oldValue', 'newValue');
 
-      expect(mockRadioButtonService.setSelected).toHaveBeenCalledWith(element, checked);
+      assert(mockRadioButtonService.setSelected).to.haveBeenCalledWith(element, checked);
     });
 
     it('should call radio button service if the checked state is changed', () => {
@@ -62,13 +62,13 @@ describe('input.RadioButton', () => {
 
       button.onAttributeChanged('gs-checked', 'oldValue', 'newValue');
 
-      expect(mockRadioButtonService.setSelected).toHaveBeenCalledWith(element, checked);
+      assert(mockRadioButtonService.setSelected).to.haveBeenCalledWith(element, checked);
     });
 
     it('should do nothing if other attributes changed', () => {
       button.onAttributeChanged('other', 'oldValue', 'newValue');
 
-      expect(mockRadioButtonService.setSelected).not.toHaveBeenCalled();
+      assert(mockRadioButtonService.setSelected).toNot.haveBeenCalled();
     });
   });
 });

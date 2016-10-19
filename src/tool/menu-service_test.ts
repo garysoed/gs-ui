@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
 import {AnchorLocation} from './anchor-location';
@@ -36,11 +36,11 @@ describe('tool.MenuService', () => {
       let listenableContainer = Mocks.disposable('listenableContainer');
       spyOn(ListenableDom, 'of').and.returnValue(listenableContainer);
 
-      expect(service['getMenuContainerEl_']()).toEqual(listenableContainer);
-      expect(ListenableDom.of).toHaveBeenCalledWith(menuContainerEl);
-      expect(mockBody.appendChild).toHaveBeenCalledWith(menuContainerEl);
-      expect(mockDocument.createElement).toHaveBeenCalledWith('gs-menu-container');
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('gs-menu-container');
+      assert(service['getMenuContainerEl_']()).to.equal(listenableContainer);
+      assert(ListenableDom.of).to.haveBeenCalledWith(menuContainerEl);
+      assert(mockBody.appendChild).to.haveBeenCalledWith(menuContainerEl);
+      assert(mockDocument.createElement).to.haveBeenCalledWith('gs-menu-container');
+      assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-menu-container');
     });
 
     it('should grab the menu container element if one already exists', () => {
@@ -53,10 +53,10 @@ describe('tool.MenuService', () => {
       let listenableContainer = Mocks.disposable('listenableContainer');
       spyOn(ListenableDom, 'of').and.returnValue(listenableContainer);
 
-      expect(service['getMenuContainerEl_']()).toEqual(listenableContainer);
-      expect(ListenableDom.of).toHaveBeenCalledWith(menuContainerEl);
-      expect(mockDocument.createElement).not.toHaveBeenCalled();
-      expect(mockDocument.querySelector).toHaveBeenCalledWith('gs-menu-container');
+      assert(service['getMenuContainerEl_']()).to.equal(listenableContainer);
+      assert(ListenableDom.of).to.haveBeenCalledWith(menuContainerEl);
+      assert(mockDocument.createElement).toNot.haveBeenCalled();
+      assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-menu-container');
     });
 
     it('should return the existing menu container element', () => {
@@ -64,8 +64,8 @@ describe('tool.MenuService', () => {
       TestDispose.add(listenableContainer);
       service['menuContainerEl_'] = listenableContainer;
 
-      expect(service['getMenuContainerEl_']()).toEqual(listenableContainer);
-      expect(mockDocument.querySelector).not.toHaveBeenCalled();
+      assert(service['getMenuContainerEl_']()).to.equal(listenableContainer);
+      assert(mockDocument.querySelector).toNot.haveBeenCalled();
     });
   });
 
@@ -79,8 +79,8 @@ describe('tool.MenuService', () => {
 
       service['onTick_'](menuContainerEl, anchorTarget, anchorElement);
 
-      expect(service['setAnchorTarget_'])
-          .toHaveBeenCalledWith(menuContainerEl, anchorTarget, anchorElement);
+      assert(service['setAnchorTarget_'])
+          .to.haveBeenCalledWith(menuContainerEl, anchorTarget, anchorElement);
     });
   });
 
@@ -106,8 +106,8 @@ describe('tool.MenuService', () => {
           AnchorLocation.TOP_LEFT,
           mockParentElement);
 
-      expect(menuContainerEl['gsAnchorTargetX']).toEqual(left);
-      expect(menuContainerEl['gsAnchorTargetY']).toEqual(top);
+      assert(menuContainerEl['gsAnchorTargetX']).to.equal(left);
+      assert(menuContainerEl['gsAnchorTargetY']).to.equal(top);
     });
 
     it('should set the correct X and Y for TOP_RIGHT', () => {
@@ -127,8 +127,8 @@ describe('tool.MenuService', () => {
           AnchorLocation.TOP_RIGHT,
           mockParentElement);
 
-      expect(menuContainerEl['gsAnchorTargetX']).toEqual(68);
-      expect(menuContainerEl['gsAnchorTargetY']).toEqual(top);
+      assert(menuContainerEl['gsAnchorTargetX']).to.equal(68);
+      assert(menuContainerEl['gsAnchorTargetY']).to.equal(top);
     });
 
     it('should set the correct X and Y for BOTTOM_RIGHT', () => {
@@ -150,8 +150,8 @@ describe('tool.MenuService', () => {
           AnchorLocation.BOTTOM_RIGHT,
           mockParentElement);
 
-      expect(menuContainerEl['gsAnchorTargetX']).toEqual(68);
-      expect(menuContainerEl['gsAnchorTargetY']).toEqual(112);
+      assert(menuContainerEl['gsAnchorTargetX']).to.equal(68);
+      assert(menuContainerEl['gsAnchorTargetY']).to.equal(112);
     });
 
     it('should set the correct X and T for BOTTOM_LEFT', () => {
@@ -171,8 +171,8 @@ describe('tool.MenuService', () => {
           AnchorLocation.BOTTOM_LEFT,
           mockParentElement);
 
-      expect(menuContainerEl['gsAnchorTargetX']).toEqual(left);
-      expect(menuContainerEl['gsAnchorTargetY']).toEqual(112);
+      assert(menuContainerEl['gsAnchorTargetX']).to.equal(left);
+      assert(menuContainerEl['gsAnchorTargetY']).to.equal(112);
     });
 
     it('should resolve auto location if the anchor target is AUTO', () => {
@@ -196,9 +196,9 @@ describe('tool.MenuService', () => {
           AnchorLocation.AUTO,
           mockParentElement);
 
-      expect(menuContainerEl['gsAnchorTargetX']).toEqual(left);
-      expect(menuContainerEl['gsAnchorTargetY']).toEqual(top);
-      expect(Anchors.resolveAutoLocation).toHaveBeenCalledWith(40, 73, window);
+      assert(menuContainerEl['gsAnchorTargetX']).to.equal(left);
+      assert(menuContainerEl['gsAnchorTargetY']).to.equal(top);
+      assert(Anchors.resolveAutoLocation).to.haveBeenCalledWith(40, 73, window);
     });
   });
 
@@ -208,7 +208,7 @@ describe('tool.MenuService', () => {
       spyOn(service, 'getMenuContainerEl_').and
           .returnValue({getEventTarget: () => mockMenuContainer});
       service.hideMenu();
-      expect(mockMenuContainer.hide).toHaveBeenCalledWith();
+      assert(mockMenuContainer.hide).to.haveBeenCalledWith();
     });
   });
 
@@ -251,32 +251,32 @@ describe('tool.MenuService', () => {
 
       service.showMenu(mockMenu, anchorElement, anchorTarget, anchorPoint)
           .then(() => {
-            expect(mockMenu.appendChild).toHaveBeenCalledWith(menuContent);
-            expect(mockAnchorTargetWatcher.dispose).toHaveBeenCalledWith();
+            assert(mockMenu.appendChild).to.haveBeenCalledWith(menuContent);
+            assert(mockAnchorTargetWatcher.dispose).to.haveBeenCalledWith();
 
-            expect(mockMenuContainerEl.show).toHaveBeenCalledWith();
-            expect(mockListenableMenuContainer.once).toHaveBeenCalledWith(
+            assert(mockMenuContainerEl.show).to.haveBeenCalledWith();
+            assert(mockListenableMenuContainer.once).to.haveBeenCalledWith(
                 MenuContainer.HIDE_EVENT,
-                jasmine.any(Function),
+                Matchers.any(Function),
                 false);
 
-            expect(service['setAnchorTarget_'])
-                .toHaveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
-            expect(mockMenuContainerEl['gsAnchorPoint']).toEqual(anchorPoint);
-            expect(mockMenuContainerEl.appendChild).toHaveBeenCalledWith(menuContent);
+            assert(service['setAnchorTarget_'])
+                .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
+            assert(mockMenuContainerEl['gsAnchorPoint']).to.equal(anchorPoint);
+            assert(mockMenuContainerEl.appendChild).to.haveBeenCalledWith(menuContent);
 
-            expect(mockAnchorTargetWatcher.start).toHaveBeenCalledWith();
-            expect(mockAnchorTargetWatcher.on).toHaveBeenCalledWith(
+            assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();
+            assert(mockAnchorTargetWatcher.on).to.haveBeenCalledWith(
                 Interval.TICK_EVENT,
-                jasmine.any(Function));
+                Matchers.any(Function));
             mockAnchorTargetWatcher.on.calls.argsFor(0)[1]();
-            expect(service['onTick_'])
-                .toHaveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
+            assert(service['onTick_'])
+                .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
 
-            expect(Interval.newInstance)
-                .toHaveBeenCalledWith(MenuService['ANCHOR_TARGET_INTERVAL_']);
+            assert(Interval.newInstance)
+                .to.haveBeenCalledWith(MenuService['ANCHOR_TARGET_INTERVAL_']);
 
-            expect(mockMenu.querySelector).toHaveBeenCalledWith('[gs-content]');
+            assert(mockMenu.querySelector).to.haveBeenCalledWith('[gs-content]');
             done();
           }, done.fail);
     });
@@ -293,7 +293,7 @@ describe('tool.MenuService', () => {
               AnchorLocation.TOP_LEFT,
               AnchorLocation.BOTTOM_RIGHT)
           .then(() => {
-            expect(mockMenuContainerEl.show).not.toHaveBeenCalled();
+            assert(mockMenuContainerEl.show).toNot.haveBeenCalled();
             done();
           }, done.fail);
     });

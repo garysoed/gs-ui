@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
 import {AnchorLocation} from './anchor-location';
@@ -32,8 +32,8 @@ describe('tool.Menu', () => {
       menu['element_'] = {getEventTarget: () => eventTarget};
       menu['onAction_']();
 
-      expect(mockMenuService.showMenu)
-          .toHaveBeenCalledWith(eventTarget, parentElement, anchorTarget, anchorPoint);
+      assert(mockMenuService.showMenu)
+          .to.haveBeenCalledWith(eventTarget, parentElement, anchorTarget, anchorPoint);
     });
   });
 
@@ -77,17 +77,17 @@ describe('tool.Menu', () => {
 
       menu.onCreated(element);
 
-      expect(element['gsAnchorPoint']).toEqual(anchorPoint);
-      expect(element['gsAnchorTarget']).toEqual(anchorTarget);
+      assert(element['gsAnchorPoint']).to.equal(anchorPoint);
+      assert(element['gsAnchorTarget']).to.equal(anchorTarget);
 
-      expect(mockListenableParentElement.on)
-          .toHaveBeenCalledWith(Event.ACTION, jasmine.any(Function));
+      assert(mockListenableParentElement.on)
+          .to.haveBeenCalledWith(Event.ACTION, Matchers.any(Function));
       mockListenableParentElement.on.calls.argsFor(0)[1]();
-      expect(menu['onAction_']).toHaveBeenCalledWith();
+      assert(menu['onAction_']).to.haveBeenCalledWith();
 
-      expect(menu['menuRoot_']).toEqual(rootElement);
-      expect(mockShadowRoot.querySelector).toHaveBeenCalledWith('.root');
-      expect(menu['element_']).toEqual(mockListenableElement);
+      assert(menu['menuRoot_']).to.equal(rootElement);
+      assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('.root');
+      assert(menu['element_']).to.equal(mockListenableElement);
     });
 
     it('should default the anchor target to AUTO', () => {
@@ -115,7 +115,7 @@ describe('tool.Menu', () => {
 
       menu.onCreated(element);
 
-      expect(element['gsAnchorTarget']).toEqual(AnchorLocation.AUTO);
+      assert(element['gsAnchorTarget']).to.equal(AnchorLocation.AUTO);
     });
 
     it('should default the anchor point to AUTO', () => {
@@ -143,7 +143,7 @@ describe('tool.Menu', () => {
 
       menu.onCreated(element);
 
-      expect(element['gsAnchorPoint']).toEqual(AnchorLocation.AUTO);
+      assert(element['gsAnchorPoint']).to.equal(AnchorLocation.AUTO);
     });
   });
 });

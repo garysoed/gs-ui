@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
 import {AnchorLocation} from './anchor-location';
@@ -8,25 +8,25 @@ import {AnchorLocationParser} from './anchor-location-parser';
 describe('tool.AnchorLocationParser', () => {
   describe('parse', () => {
     it('should return the correct enum', () => {
-      expect(AnchorLocationParser.parse('bottom_right')).toEqual(AnchorLocation.BOTTOM_RIGHT);
+      assert(AnchorLocationParser.parse('bottom_right')).to.equal(AnchorLocation.BOTTOM_RIGHT);
     });
 
     it('should return null if the string is invalid', () => {
-      expect(AnchorLocationParser.parse('invalid')).toEqual(null);
+      assert(AnchorLocationParser.parse('invalid')).to.beNull();
     });
 
     it('should return null if the string is null', () => {
-      expect(AnchorLocationParser.parse(null)).toEqual(null);
+      assert(AnchorLocationParser.parse(null)).to.beNull();
     });
   });
 
   describe('stringify', () => {
     it('should return the correct string', () => {
-      expect(AnchorLocationParser.stringify(AnchorLocation.BOTTOM_RIGHT)).toEqual('bottom_right');
+      assert(AnchorLocationParser.stringify(AnchorLocation.BOTTOM_RIGHT)).to.equal('bottom_right');
     });
 
     it('should return empty string if the enum is null', () => {
-      expect(AnchorLocationParser.stringify(null)).toEqual('');
+      assert(AnchorLocationParser.stringify(null)).to.equal('');
     });
   });
 });

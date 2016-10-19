@@ -1,4 +1,4 @@
-import {TestBase} from '../test-base';
+import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
 import {Mocks} from '../../external/gs_tools/src/mock';
@@ -32,11 +32,11 @@ describe('input.RadioButtonService', () => {
 
       service.setSelected(mockButtonEl, true);
 
-      expect(mockButtonEl['gsChecked']).toEqual(true);
-      expect(otherButton['gsChecked']).toEqual(false);
-      expect(mockDocument.querySelector)
-          .toHaveBeenCalledWith(jasmine.stringMatching(/gs-group="group"/));
-      expect(mockButtonEl.getAttribute).toHaveBeenCalledWith('gs-group');
+      assert(<boolean> mockButtonEl['gsChecked']).to.beTrue();
+      assert(<boolean> otherButton['gsChecked']).to.beFalse();
+      assert(mockDocument.querySelector)
+          .to.haveBeenCalledWith(jasmine.stringMatching(/gs-group="group"/));
+      assert(mockButtonEl.getAttribute).to.haveBeenCalledWith('gs-group');
     });
 
     it('should not unselect the button if the currently selected button is the given button',
@@ -50,8 +50,8 @@ describe('input.RadioButtonService', () => {
 
           service.setSelected(mockButtonEl, true);
 
-          expect(mockGsCheckedSetter).toHaveBeenCalledWith(true);
-          expect(mockGsCheckedSetter).not.toHaveBeenCalledWith(false);
+          assert(mockGsCheckedSetter).to.haveBeenCalledWith(true);
+          assert(mockGsCheckedSetter).toNot.haveBeenCalledWith(false);
         });
 
     it('should not unselect the button if there are no selected buttons', () => {
@@ -59,7 +59,7 @@ describe('input.RadioButtonService', () => {
 
       service.setSelected(mockButtonEl, true);
 
-      expect(mockButtonEl['gsChecked']).toEqual(true);
+      assert(<boolean> mockButtonEl['gsChecked']).to.beTrue();
     });
 
     it('should not unselect any buttons if the request is to unselect a button', () => {
@@ -71,16 +71,16 @@ describe('input.RadioButtonService', () => {
 
       service.setSelected(mockButtonEl, false);
 
-      expect(mockButtonEl['gsChecked']).toEqual(false);
-      expect(otherButton['gsChecked']).toEqual(true);
+      assert(<boolean> mockButtonEl['gsChecked']).to.beFalse();
+      assert(<boolean> otherButton['gsChecked']).to.beTrue();
     });
 
     it('should throw error if the element name is not gs-radio-button', () => {
       let element = Mocks.object('element');
       element.nodeName = 'other';
-      expect(() => {
+      assert(() => {
         service.setSelected(element, true);
-      }).toThrowError(/gs-radio-button/);
+      }).to.throwError(/gs-radio-button/);
     });
   });
 });
