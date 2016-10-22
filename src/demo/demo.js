@@ -58,7 +58,7 @@ for (var r = 0; r < 5; r++) {
     var normal = palette.normal;
     var cellEl = document.createElement('div');
     cellEl.style.backgroundColor =
-        'rgb(' + [normal.red, normal.green, normal.blue].join(',') +')';
+        'rgb(' + [normal.getRed(), normal.getGreen(), normal.getBlue()].join(',') +')';
     cellEl.classList.add('colorPickerCell');
     cellEl.classList.add('base');
     cellEl.setAttribute('data-name', name);
@@ -67,13 +67,13 @@ for (var r = 0; r < 5; r++) {
     var light = palette.light;
     var lightCell = document.createElement('div');
     lightCell.style.backgroundColor =
-        'rgb(' + [light.red, light.green, light.blue].join(',') + ')';
+        'rgb(' + [light.getRed(), light.getGreen(), light.getBlue()].join(',') + ')';
     cellEl.appendChild(lightCell);
 
     var dark = palette.dark;
     var darkCell = document.createElement('div');
     darkCell.style.backgroundColor =
-        'rgb(' + [dark.red, dark.green, dark.blue].join(',') + ')';
+        'rgb(' + [dark.getRed(), dark.getGreen(), dark.getBlue()].join(',') + ')';
     darkCell.classList.add('dark');
     cellEl.appendChild(darkCell);
 
@@ -93,7 +93,7 @@ for (var r = 0; r < 5; r++) {
     var color = palette.accent;
     var cellEl = document.createElement('div');
     cellEl.style.backgroundColor =
-        'rgb(' + [color.red, color.green, color.blue].join(',') +')';
+        'rgb(' + [color.getRed(), color.getGreen(), color.getBlue()].join(',') +')';
     cellEl.classList.add('colorPickerCell');
     cellEl.classList.add('base');
     cellEl.setAttribute('data-name', name);

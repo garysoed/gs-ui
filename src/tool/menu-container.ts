@@ -63,14 +63,18 @@ export class MenuContainer extends BaseElement {
    * @return The anchor point based on the attribute set in the element.
    */
   private getAnchorPoint_(): AnchorLocation {
-    let element = this.getElement().getEventTarget();
-    let anchorPoint = element['gsAnchorPoint'];
-    if (element['gsAnchorPoint'] !== AnchorLocation.AUTO) {
+    let element = this.getElement();
+    if (element === null) {
+      throw Error('No element found');
+    }
+    let elementTarget = element.getEventTarget();
+    let anchorPoint = elementTarget['gsAnchorPoint'];
+    if (elementTarget['gsAnchorPoint'] !== AnchorLocation.AUTO) {
       return anchorPoint;
     } else {
       return Anchors.resolveAutoLocation(
-          element['gsAnchorTargetX'],
-          element['gsAnchorTargetY'],
+          elementTarget['gsAnchorTargetX'],
+          elementTarget['gsAnchorTargetY'],
           this.windowEl_.getEventTarget());
     }
   }
@@ -83,17 +87,26 @@ export class MenuContainer extends BaseElement {
     let listenableAnimate = ListenableDom.of(animate);
     this.addDisposable(listenableAnimate);
 
-    this.addDisposable(listenableAnimate
-        .once(
-            DomEvent.FINISH,
-            () => {
-              this.rootEl_.getEventTarget().classList.remove(MenuContainer.SHOW_CLASS_);
-              this.getElement().dispatch(MenuContainer.HIDE_EVENT, () => {});
-            }));
+    this.addDisposable(listenableAnimate.once(DomEvent.FINISH, this.onFinishAnimate_.bind(this)));
   }
 
+  /**
+   * Handles the event when backdrop is clicked.
+   */
   private onBackdropClick_(): void {
     this.hide_();
+  }
+
+  /**
+   * Handles the event when animate is done.
+   */
+  private onFinishAnimate_(): void {
+    this.rootEl_.getEventTarget().classList.remove(MenuContainer.SHOW_CLASS_);
+
+    let element = this.getElement();
+    if (element !== null) {
+      element.dispatch(MenuContainer.HIDE_EVENT, () => {});
+    }
   }
 
   /**
@@ -127,27 +140,35 @@ export class MenuContainer extends BaseElement {
           contentWidth = distributedElement.clientWidth;
         });
 
-    this.getElement().dispatch(
-        MenuContainer.SHOW_EVENT,
-        () => {
-          MenuContainer.BASE_SHOW_ANIMATION_
-              .appendKeyframe({
-                height: `${contentHeight}px`,
-                opacity: 1,
-                width: `${contentWidth}px`,
-              })
-              .applyTo(this.containerEl_.getEventTarget());
+    let element = this.getElement();
+    if (element !== null) {
+      element.dispatch(
+          MenuContainer.SHOW_EVENT,
+          () => {
+            MenuContainer.BASE_SHOW_ANIMATION_
+                .appendKeyframe({
+                  height: `${contentHeight}px`,
+                  opacity: 1,
+                  width: `${contentWidth}px`,
+                })
+                .applyTo(this.containerEl_.getEventTarget());
 
-          this.rootEl_.getEventTarget().classList.add(MenuContainer.SHOW_CLASS_);
-        });
+            this.rootEl_.getEventTarget().classList.add(MenuContainer.SHOW_CLASS_);
+          });
+    }
   }
 
   /**
    * Resets the location of the container element based on the anchor point and the anchor target.
    */
   private updateContent_(): void {
-    let anchorTargetX = this.getElement().getEventTarget()['gsAnchorTargetX'];
-    let anchorTargetY = this.getElement().getEventTarget()['gsAnchorTargetY'];
+    let element = this.getElement();
+    if (element === null) {
+      return;
+    }
+
+    let anchorTargetX = element.getEventTarget()['gsAnchorTargetX'];
+    let anchorTargetY = element.getEventTarget()['gsAnchorTargetY'];
 
     if (anchorTargetX === null || anchorTargetY === null) {
       // Do nothing if the anchor target is not defined.

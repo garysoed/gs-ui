@@ -27,8 +27,9 @@ export class RadioButton extends BaseActionElement {
    */
   protected onClick_(): void {
     super.onClick_();
-    if (!this.isDisabled()) {
-      this.radioButtonService_.setSelected(this.getElement().getEventTarget(), true);
+    let element = this.getElement();
+    if (!this.isDisabled() && element !== null) {
+      this.radioButtonService_.setSelected(element.getEventTarget(), true);
     }
   }
 
@@ -40,8 +41,12 @@ export class RadioButton extends BaseActionElement {
     switch (attrName) {
       case 'gs-checked':
       case 'gs-group':
-        let element = this.getElement().getEventTarget();
-        this.radioButtonService_.setSelected(element, element['gsChecked']);
+        let element = this.getElement();
+        if (element !== null) {
+          this.radioButtonService_.setSelected(
+              element.getEventTarget(),
+              element.getEventTarget()['gsChecked']);
+        }
         break;
     }
   }

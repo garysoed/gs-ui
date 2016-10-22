@@ -25,13 +25,21 @@ export class Menu extends BaseElement {
     super();
   }
 
+  /**
+   * Handler called when there is an action.
+   */
   private onAction_(): void {
-    let element = this.getElement().getEventTarget();
+    let element = this.getElement();
+    if (element === null) {
+      return;
+    }
+
+    let elementTarget = element.getEventTarget();
     this.menuService_.showMenu(
-        element,
-        element.parentElement,
-        element['gsAnchorTarget'],
-        element['gsAnchorPoint']);
+        elementTarget,
+        elementTarget.parentElement,
+        elementTarget['gsAnchorTarget'],
+        elementTarget['gsAnchorPoint']);
   }
 
   onCreated(element: HTMLElement): void {

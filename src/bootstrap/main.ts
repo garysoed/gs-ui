@@ -5,6 +5,7 @@ import {DefaultPalettes} from './default-palettes';
 import {HorizontalTab} from '../section/horizontal-tab';
 import {Icon} from '../tool/icon';
 import {Injector} from '../../external/gs_tools/src/inject';
+import {TextInput} from '../input/text-input';
 import {Menu} from '../tool/menu';
 import {MenuContainer} from '../tool/menu-container';
 import {RadioButton} from '../input/radio-button';
@@ -20,6 +21,7 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   Menu,
   MenuContainer,
   RadioButton,
+  TextInput,
 ];
 
 const DEFAULT_THEME_: Theme = Theme.newInstance(

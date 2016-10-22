@@ -47,6 +47,14 @@ describe('common.BaseActionElement', () => {
 
       assert(mockListenableElement.dispatch).toNot.haveBeenCalled();
     });
+
+    it('should do nothing if the element is not available', () => {
+      spyOn(actionElement, 'isDisabled').and.returnValue(false);
+      spyOn(actionElement, 'getElement').and.returnValue(null);
+      actionElement['onClick_']();
+
+      assert(mockListenableElement.dispatch).toNot.haveBeenCalled();
+    });
   });
 
   describe('isDisabled', () => {
@@ -62,6 +70,11 @@ describe('common.BaseActionElement', () => {
       mockEventTarget.getAttribute.and.returnValue(null);
       spyOn(actionElement, 'getElement').and.returnValue({getEventTarget: () => mockEventTarget});
       assert(actionElement.isDisabled()).to.beFalse();
+    });
+
+    it('should return true if there are no elements', () => {
+      spyOn(actionElement, 'getElement').and.returnValue(null);
+      assert(actionElement.isDisabled()).to.beTrue();
     });
   });
 

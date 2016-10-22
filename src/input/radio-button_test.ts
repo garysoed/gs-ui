@@ -38,6 +38,14 @@ describe('input.RadioButton', () => {
       button['onClick_']();
       assert(mockRadioButtonService.setSelected).toNot.haveBeenCalled();
     });
+
+    it('should do nothing if there is no element', () => {
+      spyOn(button, 'isDisabled').and.returnValue(false);
+      spyOn(button, 'getElement').and.returnValue(null);
+
+      button['onClick_']();
+      assert(mockRadioButtonService.setSelected).toNot.haveBeenCalled();
+    });
   });
 
   describe('onAttributeChanged', () => {
@@ -67,6 +75,14 @@ describe('input.RadioButton', () => {
 
     it('should do nothing if other attributes changed', () => {
       button.onAttributeChanged('other', 'oldValue', 'newValue');
+
+      assert(mockRadioButtonService.setSelected).toNot.haveBeenCalled();
+    });
+
+    it('should do nothing if there are no elements', () => {
+      spyOn(button, 'getElement').and.returnValue(null);
+
+      button.onAttributeChanged('gs-group', 'oldValue', 'newValue');
 
       assert(mockRadioButtonService.setSelected).toNot.haveBeenCalled();
     });

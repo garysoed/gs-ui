@@ -4,14 +4,22 @@ import {DomEvent} from '../../external/gs_tools/src/event';
 
 
 export class BaseActionElement extends BaseElement {
+  /**
+   * Handler called when the element is clicked.
+   */
   protected onClick_(): void {
-    if (!this.isDisabled()) {
-      this.getElement().dispatch(Event.ACTION, () => {});
+    let element = this.getElement();
+    if (!this.isDisabled() && element !== null) {
+      element.dispatch(Event.ACTION, () => {});
     }
   }
 
+  /**
+   * @return True iff the element is disabled.
+   */
   isDisabled(): boolean {
-    return this.getElement().getEventTarget().getAttribute('disabled') !== null;
+    let element = this.getElement();
+    return element === null || element.getEventTarget().getAttribute('disabled') !== null;
   }
 
   /**
@@ -21,6 +29,7 @@ export class BaseActionElement extends BaseElement {
     super.onCreated(element);
     element.classList.add('gs-action');
 
-    this.addDisposable(this.getElement().on(DomEvent.CLICK, this.onClick_.bind(this)));
+    // TODO: use annotation.
+    this.addDisposable(this.getElement()!.on(DomEvent.CLICK, this.onClick_.bind(this)));
   }
 }

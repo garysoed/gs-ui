@@ -3,6 +3,18 @@
     <script src="../../node_modules/x-tag/src/core.js"></script>
     <script src="../../bazel-genfiles/pack.js"></script>
     <style>
+      .container {
+        display: flex;
+      }
+
+      .container > label {
+        margin-right: .5rem;
+      }
+
+      .container > gs-text-input {
+        flex: 1;
+      }
+
       .row {
         display: flex;
         width: 40rem;
@@ -13,33 +25,30 @@
         padding: 1rem;
       }
 
-      .line {
-        display: flex;
-      }
-
-      .line gs-radio-button {
-        margin-right: .5rem;
+      .value {
+        height: var(--gsLineHeight);
+        padding-left: .5rem;
       }
     </style>
     <link rel="stylesheet" href="demo.css">
   </head>
   <body>
     <template id="template">
-      <div class="line">
-        <gs-radio-button gs-checked="true"></gs-radio-button>
-        <div>Radio Button</div>
+      <div class="container">
+        <label>
+          Input:
+        </label>
+        <gs-text-input gs-value="Default value"></gs-text-input>
       </div>
-      <div class="line">
-        <gs-radio-button disabled></gs-radio-button>
-        <div>Radio Button (Disabled)</div>
+      <div class="container">
+        <label>
+          Disabled:
+        </label>
+        <gs-text-input disabled gs-value="Default value"></gs-text-input>
       </div>
-      <div class="line">
-        <gs-radio-button></gs-radio-button>
-        <div>Radio Button 2</div>
-      </div>
-      <div class="line">
-        <gs-radio-button></gs-radio-button>
-        <div>Radio Button 3</div>
+      <div>
+        <div>Value:</div>
+        <div class="value"></div>
       </div>
     </template>
 
@@ -74,15 +83,14 @@
 
     <script src="demo.js"></script>
     <script>
-      var sections = document.querySelectorAll('section.cell');
-      for (var i = 0; i < sections.length; i++) {
-        var section = sections.item(i);
-        var radios = section.querySelectorAll('gs-radio-button');
-        for (var j = 0; j < radios.length; j++) {
-          var radio = radios.item(j);
-          radio.gsGroup = 'group' + i;
-        }
-      }
+      document.querySelectorAll('section.cell').forEach(function(cell) {
+        var valueEl = cell.querySelector('.value');
+        cell.querySelector('gs-text-input:not([disabled])').addEventListener(
+            'change',
+            function(event) {
+              valueEl.innerText = event.target.gsValue;
+            });
+      });
     </script>
   </body>
 </html>

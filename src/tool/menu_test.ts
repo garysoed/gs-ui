@@ -35,6 +35,14 @@ describe('tool.Menu', () => {
       assert(mockMenuService.showMenu)
           .to.haveBeenCalledWith(eventTarget, parentElement, anchorTarget, anchorPoint);
     });
+
+    it('should not throw error if there are no elements', () => {
+      menu['element_'] = null;
+
+      assert(() => {
+        menu['onAction_']();
+      }).toNot.throw();
+    });
   });
 
   describe('onCreated', () => {

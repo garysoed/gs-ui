@@ -35,7 +35,7 @@ export class HorizontalTab extends BaseElement {
 
   private onAction_(event: Event): void {
     let target = <HTMLElement> event.target;
-    this.getElement().getEventTarget()['gsSelectedTab'] = target.getAttribute('gs-tab-id');
+    this.setAttribute('gsSelectedTab', target.getAttribute('gs-tab-id') || '');
   }
 
   private onMutate_(): void {
@@ -76,11 +76,16 @@ export class HorizontalTab extends BaseElement {
 
   @sequenced()
   private updateHighlight_(): Promise<void> {
-    let selectedId = this.getElement().getEventTarget()['gsSelectedTab'];
+    let selectedId = this.getAttribute('gsSelectedTab');
     let destinationLeft;
     let destinationWidth;
+    let element = this.getElement();
+    if (element === null) {
+      return Promise.reject('No elements are found');
+    }
+
     if (selectedId) {
-      let selectedTab = <HTMLElement> this.getElement().getEventTarget()
+      let selectedTab = <HTMLElement> element.getEventTarget()
           .querySelector(`[gs-tab-id="${selectedId}"]`);
       destinationLeft = selectedTab.offsetLeft;
       destinationWidth = selectedTab.clientWidth;
@@ -99,7 +104,10 @@ export class HorizontalTab extends BaseElement {
     super.onAttributeChanged(attrName, oldValue, newValue);
     switch (attrName) {
       case 'gs-selected-tab':
-        this.getElement().dispatch(HorizontalTab.CHANGE_EVENT, () => {});
+        let element = this.getElement();
+        if (element !== null) {
+          element.dispatch(HorizontalTab.CHANGE_EVENT, () => {});
+        }
         this.updateHighlight_();
         break;
     }
@@ -122,7 +130,6 @@ export class HorizontalTab extends BaseElement {
     this.mutationObserver_.observe(element, {childList: true});
 
     this.addDisposable(
-        this.getElement(),
         this.highlightContainerEl_,
         this.highlightEl_,
         this.tabContainer_);
@@ -132,6 +139,9 @@ export class HorizontalTab extends BaseElement {
    * @override
    */
   onInserted(): void {
-    this.getElement().on(Event.ACTION, this.onAction_.bind(this));
+    let element = this.getElement();
+    if (element !== null) {
+      element.on(Event.ACTION, this.onAction_.bind(this));
+    }
   }
 }

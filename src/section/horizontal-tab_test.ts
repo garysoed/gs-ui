@@ -182,6 +182,17 @@ describe('section.HorizontalTab', () => {
             done();
           }, done.fail);
     });
+
+    it('should reject if there are no elements', (done: any) => {
+      tab['element_'] = null;
+
+      tab['updateHighlight_']().then(
+          done.fail,
+          (error: string) => {
+            assert(error).to.match(/elements are found/);
+            done();
+          });
+    });
   });
 
   describe('onAttributeChanged', () => {
@@ -208,6 +219,17 @@ describe('section.HorizontalTab', () => {
 
       assert(mockElement.dispatch).toNot.haveBeenCalled();
       assert(tab['updateHighlight_']).toNot.haveBeenCalled();
+    });
+
+    it('should not dispatch any events if there are no elements', () => {
+      tab['element_'] = null;
+      spyOn(tab, 'updateHighlight_');
+
+      assert(() => {
+        tab.onAttributeChanged('gs-selected-tab');
+      }).toNot.throw();
+
+      assert(tab['updateHighlight_']).to.haveBeenCalledWith();
     });
   });
 
@@ -264,6 +286,16 @@ describe('section.HorizontalTab', () => {
       assert(tab['element_'].on).to.haveBeenCalledWith('gse-action', Matchers.any(Function));
       tab['element_'].on.calls.argsFor(0)[1]();
       assert(tab['onAction_']).to.haveBeenCalledWith();
+    });
+
+    it('should not throw error if there are no elements', () => {
+      tab['element_'] = null;
+
+      spyOn(tab, 'onAction_');
+
+      assert(() => {
+        tab.onInserted();
+      }).toNot.throw();
     });
   });
 });

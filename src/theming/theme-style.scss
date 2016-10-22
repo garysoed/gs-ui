@@ -8,11 +8,14 @@
 
 // General, non themed styles
 body {
-  font-family: 'Ubuntu', sans-serif;
-  font-size: 13px;
-  line-height: 24px;
+  font-family: var(--gsFontFamily);
+  font-size: var(--gsFontSizeRoot);
+  line-height: var(--gsLineHeight);
   margin: 0;
 
+  --gsFontFamily: 'Ubuntu', sans-serif;
+  --gsFontSizeRoot: 13px;
+  --gsLineHeight: 24px;
   --gsZIndexMenuBackdrop: 100;
   --gsBoxShadowAbove: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12)
 }
@@ -56,8 +59,10 @@ code {
 // Themed styles.
 .gs-theme-normal {
   --gsColorBackground: #fff;
-  --gsColorForeground: #000;
   --gsColorBackgroundMask: transparent;
+  --gsColorForeground: #000;
+  --gsColorForegroundRoot: var(--gsColorForeground);
+  --gsColorAccent: rgba(44,44,44,.99);
   color: var(--gsColorForeground);
   background-color: var(--gsColorBackground);
 
@@ -78,7 +83,7 @@ code {
     &:not([disabled]) {
       &:focus,
       &:hover {
-        --gsColorForeground: rgba(44,44,44,.99);
+        --gsColorForeground: var(--gsColorAccent);
       }
     }
 
@@ -94,7 +99,7 @@ code {
       &:not([disabled]) {
         &:focus,
         &:hover {
-          --gsColorForeground: rgba(44,44,44,.99);
+          --gsColorForeground: var(--gsColorAccent);
         }
       }
     }
@@ -124,7 +129,7 @@ code {
       &:not([disabled]) {
         &:focus,
         &:hover {
-          --gsColorForeground: rgba(44,44,44,.99);
+          --gsColorForeground: var(--gsColorAccent);
         }
       }
 
@@ -140,7 +145,7 @@ code {
         &:not([disabled]) {
           &:focus,
           &:hover {
-            --gsColorForeground: rgba(44,44,44,.99);
+            --gsColorForeground: var(--gsColorAccent);
           }
         }
       }
@@ -149,9 +154,11 @@ code {
 }
 
 .gs-theme-invert {
+  --gsColorAccent: rgba(44,44,44,.99);
   --gsColorBackground: #000;
-  --gsColorForeground: #fff;
   --gsColorBackgroundMask: transparent;
+  --gsColorForeground: #fff;
+  --gsColorForegroundRoot: var(--gsColorForeground);
   color: var(--gsColorForeground);
   background-color: var(--gsColorBackground);
 
@@ -172,7 +179,7 @@ code {
     &:not([disabled]) {
       &:focus,
       &:hover {
-        --gsColorForeground: rgba(44,44,44,.99);
+        --gsColorForeground: var(--gsColorAccent);
       }
     }
 
@@ -188,7 +195,7 @@ code {
       &:not([disabled]) {
         &:focus,
         &:hover {
-          --gsColorForeground: rgba(44,44,44,.99);
+          --gsColorForeground: var(--gsColorAccent);
         }
       }
     }
@@ -198,6 +205,7 @@ code {
   .gs-hilite {
     --gsColorBackground: rgba(33,33,33,.99);
     --gsColorForeground: #000;
+    --gsColorForegroundRoot: var(--gsColorForeground);
 
     &.gs-secondary,
     .gs-secondary {
@@ -216,7 +224,7 @@ code {
       &:not([disabled]) {
         &:focus,
         &:hover {
-          --gsColorForeground: rgba(44,44,44,.99);
+          --gsColorForeground: var(--gsColorAccent);
         }
       }
 
@@ -232,7 +240,7 @@ code {
         &:not([disabled]) {
           &:focus,
           &:hover {
-            --gsColorForeground: rgba(44,44,44,.99);
+            --gsColorForeground: var(--gsColorAccent);
           }
         }
       }

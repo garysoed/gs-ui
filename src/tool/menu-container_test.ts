@@ -50,43 +50,43 @@ describe('tool.MenuContainer', () => {
 
       assert(container['getAnchorPoint_']()).to.equal(AnchorLocation.TOP_RIGHT);
     });
+
+    it('should throw error if no elements are found', () => {
+      container['element_'] = null;
+
+      assert(() => {
+        container['getAnchorPoint_']();
+      }).to.throwError(/No element found/);
+    });
   });
 
   describe('hide_', () => {
-    it('should play the hide animation, remove the "show" class, and dispatches the HIDE event',
-        () => {
-          let mockClassList = jasmine.createSpyObj('ClassList', ['remove']);
-          let rootEl = Mocks.object('rootEl');
-          rootEl.classList = mockClassList;
-          container['rootEl_'] = {getEventTarget: () => rootEl};
+    it('should play the hide animation', () => {
+      let containerEl = Mocks.object('containerEl');
+      container['containerEl_'] = {getEventTarget: () => containerEl};
 
-          let containerEl = Mocks.object('containerEl');
-          container['containerEl_'] = {getEventTarget: () => containerEl};
+      let animate = Mocks.object('animate');
+      spyOn(MenuContainer['HIDE_ANIMATION_'], 'applyTo').and.returnValue(animate);
 
-          let animate = Mocks.object('animate');
-          spyOn(MenuContainer['HIDE_ANIMATION_'], 'applyTo').and.returnValue(animate);
+      let mockListenableAnimate =
+          jasmine.createSpyObj('ListenableAnimate', ['dispose', 'once']);
+      mockListenableAnimate.once.and.returnValue(Mocks.disposable('ListenableAnimate.once'));
+      spyOn(ListenableDom, 'of').and.returnValue(mockListenableAnimate);
 
-          let mockListenableAnimate =
-              jasmine.createSpyObj('ListenableAnimate', ['dispose', 'once']);
-          mockListenableAnimate.once.and.returnValue(Mocks.disposable('ListenableAnimate.once'));
-          spyOn(ListenableDom, 'of').and.returnValue(mockListenableAnimate);
+      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['dispatch']);
+      container['element_'] = mockListenableElement;
 
-          let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['dispatch']);
-          container['element_'] = mockListenableElement;
+      spyOn(container, 'onFinishAnimate_');
 
-          container['hide_']();
+      container['hide_']();
 
-          assert(mockListenableAnimate.once)
-              .to.haveBeenCalledWith(DomEvent.FINISH, Matchers.any(Function));
-          mockListenableAnimate['once'].calls.argsFor(0)[1]();
-          assert(mockClassList.remove).to.haveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
-          assert(mockListenableElement.dispatch).to.haveBeenCalledWith(
-              MenuContainer.HIDE_EVENT,
-              Matchers.any(Function));
-
-          assert(MenuContainer['HIDE_ANIMATION_'].applyTo).to.haveBeenCalledWith(containerEl);
-          assert(ListenableDom.of).to.haveBeenCalledWith(animate);
-        });
+      assert(mockListenableAnimate.once)
+          .to.haveBeenCalledWith(DomEvent.FINISH, Matchers.any(Function));
+      mockListenableAnimate['once'].calls.argsFor(0)[1]();
+      assert(container['onFinishAnimate_']).to.haveBeenCalledWith();
+      assert(MenuContainer['HIDE_ANIMATION_'].applyTo).to.haveBeenCalledWith(containerEl);
+      assert(ListenableDom.of).to.haveBeenCalledWith(animate);
+    });
   });
 
   describe('onBackdropClick_', () => {
@@ -94,6 +94,40 @@ describe('tool.MenuContainer', () => {
       spyOn(container, 'hide_');
       container['onBackdropClick_']();
       assert(container['hide_']).to.haveBeenCalledWith();
+    });
+  });
+
+  describe('onFinishAnimate_', () => {
+    it('should remove the SHOW class and dispatch the HIDE event', () => {
+      let mockRootElement = Mocks.element();
+      container['rootEl_'] = {getEventTarget: () => mockRootElement};
+
+      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+      spyOn(container, 'getElement').and.returnValue(mockElement);
+
+      spyOn(mockRootElement.classList, 'remove');
+
+      container['onFinishAnimate_']();
+
+      assert(mockRootElement.classList.remove).to.haveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
+      assert(mockElement.dispatch).to.haveBeenCalledWith(
+          MenuContainer.HIDE_EVENT,
+          Matchers.any(Function));
+    });
+
+    it('should not throw error if there are no elements', () => {
+      let mockRootElement = Mocks.element();
+      container['rootEl_'] = {getEventTarget: () => mockRootElement};
+
+      spyOn(container, 'getElement').and.returnValue(null);
+
+      spyOn(mockRootElement.classList, 'remove');
+
+      assert(() => {
+        container['onFinishAnimate_']();
+      }).toNot.throw();
+
+      assert(mockRootElement.classList.remove).to.haveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
     });
   });
 
@@ -177,6 +211,28 @@ describe('tool.MenuContainer', () => {
       container['show_']();
 
       assert(mockClassList.add).toNot.haveBeenCalled();
+    });
+
+    it('should not throw error if there are no elements', () => {
+      container['element_'] = null;
+
+      let distributedElement = Mocks.object('distributedElement');
+      distributedElement.clientHeight = 123;
+      distributedElement.clientWidth = 456;
+      mockContentEl.getDistributedNodes.and.returnValue([distributedElement]);
+
+      spyOn(Jsons, 'setTemporaryValue').and.callFake(
+          (json: any, substitutions: any, callback: any) => {
+            callback();
+          });
+
+      let mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
+      spyOn(MenuContainer['BASE_SHOW_ANIMATION_'], 'appendKeyframe').and
+          .returnValue(mockAnimation);
+
+      assert(() => {
+        container['show_']();
+      }).toNot.throw();
     });
   });
 
@@ -285,6 +341,14 @@ describe('tool.MenuContainer', () => {
       container['updateContent_']();
 
       assert(container['getAnchorPoint_']).toNot.haveBeenCalled();
+    });
+
+    it('should not throw error if there are no elements', () => {
+      spyOn(container, 'getElement').and.returnValue(null);
+
+      assert(() => {
+        container['updateContent_']();
+      }).toNot.throw();
     });
   });
 
