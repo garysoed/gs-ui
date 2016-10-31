@@ -5,7 +5,8 @@ import {
   AnimationEasing,
   BaseElement,
   customElement,
-  FloatParser} from '../../external/gs_tools/src/webc';
+  FloatParser,
+  handle} from '../../external/gs_tools/src/webc';
 import {Anchors} from './anchors';
 import {DomEvent, ListenableDom} from '../../external/gs_tools/src/event';
 import {inject} from '../../external/gs_tools/src/inject';
@@ -161,6 +162,9 @@ export class MenuContainer extends BaseElement {
   /**
    * Resets the location of the container element based on the anchor point and the anchor target.
    */
+  @handle.host.attributeChange(null, 'gs-anchor-point', AnchorLocationParser)
+  @handle.host.attributeChange(null, 'gs-anchor-target-x', FloatParser)
+  @handle.host.attributeChange(null, 'gs-anchor-target-y', FloatParser)
   private updateContent_(): void {
     let element = this.getElement();
     if (element === null) {
@@ -208,20 +212,6 @@ export class MenuContainer extends BaseElement {
       case AnchorLocation.BOTTOM_RIGHT:
       case AnchorLocation.TOP_RIGHT:
         containerEl.style.right = `${Math.max(viewportWidth - anchorTargetX, 0)}px`;
-        break;
-    }
-  }
-
-  /**
-   * @override
-   */
-  onAttributeChanged(attrName: string, oldValue: string, newValue: string): void {
-    super.onAttributeChanged(attrName, oldValue, newValue);
-    switch (attrName) {
-      case 'gs-anchor-point':
-      case 'gs-anchor-target-x':
-      case 'gs-anchor-target-y':
-        this.updateContent_();
         break;
     }
   }

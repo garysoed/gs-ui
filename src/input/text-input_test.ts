@@ -55,6 +55,37 @@ describe('input.TextInput', () => {
     });
   });
 
+  describe('onGsValueChange_', () => {
+    fit('should update the event target value', () => {
+      let value = 'value';
+      let eventTarget = Mocks.object('eventTarget');
+      let mockListenableInputEl = jasmine.createSpyObj('ListenableInputEl', ['getEventTarget']);
+      mockListenableInputEl.getEventTarget.and.returnValue(eventTarget);
+      textInput['listenableInputEl_'] = mockListenableInputEl;
+
+      textInput['onGsValueChange_'](value);
+
+      assert(eventTarget.value).to.equal(value);
+    });
+
+    fit('should not throw error if there are no listenable input elements', () => {
+      textInput['listenableInputEl_'] = null;
+
+      assert(() => {
+        textInput['onGsValueChange_']('value');
+      }).toNot.throw();
+    });
+  });
+
+  describe('onDisabledChange_', () => {
+    fit('should set the value to the input element', () => {
+      let value = true;
+      spyOn(textInput['inputDisabledBridge_'], 'set');
+      textInput['onDisabledChange_'](value);
+      assert(textInput['inputDisabledBridge_'].set).to.haveBeenCalledWith(value);
+    });
+  });
+
   describe('onInputChange_', () => {
     it('should set the new value and dispatch a CHANGE event', () => {
       let value = 'value';
@@ -68,11 +99,11 @@ describe('input.TextInput', () => {
       let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
 
       spyOn(textInput, 'getElement').and.returnValue(mockElement);
-      spyOn(textInput, 'setAttribute');
+      spyOn(textInput['gsValueBridge_'], 'set');
 
       textInput['onInputChange_']();
 
-      assert(textInput.setAttribute).to.haveBeenCalledWith('gsValue', value);
+      assert(textInput['gsValueBridge_'].set).to.haveBeenCalledWith(value);
       assert(mockElement.dispatch).to.haveBeenCalledWith(DomEvent.CHANGE);
     });
 
@@ -80,11 +111,11 @@ describe('input.TextInput', () => {
       let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
 
       spyOn(textInput, 'getElement').and.returnValue(mockElement);
-      spyOn(textInput, 'setAttribute');
+      spyOn(textInput['gsValueBridge_'], 'set');
 
       textInput['onInputChange_']();
 
-      assert(textInput.setAttribute).toNot.haveBeenCalled();
+      assert(textInput['gsValueBridge_'].set).toNot.haveBeenCalled();
       assert(mockElement.dispatch).to.haveBeenCalledWith(DomEvent.CHANGE);
     });
 
@@ -98,34 +129,22 @@ describe('input.TextInput', () => {
       TestDispose.add(mockListenableInputElement);
 
       spyOn(textInput, 'getElement').and.returnValue(null);
-      spyOn(textInput, 'setAttribute');
+      spyOn(textInput['gsValueBridge_'], 'set');
 
       textInput['onInputChange_']();
 
-      assert(textInput.setAttribute).to.haveBeenCalledWith('gsValue', value);
+      assert(textInput['gsValueBridge_'].set).to.haveBeenCalledWith(value);
     });
   });
 
   describe('onAttributeChanged', () => {
     it('should update the input element for disabled attribute', () => {
-      let inputElement = Mocks.object('inputElement');
-      let mockListenableInputElement = Mocks.listenable('ListenableInputElement', inputElement);
-      textInput['listenableInputEl_'] = mockListenableInputElement;
-      TestDispose.add(mockListenableInputElement);
-
       spyOn(textInput, 'isDisabled').and.returnValue(true);
+      spyOn(textInput['inputDisabledBridge_'], 'set');
 
       textInput.onAttributeChanged('disabled', '', '');
 
-      assert(<boolean> inputElement.disabled).to.beTrue();
-    });
-
-    it('should do nothing if disabled attribute changed but there are no input elements', () => {
-      spyOn(textInput, 'isDisabled').and.returnValue(true);
-
-      assert(() => {
-        textInput.onAttributeChanged('disabled', '', '');
-      }).toNot.throw();
+      assert(textInput['inputDisabledBridge_'].set).to.haveBeenCalledWith(true);
     });
 
     it('should update the input element for gsValue attribute', () => {
@@ -148,7 +167,7 @@ describe('input.TextInput', () => {
   });
 
   describe('onCreated', () => {
-    fit('should initialize correctly', () => {
+    it('should initialize correctly', () => {
       let inputElement = Mocks.object('inputElement');
       let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(inputElement);

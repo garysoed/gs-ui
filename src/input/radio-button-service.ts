@@ -30,6 +30,9 @@ export class RadioButtonService extends BaseDisposable {
         button['gsChecked'] = false;
       }
     }
-    element['gsChecked'] = selected;
+
+    if (element['gsChecked'] !== selected) {
+      element['gsChecked'] = selected;
+    }
   }
 }

@@ -48,42 +48,54 @@ describe('input.RadioButton', () => {
     });
   });
 
-  describe('onAttributeChanged', () => {
-    it('should call radio button service if the group is changed', () => {
+  describe('onGsCheckedChanged_', () => {
+    it('should update the service', () => {
+      let newValue = true;
+      spyOn(button, 'updateService_');
+      button['onGsCheckedChanged_'](newValue, false /* oldValue */);
+      assert(button['updateService_']).to.haveBeenCalledWith(newValue);
+    });
+
+    it('should do nothing if the new and old values are the same', () => {
+      spyOn(button, 'updateService_');
+      button['onGsCheckedChanged_'](false /* newValue */, false /* oldValue */);
+      assert(button['updateService_']).toNot.haveBeenCalled();
+    });
+  });
+
+  describe('onGsGroupChanged_', () => {
+    it('should update the service', () => {
+      let value = true;
+      spyOn(button, 'updateService_');
+      spyOn(button['gsCheckedBridge_'], 'get').and.returnValue(value);
+      button['onGsGroupChanged_']();
+      assert(button['updateService_']).to.haveBeenCalledWith(value);
+    });
+
+    it('should update the service to not checked if the bridge value is null', () => {
+      spyOn(button, 'updateService_');
+      spyOn(button['gsCheckedBridge_'], 'get').and.returnValue(null);
+      button['onGsGroupChanged_']();
+      assert(button['updateService_']).to.haveBeenCalledWith(false);
+    });
+  });
+
+  describe('updateService_', () => {
+    it('should call the radio button service', () => {
+      let eventTarget = Mocks.object('eventTarget');
+      let mockElement = jasmine.createSpyObj('Element', ['getEventTarget']);
+      mockElement.getEventTarget.and.returnValue(eventTarget);
+      spyOn(button, 'getElement').and.returnValue(mockElement);
+
       let checked = true;
-      let element = Mocks.object('element');
-      element['gsChecked'] = checked;
-
-      spyOn(button, 'getElement').and.returnValue({getEventTarget: () => element});
-
-      button.onAttributeChanged('gs-group', 'oldValue', 'newValue');
-
-      assert(mockRadioButtonService.setSelected).to.haveBeenCalledWith(element, checked);
+      button['updateService_'](checked);
+      assert(mockRadioButtonService.setSelected).to.haveBeenCalledWith(eventTarget, checked);
     });
 
-    it('should call radio button service if the checked state is changed', () => {
-      let checked = true;
-      let element = Mocks.object('element');
-      element['gsChecked'] = checked;
-
-      spyOn(button, 'getElement').and.returnValue({getEventTarget: () => element});
-
-      button.onAttributeChanged('gs-checked', 'oldValue', 'newValue');
-
-      assert(mockRadioButtonService.setSelected).to.haveBeenCalledWith(element, checked);
-    });
-
-    it('should do nothing if other attributes changed', () => {
-      button.onAttributeChanged('other', 'oldValue', 'newValue');
-
-      assert(mockRadioButtonService.setSelected).toNot.haveBeenCalled();
-    });
-
-    it('should do nothing if there are no elements', () => {
+    it('should not call the service if there are no elements', () => {
       spyOn(button, 'getElement').and.returnValue(null);
 
-      button.onAttributeChanged('gs-group', 'oldValue', 'newValue');
-
+      button['updateService_'](true /* checked */);
       assert(mockRadioButtonService.setSelected).toNot.haveBeenCalled();
     });
   });

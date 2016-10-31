@@ -3,6 +3,7 @@ import {
   AnimationEasing,
   BaseElement,
   customElement,
+  handle,
   StringParser} from '../../external/gs_tools/src/webc';
 import {DomEvent, ListenableDom} from '../../external/gs_tools/src/event';
 import {Event} from '../const/event';
@@ -39,6 +40,18 @@ export class HorizontalTab extends BaseElement {
   }
 
   private onMutate_(): void {
+    this.updateHighlight_();
+  }
+
+  /**
+   * Handles event when the gs-selected-tab attribute was changed.
+   */
+  @handle.host.attributeChange(null, 'gs-selected-tab', StringParser)
+  protected onSelectedTabChanged_(): void {
+    let element = this.getElement();
+    if (element !== null) {
+      element.dispatch(HorizontalTab.CHANGE_EVENT, () => {});
+    }
     this.updateHighlight_();
   }
 
@@ -95,22 +108,6 @@ export class HorizontalTab extends BaseElement {
     }
 
     return this.setHighlight_(destinationLeft, destinationWidth);
-  }
-
-  /**
-   * @override
-   */
-  onAttributeChanged(attrName: string, oldValue: string, newValue: string): void {
-    super.onAttributeChanged(attrName, oldValue, newValue);
-    switch (attrName) {
-      case 'gs-selected-tab':
-        let element = this.getElement();
-        if (element !== null) {
-          element.dispatch(HorizontalTab.CHANGE_EVENT, () => {});
-        }
-        this.updateHighlight_();
-        break;
-    }
   }
 
   /**

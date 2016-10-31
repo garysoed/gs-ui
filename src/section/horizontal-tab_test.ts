@@ -41,6 +41,31 @@ describe('section.HorizontalTab', () => {
     });
   });
 
+  describe('onSelectedTabChanged_', () => {
+    it('should dispatch the change event and update highlight', () => {
+      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+      tab['element_'] = mockElement;
+      spyOn(tab, 'updateHighlight_');
+
+      tab['onSelectedTabChanged_']();
+
+      assert(mockElement.dispatch)
+          .to.haveBeenCalledWith(HorizontalTab.CHANGE_EVENT, Matchers.any(Function));
+      assert(tab['updateHighlight_']).to.haveBeenCalledWith();
+    });
+
+    it('should not update any events if there are no elements', () => {
+      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+      tab['element_'] = null;
+      spyOn(tab, 'updateHighlight_');
+
+      tab['onSelectedTabChanged_']();
+
+      assert(mockElement.dispatch).toNot.haveBeenCalled();
+      assert(tab['updateHighlight_']).to.haveBeenCalledWith();
+    });
+  });
+
   describe('onTick_', () => {
     it('should update the highlight', () => {
       spyOn(tab, 'updateHighlight_');
@@ -192,44 +217,6 @@ describe('section.HorizontalTab', () => {
             assert(error).to.match(/elements are found/);
             done();
           });
-    });
-  });
-
-  describe('onAttributeChanged', () => {
-    it('should dispatch the tab change event and update the highlight if the gs-selected-tab' +
-        ' attribute changed',
-        () => {
-          let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
-          tab['element_'] = mockElement;
-          spyOn(tab, 'updateHighlight_');
-
-          tab.onAttributeChanged('gs-selected-tab');
-
-          assert(mockElement.dispatch)
-              .to.haveBeenCalledWith(HorizontalTab.CHANGE_EVENT, Matchers.any(Function));
-          assert(tab['updateHighlight_']).to.haveBeenCalledWith();
-        });
-
-    it('should do nothing if other attributes was changed', () => {
-      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
-      tab['element_'] = mockElement;
-      spyOn(tab, 'updateHighlight_');
-
-      tab.onAttributeChanged('other-attribute');
-
-      assert(mockElement.dispatch).toNot.haveBeenCalled();
-      assert(tab['updateHighlight_']).toNot.haveBeenCalled();
-    });
-
-    it('should not dispatch any events if there are no elements', () => {
-      tab['element_'] = null;
-      spyOn(tab, 'updateHighlight_');
-
-      assert(() => {
-        tab.onAttributeChanged('gs-selected-tab');
-      }).toNot.throw();
-
-      assert(tab['updateHighlight_']).to.haveBeenCalledWith();
     });
   });
 

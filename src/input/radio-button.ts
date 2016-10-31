@@ -1,7 +1,10 @@
 import {BaseActionElement} from '../common/base-action-element';
 import {
+  bind,
   BooleanParser,
   customElement,
+  DomBridge,
+  handle,
   StringParser} from '../../external/gs_tools/src/webc';
 import {inject} from '../../external/gs_tools/src/inject';
 import {RadioButtonService} from './radio-button-service';
@@ -17,9 +20,13 @@ import {RadioButtonService} from './radio-button-service';
   templateKey: 'src/input/radio-button',
 })
 export class RadioButton extends BaseActionElement {
+  @bind.host.attribute(null, 'gs-checked')
+  private gsCheckedBridge_: DomBridge<boolean>;
+
   constructor(
       @inject('input.RadioButtonService') protected radioButtonService_: RadioButtonService) {
     super();
+    this.gsCheckedBridge_ = DomBridge.of(BooleanParser, false /* deleteOnFalsy */);
   }
 
   /**
@@ -34,20 +41,35 @@ export class RadioButton extends BaseActionElement {
   }
 
   /**
-   * @override
+   * Handles event when gs-checked attribute is changed.
+   *
+   * @param newValue The new value of gs-checked.
+   * @param oldValue The old value of gs-checked.
    */
-  onAttributeChanged(attrName: string, oldValue: string, newValue: string): void {
-    super.onAttributeChanged(attrName, oldValue, newValue);
-    switch (attrName) {
-      case 'gs-checked':
-      case 'gs-group':
-        let element = this.getElement();
-        if (element !== null) {
-          this.radioButtonService_.setSelected(
-              element.getEventTarget(),
-              element.getEventTarget()['gsChecked']);
-        }
-        break;
+  @handle.host.attributeChange(null, 'gs-checked', BooleanParser)
+  protected onGsCheckedChanged_(newValue: boolean, oldValue: boolean): void {
+    if (newValue !== oldValue) {
+      this.updateService_(newValue);
+    }
+  }
+
+  /**
+   * Handles event when gs-group attribute is changed.
+   */
+  @handle.host.attributeChange(null, 'gs-group', StringParser)
+  protected onGsGroupChanged_(): void {
+    this.updateService_(this.gsCheckedBridge_.get() || false);
+  }
+
+  /**
+   * Updates the radio button service.
+   *
+   * @param isChecked True iff the element should be checked.
+   */
+  protected updateService_(isChecked: boolean): void {
+    let element = this.getElement();
+    if (element !== null) {
+      this.radioButtonService_.setSelected(element.getEventTarget(), isChecked);
     }
   }
 }

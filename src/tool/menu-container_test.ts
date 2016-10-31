@@ -352,16 +352,6 @@ describe('tool.MenuContainer', () => {
     });
   });
 
-  describe('onAttributeChanged', () => {
-    it('should update the content when gs-anchor-point attribute was changed', () => {
-      spyOn(container, 'updateContent_');
-
-      container.onAttributeChanged('gs-anchor-target-x', 12, 23);
-
-      assert(container['updateContent_']).to.haveBeenCalledWith();
-    });
-  });
-
   describe('onCreated', () => {
     it('should initialize correctly', () => {
       let backdropEl = Mocks.object('backdropEl');
