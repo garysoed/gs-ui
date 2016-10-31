@@ -17,7 +17,7 @@ body {
   --gsFontSizeRoot: 13px;
   --gsLineHeight: 24px;
   --gsZIndexMenuBackdrop: 100;
-  --gsBoxShadowAbove: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12)
+  --gsBoxShadowAbove: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
 }
 
 a {
@@ -75,6 +75,7 @@ code {
   .gs-action,
   a {
     --gsColorForeground: rgba(11,11,11,.99);
+    --gsColorForegroundRoot: rgba(11,11,11,.99);
 
     &[disabled] {
       --gsColorForeground: rgba(0,0,0,.54);
@@ -121,6 +122,7 @@ code {
     .gs-action,
     a {
       --gsColorForeground: #fff;
+      --gsColorForegroundRoot: #fff;
 
       &[disabled] {
         --gsColorForeground: rgba(255,255,255,.62);
@@ -171,6 +173,8 @@ code {
   .gs-action,
   a {
     --gsColorForeground: rgba(33,33,33,.99);
+    --gsColorForegroundRoot: rgba(33,33,33,.99);
+
 
     &[disabled] {
       --gsColorForeground: rgba(255,255,255,.62);
@@ -216,6 +220,7 @@ code {
     .gs-action,
     a {
       --gsColorForeground: #000;
+      --gsColorForegroundRoot: #000;
 
       &[disabled] {
         --gsColorForeground: rgba(0,0,0,.62);

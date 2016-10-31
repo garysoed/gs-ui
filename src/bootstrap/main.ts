@@ -4,6 +4,7 @@ import {BaseElement, ElementRegistrar} from '../../external/gs_tools/src/webc';
 import {DefaultPalettes} from './default-palettes';
 import {HorizontalTab} from '../section/horizontal-tab';
 import {Icon} from '../tool/icon';
+import {IndefiniteLoading} from '../tool/indefinite-loading';
 import {Injector} from '../../external/gs_tools/src/inject';
 import {TextInput} from '../input/text-input';
 import {Menu} from '../tool/menu';
@@ -18,6 +19,7 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   BasicButton,
   HorizontalTab,
   Icon,
+  IndefiniteLoading,
   Menu,
   MenuContainer,
   RadioButton,

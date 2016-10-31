@@ -1,0 +1,127 @@
+<style>
+  .box {
+    background-color: var(--gsColorForegroundRoot);
+    height: 1rem;
+    opacity: .5;
+    position: absolute;
+    width: 1rem;
+  }
+
+  .container {
+    height: 1.5rem;
+    position: relative;
+    width: 1.5rem;
+  }
+
+  .layer {
+    -webkit-animation-name: spin;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-direction: alternate;
+    -webkit-animation-timing-function: ease-in-out;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 2.1rem;
+    width: 2.1rem;
+  }
+
+  .layer:nth-child(1) {
+    -webkit-animation-delay: 1.5s;
+    -webkit-animation-duration: 1.5s;
+  }
+
+  .layer:nth-child(2) {
+    -webkit-animation-delay: 4.5s;
+    -webkit-animation-duration: 4.5s;
+  }
+
+  .layer:nth-child(3) {
+    -webkit-animation-delay: 7.5s;
+    -webkit-animation-duration: 7.5s;
+  }
+
+  .layer:nth-child(4) {
+    -webkit-animation-delay: 10.5s;
+    -webkit-animation-duration: 10.5s;
+  }
+
+  .root {
+    cursor: initial;
+    display: inline-block;
+    height: 3rem;
+    position: relative;
+    width: 3rem;
+  }
+
+  .br {
+    bottom: 0;
+    right: 0;
+  }
+
+  .bl {
+    bottom: 0;
+    left: 0;
+  }
+
+  .tr {
+    top: 0;
+    right: 0;
+  }
+
+  .tl {
+    top: 0;
+    left: 0;
+  }
+
+  @-webkit-keyframes spin {
+    0% {
+      height: 2.1rem;
+      width: 2.1rem;
+    }
+
+    25% {
+      height: 2.5rem;
+      transform: rotateZ(0);
+      width: 2.5rem;
+    }
+
+    75% {
+      transform: rotateZ(90deg);
+    }
+
+    100% {
+      height: 2.1rem;
+      transform: rotateZ(90deg);
+      width: 2.1rem;
+    }
+  }
+</style>
+<div class="root">
+  <div class="layer">
+    <div class="tl box"></div>
+    <div class="tr box"></div>
+    <div class="bl box"></div>
+    <div class="br box"></div>
+  </div>
+  <div class="layer">
+    <div class="tl box"></div>
+    <div class="tr box"></div>
+    <div class="bl box"></div>
+    <div class="br box"></div>
+  </div>
+  <div class="layer">
+    <div class="tl box"></div>
+    <div class="tr box"></div>
+    <div class="bl box"></div>
+    <div class="br box"></div>
+  </div>
+  <div class="layer">
+    <div class="tl box"></div>
+    <div class="tr box"></div>
+    <div class="bl box"></div>
+    <div class="br box"></div>
+  </div>
+</div>
