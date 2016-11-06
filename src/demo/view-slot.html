@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <script src="../../node_modules/x-tag/src/core.js"></script>
+    <script src="../../bazel-genfiles/pack.js"></script>
+    <style>
+      .cell {
+        display: flex;
+        justify-content: center;
+      }
+
+      .menu-content {
+        background-color: white;
+        box-sizing: border-box;
+        padding: 1rem;
+        width: 10rem;
+      }
+
+      .cell gs-basic-button > div {
+        width: 6rem;
+      }
+    </style>
+    <link rel="stylesheet" href="demo.css">
+  </head>
+  <body>
+    <template id="template">
+      <gs-view-slot>
+        <div gs-view-path="a/b">
+          /a/b
+        </div>
+        <div gs-view-path="a">
+          <gs-view-slot>
+            <div gs-view-path="c">
+              /a/c
+            </div>
+            <div gs-view-path=".">
+              /a
+            </div>
+          </gs-view-slot>
+        </div>
+      </gs-view-slot>
+    </template>
+
+    <section>
+      <section class="cell gs-theme-normal"></section>
+      <section class="cell gs-theme-normal gs-hilite"></section>
+      <section class="cell gs-theme-invert"></section>
+      <section class="cell gs-theme-invert gs-hilite"></section>
+    </section>
+
+    <gs-basic-button class="colorPicker gs-theme-normal gs-hilite">
+      <div gs-content><gs-icon>color_lens</gs-icon></div>
+      <gs-menu>
+        <div class="menuRoot" gs-content selected-tab="base">
+          <div class="colorPickerMenu base"></div>
+          <div class="colorPickerMenu accent"></div>
+          <gs-horizontal-tab gs-selected-tab="base">
+            <gs-basic-button gs-tab-id="base">
+              <div gs-content>Base</div>
+            </gs-basic-button>
+            <gs-basic-button gs-tab-id="accent">
+              <div gs-content>Accent</div>
+            </gs-basic-button>
+          </gs-horizontal-tab>
+        </div>
+      </gs-menu>
+    </gs-basic-button>
+
+    <script src="demo.js"></script>
+  </body>
+</html>

@@ -14,10 +14,10 @@
   }
 
   .layer {
-    -webkit-animation-name: spin;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-direction: alternate;
-    -webkit-animation-timing-function: ease-in-out;
+    animation-name: spin;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: ease-in-out;
     bottom: 0;
     left: 0;
     margin: auto;
@@ -29,23 +29,23 @@
   }
 
   .layer:nth-child(1) {
-    -webkit-animation-delay: 1.5s;
-    -webkit-animation-duration: 1.5s;
+    animation-delay: 1.5s;
+    animation-duration: 1.5s;
   }
 
   .layer:nth-child(2) {
-    -webkit-animation-delay: 4.5s;
-    -webkit-animation-duration: 4.5s;
+    animation-delay: 4.5s;
+    animation-duration: 4.5s;
   }
 
   .layer:nth-child(3) {
-    -webkit-animation-delay: 7.5s;
-    -webkit-animation-duration: 7.5s;
+    animation-delay: 7.5s;
+    animation-duration: 7.5s;
   }
 
   .layer:nth-child(4) {
-    -webkit-animation-delay: 10.5s;
-    -webkit-animation-duration: 10.5s;
+    animation-delay: 10.5s;
+    animation-duration: 10.5s;
   }
 
   .root {
@@ -76,7 +76,7 @@
     left: 0;
   }
 
-  @-webkit-keyframes spin {
+  @keyframes spin {
     0% {
       height: 2.1rem;
       width: 2.1rem;

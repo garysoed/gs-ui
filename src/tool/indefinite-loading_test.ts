@@ -14,7 +14,7 @@ describe('tool.IndefiniteLoading', () => {
   });
 
   describe('onCreated', () => {
-    fit('should add the gs-action class', () => {
+    it('should add the gs-action class', () => {
       let mockClassList = jasmine.createSpyObj('ClassList', ['add']);
       loading.onCreated({classList: mockClassList});
       assert(mockClassList.add).to.haveBeenCalledWith('gs-action');

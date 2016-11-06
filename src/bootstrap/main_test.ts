@@ -6,7 +6,7 @@ import {Injector} from '../../external/gs_tools/src/inject';
 import {Main} from './main';
 import {Mocks} from '../../external/gs_tools/src/mock';
 import {Templates} from '../../external/gs_tools/src/webc';
-import {TestInject} from '../../external/gs_tools/src/testing';
+import {TestDispose, TestInject} from '../../external/gs_tools/src/testing';
 import {ThemeService} from '../theming/theme-service';
 
 
@@ -17,9 +17,11 @@ describe('bootstrap.Main', () => {
 
   beforeEach(() => {
     let injector = Mocks.object('injector');
+    let locationService = Mocks.disposable('LocationService');
     mockThemeService = jasmine.createSpyObj('ThemeService', ['install']);
     mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
-    main = new Main(injector, mockThemeService, mockRegistrar);
+    main = new Main(injector, locationService, mockThemeService, mockRegistrar);
+    TestDispose.add(main);
   });
 
   describe('bootstrap', () => {
@@ -46,6 +48,7 @@ describe('bootstrap.Main', () => {
       spyOn(ElementRegistrar, 'newInstance').and.returnValue(mockRegistrar);
 
       let main = Main.newInstance();
+      TestDispose.add(main);
 
       assert(main['injector_']).to.equal(mockInjector);
       assert(main['themeService_']).to.equal(mockThemeService);

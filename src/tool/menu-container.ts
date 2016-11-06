@@ -248,8 +248,8 @@ export class MenuContainer extends BaseElement {
   /**
    * @override
    */
-  onInserted(): void {
-    super.onInserted();
+  onInserted(element: HTMLElement): void {
+    super.onInserted(element);
     this.addDisposable(this.windowEl_.on(DomEvent.RESIZE, this.onWindowResize_.bind(this)));
     this.addDisposable(this.backdropEl_.on(DomEvent.CLICK, this.onBackdropClick_.bind(this)));
     this.updateContent_();

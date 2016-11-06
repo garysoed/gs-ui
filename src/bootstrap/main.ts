@@ -1,18 +1,23 @@
 import {Arrays} from '../../external/gs_tools/src/collection';
 import {BasicButton} from '../button/basic-button';
+import {BaseDisposable} from '../../external/gs_tools/src/dispose';
 import {BaseElement, ElementRegistrar} from '../../external/gs_tools/src/webc';
 import {DefaultPalettes} from './default-palettes';
 import {HorizontalTab} from '../section/horizontal-tab';
 import {Icon} from '../tool/icon';
 import {IndefiniteLoading} from '../tool/indefinite-loading';
 import {Injector} from '../../external/gs_tools/src/inject';
-import {TextInput} from '../input/text-input';
+import {ListenableDom} from '../../external/gs_tools/src/event';
+import {LocationService} from '../../external/gs_tools/src/ui';
 import {Menu} from '../tool/menu';
 import {MenuContainer} from '../tool/menu-container';
 import {RadioButton} from '../input/radio-button';
+import {Reflect} from '../../external/gs_tools/src/util';
 import {Templates} from '../../external/gs_tools/src/webc';
+import {TextInput} from '../input/text-input';
 import {Theme} from '../theming/theme';
 import {ThemeService} from '../theming/theme-service';
+import {ViewSlot} from '../tool/view-slot';
 
 
 const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
@@ -24,6 +29,7 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   MenuContainer,
   RadioButton,
   TextInput,
+  ViewSlot,
 ];
 
 const DEFAULT_THEME_: Theme = Theme.newInstance(
@@ -34,11 +40,22 @@ const DEFAULT_THEME_: Theme = Theme.newInstance(
 /**
  * Main entry class to the app.
  */
-export class Main {
+export class Main extends BaseDisposable {
+  private readonly injector_: Injector;
+  private readonly themeService_: ThemeService;
+  private readonly registrar_: ElementRegistrar;
+
   constructor(
-      private injector_: Injector,
-      private themeService_: ThemeService,
-      private registrar_: ElementRegistrar) { }
+      injector: Injector,
+      locationService: LocationService,
+      themeService: ThemeService,
+      registrar: ElementRegistrar) {
+    super();
+    this.injector_ = injector;
+    this.themeService_ = themeService;
+    this.registrar_ = registrar;
+    this.addDisposable(locationService);
+  }
 
   /**
    * Bootstraps the app.
@@ -58,6 +75,11 @@ export class Main {
     return this.injector_;
   }
 
+  /**
+   * Sets the theme for the app.
+   *
+   * @param theme The theme to set.
+   */
   setTheme(theme: Theme): void {
     this.themeService_.install(theme);
   }
@@ -72,15 +94,19 @@ export class Main {
       [/rgba\(33,33,33/g, 'rgba(var(--gsRgbBaseLight)'],
       [/rgba\(44,44,44/g, 'rgba(var(--gsRgbAccent)'],
     ]));
+    let locationService = Reflect.construct(LocationService, [ListenableDom.of(window)]);
+
     Injector.bindProvider(() => document, 'x.dom.document');
     Injector.bindProvider(() => window, 'x.dom.window');
     Injector.bindProvider(() => templates, 'x.gs_tools.templates');
+    Injector.bindProvider(() => locationService, 'gs.LocationService');
 
     let injector = Injector.newInstance();
     let themeService = injector.instantiate<ThemeService>(ThemeService);
     themeService.initialize();
     return new Main(
         injector,
+        locationService,
         themeService,
         ElementRegistrar.newInstance(injector, templates));
   }
