@@ -1,7 +1,8 @@
 import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
-import {Mocks} from '../../external/gs_tools/src/mock';
+import {Mocks} from 'external/gs_tools/src/mock';
+
 import {ThemeService} from './theme-service';
 
 

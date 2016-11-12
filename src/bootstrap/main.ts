@@ -1,19 +1,20 @@
-import {Arrays} from '../../external/gs_tools/src/collection';
+import {Arrays} from 'external/gs_tools/src/collection';
+import {BaseDisposable} from 'external/gs_tools/src/dispose';
+import {BaseElement, ElementRegistrar} from 'external/gs_tools/src/webc';
+import {Injector} from 'external/gs_tools/src/inject';
+import {ListenableDom} from 'external/gs_tools/src/event';
+import {LocationService} from 'external/gs_tools/src/ui';
+import {Reflect} from 'external/gs_tools/src/util';
+import {Templates} from 'external/gs_tools/src/webc';
+
 import {BasicButton} from '../button/basic-button';
-import {BaseDisposable} from '../../external/gs_tools/src/dispose';
-import {BaseElement, ElementRegistrar} from '../../external/gs_tools/src/webc';
 import {DefaultPalettes} from './default-palettes';
 import {HorizontalTab} from '../section/horizontal-tab';
 import {Icon} from '../tool/icon';
 import {IndefiniteLoading} from '../tool/indefinite-loading';
-import {Injector} from '../../external/gs_tools/src/inject';
-import {ListenableDom} from '../../external/gs_tools/src/event';
-import {LocationService} from '../../external/gs_tools/src/ui';
 import {Menu} from '../tool/menu';
 import {MenuContainer} from '../tool/menu-container';
 import {RadioButton} from '../input/radio-button';
-import {Reflect} from '../../external/gs_tools/src/util';
-import {Templates} from '../../external/gs_tools/src/webc';
 import {TextInput} from '../input/text-input';
 import {Theme} from '../theming/theme';
 import {ThemeService} from '../theming/theme-service';

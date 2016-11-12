@@ -1,12 +1,13 @@
 import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
+import {ListenableDom} from 'external/gs_tools/src/event';
+import {Mocks} from 'external/gs_tools/src/mock';
+import {TestDispose} from 'external/gs_tools/src/testing';
+
 import {AnchorLocation} from './anchor-location';
 import {Event} from '../const/event';
-import {ListenableDom} from '../../external/gs_tools/src/event';
 import {Menu} from './menu';
-import {Mocks} from '../../external/gs_tools/src/mock';
-import {TestDispose} from '../../external/gs_tools/src/testing';
 
 
 describe('tool.Menu', () => {

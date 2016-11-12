@@ -1,8 +1,9 @@
 import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
+import {TestDispose} from 'external/gs_tools/src/testing';
+
 import {IndefiniteLoading} from './indefinite-loading';
-import {TestDispose} from '../../external/gs_tools/src/testing';
 
 
 describe('tool.IndefiniteLoading', () => {

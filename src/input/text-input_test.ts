@@ -1,9 +1,10 @@
 import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
-import {DomEvent, ListenableDom} from '../../external/gs_tools/src/event';
-import {Mocks} from '../../external/gs_tools/src/mock';
-import {TestDispose} from '../../external/gs_tools/src/testing';
+import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
+import {Mocks} from 'external/gs_tools/src/mock';
+import {TestDispose} from 'external/gs_tools/src/testing';
+
 import {TextInput} from './text-input';
 
 

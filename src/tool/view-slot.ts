@@ -1,13 +1,13 @@
-import {Arrays} from '../../external/gs_tools/src/collection';
+import {Arrays} from 'external/gs_tools/src/collection';
 import {
     BaseElement,
     bind,
     customElement,
     DomBridge,
-    StringParser} from '../../external/gs_tools/src/webc';
-import {Doms, LocationService, LocationServiceEvents} from '../../external/gs_tools/src/ui';
-import {inject} from '../../external/gs_tools/src/inject';
-import {Iterables} from '../../external/gs_tools/src/collection';
+    StringParser} from 'external/gs_tools/src/webc';
+import {Doms, LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
+import {inject} from 'external/gs_tools/src/inject';
+import {Iterables} from 'external/gs_tools/src/collection';
 
 export const __FULL_PATH = Symbol('fullPath');
 

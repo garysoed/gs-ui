@@ -1,7 +1,8 @@
 import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
-import {Log} from '../../external/gs_tools/src/util';
+import {Log} from 'external/gs_tools/src/util';
+
 import {Palette} from './palette';
 
 

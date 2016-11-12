@@ -1,9 +1,10 @@
 import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
-import {Mocks} from '../../external/gs_tools/src/mock';
+import {Mocks} from 'external/gs_tools/src/mock';
+import {TestDispose} from 'external/gs_tools/src/testing';
+
 import {RadioButtonService} from './radio-button-service';
-import {TestDispose} from '../../external/gs_tools/src/testing';
 
 
 describe('input.RadioButtonService', () => {

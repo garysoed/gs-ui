@@ -1,6 +1,7 @@
-import {Log} from '../../external/gs_tools/src/util';
+import {Log} from 'external/gs_tools/src/util';
+import {Validate} from 'external/gs_tools/src/valid';
+
 import {Palette} from './palette';
-import {Validate} from '../../external/gs_tools/src/valid';
 
 
 const LOG: Log = new Log('theming.Theme');

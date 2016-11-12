@@ -4,10 +4,11 @@ import {
   BaseElement,
   customElement,
   handle,
-  StringParser} from '../../external/gs_tools/src/webc';
-import {DomEvent, ListenableDom} from '../../external/gs_tools/src/event';
+  StringParser} from 'external/gs_tools/src/webc';
+import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
+import {Interval, sequenced} from 'external/gs_tools/src/async';
+
 import {Event} from '../const/event';
-import {Interval, sequenced} from '../../external/gs_tools/src/async';
 
 
 @customElement({

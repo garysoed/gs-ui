@@ -1,5 +1,6 @@
+import {customElement} from 'external/gs_tools/src/webc';
+
 import {BaseActionElement} from '../common/base-action-element';
-import {customElement} from '../../external/gs_tools/src/webc';
 
 
 @customElement({

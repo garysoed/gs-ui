@@ -1,4 +1,4 @@
-import {BaseElement, customElement} from '../../external/gs_tools/src/webc';
+import {BaseElement, customElement} from 'external/gs_tools/src/webc';
 
 
 @customElement({

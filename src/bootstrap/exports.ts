@@ -1,8 +1,9 @@
+import {HslColor} from 'external/gs_tools/src/color';
+import {Jsons} from 'external/gs_tools/src/collection';
+import {Templates} from 'external/gs_tools/src/webc';
+
 import {DefaultPalettes} from './default-palettes';
-import {HslColor} from '../../external/gs_tools/src/color';
-import {Jsons} from '../../external/gs_tools/src/collection';
 import {Main} from './main';
-import {Templates} from '../../external/gs_tools/src/webc';
 import {Theme} from '../theming/theme';
 
 

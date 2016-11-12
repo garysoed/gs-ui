@@ -1,6 +1,6 @@
-import {BaseDisposable} from '../../external/gs_tools/src/dispose';
-import {bind, inject} from '../../external/gs_tools/src/inject';
-import {Validate} from '../../external/gs_tools/src/valid';
+import {BaseDisposable} from 'external/gs_tools/src/dispose';
+import {bind, inject} from 'external/gs_tools/src/inject';
+import {Validate} from 'external/gs_tools/src/valid';
 
 
 /**

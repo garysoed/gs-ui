@@ -6,6 +6,7 @@ load("@gs_tools//bazel/ts:defs.bzl", "ts_binary", "ts_library")
 gs_ui(
     deps = [
       "@gs_tools//src",
+      "//src/bootstrap",
     ])
 
 ts_library(

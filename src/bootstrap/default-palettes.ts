@@ -1,5 +1,6 @@
+import {HslColor} from 'external/gs_tools/src/color';
+
 import {Palette} from '../theming/palette';
-import {HslColor} from '../../external/gs_tools/src/color';
 
 
 /**

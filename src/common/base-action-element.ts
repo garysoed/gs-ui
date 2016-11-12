@@ -1,6 +1,7 @@
-import {BaseElement} from '../../external/gs_tools/src/webc';
+import {BaseElement} from 'external/gs_tools/src/webc';
+import {DomEvent} from 'external/gs_tools/src/event';
+
 import {Event} from '../const/event';
-import {DomEvent} from '../../external/gs_tools/src/event';
 
 
 export class BaseActionElement extends BaseElement {

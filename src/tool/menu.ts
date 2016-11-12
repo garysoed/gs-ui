@@ -1,9 +1,10 @@
+import {BaseElement, customElement} from 'external/gs_tools/src/webc';
+import {ListenableDom} from 'external/gs_tools/src/event';
+import {inject} from 'external/gs_tools/src/inject';
+
 import {AnchorLocation} from './anchor-location';
 import {AnchorLocationParser} from './anchor-location-parser';
-import {BaseElement, customElement} from '../../external/gs_tools/src/webc';
 import {Event} from '../const/event';
-import {ListenableDom} from '../../external/gs_tools/src/event';
-import {inject} from '../../external/gs_tools/src/inject';
 import {MenuService} from './menu-service';
 
 

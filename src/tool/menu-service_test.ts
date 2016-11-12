@@ -1,14 +1,15 @@
 import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
+import {Interval} from 'external/gs_tools/src/async';
+import {ListenableDom} from 'external/gs_tools/src/event';
+import {Mocks} from 'external/gs_tools/src/mock';
+import {TestDispose} from 'external/gs_tools/src/testing';
+
 import {AnchorLocation} from './anchor-location';
 import {Anchors} from './anchors';
-import {Interval} from '../../external/gs_tools/src/async';
-import {ListenableDom} from '../../external/gs_tools/src/event';
 import {MenuContainer} from './menu-container';
 import {MenuService} from './menu-service';
-import {Mocks} from '../../external/gs_tools/src/mock';
-import {TestDispose} from '../../external/gs_tools/src/testing';
 
 
 describe('tool.MenuService', () => {

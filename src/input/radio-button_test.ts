@@ -1,10 +1,11 @@
 import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
+import {Mocks} from 'external/gs_tools/src/mock';
+import {TestDispose} from 'external/gs_tools/src/testing';
+
 import {BaseActionElement} from '../common/base-action-element';
-import {Mocks} from '../../external/gs_tools/src/mock';
 import {RadioButton} from './radio-button';
-import {TestDispose} from '../../external/gs_tools/src/testing';
 
 
 describe('input.RadioButton', () => {

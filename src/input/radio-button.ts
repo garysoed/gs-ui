@@ -1,12 +1,13 @@
-import {BaseActionElement} from '../common/base-action-element';
 import {
   bind,
   BooleanParser,
   customElement,
   DomBridge,
   handle,
-  StringParser} from '../../external/gs_tools/src/webc';
-import {inject} from '../../external/gs_tools/src/inject';
+  StringParser} from 'external/gs_tools/src/webc';
+import {inject} from 'external/gs_tools/src/inject';
+
+import {BaseActionElement} from '../common/base-action-element';
 import {RadioButtonService} from './radio-button-service';
 
 

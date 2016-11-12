@@ -1,9 +1,10 @@
+import {BaseDisposable} from 'external/gs_tools/src/dispose';
+import {bind, inject} from 'external/gs_tools/src/inject';
+import {Interval} from 'external/gs_tools/src/async';
+import {ListenableDom} from 'external/gs_tools/src/event';
+
 import {AnchorLocation} from './anchor-location';
 import {Anchors} from './anchors';
-import {BaseDisposable} from '../../external/gs_tools/src/dispose';
-import {bind, inject} from '../../external/gs_tools/src/inject';
-import {Interval} from '../../external/gs_tools/src/async';
-import {ListenableDom} from '../../external/gs_tools/src/event';
 import {MenuContainer} from './menu-container';
 
 

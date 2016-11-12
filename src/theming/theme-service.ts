@@ -1,9 +1,10 @@
-import {IColor} from '../../external/gs_tools/src/color';
-import {bind, inject} from '../../external/gs_tools/src/inject';
-import {Maps} from '../../external/gs_tools/src/collection';
-import {Templates} from '../../external/gs_tools/src/webc';
+import {IColor} from 'external/gs_tools/src/color';
+import {bind, inject} from 'external/gs_tools/src/inject';
+import {Maps} from 'external/gs_tools/src/collection';
+import {Templates} from 'external/gs_tools/src/webc';
+import {Validate} from 'external/gs_tools/src/valid';
+
 import {Theme} from './theme';
-import {Validate} from '../../external/gs_tools/src/valid';
 
 
 @bind('theming.ThemeService')
