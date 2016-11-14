@@ -1,3 +1,6 @@
+workspace(name = "gs_ui")
+
+
 local_repository(
     name = "gs_tools",
     path = "./node_modules/gs-tools",

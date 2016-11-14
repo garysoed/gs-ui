@@ -51,6 +51,7 @@ filegroup(
         "//src/input:template",
         "//src/section:template",
         "//src/theming:template",
+        "//src/theming:theme-style_templatepack",
         "//src/tool:template",
     ]
 )
@@ -61,7 +62,6 @@ genrule(
         "@web_animations_js//:next",
         "//:pack_js",
         "//:pack_template",
-        "//src/theming:theme-style_templatepack",
     ],
     outs = ["pack.js"],
     cmd = "awk 'FNR==1{print \"\"}1' $(SRCS) > $@",

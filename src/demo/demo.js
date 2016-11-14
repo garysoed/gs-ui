@@ -61,6 +61,7 @@ for (var r = 0; r < 5; r++) {
         'rgb(' + [normal.getRed(), normal.getGreen(), normal.getBlue()].join(',') +')';
     cellEl.classList.add('colorPickerCell');
     cellEl.classList.add('base');
+    cellEl.title = name;
     cellEl.setAttribute('data-name', name);
     cellEl.addEventListener('click', onClickBase.bind(null, name));
 
@@ -97,6 +98,7 @@ for (var r = 0; r < 5; r++) {
     cellEl.classList.add('colorPickerCell');
     cellEl.classList.add('base');
     cellEl.setAttribute('data-name', name);
+    cellEl.title = name;
     cellEl.addEventListener('click', onClickAccent.bind(null, name));
 
     rowEl.appendChild(cellEl);

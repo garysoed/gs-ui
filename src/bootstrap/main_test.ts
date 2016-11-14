@@ -27,9 +27,12 @@ describe('bootstrap.Main', () => {
 
   describe('bootstrap', () => {
     it('should set up correctly', () => {
+      let customElement1 = Mocks.object('customElement1');
+      let customElement2 = Mocks.object('customElement2');
       let theme = Mocks.object('theme');
-      main.bootstrap(theme);
-      assert(mockRegistrar.register).to.haveBeenCalled();
+      main.bootstrap(theme, [customElement1, customElement2]);
+      assert(mockRegistrar.register).to.haveBeenCalledWith(customElement1);
+      assert(mockRegistrar.register).to.haveBeenCalledWith(customElement2);
       assert(mockThemeService.install).to.haveBeenCalledWith(theme);
     });
   });

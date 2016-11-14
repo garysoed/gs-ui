@@ -63,8 +63,10 @@ export class Main extends BaseDisposable {
    *
    * @param theme The theme to apply to the app.
    */
-  bootstrap(theme: Theme = DEFAULT_THEME_): void {
-    Arrays.of(DEFAULT_ELEMENTS_)
+  bootstrap(theme: Theme = DEFAULT_THEME_, customElements: gs.ICtor<BaseElement>[] = []): void {
+    Arrays
+        .of(DEFAULT_ELEMENTS_)
+        .addAllArray(customElements)
         .forEach((ctor: gs.ICtor<BaseElement>) => {
           this.registrar_.register(ctor);
         });
