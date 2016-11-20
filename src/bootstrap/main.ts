@@ -58,6 +58,10 @@ export class Main extends BaseDisposable {
     this.addDisposable(locationService);
   }
 
+  applyTheme(element: Element): void {
+    this.themeService_.applyTheme(element);
+  }
+
   /**
    * Bootstraps the app.
    *

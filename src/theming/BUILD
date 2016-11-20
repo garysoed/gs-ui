@@ -14,6 +14,29 @@ sass_binary(
     src = "theme-style.scss",
 )
 
+sass_binary(
+    name = "common-style_cssbin",
+    src = "common-style.scss",
+)
+
+webc_gen_template(
+    name = "common-style_templatepack",
+    css = ":common-style_cssbin",
+    key = "src/theming/common",
+    template = "common-style.html",
+)
+
+sass_binary(
+    name = "global-style_cssbin",
+    src = "global-style.scss",
+)
+
+webc_gen_template(
+    name = "global-style_templatepack",
+    css = ":global-style_cssbin",
+    key = "src/theming/global",
+    template = "global-style.html",
+)
 
 webc_gen_template(
     name = "theme-style_templatepack",

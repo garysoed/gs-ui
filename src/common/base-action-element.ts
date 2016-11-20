@@ -28,7 +28,6 @@ export class BaseActionElement extends BaseElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    element.classList.add('gs-action');
 
     // TODO: use annotation.
     this.addDisposable(this.getElement()!.on(DomEvent.CLICK, this.onClick_.bind(this)));

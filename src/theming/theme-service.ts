@@ -9,11 +9,27 @@ import {Theme} from './theme';
 
 @bind('theming.ThemeService')
 export class ThemeService {
+  private readonly document_: Document;
+  private readonly parser_: DOMParser;
+  private readonly templates_: Templates;
   private initialized_: boolean = false;
 
   constructor(
-      @inject('x.gs_tools.templates') private templates_: Templates,
-      @inject('x.dom.document') private document_: Document = window.document) { }
+      @inject('x.gs_tools.templates') templates: Templates,
+      @inject('x.dom.document') document: Document = window.document) {
+    this.document_ = document;
+    this.parser_ = new DOMParser();
+    this.templates_ = templates;
+  }
+
+  applyTheme(root: Element): void {
+    let cssTemplate = this.templates_.getTemplate('src/theming/common');
+    Validate.any(cssTemplate).to.exist()
+        .orThrows(`Template for src/theming/common not found`)
+        .assertValid();
+    let styleEl = this.parser_.parseFromString(cssTemplate!, 'text/html');
+    root.appendChild(styleEl.querySelector('style'));
+  }
 
   /**
    * Initializes the app.
@@ -23,13 +39,14 @@ export class ThemeService {
       return;
     }
 
-    let mainCssTemplate = this.templates_.getTemplate('src/theming/theme');
-    Validate.any(mainCssTemplate).to.exist()
-        .orThrows(`Template for src/theming/theme not found`)
+    let globalCssTemplate = this.templates_.getTemplate('src/theming/global');
+    Validate.any(globalCssTemplate).to.exist()
+        .orThrows(`Template for src/theming/global not found`)
         .assertValid();
 
+    let styleEl = this.parser_.parseFromString(globalCssTemplate!, 'text/html');
     let headEl = this.document_.querySelector('head');
-    headEl.innerHTML += mainCssTemplate;
+    headEl.appendChild(styleEl.querySelector('style'));
     this.initialized_ = true;
   }
 

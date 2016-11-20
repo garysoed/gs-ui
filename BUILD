@@ -51,6 +51,8 @@ filegroup(
         "//src/input:template",
         "//src/section:template",
         "//src/theming:template",
+        "//src/theming:common-style_templatepack",
+        "//src/theming:global-style_templatepack",
         "//src/theming:theme-style_templatepack",
         "//src/tool:template",
     ]
