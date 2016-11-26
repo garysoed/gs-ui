@@ -26,7 +26,7 @@ export class TextInput extends BaseActionElement {
   @bind.shadow.attribute('input[type="text"]', 'disabled')
   private inputDisabledBridge_: DomBridge<boolean>;
 
-  private listenableInputEl_: ListenableDom<HTMLInputElement> | null = null;
+  private inputEl_: HTMLInputElement | null = null;
 
   constructor() {
     super();
@@ -39,9 +39,10 @@ export class TextInput extends BaseActionElement {
    */
   protected onClick_(): void {
     super.onClick_();
-    if (this.listenableInputEl_ !== null && !this.isDisabled()) {
-      this.listenableInputEl_.getEventTarget().click();
-      this.listenableInputEl_.getEventTarget().focus();
+    if (this.inputEl_ !== null && !this.isDisabled()) {
+      // TODO: Bind element.
+      this.inputEl_.click();
+      this.inputEl_.focus();
     }
   }
 
@@ -52,9 +53,9 @@ export class TextInput extends BaseActionElement {
    */
   @handle.host.attributeChange(null, 'gs-value', StringParser)
   protected onGsValueChange_(newValue: string): void {
-    if (this.listenableInputEl_ !== null) {
+    if (this.inputEl_ !== null) {
       // TODO: Make a DOM bridge.
-      this.listenableInputEl_.getEventTarget().value = newValue;
+      this.inputEl_.value = newValue;
     }
   }
 
@@ -71,9 +72,10 @@ export class TextInput extends BaseActionElement {
   /**
    * Handler called when the input element fires a change event.
    */
+  @handle.host.event('input', DomEvent.CHANGE)
   protected onInputChange_(): void {
-    if (this.listenableInputEl_ !== null) {
-      this.gsValueBridge_.set(this.listenableInputEl_.getEventTarget().value);
+    if (this.inputEl_ !== null) {
+      this.gsValueBridge_.set(this.inputEl_.value);
     }
 
     let element = this.getElement();
@@ -87,11 +89,6 @@ export class TextInput extends BaseActionElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    this.listenableInputEl_ = ListenableDom.of(
-        element.shadowRoot.querySelector('input'));
-    this.addDisposable(this.listenableInputEl_);
-    // TODO: Make event handler.
-    this.addDisposable(
-        this.listenableInputEl_.on(DomEvent.CHANGE, this.onInputChange_.bind(this)));
+    this.inputEl_ = element.shadowRoot.querySelector('input');
   }
 }

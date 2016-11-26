@@ -40,7 +40,8 @@ export class ThemeService {
     }
 
     let globalCssTemplate = this.templates_.getTemplate('src/theming/global');
-    Validate.any(globalCssTemplate).to.exist()
+    Validate
+        .any(globalCssTemplate).to.exist()
         .orThrows(`Template for src/theming/global not found`)
         .assertValid();
 

@@ -19,34 +19,32 @@ describe('theming.ThemeService', () => {
 
   describe('initialize', () => {
     it('should initialize the app correctly', () => {
-      let initialInnerHTML = 'initialInnerHTML';
-      let headEl = Mocks.object('headEl');
-      headEl.innerHTML = initialInnerHTML;
+      let mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
 
-      mockDocument.querySelector.and.returnValue(headEl);
+      mockDocument.querySelector.and.returnValue(mockHeadEl);
 
       let cssTemplate = 'cssTemplate';
       mockTemplates.getTemplate.and.returnValue(cssTemplate);
 
+      let styleEl = Mocks.object('styleEl');
+      let mockParsedCss = jasmine.createSpyObj('ParsedCss', ['querySelector']);
+      mockParsedCss.querySelector.and.returnValue(styleEl);
+      spyOn(service['parser_'], 'parseFromString').and.returnValue(mockParsedCss);
+
       service.initialize();
 
-      assert(headEl.innerHTML).to.equal(initialInnerHTML + cssTemplate);
-      assert(mockTemplates.getTemplate).to.haveBeenCalledWith('src/theming/theme');
+      assert(mockHeadEl.appendChild).to.haveBeenCalledWith(styleEl);
+      assert(mockParsedCss.querySelector).to.haveBeenCalledWith('style');
       assert(mockDocument.querySelector).to.haveBeenCalledWith('head');
+      assert(service['parser_'].parseFromString).to.haveBeenCalledWith(cssTemplate, 'text/html');
+      assert(mockTemplates.getTemplate).to.haveBeenCalledWith('src/theming/global');
+      assert(<boolean> service['initialized_']).to.beTrue();
     });
 
     it('should not initialize again if called the second time', () => {
-      let headEl = Mocks.object('headEl');
-      headEl.innerHTML = '';
-      mockDocument.querySelector.and.returnValue(headEl);
-
-      let cssTemplate = 'cssTemplate';
-      mockTemplates.getTemplate.and.returnValue(cssTemplate);
-
+      service['initialized_'] = true;
       service.initialize();
-      service.initialize();
-
-      assert(headEl.innerHTML).to.equal(cssTemplate);
+      assert(mockDocument.querySelector).toNot.haveBeenCalled();
     });
 
     it('should throw error if the theme template cannot be found', () => {

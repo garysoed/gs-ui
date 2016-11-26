@@ -19,9 +19,7 @@ describe('input.TextInput', () => {
   describe('onClick_', () => {
     it('should click and focus the input element', () => {
       let mockInputElement = jasmine.createSpyObj('InputElement', ['click', 'focus']);
-      let mockListenableInputElement = Mocks.listenable('ListenableInputEl', mockInputElement);
-      textInput['listenableInputEl_'] = mockListenableInputElement;
-      TestDispose.add(mockListenableInputElement);
+      textInput['inputEl_'] = mockInputElement;
 
       spyOn(textInput, 'isDisabled').and.returnValue(false);
 
@@ -32,7 +30,7 @@ describe('input.TextInput', () => {
     });
 
     it('should do nothing if there are no input elements', () => {
-      textInput['listenableInputEl_'] = null;
+      textInput['inputEl_'] = null;
 
       spyOn(textInput, 'isDisabled').and.returnValue(false);
 
@@ -43,9 +41,7 @@ describe('input.TextInput', () => {
 
     it('should do nothing if disabled', () => {
       let mockInputElement = jasmine.createSpyObj('InputElement', ['click', 'focus']);
-      let mockListenableInputElement = Mocks.listenable('ListenableInputEl', mockInputElement);
-      textInput['listenableInputEl_'] = mockListenableInputElement;
-      TestDispose.add(mockListenableInputElement);
+      textInput['inputEl_'] = mockInputElement;
 
       spyOn(textInput, 'isDisabled').and.returnValue(true);
 
@@ -57,20 +53,18 @@ describe('input.TextInput', () => {
   });
 
   describe('onGsValueChange_', () => {
-    fit('should update the event target value', () => {
+    it('should update the event target value', () => {
       let value = 'value';
       let eventTarget = Mocks.object('eventTarget');
-      let mockListenableInputEl = jasmine.createSpyObj('ListenableInputEl', ['getEventTarget']);
-      mockListenableInputEl.getEventTarget.and.returnValue(eventTarget);
-      textInput['listenableInputEl_'] = mockListenableInputEl;
+      textInput['inputEl_'] = eventTarget;
 
       textInput['onGsValueChange_'](value);
 
       assert(eventTarget.value).to.equal(value);
     });
 
-    fit('should not throw error if there are no listenable input elements', () => {
-      textInput['listenableInputEl_'] = null;
+    it('should not throw error if there are no listenable input elements', () => {
+      textInput['inputEl_'] = null;
 
       assert(() => {
         textInput['onGsValueChange_']('value');
@@ -79,7 +73,7 @@ describe('input.TextInput', () => {
   });
 
   describe('onDisabledChange_', () => {
-    fit('should set the value to the input element', () => {
+    it('should set the value to the input element', () => {
       let value = true;
       spyOn(textInput['inputDisabledBridge_'], 'set');
       textInput['onDisabledChange_'](value);
@@ -93,9 +87,7 @@ describe('input.TextInput', () => {
       let inputElement = Mocks.object('inputElement');
       inputElement.value = value;
 
-      let mockListenableInputElement = Mocks.listenable('ListenableInputElement', inputElement);
-      textInput['listenableInputEl_'] = mockListenableInputElement;
-      TestDispose.add(mockListenableInputElement);
+      textInput['inputEl_'] = inputElement;
 
       let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
 
@@ -125,9 +117,7 @@ describe('input.TextInput', () => {
       let inputElement = Mocks.object('inputElement');
       inputElement.value = value;
 
-      let mockListenableInputElement = Mocks.listenable('ListenableInputElement', inputElement);
-      textInput['listenableInputEl_'] = mockListenableInputElement;
-      TestDispose.add(mockListenableInputElement);
+      textInput['inputEl_'] = inputElement;
 
       spyOn(textInput, 'getElement').and.returnValue(null);
       spyOn(textInput['gsValueBridge_'], 'set');
@@ -138,74 +128,19 @@ describe('input.TextInput', () => {
     });
   });
 
-  describe('onAttributeChanged', () => {
-    it('should update the input element for disabled attribute', () => {
-      spyOn(textInput, 'isDisabled').and.returnValue(true);
-      spyOn(textInput['inputDisabledBridge_'], 'set');
-
-      textInput.onAttributeChanged('disabled', '', '');
-
-      assert(textInput['inputDisabledBridge_'].set).to.haveBeenCalledWith(true);
-    });
-
-    it('should update the input element for gsValue attribute', () => {
-      let newValue = 'newValue';
-      let inputElement = Mocks.object('inputElement');
-      let mockListenableInputElement = Mocks.listenable('ListenableInputElement', inputElement);
-      textInput['listenableInputEl_'] = mockListenableInputElement;
-      TestDispose.add(mockListenableInputElement);
-
-      textInput.onAttributeChanged('gsValue', '', newValue);
-
-      assert(inputElement.value).to.equal(newValue);
-    });
-
-    it('should do nothing if gsValue attribute changed but there are no input elements', () => {
-      assert(() => {
-        textInput.onAttributeChanged('gsValue', '', 'newValue');
-      }).toNot.throw();
-    });
-  });
-
   describe('onCreated', () => {
     it('should initialize correctly', () => {
       let inputElement = Mocks.object('inputElement');
       let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(inputElement);
 
-      let gsValue = 'gsValue';
-      let disabled = 'disabled';
       let mockElement = Mocks.element();
-      spyOn(mockElement, 'getAttribute').and.callFake((attrName: string) => {
-        switch (attrName) {
-          case 'disabled':
-            return disabled;
-          case 'gs-value':
-            return gsValue;
-        }
-      });
       mockElement.shadowRoot = mockShadowRoot;
-
-      let mockListenableInputElement = Mocks.listenable('ListenableInputElement');
-      spyOn(mockListenableInputElement, 'on').and.callThrough();
-      spyOn(ListenableDom, 'of').and.returnValue(mockListenableInputElement);
-      TestDispose.add(mockListenableInputElement);
-
-      spyOn(textInput, 'onInputChange_');
-      spyOn(textInput, 'onAttributeChanged');
 
       textInput.onCreated(mockElement);
 
-      assert(textInput.onAttributeChanged).to.haveBeenCalledWith('gsValue', '', gsValue);
-      assert(textInput.onAttributeChanged).to.haveBeenCalledWith('disabled', '', disabled);
-
-      assert(mockListenableInputElement.on)
-          .to.haveBeenCalledWith(DomEvent.CHANGE, Matchers.any(Function));
-      mockListenableInputElement.on.calls.argsFor(1)[1]();
-      assert(textInput['onInputChange_']).to.haveBeenCalledWith();
-
+      assert(textInput['inputEl_']).to.equal(inputElement);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('input');
-      assert(ListenableDom.of).to.haveBeenCalledWith(inputElement);
     });
   });
 });
