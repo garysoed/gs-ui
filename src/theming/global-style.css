@@ -1,12 +1,14 @@
-// ThemeD: rgba(11,11,11
-// Theme: rgba(22,22,22
-// ThemeL: rgba(33,33,33
-// Accent: rgba(44,44,44
-// 1 rem = 16px
+/*
+  ThemeD: rgba(11,11,11
+  Theme: rgba(22,22,22
+  ThemeL: rgba(33,33,33
+  Accent: rgba(44,44,44
+  1 rem = 16px
+*/
 @import 'https://fonts.googleapis.com/css?family=Ubuntu+Mono|Ubuntu:300,400,700';
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 
-// General, non themed styles
+/* General, non themed styles */
 body {
   font-family: var(--gsFontFamily);
   font-size: var(--gsFontSizeRoot);
@@ -21,8 +23,8 @@ body {
 
   --gsThemePrimary: #000;
   --gsThemeSecondary: #fff;
-  --gsThemeDark: rgba(11,11,11,.99);
-  --gsThemeNormal: rgba(22,22,22,.99);
-  --gsThemeLight: rgba(33,33,33,.99);
-  --gsThemeAccent: rgba(44,44,44,.99);
+  --gsThemeDark: rgba(11,11,11,1);
+  --gsThemeNormal: rgba(22,22,22,1);
+  --gsThemeLight: rgba(33,33,33,1);
+  --gsThemeAccent: rgba(44,44,44,1);
 }

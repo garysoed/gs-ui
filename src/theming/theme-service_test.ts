@@ -17,6 +17,56 @@ describe('theming.ThemeService', () => {
     service = new ThemeService(mockTemplates, mockDocument);
   });
 
+  describe('applyTheme', () => {
+    it('should append the style element correctly', () => {
+      let styleEl = Mocks.object('styleEl');
+      let mockCssTemplateEl = jasmine.createSpyObj('CssTemplateEl', ['querySelector']);
+      mockCssTemplateEl.querySelector.and.returnValue(styleEl);
+      let mockRoot = jasmine.createSpyObj('Root', ['appendChild']);
+
+      let cssTemplate = 'cssTemplate';
+      mockTemplates.getTemplate.and.returnValue(cssTemplate);
+
+      spyOn(service['parser_'], 'parseFromString').and.returnValue(mockCssTemplateEl);
+
+      service.applyTheme(mockRoot);
+
+      assert(mockRoot.appendChild).to.haveBeenCalledWith(styleEl);
+      assert(mockCssTemplateEl.querySelector).to.haveBeenCalledWith('style');
+      assert(service['parser_'].parseFromString).to.haveBeenCalledWith(cssTemplate, 'text/html');
+      assert(mockTemplates.getTemplate).to.haveBeenCalledWith('src/theming/common');
+    });
+
+    it('should append the style element to the document head if root is document', () => {
+      let styleEl = Mocks.object('styleEl');
+      let mockCssTemplateEl = jasmine.createSpyObj('CssTemplateEl', ['querySelector']);
+      mockCssTemplateEl.querySelector.and.returnValue(styleEl);
+      let mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
+
+      let document = Mocks.object('document');
+      document.head = mockHeadEl;
+      Object.setPrototypeOf(document, Document.prototype);
+
+      let cssTemplate = 'cssTemplate';
+      mockTemplates.getTemplate.and.returnValue(cssTemplate);
+
+      spyOn(service['parser_'], 'parseFromString').and.returnValue(mockCssTemplateEl);
+
+      service.applyTheme(document);
+
+      assert(mockHeadEl.appendChild).to.haveBeenCalledWith(styleEl);
+    });
+
+    it('should throw error if the common template is not available', () => {
+      let mockRootEl = Mocks.object('RootEl');
+      mockTemplates.getTemplate.and.returnValue(null);
+
+      assert(() => {
+        service.applyTheme(mockRootEl);
+      }).to.throwError(/src\/theming\/common not found/);
+    });
+  });
+
   describe('initialize', () => {
     it('should initialize the app correctly', () => {
       let mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
@@ -84,8 +134,8 @@ describe('theming.ThemeService', () => {
       service.install(theme);
 
       assert(themeStyleEl.innerHTML).to.equal(
-          'body{--gsRgbBaseDark:1,2,3;--gsRgbBaseNormal:7,8,9;' +
-          '--gsRgbBaseLight:4,5,6;--gsRgbAccent:10,11,12;}');
+          'body{--gsRgbAccent:10,11,12;--gsRgbBaseDark:1,2,3;' +
+          '--gsRgbBaseLight:4,5,6;--gsRgbBaseNormal:7,8,9;}');
       assert(themeStyleEl.id).to.equal('gs-theme');
 
       assert(mockHeadEl.appendChild).to.haveBeenCalledWith(themeStyleEl);
@@ -113,8 +163,8 @@ describe('theming.ThemeService', () => {
       service.install(theme);
 
       assert(themeStyleEl.innerHTML).to.equal(
-          'body{--gsRgbBaseDark:1,2,3;--gsRgbBaseNormal:7,8,9;' +
-          '--gsRgbBaseLight:4,5,6;--gsRgbAccent:10,11,12;}');
+          'body{--gsRgbAccent:10,11,12;--gsRgbBaseDark:1,2,3;' +
+          '--gsRgbBaseLight:4,5,6;--gsRgbBaseNormal:7,8,9;}');
 
       assert(mockDocument.querySelector).to.haveBeenCalledWith('style#gs-theme');
       assert(mockDocument.createElement).toNot.haveBeenCalled();

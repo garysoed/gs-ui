@@ -58,8 +58,13 @@ export class Main extends BaseDisposable {
     this.addDisposable(locationService);
   }
 
-  applyTheme(element: Element): void {
-    this.themeService_.applyTheme(element);
+  /**
+   * Applies the theme to the given element.
+   *
+   * @param targetEl The element to apply the theme to.
+   */
+  applyTheme(targetEl: Element | Document): void {
+    this.themeService_.applyTheme(targetEl);
   }
 
   /**

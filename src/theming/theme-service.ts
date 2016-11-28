@@ -22,13 +22,20 @@ export class ThemeService {
     this.templates_ = templates;
   }
 
-  applyTheme(root: Element): void {
+  /**
+   * Applies the theme to the given element.
+   *
+   * @param root The root element to add the element to. If document, this method will append the
+   *    style tag to the header element.
+   */
+  applyTheme(root: Element | Document): void {
+    let targetEl: Element = root instanceof Document ? root.head : root;
     let cssTemplate = this.templates_.getTemplate('src/theming/common');
     Validate.any(cssTemplate).to.exist()
         .orThrows(`Template for src/theming/common not found`)
         .assertValid();
-    let styleEl = this.parser_.parseFromString(cssTemplate!, 'text/html');
-    root.appendChild(styleEl.querySelector('style'));
+    let cssTemplateEl = this.parser_.parseFromString(cssTemplate!, 'text/html');
+    targetEl.appendChild(cssTemplateEl.querySelector('style'));
   }
 
   /**
@@ -67,10 +74,10 @@ export class ThemeService {
 
     const vars = Maps
         .fromRecord({
-          'gsRgbBaseDark': theme.base.dark,
-          'gsRgbBaseNormal': theme.base.normal,
-          'gsRgbBaseLight': theme.base.light,
           'gsRgbAccent': theme.accent.accent,
+          'gsRgbBaseDark': theme.base.dark,
+          'gsRgbBaseLight': theme.base.light,
+          'gsRgbBaseNormal': theme.base.normal,
         })
         .entries()
         .map(([name, color]: [string, IColor]) => {

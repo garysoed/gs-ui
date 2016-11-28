@@ -19,10 +19,18 @@ describe('bootstrap.Main', () => {
   beforeEach(() => {
     let injector = Mocks.object('injector');
     let locationService = Mocks.disposable('LocationService');
-    mockThemeService = jasmine.createSpyObj('ThemeService', ['install']);
+    mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme', 'install']);
     mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
     main = new Main(injector, locationService, mockThemeService, mockRegistrar);
     TestDispose.add(main);
+  });
+
+  describe('applyTheme', () => {
+    it('should apply the theme correctly', () => {
+      let targetEl = Mocks.object('targetEl');
+      main.applyTheme(targetEl);
+      assert(mockThemeService.applyTheme).to.haveBeenCalledWith(targetEl);
+    });
   });
 
   describe('bootstrap', () => {

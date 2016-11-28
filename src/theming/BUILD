@@ -1,5 +1,4 @@
 package(default_visibility = ["//:internal"])
-load("@io_bazel_rules_sass//sass:sass.bzl", "sass_binary")
 load("@gs_tools//bazel/webc:defs.bzl", "webc_gen_template")
 
 load("//:defs.bzl", "gs_ui")
@@ -9,14 +8,14 @@ gs_ui(
       "@gs_tools//src"
     ])
 
-sass_binary(
+native.filegroup(
     name = "theme-style_cssbin",
-    src = "theme-style.scss",
+    srcs = ["theme-style.css"],
 )
 
-sass_binary(
+native.filegroup(
     name = "common-style_cssbin",
-    src = "common-style.scss",
+    srcs = ["common-style.css"],
 )
 
 webc_gen_template(
@@ -26,9 +25,9 @@ webc_gen_template(
     template = "common-style.html",
 )
 
-sass_binary(
+native.filegroup(
     name = "global-style_cssbin",
-    src = "global-style.scss",
+    srcs = ["global-style.css"],
 )
 
 webc_gen_template(

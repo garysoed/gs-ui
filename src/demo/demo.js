@@ -124,4 +124,4 @@ var theme = gs.ui.Theme.newInstance(
     gs.ui.DefaultPalettes[base],
     gs.ui.DefaultPalettes[accent]);
 main.bootstrap(theme);
-main.applyTheme(document.head);
+main.applyTheme(document);

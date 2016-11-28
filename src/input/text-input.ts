@@ -5,7 +5,7 @@ import {
   DomBridge,
   handle,
   StringParser} from 'external/gs_tools/src/webc';
-import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
+import {DomEvent} from 'external/gs_tools/src/event';
 
 import {BaseActionElement} from '../common/base-action-element';
 

@@ -16,9 +16,9 @@ import {Anchors} from './anchors';
 
 @customElement({
   attributes: {
+    'gsAnchorPoint': AnchorLocationParser,
     'gsAnchorTargetX': FloatParser,
     'gsAnchorTargetY': FloatParser,
-    'gsAnchorPoint': AnchorLocationParser,
   },
   tag: 'gs-menu-container',
   templateKey: 'src/tool/menu-container',
