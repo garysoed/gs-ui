@@ -1,6 +1,7 @@
 import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
+import {Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 
 import {BaseActionElement} from './base-action-element';
@@ -11,7 +12,7 @@ describe('common.BaseActionElement', () => {
   let actionElement: BaseActionElement;
 
   beforeEach(() => {
-    actionElement = new BaseActionElement();
+    actionElement = new BaseActionElement(Mocks.object('ThemeService'));
     TestDispose.add(actionElement);
   });
 

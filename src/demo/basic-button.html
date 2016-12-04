@@ -9,6 +9,11 @@
       }
 
       .cell {
+        display: flex;
+        flex: 1;
+      }
+
+      .cell > section {
         flex: 1;
         padding: 1rem;
       }
@@ -17,28 +22,42 @@
   </head>
   <body>
     <template id="template">
-      <gs-basic-button>
-        <div gs-content>Normal Button</div>
-      </gs-basic-button>
-      <gs-basic-button disabled>
-        <div gs-content>Disabled Button</div>
-      </gs-basic-button>
-      <gs-basic-button class="gs-primary">
-        <div gs-content>Primary Button</div>
-      </gs-basic-button>
-      <gs-basic-button class="gs-primary" disabled>
-        <div gs-content>Disabled Primary Button</div>
-      </gs-basic-button>
+      <section>
+        <gs-basic-button>
+          <div gs-content>Normal Button</div>
+        </gs-basic-button>
+        <gs-basic-button disabled>
+          <div gs-content>Disabled Button</div>
+        </gs-basic-button>
+        <gs-basic-button class="gs-hilite">
+          <div gs-content>Primary Button</div>
+        </gs-basic-button>
+        <gs-basic-button class="gs-hilite" disabled>
+          <div gs-content>Disabled Primary Button</div>
+        </gs-basic-button>
+      </section>
+      <section class="gs-hilite">
+        <gs-basic-button>
+          <div gs-content>Normal Button</div>
+        </gs-basic-button>
+        <gs-basic-button disabled>
+          <div gs-content>Disabled Button</div>
+        </gs-basic-button>
+        <gs-basic-button class="gs-unhilite">
+          <div gs-content>Primary Button</div>
+        </gs-basic-button>
+        <gs-basic-button class="gs-unhilite" disabled>
+          <div gs-content>Disabled Primary Button</div>
+        </gs-basic-button>
+      </section>
     </template>
 
     <section>
       <section class="row">
         <section class="cell gs-theme-normal"></section>
-        <section class="cell gs-theme-normal gs-hilite"></section>
       </section>
       <section class="row">
         <section class="cell gs-theme-invert"></section>
-        <section class="cell gs-theme-invert gs-hilite"></section>
       </section>
     </section>
 

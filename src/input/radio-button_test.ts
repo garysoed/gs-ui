@@ -19,7 +19,7 @@ describe('input.RadioButton', () => {
     spyOn(BaseActionElement.prototype, 'onClick_');
     spyOn(BaseActionElement.prototype, 'onAttributeChanged');
 
-    button = new RadioButton(mockRadioButtonService);
+    button = new RadioButton(mockRadioButtonService, Mocks.object('ThemeService'));
     TestDispose.add(button);
   });
 

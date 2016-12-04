@@ -12,7 +12,8 @@ describe('input.TextInput', () => {
   let textInput: TextInput;
 
   beforeEach(() => {
-    textInput = new TextInput();
+    let mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
+    textInput = new TextInput(mockThemeService);
     TestDispose.add(textInput);
   });
 

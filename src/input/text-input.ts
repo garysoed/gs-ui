@@ -6,8 +6,10 @@ import {
   handle,
   StringParser} from 'external/gs_tools/src/webc';
 import {DomEvent} from 'external/gs_tools/src/event';
+import {inject} from 'external/gs_tools/src/inject';
 
 import {BaseActionElement} from '../common/base-action-element';
+import {ThemeService} from '../theming/theme-service';
 
 
 @customElement({
@@ -28,8 +30,8 @@ export class TextInput extends BaseActionElement {
 
   private inputEl_: HTMLInputElement | null = null;
 
-  constructor() {
-    super();
+  constructor(@inject('theming.ThemeService') themeService: ThemeService) {
+    super(themeService);
     this.gsValueBridge_ = DomBridge.of(StringParser);
     this.inputDisabledBridge_ = DomBridge.of(BooleanParser, true);
   }

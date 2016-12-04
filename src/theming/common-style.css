@@ -1,11 +1,17 @@
-a {
-  color: var(--gsColorForeground);
-  font-weight: 600;
+a, .gs-action {
+  color: var(--gsColorActionFG);
+  font-weight: 700;
   text-decoration: none;
 }
 
-a:hover {
+a:hover, .gs-action:hover {
+  color: var(--gsColorActionFocusFG);
   cursor: pointer;
+}
+
+a[disabled], .gs-action[disabled] {
+  color: var(--gsColorActionDisabledFG);
+  cursor: default;
 }
 
 h1 {
@@ -23,63 +29,126 @@ h3 {
 }
 
 code {
+  background-color: var(--gsColorPassivePrimaryBG);
+  border-radius: .4rem;
   font-family: 'Ubuntu Mono', monospace;
+  padding: 2 .2rem;
 }
 
-/* Normal theme */
-.gs-theme-normal {
-  --gsColorBackgroundParent: var(--gsThemeSecondary);
-  --gsColorBackground: var(--gsThemeSecondary);
-  --gsColorForegroundParent: var(--gsThemePrimary);
-  --gsColorForeground: var(--gsThemePrimary);
-  --gsColorAccentParent: var(--gsThemeAccent);
+.gs-theme-normal,
+.gs-theme-normal-hilite,
+.gs-theme-invert,
+.gs-theme-invert-hilite {
   --gsColorAccent: var(--gsThemeAccent);
+
+  color: var(--gsColorPassiveFG);
+  background-color: var(--gsColorPassiveBG);
+}
+
+.gs-secondary {
+  color: var(--gsColorSecondaryFG);
+}
+
+.gs-theme-normal {
+  --gsColorPassiveBG: var(--gsThemeWhite);
+  --gsColorPassiveFG: var(--gsThemeBlack);
+  --gsColorPassivePrimaryBG: var(--gsThemeNormalFFFF);
+  --gsColorSecondaryFG: var(--gsThemeBlackFFF);
+  --gsColorActionBG: var(--gsThemeWhite);
+  --gsColorActionFG: var(--gsThemeDark);
+  --gsColorActionFocusFG: var(--gsThemeAccent);
+  --gsColorActionDisabledFG: var(--gsThemeBlackFFF);
+}
+
+.gs-theme-normal-hilite {
+  --gsColorPassiveBG: var(--gsThemeNormal);
+  --gsColorPassiveFG: var(--gsThemeWhite);
+  --gsColorPassivePrimaryBG: var(--gsThemeBlackFFFF);
+  --gsColorSecondaryFG: var(--gsThemeWhiteFF);
+  --gsColorActionBG: var(--gsThemeNormal);
+  --gsColorActionFG: var(--gsThemeWhiteF);
+  --gsColorActionFocusFG: var(--gsThemeAccent);
+  --gsColorActionDisabledFG: var(--gsThemeWhiteFF);
+}
+
+.gs-theme-invert {
+  --gsColorPassiveBG: var(--gsThemeBlack);
+  --gsColorPassiveFG: var(--gsThemeWhite);
+  --gsColorPassivePrimaryBG: var(--gsThemeLightFFF);
+  --gsColorSecondaryFG: var(--gsThemeWhiteFF);
+  --gsColorActionBG: var(--gsThemeBlack);
+  --gsColorActionFG: var(--gsThemeLight);
+  --gsColorActionFocusFG: var(--gsThemeAccent);
+  --gsColorActionDisabledFG: var(--gsThemeWhiteFF);
+}
+
+.gs-theme-invert-hilite {
+  --gsColorPassiveBG: var(--gsThemeLight);
+  --gsColorPassiveFG: var(--gsThemeBlack);
+  --gsColorPassivePrimaryBG: var(--gsThemeWhiteFFF);
+  --gsColorSecondaryFG: var(--gsThemeBlackFF);
+  --gsColorActionBG: var(--gsThemeLight);
+  --gsColorActionFG: var(--gsThemeBlackFF);
+  --gsColorActionFocusFG: var(--gsThemeAccent);
+  --gsColorActionDisabledFG: var(--gsThemeBlackFFF);
+}
+
+
+
+
+
+/* Normal theme */
+/*.gs-theme-normal {
+  --gsColorBackground: var(--gsThemeSecondary);
+  --gsColorForeground: var(--gsThemePrimary);
+  --gsColorAccent: var(--gsThemeAccent);
+
+  --gsColorPropBackground: var(--gsThemeSecondary);
+  --gsColorPropForeground: var(--gsThemePrimary);
+  --gsColorPropHiliteBackground: var(--gsThemeNormal);
+  --gsColorPropHiliteForeground: var(--gsThemeSecondary);
 
   color: var(--gsColorForeground);
   background-color: var(--gsColorBackground);
 }
 
 .gs-theme-normal a,
-a.gs-theme-normal {
-  --gsColorForegroundParent: var(--gsColorForeground);
+a.gs-theme-normal,
+.gs-theme-normal.gs-action,
+.gs-theme-normal .gs-action {
   --gsColorForeground: var(--gsThemeDark);
+}
+
+.gs-theme-normal a[disabled],
+a.gs-theme-normal[disabled] {
+  --gsColorForeground: var(--gsThemePrimaryFade);
 }
 
 .gs-theme-normal a:not([disabled]):focus,
 .gs-theme-normal a:not([disabled]):hover,
 a.gs-theme-normal:not([disabled]):focus,
 a.gs-theme-normal:not([disabled]):hover {
-  --gsColorForegroundParent: var(--gsColorForeground);
   --gsColorForeground: var(--gsColorAccent);
-}
+}*/
 
-/* Highlighted normal theme */
-.gs-theme-normal.gs-hilite,
-.gs-theme-normal .gs-hilite {
-  --gsColorBackgroundParent: var(--gsColorBackground);
-  --gsColorBackground: var(--gsThemeNormal);
-  --gsColorForegroundParent: var(--gsColorForeground);
-  --gsColorForeground: var(--gsThemeSecondary);
+/* Highlighted theme */
+/*.gs-hilite {
+  --gsColorBackground: var(--gsColorPropHiliteBackground);
+  --gsColorForeground: var(--gsColorPropHiliteForeground);
+
+  --gsColorPropBackground: var(--gsColorPropHiliteBackground);
+  --gsColorPropForeground: var(--gsColorPropHiliteForeground);
+  --gsColorPropHiliteBackground: var(--gsColorPropBackground);
+  --gsColorPropHiliteForeground: var(--gsThemeSecondary);
 
   color: var(--gsColorForeground);
   background-color: var(--gsColorBackground);
-}
-
-.gs-theme-normal.gs-hilite a,
-.gs-theme-normal .gs-hilite a,
-a.gs-theme-normal.gs-hilite,
-.gs-theme-normal a.gs-hilite {
-  --gsColorForegroundParent: var(--gsColorForeground);
-  --gsColorForeground: var(--gsThemeSecondary);
-}
+}*/
 
 /** Inverted Theme */
-.gs-theme-invert {
-  --gsColorBackgroundParent: var(--gsThemePrimary);
+/*.gs-theme-invert {
   --gsColorBackground: var(--gsThemePrimary);
-  --gsColorForegroundParent: var(--gsThemeSecondary);
   --gsColorForeground: var(--gsThemeSecondary);
-  --gsColorAccentParent: var(--gsThemeAccent);
   --gsColorAccent: var(--gsThemeAccent);
 
   color: var(--gsColorForeground);
@@ -98,14 +167,12 @@ a.gs-theme-invert:not([disabled]):focus,
 a.gs-theme-invert:not([disabled]):hover {
   --gsColorForegroundParent: var(--gsColorForeground);
   --gsColorForeground: var(--gsColorAccent);
-}
+}*/
 
 /* Highlighted inverted theme */
-.gs-theme-invert.gs-hilite,
+/*.gs-theme-invert.gs-hilite,
 .gs-theme-invert .gs-hilite {
-  --gsColorBackgroundParent: var(--gsColorBackground);
   --gsColorBackground: var(--gsThemeLight);
-  --gsColorForegroundParent: var(--gsColorForeground);
   --gsColorForeground: var(--gsThemePrimary);
 
   color: var(--gsColorForeground);
@@ -118,19 +185,10 @@ a.gs-theme-invert.gs-hilite,
 .gs-theme-invert a.gs-hilite {
   --gsColorForegroundParent: var(--gsColorForeground);
   --gsColorForeground: var(--gsThemePrimary);
-}
+}*/
 
 
 /*
-.gs-action {
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.gs-action[disabled] {
-  cursor: default;
-}
-
 // Themed styles.
 .gs-theme-normal {
   --gsColorBackground: var(--gsThemeSecondary);
@@ -147,13 +205,6 @@ a.gs-theme-invert.gs-hilite,
   &.gs-action,
   .gs-action,
   a {
-    --gsColorForeground: rgba(11,11,11,.99);
-    --gsColorForegroundRoot: rgba(11,11,11,.99);
-
-    &[disabled] {
-      --gsColorForeground: rgba(0,0,0,.54);
-    }
-
     &.gs-primary {
       --gsColorBackground: rgba(22,22,22,.99);
       --gsColorForeground: #fff;

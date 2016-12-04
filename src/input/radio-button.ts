@@ -9,6 +9,7 @@ import {inject} from 'external/gs_tools/src/inject';
 
 import {BaseActionElement} from '../common/base-action-element';
 import {RadioButtonService} from './radio-button-service';
+import {ThemeService} from '../theming/theme-service';
 
 
 @customElement({
@@ -24,10 +25,14 @@ export class RadioButton extends BaseActionElement {
   @bind.host.attribute(null, 'gs-checked')
   private gsCheckedBridge_: DomBridge<boolean>;
 
+  protected radioButtonService_: RadioButtonService;
+
   constructor(
-      @inject('input.RadioButtonService') protected radioButtonService_: RadioButtonService) {
-    super();
+      @inject('input.RadioButtonService') radioButtonService: RadioButtonService,
+      @inject('theming.ThemeService') themeService: ThemeService) {
+    super(themeService);
     this.gsCheckedBridge_ = DomBridge.of(BooleanParser, false /* deleteOnFalsy */);
+    this.radioButtonService_ = radioButtonService;
   }
 
   /**

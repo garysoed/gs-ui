@@ -1,10 +1,11 @@
-import {BaseElement, handle} from 'external/gs_tools/src/webc';
 import {DomEvent} from 'external/gs_tools/src/event';
+import {handle} from 'external/gs_tools/src/webc';
 
+import {BaseThemedElement} from '../common/base-themed-element';
 import {Event} from '../const/event';
 
 
-export class BaseActionElement extends BaseElement {
+export class BaseActionElement extends BaseThemedElement {
   /**
    * Handler called when the element is clicked.
    */
