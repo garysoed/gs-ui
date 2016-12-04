@@ -52,7 +52,7 @@ export class RadioButton extends BaseActionElement {
    * @param newValue The new value of gs-checked.
    * @param oldValue The old value of gs-checked.
    */
-  @handle.host.attributeChange(null, 'gs-checked', BooleanParser)
+  @handle(null).attributeChange('gs-checked', BooleanParser)
   protected onGsCheckedChanged_(newValue: boolean, oldValue: boolean): void {
     if (newValue !== oldValue) {
       this.updateService_(newValue);
@@ -62,7 +62,7 @@ export class RadioButton extends BaseActionElement {
   /**
    * Handles event when gs-group attribute is changed.
    */
-  @handle.host.attributeChange(null, 'gs-group', StringParser)
+  @handle(null).attributeChange('gs-group', StringParser)
   protected onGsGroupChanged_(): void {
     this.updateService_(this.gsCheckedBridge_.get() || false);
   }

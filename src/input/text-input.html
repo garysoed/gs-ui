@@ -2,8 +2,8 @@
   input {
     background-color: transparent;
     border: none;
-    border-bottom: 2px solid var(--gsColorForeground);
-    color: var(--gsColorForegroundRoot);
+    border-bottom: 2px solid var(--gsInputLine);
+    color: var(--gsInputText);
     font-family: var(--gsFontFamily);
     font-size: var(--gsFontSizeRoot);
     line-height: 22px;
@@ -16,8 +16,20 @@
     border-color: var(--gsColorAccent);
   }
 
-  input[disabled] {
-    color: var(--gsColorForeground);
+  :host {
+    --gsInputText: var(--gsColorPassiveFG);
+    --gsInputLine: var(--gsColorActionFG);
+    cursor: pointer;
+  }
+
+  :host([disabled]) {
+    --gsInputLine: var(--gsColorActionDisabledFG);
+    --gsInputText: var(--gsColorSecondaryFG);
+    cursor: default;
+  }
+
+  :host(:not([disabled]):hover) {
+    --gsInputLine: var(--gsColorAccent);
   }
 </style>
 <div class="root">

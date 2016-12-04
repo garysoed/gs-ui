@@ -163,9 +163,9 @@ export class MenuContainer extends BaseElement {
   /**
    * Resets the location of the container element based on the anchor point and the anchor target.
    */
-  @handle.host.attributeChange(null, 'gs-anchor-point', AnchorLocationParser)
-  @handle.host.attributeChange(null, 'gs-anchor-target-x', FloatParser)
-  @handle.host.attributeChange(null, 'gs-anchor-target-y', FloatParser)
+  @handle(null).attributeChange('gs-anchor-point', AnchorLocationParser)
+  @handle(null).attributeChange('gs-anchor-target-x', FloatParser)
+  @handle(null).attributeChange('gs-anchor-target-y', FloatParser)
   private updateContent_(): void {
     let element = this.getElement();
     if (element === null) {

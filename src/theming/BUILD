@@ -9,11 +9,6 @@ gs_ui(
     ])
 
 native.filegroup(
-    name = "theme-style_cssbin",
-    srcs = ["theme-style.css"],
-)
-
-native.filegroup(
     name = "common-style_cssbin",
     srcs = ["common-style.css"],
 )
@@ -35,11 +30,4 @@ webc_gen_template(
     css = ":global-style_cssbin",
     key = "src/theming/global",
     template = "global-style.html",
-)
-
-webc_gen_template(
-    name = "theme-style_templatepack",
-    css = ":theme-style_cssbin",
-    key = "src/theming/theme",
-    template = "theme-style.html",
 )

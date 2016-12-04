@@ -1,7 +1,7 @@
 <style>
   .root {
     border-radius: 50%;
-    border: .2rem solid var(--gsColorForeground);
+    border: .2rem solid var(--gsRadioButtonFG);
     width: 1rem;
     height: 1rem;
     display: inline-block;
@@ -9,7 +9,7 @@
   }
 
   .selection {
-    background-color: var(--gsColorForeground);
+    background-color: var(--gsRadioButtonFG);
     border-radius: 50%;
     position: absolute;
     width: 0;
@@ -25,6 +25,29 @@
     top: .2rem;
     left: .2rem;
     transition: all .2s;
+  }
+
+  :host {
+    --gsRadioButtonFG: var(--gsColorActionFG);
+    cursor: pointer;
+  }
+
+  :host([disabled]) {
+    --gsRadioButtonFG: var(--gsColorActionDisabledFG);
+    cursor: default;
+  }
+
+  :host(:not([disabled]):hover) {
+    --gsRadioButtonFG: var(--gsColorAccent);
+  }
+
+  /* Primary button */
+  :host(.gs-primary) {
+    --gsRadioButtonFG: var(--gsColorActionPrimaryFG);
+  }
+
+  :host(.gs-primary[disabled]) {
+    --gsRadioButtonFG: var(--gsColorActionPrimaryDisabledFG);
   }
 </style>
 <div class="root">

@@ -21,6 +21,10 @@ body {
   --gsZIndexMenuBackdrop: 100;
   --gsBoxShadowAbove: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
 
+  --gsFontWeightBold: 700;
+  --gsFontWeightNormal: 400;
+  --gsFontWeightLight: 300;
+
   --gsThemeAccent: rgba(44,44,44,1);
   --gsThemeAccentFF: rgba(44,44,44,.62);
 

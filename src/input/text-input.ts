@@ -53,7 +53,7 @@ export class TextInput extends BaseActionElement {
    *
    * @param newValue The value it was changed to.
    */
-  @handle.host.attributeChange(null, 'gs-value', StringParser)
+  @handle(null).attributeChange('gs-value', StringParser)
   protected onGsValueChange_(newValue: string): void {
     if (this.inputEl_ !== null) {
       // TODO: Make a DOM bridge.
@@ -66,7 +66,7 @@ export class TextInput extends BaseActionElement {
    *
    * @param newValue The value of the disabled attribute..
    */
-  @handle.host.attributeChange(null, 'disabled', BooleanParser)
+  @handle(null).attributeChange('disabled', BooleanParser)
   protected onDisabledChange_(newValue: boolean): void {
     this.inputDisabledBridge_.set(newValue);
   }
@@ -74,7 +74,7 @@ export class TextInput extends BaseActionElement {
   /**
    * Handler called when the input element fires a change event.
    */
-  @handle.host.event('input', DomEvent.CHANGE)
+  @handle('input').event(DomEvent.CHANGE)
   protected onInputChange_(): void {
     if (this.inputEl_ !== null) {
       this.gsValueBridge_.set(this.inputEl_.value);

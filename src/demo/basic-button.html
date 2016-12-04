@@ -7,13 +7,7 @@
         display: flex;
         width: 40rem;
       }
-
       .cell {
-        display: flex;
-        flex: 1;
-      }
-
-      .cell > section {
         flex: 1;
         padding: 1rem;
       }
@@ -22,49 +16,35 @@
   </head>
   <body>
     <template id="template">
-      <section>
-        <gs-basic-button>
-          <div gs-content>Normal Button</div>
-        </gs-basic-button>
-        <gs-basic-button disabled>
-          <div gs-content>Disabled Button</div>
-        </gs-basic-button>
-        <gs-basic-button class="gs-hilite">
-          <div gs-content>Primary Button</div>
-        </gs-basic-button>
-        <gs-basic-button class="gs-hilite" disabled>
-          <div gs-content>Disabled Primary Button</div>
-        </gs-basic-button>
-      </section>
-      <section class="gs-hilite">
-        <gs-basic-button>
-          <div gs-content>Normal Button</div>
-        </gs-basic-button>
-        <gs-basic-button disabled>
-          <div gs-content>Disabled Button</div>
-        </gs-basic-button>
-        <gs-basic-button class="gs-unhilite">
-          <div gs-content>Primary Button</div>
-        </gs-basic-button>
-        <gs-basic-button class="gs-unhilite" disabled>
-          <div gs-content>Disabled Primary Button</div>
-        </gs-basic-button>
-      </section>
+      <gs-basic-button>
+        <div gs-content>Normal Button</div>
+      </gs-basic-button>
+      <gs-basic-button disabled>
+        <div gs-content>Disabled Button</div>
+      </gs-basic-button>
+      <gs-basic-button class="gs-primary">
+        <div gs-content>Primary Button</div>
+      </gs-basic-button>
+      <gs-basic-button class="gs-primary" disabled>
+        <div gs-content>Disabled Primary Button</div>
+      </gs-basic-button>
     </template>
 
     <section>
       <section class="row">
         <section class="cell gs-theme-normal"></section>
+        <section class="cell gs-theme-normal-hilite"></section>
       </section>
       <section class="row">
         <section class="cell gs-theme-invert"></section>
+        <section class="cell gs-theme-invert-hilite"></section>
       </section>
     </section>
 
-    <gs-basic-button class="colorPicker gs-theme-normal gs-hilite">
+    <gs-basic-button class="colorPicker gs-theme-normal gs-primary">
       <div gs-content><gs-icon>color_lens</gs-icon></div>
       <gs-menu>
-        <div class="menuRoot" gs-content selected-tab="base">
+        <div class="menuRoot gs-theme-normal" gs-content selected-tab="base">
           <div class="colorPickerMenu base"></div>
           <div class="colorPickerMenu accent"></div>
           <gs-horizontal-tab gs-selected-tab="base">

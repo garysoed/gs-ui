@@ -1,7 +1,8 @@
 <style>
   .root {
-    background-color: var(--gsColorBackground);
-    color: var(--gsColorForeground);
+    background-color: var(--gsButtonBG);
+    color: var(--gsButtonFG);
+    font-weight: var(--gsFontWeightBold);
     line-height: 1.5rem;
     padding: 1rem;
     text-align: center;
@@ -10,6 +11,32 @@
     -moz-user-select: none;
     -ms-user-select: none;
     -webkit-user-select: none;
+  }
+
+  :host {
+    --gsButtonFG: var(--gsColorActionFG);
+    --gsButtonBG: var(--gsColorActionBG);
+    cursor: pointer;
+  }
+
+  :host([disabled]) {
+    --gsButtonFG: var(--gsColorActionDisabledFG);
+    cursor: default;
+  }
+
+  :host(:not([disabled]):hover) {
+    --gsButtonFG: var(--gsColorAccent);
+  }
+
+  /* Primary button */
+  :host(.gs-primary) {
+    --gsButtonFG: var(--gsColorActionPrimaryFG);
+    --gsButtonBG: var(--gsColorActionPrimaryBG);
+  }
+
+  :host(.gs-primary[disabled]) {
+    --gsButtonFG: var(--gsColorActionPrimaryDisabledFG);
+    --gsButtonBG: var(--gsColorActionPrimaryDisabledBG);
   }
 </style>
 <div class="root">

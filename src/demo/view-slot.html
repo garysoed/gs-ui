@@ -37,20 +37,23 @@
             </div>
           </gs-view-slot>
         </div>
+        <div gs-view-path=".">
+          Available paths: <code>/a/b</code>, <code>/a/c</code>
+        </div>
       </gs-view-slot>
     </template>
 
     <section>
       <section class="cell gs-theme-normal"></section>
-      <section class="cell gs-theme-normal gs-hilite"></section>
+      <section class="cell gs-theme-normal-hilite"></section>
       <section class="cell gs-theme-invert"></section>
-      <section class="cell gs-theme-invert gs-hilite"></section>
+      <section class="cell gs-theme-invert-hilite"></section>
     </section>
 
-    <gs-basic-button class="colorPicker gs-theme-normal gs-hilite">
+    <gs-basic-button class="colorPicker gs-theme-normal gs-primary">
       <div gs-content><gs-icon>color_lens</gs-icon></div>
       <gs-menu>
-        <div class="menuRoot" gs-content selected-tab="base">
+        <div class="menuRoot gs-theme-normal" gs-content selected-tab="base">
           <div class="colorPickerMenu base"></div>
           <div class="colorPickerMenu accent"></div>
           <gs-horizontal-tab gs-selected-tab="base">

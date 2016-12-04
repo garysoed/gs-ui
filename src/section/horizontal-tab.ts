@@ -47,7 +47,7 @@ export class HorizontalTab extends BaseElement {
   /**
    * Handles event when the gs-selected-tab attribute was changed.
    */
-  @handle.host.attributeChange(null, 'gs-selected-tab', StringParser)
+  @handle(null).attributeChange('gs-selected-tab', StringParser)
   protected onSelectedTabChanged_(): void {
     let element = this.getElement();
     if (element !== null) {

@@ -8,8 +8,9 @@ import {Event} from '../const/event';
 export class BaseActionElement extends BaseThemedElement {
   /**
    * Handler called when the element is clicked.
+   * TODO: This makes no sense.
    */
-  @handle.host.event(null, DomEvent.CLICK)
+  @handle(null).event(DomEvent.CLICK)
   protected onClick_(): void {
     let element = this.getElement();
     if (!this.isDisabled() && element !== null) {
