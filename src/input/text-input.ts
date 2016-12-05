@@ -22,18 +22,22 @@ import {ThemeService} from '../theming/theme-service';
   templateKey: 'src/input/text-input',
 })
 export class TextInput extends BaseActionElement {
-  @bind.host.attribute(null, 'gs-value')
+  @bind(null).attribute('gs-value', StringParser)
   private gsValueBridge_: DomBridge<string>;
 
-  @bind.shadow.attribute('input[type="text"]', 'disabled')
+  @bind('input[type="text"]').attribute('disabled', BooleanParser)
   private inputDisabledBridge_: DomBridge<boolean>;
+
+  @bind('input').property('value')
+  private inputValueBridge_: DomBridge<string>;
 
   private inputEl_: HTMLInputElement | null = null;
 
   constructor(@inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-    this.gsValueBridge_ = DomBridge.of(StringParser);
-    this.inputDisabledBridge_ = DomBridge.of(BooleanParser, true);
+    this.gsValueBridge_ = DomBridge.of<string>();
+    this.inputDisabledBridge_ = DomBridge.of<boolean>(true);
+    this.inputValueBridge_ = DomBridge.of<string>();
   }
 
   /**
@@ -55,10 +59,7 @@ export class TextInput extends BaseActionElement {
    */
   @handle(null).attributeChange('gs-value', StringParser)
   protected onGsValueChange_(newValue: string): void {
-    if (this.inputEl_ !== null) {
-      // TODO: Make a DOM bridge.
-      this.inputEl_.value = newValue;
-    }
+    this.inputValueBridge_.set(newValue);
   }
 
   /**

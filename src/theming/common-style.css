@@ -35,6 +35,44 @@ code {
   padding: 2 .2rem;
 }
 
+/* Layouts */
+[layout] {
+  display: flex;
+}
+
+[layout="row"] {
+  flex-direction: row;
+}
+
+[layout="column"] {
+  flex-direction: column;
+}
+
+[flex] {
+  flex: 1;
+}
+
+[flex-justify="flex-start"] {
+  justify-content: flex-start;
+}
+
+[flex-justify="flex-end"] {
+  justify-content: flex-end;
+}
+
+[flex-justify="center"] {
+  justify-content: center;
+}
+
+[flex-justify="space-between"] {
+  justify-content: space-between;
+}
+
+[flex-justify="space-around"] {
+  justify-content: space-around;
+}
+
+/* Theming */
 .gs-theme-normal,
 .gs-theme-normal-hilite,
 .gs-theme-invert,

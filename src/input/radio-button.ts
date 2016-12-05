@@ -22,7 +22,7 @@ import {ThemeService} from '../theming/theme-service';
   templateKey: 'src/input/radio-button',
 })
 export class RadioButton extends BaseActionElement {
-  @bind.host.attribute(null, 'gs-checked')
+  @bind(null).attribute('gs-checked', BooleanParser)
   private gsCheckedBridge_: DomBridge<boolean>;
 
   protected radioButtonService_: RadioButtonService;
@@ -31,7 +31,7 @@ export class RadioButton extends BaseActionElement {
       @inject('input.RadioButtonService') radioButtonService: RadioButtonService,
       @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-    this.gsCheckedBridge_ = DomBridge.of(BooleanParser, false /* deleteOnFalsy */);
+    this.gsCheckedBridge_ = DomBridge.of<boolean>(false /* deleteOnFalsy */);
     this.radioButtonService_ = radioButtonService;
   }
 

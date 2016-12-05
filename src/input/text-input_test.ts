@@ -56,20 +56,11 @@ describe('input.TextInput', () => {
   describe('onGsValueChange_', () => {
     it('should update the event target value', () => {
       let value = 'value';
-      let eventTarget = Mocks.object('eventTarget');
-      textInput['inputEl_'] = eventTarget;
+      spyOn(textInput['inputValueBridge_'], 'set');
 
       textInput['onGsValueChange_'](value);
 
-      assert(eventTarget.value).to.equal(value);
-    });
-
-    it('should not throw error if there are no listenable input elements', () => {
-      textInput['inputEl_'] = null;
-
-      assert(() => {
-        textInput['onGsValueChange_']('value');
-      }).toNot.throw();
+      assert(textInput['inputValueBridge_'].set).to.haveBeenCalledWith(value);
     });
   });
 

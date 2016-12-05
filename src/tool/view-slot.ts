@@ -19,7 +19,7 @@ export const __FULL_PATH = Symbol('fullPath');
   templateKey: 'src/tool/view-slot',
 })
 export class ViewSlot extends BaseElement {
-  @bind.shadow.attribute('content', 'select')
+  @bind('content').attribute('select', StringParser)
   private readonly contentSelectBridge_: DomBridge<string>;
 
   private readonly locationService_: LocationService;
@@ -33,7 +33,7 @@ export class ViewSlot extends BaseElement {
   constructor(
       @inject('gs.LocationService') locationService: LocationService) {
     super();
-    this.contentSelectBridge_ = DomBridge.of(StringParser);
+    this.contentSelectBridge_ = DomBridge.of<string>();
     this.locationService_ = locationService;
     this.path_ = null;
     this.rootEl_ = null;
