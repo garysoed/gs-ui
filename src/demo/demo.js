@@ -1,12 +1,41 @@
 'use strict';
 
 var base = 'crimson';
-var accent = 'harlequin';
+var accent = 'brightgreen';
 
 var accentPickerMenu = document.querySelector('.colorPickerMenu.accent');
 var basePickerMenu = document.querySelector('.colorPickerMenu.base');
+var paletteNames = [
+  'red',
+  'vermilion',
+  'safetyorange',
+  'darkorange',
+  'orange',
+  'amber',
+  'gold',
+  'goldenyellow',
+  'yellow',
+  'electriclime',
+  'springbud',
+  'brightgreen',
+  'freespeechgreen',
+  'jade',
+  'persiangreen',
+  'denim',
+  'egyptianblue',
+  'persianblue',
+  'ultramarine',
+  'bluediamond',
+  'purpleheart',
+  'darkmagenta',
+  'violetred',
+  'crimson',
+  'grey'
+];
+
 var palettes = [];
-for (var name in gs.ui.DefaultPalettes) {
+for (var i in paletteNames) {
+  var name = paletteNames[i];
   palettes.push({name: name, palette: gs.ui.DefaultPalettes[name]});
 }
 var main = gs.ui.Main.newInstance();
