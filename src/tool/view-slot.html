@@ -2,8 +2,12 @@
   .hidden {
     display: none;
   }
+
+  ::slotted > * {
+    flex: 1
+  }
 </style>
 
-<div class="root">
+<div fill-parent id="root" layout="column">
   <content select=""></content>
 </div>

@@ -1,6 +1,5 @@
 import {Arrays} from 'external/gs_tools/src/collection';
 import {
-    BaseElement,
     bind,
     customElement,
     DomBridge,
@@ -8,6 +7,9 @@ import {
 import {Doms, LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
 import {inject} from 'external/gs_tools/src/inject';
 import {Iterables} from 'external/gs_tools/src/collection';
+
+import {BaseThemedElement} from '../common/base-themed-element';
+import {ThemeService} from '../theming/theme-service';
 
 export const __FULL_PATH = Symbol('fullPath');
 
@@ -18,7 +20,7 @@ export const __FULL_PATH = Symbol('fullPath');
   tag: 'gs-view-slot',
   templateKey: 'src/tool/view-slot',
 })
-export class ViewSlot extends BaseElement {
+export class ViewSlot extends BaseThemedElement {
   @bind('content').attribute('select', StringParser)
   private readonly contentSelectBridge_: DomBridge<string>;
 
@@ -31,8 +33,9 @@ export class ViewSlot extends BaseElement {
    * @param locationService
    */
   constructor(
+      @inject('theming.ThemeService') themeService: ThemeService,
       @inject('gs.LocationService') locationService: LocationService) {
-    super();
+    super(themeService);
     this.contentSelectBridge_ = DomBridge.of<string>();
     this.locationService_ = locationService;
     this.path_ = null;
@@ -92,7 +95,7 @@ export class ViewSlot extends BaseElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    this.rootEl_ = <HTMLElement> element.shadowRoot.querySelector('.root');
+    this.rootEl_ = <HTMLElement> element.shadowRoot.querySelector('#root');
   }
 
   /**
