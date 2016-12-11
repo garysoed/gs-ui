@@ -82,9 +82,7 @@ describe('tool.MenuContainer', () => {
       container['hide_']();
 
       assert(mockListenableAnimate.once)
-          .to.haveBeenCalledWith(DomEvent.FINISH, Matchers.any(Function));
-      mockListenableAnimate['once'].calls.argsFor(0)[1]();
-      assert(container['onFinishAnimate_']).to.haveBeenCalledWith();
+          .to.haveBeenCalledWith(DomEvent.FINISH, container['onFinishAnimate_'], container);
       assert(MenuContainer['HIDE_ANIMATION_'].applyTo).to.haveBeenCalledWith(containerEl);
       assert(ListenableDom.of).to.haveBeenCalledWith(animate);
     });
@@ -437,14 +435,9 @@ describe('tool.MenuContainer', () => {
       assert(container['updateContent_']).to.haveBeenCalledWith();
 
       assert(mockListenableBackdrop.on)
-          .to.haveBeenCalledWith(DomEvent.CLICK, Matchers.any(Function));
-      mockListenableBackdrop.on.calls.argsFor(0)[1]();
-      assert(container['onBackdropClick_']).to.haveBeenCalledWith();
-
+          .to.haveBeenCalledWith(DomEvent.CLICK, container['onBackdropClick_'], container);
       assert(mockListenableWindow.on)
-          .to.haveBeenCalledWith(DomEvent.RESIZE, Matchers.any(Function));
-      mockListenableWindow.on.calls.argsFor(0)[1]();
-      assert(container['onWindowResize_']).to.haveBeenCalledWith();
+          .to.haveBeenCalledWith(DomEvent.RESIZE, container['onWindowResize_'], container);
     });
   });
 });

@@ -7,6 +7,7 @@ import {
 import {Doms, LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
 import {inject} from 'external/gs_tools/src/inject';
 import {Iterables} from 'external/gs_tools/src/collection';
+import {Reflect} from 'external/gs_tools/src/util';
 
 import {BaseThemedElement} from '../common/base-themed-element';
 import {ThemeService} from '../theming/theme-service';
@@ -40,11 +41,6 @@ export class ViewSlot extends BaseThemedElement {
     this.locationService_ = locationService;
     this.path_ = null;
     this.rootEl_ = null;
-
-    // TODO: Move this to Reflect.initialize
-    this.addDisposable(locationService.on(
-        LocationServiceEvents.CHANGED,
-        this.onLocationChanged_.bind(this)));
   }
 
   /**
@@ -96,6 +92,10 @@ export class ViewSlot extends BaseThemedElement {
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
     this.rootEl_ = <HTMLElement> element.shadowRoot.querySelector('#root');
+    this.addDisposable(this.locationService_.on(
+        LocationServiceEvents.CHANGED,
+        this.onLocationChanged_,
+        this));
   }
 
   /**

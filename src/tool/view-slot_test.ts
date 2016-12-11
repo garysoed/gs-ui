@@ -1,4 +1,4 @@
-import {assert, Matchers, TestBase} from '../test-base';
+import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
 import {Arrays} from 'external/gs_tools/src/collection';
@@ -21,19 +21,10 @@ describe('tool.ViewSlot', () => {
     spyOn(mockLocationService, 'on').and.callThrough();
     spyOn(ViewSlot.prototype, 'onLocationChanged_').and.callThrough();
 
-    viewSlot = new ViewSlot(mockLocationService);
+    viewSlot = new ViewSlot(
+        jasmine.createSpyObj('ThemeService', ['applyTheme']),
+        mockLocationService);
     TestDispose.add(viewSlot);
-  });
-
-  describe('constructor', () => {
-    it('should listen to location service changed event', () => {
-      assert(mockLocationService.on).to.haveBeenCalledWith(
-          LocationServiceEvents.CHANGED,
-          Matchers.any(Function));
-
-      mockLocationService.on.calls.argsFor(0)[1]();
-      assert(viewSlot['onLocationChanged_']).to.haveBeenCalledWith();
-    });
   });
 
   describe('onLocationChanged_', () => {
@@ -140,7 +131,11 @@ describe('tool.ViewSlot', () => {
       mockShadowRoot.querySelector.and.returnValue(rootEl);
       viewSlot.onCreated(<HTMLElement> {shadowRoot: mockShadowRoot});
       assert(viewSlot['rootEl_']).to.equal(rootEl);
-      assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('.root');
+      assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('#root');
+      assert(mockLocationService.on).to.haveBeenCalledWith(
+          LocationServiceEvents.CHANGED,
+          viewSlot['onLocationChanged_'],
+          viewSlot);
     });
   });
 

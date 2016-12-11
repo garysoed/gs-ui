@@ -117,7 +117,7 @@ describe('section.HorizontalTab', () => {
           }, done.fail);
 
       assert(mockListenableAnimate.once)
-          .to.haveBeenCalledWith(DomEvent.FINISH, Matchers.any(Function));
+          .to.haveBeenCalledWith(DomEvent.FINISH, Matchers.any(Function), tab);
       mockListenableAnimate.once.calls.argsFor(0)[1]();
     });
 
@@ -252,9 +252,7 @@ describe('section.HorizontalTab', () => {
 
       assert(tab['interval_'].start).to.haveBeenCalledWith();
       assert(tab['interval_'].on)
-          .to.haveBeenCalledWith(Interval.TICK_EVENT, Matchers.any(Function));
-      tab['interval_']['on'].calls.argsFor(0)[1]();
-      assert(tab['onTick_']).to.haveBeenCalledWith();
+          .to.haveBeenCalledWith(Interval.TICK_EVENT, tab['onTick_'], tab);
 
       assert(tab['tabContainer_'].getEventTarget()).to.equal(tabContainer);
       assert(tab['highlightEl_'].getEventTarget()).to.equal(highlightEl);
@@ -271,9 +269,7 @@ describe('section.HorizontalTab', () => {
 
       tab.onInserted();
 
-      assert(tab['element_'].on).to.haveBeenCalledWith('gse-action', Matchers.any(Function));
-      tab['element_'].on.calls.argsFor(0)[1]();
-      assert(tab['onAction_']).to.haveBeenCalledWith();
+      assert(tab['element_'].on).to.haveBeenCalledWith('gse-action', tab['onAction_'], tab);
     });
 
     it('should not throw error if there are no elements', () => {

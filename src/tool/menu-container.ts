@@ -89,7 +89,7 @@ export class MenuContainer extends BaseElement {
     let listenableAnimate = ListenableDom.of(animate);
     this.addDisposable(listenableAnimate);
 
-    this.addDisposable(listenableAnimate.once(DomEvent.FINISH, this.onFinishAnimate_.bind(this)));
+    this.addDisposable(listenableAnimate.once(DomEvent.FINISH, this.onFinishAnimate_, this));
   }
 
   /**
@@ -251,8 +251,8 @@ export class MenuContainer extends BaseElement {
    */
   onInserted(element: HTMLElement): void {
     super.onInserted(element);
-    this.addDisposable(this.windowEl_.on(DomEvent.RESIZE, this.onWindowResize_.bind(this)));
-    this.addDisposable(this.backdropEl_.on(DomEvent.CLICK, this.onBackdropClick_.bind(this)));
+    this.addDisposable(this.windowEl_.on(DomEvent.RESIZE, this.onWindowResize_, this));
+    this.addDisposable(this.backdropEl_.on(DomEvent.CLICK, this.onBackdropClick_, this));
     this.updateContent_();
   }
 }

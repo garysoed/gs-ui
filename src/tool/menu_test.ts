@@ -90,9 +90,7 @@ describe('tool.Menu', () => {
       assert(element['gsAnchorTarget']).to.equal(anchorTarget);
 
       assert(mockListenableParentElement.on)
-          .to.haveBeenCalledWith(Event.ACTION, Matchers.any(Function));
-      mockListenableParentElement.on.calls.argsFor(0)[1]();
-      assert(menu['onAction_']).to.haveBeenCalledWith();
+          .to.haveBeenCalledWith(Event.ACTION, menu['onAction_'], menu);
 
       assert(menu['menuRoot_']).to.equal(rootElement);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('.root');

@@ -84,7 +84,7 @@ export class HorizontalTab extends BaseElement {
         this.highlightLeft_ = left;
         this.highlightWidth_ = width;
         resolve();
-      }));
+      }, this));
     });
   }
 
@@ -123,7 +123,7 @@ export class HorizontalTab extends BaseElement {
     this.tabContainer_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('.tab-container'));
 
     this.addDisposable(
-        this.interval_.on(Interval.TICK_EVENT, this.onTick_.bind(this)));
+        this.interval_.on(Interval.TICK_EVENT, this.onTick_, this));
     this.interval_.start();
     this.mutationObserver_.observe(element, {childList: true});
 
@@ -139,7 +139,7 @@ export class HorizontalTab extends BaseElement {
   onInserted(): void {
     let element = this.getElement();
     if (element !== null) {
-      element.on(Event.ACTION, this.onAction_.bind(this));
+      element.on(Event.ACTION, this.onAction_, this);
     }
   }
 }

@@ -110,7 +110,8 @@ export class MenuService extends BaseDisposable {
     let anchorTargetWatcher = Interval.newInstance(MenuService.ANCHOR_TARGET_INTERVAL_);
     anchorTargetWatcher.on(
         Interval.TICK_EVENT,
-        this.onTick_.bind(this, menuContainerEl.getEventTarget(), anchorTarget, anchorElement));
+        this.onTick_.bind(this, menuContainerEl.getEventTarget(), anchorTarget, anchorElement),
+        this);
     anchorTargetWatcher.start();
 
     menuContainerEl.getEventTarget().appendChild(menuContent);

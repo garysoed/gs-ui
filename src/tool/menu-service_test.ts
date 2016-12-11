@@ -269,7 +269,8 @@ describe('tool.MenuService', () => {
             assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();
             assert(mockAnchorTargetWatcher.on).to.haveBeenCalledWith(
                 Interval.TICK_EVENT,
-                Matchers.any(Function));
+                Matchers.any(Function),
+                service);
             mockAnchorTargetWatcher.on.calls.argsFor(0)[1]();
             assert(service['onTick_'])
                 .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
