@@ -52,6 +52,10 @@ code {
   flex: 1;
 }
 
+[flex-wrap] {
+  flex-wrap: wrap;
+}
+
 [flex-justify="flex-start"] {
   justify-content: flex-start;
 }
