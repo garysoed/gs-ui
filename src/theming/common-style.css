@@ -76,6 +76,26 @@ code {
   justify-content: space-around;
 }
 
+[flex-align="flex-start"] {
+  align-items: flex-start;
+}
+
+[flex-align="flex-end"] {
+  align-items: flex-end;
+}
+
+[flex-align="center"] {
+  align-items: center;
+}
+
+[flex-align="stretch"] {
+  align-items: stretch;
+}
+
+[flex-align="baseline"] {
+  align-items: baseline;
+}
+
 [fill-parent] {
   bottom: 0;
   left: 0;

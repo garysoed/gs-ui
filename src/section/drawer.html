@@ -1,0 +1,18 @@
+<style>
+  #root {
+    overflow: hidden;
+    transition: width .2s;
+    width: var(--gsDrawerCollapsedWidth);
+  }
+
+  #root.expanded {
+    transition: width .2s;
+    width: var(--gsDrawerExpandedWidth);
+  }
+</style>
+
+<div id="root" layout="row" flex-justify="flex-start">
+  <div>
+    <content select="[gs-content]"></content>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-import {assert, Matchers, TestBase} from '../test-base';
+import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
 import {Palette} from './palette';

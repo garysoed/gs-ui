@@ -9,6 +9,7 @@ import {Templates} from 'external/gs_tools/src/webc';
 
 import {BasicButton} from '../button/basic-button';
 import {DefaultPalettes} from './default-palettes';
+import {Drawer} from '../section/drawer';
 import {HorizontalTab} from '../section/horizontal-tab';
 import {Icon} from '../tool/icon';
 import {IndefiniteLoading} from '../tool/indefinite-loading';
@@ -23,6 +24,7 @@ import {ViewSlot} from '../tool/view-slot';
 
 const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   BasicButton,
+  Drawer,
   HorizontalTab,
   Icon,
   IndefiniteLoading,

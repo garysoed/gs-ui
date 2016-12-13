@@ -7,7 +7,6 @@ import {
 import {Doms, LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
 import {inject} from 'external/gs_tools/src/inject';
 import {Iterables} from 'external/gs_tools/src/collection';
-import {Reflect} from 'external/gs_tools/src/util';
 
 import {BaseThemedElement} from '../common/base-themed-element';
 import {ThemeService} from '../theming/theme-service';

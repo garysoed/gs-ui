@@ -1,8 +1,5 @@
 import {IColor} from 'external/gs_tools/src/color';
-import {Log} from 'external/gs_tools/src/util';
 import {Validate} from 'external/gs_tools/src/valid';
-
-const LOG = new Log('theming.Palette');
 
 
 /**
