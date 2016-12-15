@@ -54,13 +54,24 @@ describe('input.TextInput', () => {
   });
 
   describe('onGsValueChange_', () => {
-    it('should update the event target value', () => {
+    it('should update the input target value', () => {
       let value = 'value';
+      spyOn(textInput['inputValueBridge_'], 'get').and.returnValue(null);
       spyOn(textInput['inputValueBridge_'], 'set');
 
       textInput['onGsValueChange_'](value);
 
       assert(textInput['inputValueBridge_'].set).to.haveBeenCalledWith(value);
+    });
+
+    it('should not update the input value if it is the same', () => {
+      let value = 'value';
+      spyOn(textInput['inputValueBridge_'], 'get').and.returnValue(value);
+      spyOn(textInput['inputValueBridge_'], 'set');
+
+      textInput['onGsValueChange_'](value);
+
+      assert(textInput['inputValueBridge_'].set).toNot.haveBeenCalled();
     });
   });
 
@@ -73,8 +84,11 @@ describe('input.TextInput', () => {
     });
   });
 
-  describe('onInputChange_', () => {
+  describe('onInputTick_', () => {
     it('should set the new value and dispatch a CHANGE event', () => {
+      let oldValue = 'oldValue';
+      spyOn(textInput['gsValueBridge_'], 'get').and.returnValue(oldValue);
+
       let value = 'value';
       let inputElement = Mocks.object('inputElement');
       inputElement.value = value;
@@ -86,35 +100,58 @@ describe('input.TextInput', () => {
       spyOn(textInput, 'getElement').and.returnValue(mockElement);
       spyOn(textInput['gsValueBridge_'], 'set');
 
-      textInput['onInputChange_']();
+      textInput['onInputTick_']();
 
       assert(textInput['gsValueBridge_'].set).to.haveBeenCalledWith(value);
       assert(mockElement.dispatch).to.haveBeenCalledWith(DomEvent.CHANGE);
     });
 
     it('should not set the new value if there are no input elements', () => {
+      let oldValue = 'oldValue';
+      spyOn(textInput['gsValueBridge_'], 'get').and.returnValue(oldValue);
+
       let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
 
       spyOn(textInput, 'getElement').and.returnValue(mockElement);
       spyOn(textInput['gsValueBridge_'], 'set');
 
-      textInput['onInputChange_']();
+      textInput['onInputTick_']();
 
       assert(textInput['gsValueBridge_'].set).toNot.haveBeenCalled();
-      assert(mockElement.dispatch).to.haveBeenCalledWith(DomEvent.CHANGE);
+      assert(mockElement.dispatch).toNot.haveBeenCalledWith(DomEvent.CHANGE);
+    });
+
+    it('should not set the new value if the value does not change', () => {
+      let value = 'value';
+      let inputElement = Mocks.object('inputElement');
+      inputElement.value = value;
+      spyOn(textInput['gsValueBridge_'], 'get').and.returnValue(value);
+
+      textInput['inputEl_'] = inputElement;
+
+      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+
+      spyOn(textInput, 'getElement').and.returnValue(mockElement);
+      spyOn(textInput['gsValueBridge_'], 'set');
+
+      textInput['onInputTick_']();
+
+      assert(textInput['gsValueBridge_'].set).toNot.haveBeenCalled();
+      assert(mockElement.dispatch).toNot.haveBeenCalled();
     });
 
     it('should not dispatch event if there are no elements', () => {
       let value = 'value';
       let inputElement = Mocks.object('inputElement');
       inputElement.value = value;
+      spyOn(textInput['gsValueBridge_'], 'get').and.returnValue('oldValue');
 
       textInput['inputEl_'] = inputElement;
 
       spyOn(textInput, 'getElement').and.returnValue(null);
       spyOn(textInput['gsValueBridge_'], 'set');
 
-      textInput['onInputChange_']();
+      textInput['onInputTick_']();
 
       assert(textInput['gsValueBridge_'].set).to.haveBeenCalledWith(value);
     });
@@ -133,6 +170,26 @@ describe('input.TextInput', () => {
 
       assert(textInput['inputEl_']).to.equal(inputElement);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('input');
+    });
+  });
+
+  describe('onInserted', () => {
+    it('should start the interval', () => {
+      let element = Mocks.object('element');
+      spyOn(textInput['interval_'], 'start');
+      textInput.onInserted(element);
+
+      assert(textInput['interval_'].start).to.haveBeenCalledWith();
+    });
+  });
+
+  describe('onRemoved', () => {
+    it('should stop the interval', () => {
+      let element = Mocks.object('element');
+      spyOn(textInput['interval_'], 'stop');
+      textInput.onRemoved(element);
+
+      assert(textInput['interval_'].stop).to.haveBeenCalledWith();
     });
   });
 });

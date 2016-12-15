@@ -7,6 +7,7 @@ import {
   StringParser} from 'external/gs_tools/src/webc';
 import {DomEvent} from 'external/gs_tools/src/event';
 import {inject} from 'external/gs_tools/src/inject';
+import {Interval} from 'external/gs_tools/src/async';
 
 import {BaseActionElement} from '../common/base-action-element';
 import {ThemeService} from '../theming/theme-service';
@@ -22,15 +23,18 @@ import {ThemeService} from '../theming/theme-service';
   templateKey: 'src/input/text-input',
 })
 export class TextInput extends BaseActionElement {
+  private static INPUT_INTERVAL_: number = 500;
+
   @bind(null).attribute('gs-value', StringParser)
-  private gsValueBridge_: DomBridge<string>;
+  private readonly gsValueBridge_: DomBridge<string>;
 
   @bind('input[type="text"]').attribute('disabled', BooleanParser)
-  private inputDisabledBridge_: DomBridge<boolean>;
+  private readonly inputDisabledBridge_: DomBridge<boolean>;
 
   @bind('input').property('value')
-  private inputValueBridge_: DomBridge<string>;
+  private readonly inputValueBridge_: DomBridge<string>;
 
+  private readonly interval_: Interval;
   private inputEl_: HTMLInputElement | null = null;
 
   constructor(@inject('theming.ThemeService') themeService: ThemeService) {
@@ -38,6 +42,8 @@ export class TextInput extends BaseActionElement {
     this.gsValueBridge_ = DomBridge.of<string>();
     this.inputDisabledBridge_ = DomBridge.of<boolean>(true);
     this.inputValueBridge_ = DomBridge.of<string>();
+    this.interval_ = new Interval(TextInput.INPUT_INTERVAL_);
+    this.addDisposable(this.interval_);
   }
 
   /**
@@ -59,7 +65,9 @@ export class TextInput extends BaseActionElement {
    */
   @handle(null).attributeChange('gs-value', StringParser)
   protected onGsValueChange_(newValue: string): void {
-    this.inputValueBridge_.set(newValue);
+    if (this.inputValueBridge_.get() !== newValue) {
+      this.inputValueBridge_.set(newValue);
+    }
   }
 
   /**
@@ -75,15 +83,18 @@ export class TextInput extends BaseActionElement {
   /**
    * Handler called when the input element fires a change event.
    */
-  @handle('input').event(DomEvent.CHANGE)
-  protected onInputChange_(): void {
+  protected onInputTick_(): void {
+    let previousValue = this.gsValueBridge_.get();
+    let newValue: string | null = null;
     if (this.inputEl_ !== null) {
-      this.gsValueBridge_.set(this.inputEl_.value);
-    }
-
-    let element = this.getElement();
-    if (element !== null) {
-      element.dispatch(DomEvent.CHANGE);
+      newValue = this.inputEl_.value;
+      if (newValue !== previousValue) {
+        this.gsValueBridge_.set(newValue);
+        let element = this.getElement();
+        if (element !== null) {
+          element.dispatch(DomEvent.CHANGE);
+        }
+      }
     }
   }
 
@@ -93,5 +104,22 @@ export class TextInput extends BaseActionElement {
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
     this.inputEl_ = element.shadowRoot.querySelector('input');
+    this.addDisposable(this.interval_.on(Interval.TICK_EVENT, this.onInputTick_, this));
+  }
+
+  /**
+   * @override
+   */
+  onInserted(element: HTMLElement): void {
+    super.onInserted(element);
+    this.interval_.start();
+  }
+
+  /**
+   * @override
+   */
+  onRemoved(element: HTMLElement): void {
+    super.onRemoved(element);
+    this.interval_.stop();
   }
 }
