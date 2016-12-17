@@ -1,9 +1,5 @@
 import {Arrays} from 'external/gs_tools/src/collection';
-import {
-    bind,
-    customElement,
-    DomBridge,
-    StringParser} from 'external/gs_tools/src/webc';
+import {customElement, StringParser} from 'external/gs_tools/src/webc';
 import {Doms, LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
 import {inject} from 'external/gs_tools/src/inject';
 import {Iterables} from 'external/gs_tools/src/collection';
@@ -21,9 +17,6 @@ export const __FULL_PATH = Symbol('fullPath');
   templateKey: 'src/tool/view-slot',
 })
 export class ViewSlot extends BaseThemedElement {
-  @bind('content').attribute('select', StringParser)
-  private readonly contentSelectBridge_: DomBridge<string>;
-
   private readonly locationService_: LocationService;
 
   private rootEl_: HTMLElement | null;
@@ -36,7 +29,6 @@ export class ViewSlot extends BaseThemedElement {
       @inject('theming.ThemeService') themeService: ThemeService,
       @inject('gs.LocationService') locationService: LocationService) {
     super(themeService);
-    this.contentSelectBridge_ = DomBridge.of<string>();
     this.locationService_ = locationService;
     this.path_ = null;
     this.rootEl_ = null;
@@ -46,7 +38,26 @@ export class ViewSlot extends BaseThemedElement {
    * Handles event when the location was changed.
    */
   private onLocationChanged_(): void {
-    this.updateSelector_();
+    this.updateActiveView_();
+  }
+
+  /**
+   * @param targetEl The element to be set as the active element, if any. If null, this will
+   *    deactivate all elements.
+   */
+  setActiveElement_(targetEl: Element | null): void {
+    let listenableElement = this.getElement();
+    if (listenableElement !== null) {
+      let element = listenableElement.getEventTarget();
+      let currentActive = element.querySelector('[gs-view-active="true"]');
+      if (currentActive !== null) {
+        currentActive.setAttribute('gs-view-active', 'false');
+      }
+    }
+
+    if (targetEl !== null) {
+      targetEl.setAttribute('gs-view-active', 'true');
+    }
   }
 
   /**
@@ -64,7 +75,7 @@ export class ViewSlot extends BaseThemedElement {
   /**
    * Updates the selector.
    */
-  private updateSelector_(): void {
+  private updateActiveView_(): void {
     let listenableElement = this.getElement();
     if (listenableElement !== null) {
       let element = listenableElement.getEventTarget();
@@ -75,12 +86,7 @@ export class ViewSlot extends BaseThemedElement {
             return !!path && this.locationService_
                 .hasMatch(LocationService.appendParts([element[__FULL_PATH], path]));
           });
-      if (targetEl !== null) {
-        this.contentSelectBridge_.set(`[gs-view-path="${targetEl.getAttribute('gs-view-path')}"]`);
-      } else {
-        this.contentSelectBridge_.delete();
-      }
-
+      this.setActiveElement_(targetEl);
       this.setRootElVisible_(targetEl !== null);
     }
   }
@@ -119,6 +125,6 @@ export class ViewSlot extends BaseThemedElement {
 
     element[__FULL_PATH] = LocationService.appendParts([rootPath, currentPath]);
 
-    this.updateSelector_();
+    this.updateActiveView_();
   }
 }

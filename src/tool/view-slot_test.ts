@@ -29,9 +29,63 @@ describe('tool.ViewSlot', () => {
 
   describe('onLocationChanged_', () => {
     it('should update the selector', () => {
-      spyOn(viewSlot, 'updateSelector_');
+      spyOn(viewSlot, 'updateActiveView_');
       viewSlot['onLocationChanged_']();
-      assert(viewSlot['updateSelector_']).to.haveBeenCalledWith();
+      assert(viewSlot['updateActiveView_']).to.haveBeenCalledWith();
+    });
+  });
+
+  describe('setActiveElement_', () => {
+    it('should deactivate the currently active element and activates the target element', () => {
+      let mockCurrentActiveEl = jasmine.createSpyObj('CurrentActiveEl', ['setAttribute']);
+      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      mockElement.querySelector.and.returnValue(mockCurrentActiveEl);
+
+      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
+      mockListenableElement.getEventTarget.and.returnValue(mockElement);
+      spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
+
+      let mockTargetElement = jasmine.createSpyObj('TargetElement', ['setAttribute']);
+
+      viewSlot['setActiveElement_'](mockTargetElement);
+
+      assert(mockTargetElement.setAttribute).to.haveBeenCalledWith('gs-view-active', 'true');
+      assert(mockCurrentActiveEl.setAttribute).to.haveBeenCalledWith('gs-view-active', 'false');
+      assert(mockElement.querySelector).to.haveBeenCalledWith('[gs-view-active="true"]');
+    });
+
+    it('should deactive the currently active element if target element is null', () => {
+      let mockCurrentActiveEl = jasmine.createSpyObj('CurrentActiveEl', ['setAttribute']);
+      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      mockElement.querySelector.and.returnValue(mockCurrentActiveEl);
+
+      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
+      mockListenableElement.getEventTarget.and.returnValue(mockElement);
+      spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
+
+      viewSlot['setActiveElement_'](null);
+
+      assert(mockCurrentActiveEl.setAttribute).to.haveBeenCalledWith('gs-view-active', 'false');
+      assert(mockElement.querySelector).to.haveBeenCalledWith('[gs-view-active="true"]');
+    });
+
+    it('should not throw error if there are no current active element', () => {
+      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      mockElement.querySelector.and.returnValue(null);
+
+      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
+      mockListenableElement.getEventTarget.and.returnValue(mockElement);
+      spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
+
+      assert(() => {
+        viewSlot['setActiveElement_'](null);
+      }).toNot.throw();
+    });
+
+    it('should not throw error if there are no listenable elements', () => {
+      assert(() => {
+        viewSlot['setActiveElement_'](null);
+      }).toNot.throw();
     });
   });
 
@@ -51,8 +105,8 @@ describe('tool.ViewSlot', () => {
     });
   });
 
-  describe('updateSelector_', () => {
-    it('should set the selector correctly', () => {
+  describe('updateActiveView_', () => {
+    it('should set the correct target element to active', () => {
       let fullPath = 'fullPath';
       let children = Mocks.object('children');
       let element = Mocks.object('element');
@@ -79,13 +133,12 @@ describe('tool.ViewSlot', () => {
           .returnValue(true);
 
       spyOn(viewSlot, 'setRootElVisible_');
-      spyOn(viewSlot['contentSelectBridge_'], 'set');
+      spyOn(viewSlot, 'setActiveElement_');
 
-      viewSlot['updateSelector_']();
+      viewSlot['updateActiveView_']();
 
       assert(viewSlot['setRootElVisible_']).to.haveBeenCalledWith(true);
-      assert(viewSlot['contentSelectBridge_'].set).to
-          .haveBeenCalledWith(`[gs-view-path="${path}"]`);
+      assert(viewSlot['setActiveElement_']).to.haveBeenCalledWith(mockChildWithPath);
 
       assert(LocationService.appendParts).to.haveBeenCalledWith([fullPath, path]);
       assert(mockLocationService.hasMatch).to.haveBeenCalledWith(appendedPath);
@@ -94,7 +147,7 @@ describe('tool.ViewSlot', () => {
       assert(Arrays.fromHtmlCollection).to.haveBeenCalledWith(children);
     });
 
-    it('should delete the select attribute if there are no target elements found', () => {
+    it('should set no elements to active if there are no active elements', () => {
       let element = Mocks.object('element');
       element.children = Mocks.object('children');
 
@@ -107,19 +160,19 @@ describe('tool.ViewSlot', () => {
       spyOn(Arrays, 'fromHtmlCollection').and.returnValue(Arrays.of([mockChild]));
 
       spyOn(viewSlot, 'setRootElVisible_');
-      spyOn(viewSlot['contentSelectBridge_'], 'delete');
+      spyOn(viewSlot, 'setActiveElement_');
 
-      viewSlot['updateSelector_']();
+      viewSlot['updateActiveView_']();
 
       assert(viewSlot['setRootElVisible_']).to.haveBeenCalledWith(false);
-      assert(viewSlot['contentSelectBridge_'].delete).to.haveBeenCalled();
+      assert(viewSlot['setActiveElement_']).to.haveBeenCalledWith(null);
     });
 
     it('should not throw error if there are no listenable elements', () => {
       spyOn(viewSlot, 'getElement').and.returnValue(null);
 
       assert(() => {
-        viewSlot['updateSelector_']();
+        viewSlot['updateActiveView_']();
       }).toNot.throw();
     });
   });
@@ -155,11 +208,11 @@ describe('tool.ViewSlot', () => {
       spyOn(LocationService, 'appendParts').and.returnValue(appendedPath);
 
       spyOn(Doms, 'parentIterable').and.returnValue([mockPathElement, rootElement]);
-      spyOn(viewSlot, 'updateSelector_');
+      spyOn(viewSlot, 'updateActiveView_');
 
       viewSlot.onInserted(element);
 
-      assert(viewSlot['updateSelector_']).to.haveBeenCalledWith();
+      assert(viewSlot['updateActiveView_']).to.haveBeenCalledWith();
       assert(element[__FULL_PATH]).to.equal(appendedPath);
       assert(LocationService.appendParts).to.haveBeenCalledWith([rootPath, currentPath]);
       assert(mockPathElement.getAttribute).to.haveBeenCalledWith('gs-view-path');
@@ -172,7 +225,7 @@ describe('tool.ViewSlot', () => {
       spyOn(LocationService, 'appendParts').and.returnValue(appendedPath);
 
       spyOn(Doms, 'parentIterable').and.returnValue([]);
-      spyOn(viewSlot, 'updateSelector_');
+      spyOn(viewSlot, 'updateActiveView_');
 
       viewSlot.onInserted(element);
 
