@@ -5,3 +5,4 @@ bazel-gs-ui
 bazel-out
 bazel-testlogs
 node_modules/
+.vscode/

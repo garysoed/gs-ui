@@ -7,6 +7,7 @@ gs_ui(
     deps = [
       "@gs_tools//src",
       "//src/bootstrap",
+      "//src/routing",
     ])
 
 ts_library(
