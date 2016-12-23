@@ -1,9 +1,10 @@
+import {Arrays, Maps} from 'external/gs_tools/src/collection';
 import {BaseListenable} from 'external/gs_tools/src/event';
 import {bind, inject} from 'external/gs_tools/src/inject';
 import {LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
 import {Reflect} from 'external/gs_tools/src/util';
 
-import {IRouteFactory} from './interfaces';
+import {AbstractRouteFactory} from './abstract-route-factory';
 import {Route} from './route';
 import {RouteServiceEvents} from './route-service-events';
 
@@ -13,13 +14,18 @@ import {RouteServiceEvents} from './route-service-events';
     [
       LocationService,
     ])
-export class RouteService extends BaseListenable<RouteServiceEvents> {
+export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
   private readonly locationService_: LocationService;
+  private readonly routeFactories_: AbstractRouteFactory<T, any, any>[];
+  private readonly routeFactoryMap_: Map<T, AbstractRouteFactory<T, any, any>>;
 
   constructor(
-      @inject('gs.LocationService') locationService: LocationService) {
+      @inject('gs.LocationService') locationService: LocationService,
+      @inject('x.gs_ui.routeFactories') routeFactories: AbstractRouteFactory<T, any, any>[]) {
     super();
     this.locationService_ = locationService;
+    this.routeFactories_ = routeFactories;
+    this.routeFactoryMap_ = new Map();
   }
 
   /**
@@ -37,32 +43,44 @@ export class RouteService extends BaseListenable<RouteServiceEvents> {
         LocationServiceEvents.CHANGED,
         this.onLocationChanged_,
         this));
+
+    Arrays
+        .of(this.routeFactories_)
+        .forEach((factory: AbstractRouteFactory<T, any, any>) => {
+          this.routeFactoryMap_.set(factory.getType(), factory);
+        });
   }
 
   /**
-   * @param routeFactory The factory of the routes to get the matcher of.
+   * @return The currently matching route, or null if there are none.
    */
-  getMatches<T>(routeFactory: IRouteFactory<any, T>): T | null {
-    let matches = this.locationService_.getMatches(routeFactory.getMatcher());
-    if (matches === null) {
-      return null;
-    }
+  getRoute(): Route<T, any> | null {
+    let path = this.locationService_.getPath();
+    let route: Route<T, any> | null = null;
+    Arrays
+        .of(this.routeFactories_)
+        .forOf((factory: AbstractRouteFactory<T, any, any>, index: number, breakFn: () => void) => {
+          route = factory.createFromPath(path);
+          if (route !== null) {
+            breakFn();
+          }
+        });
+    return route;
+  }
 
-    return routeFactory.populateMatches(matches);
+  /**
+   * @param type Type of RouteFactory to return.
+   * @return The RouteFactory matching the given type, or null if there are none.
+   */
+  getRouteFactory(type: T): AbstractRouteFactory<T, any, any> | null {
+    return this.routeFactoryMap_.get(type) || null;
   }
 
   /**
    * Go to the given route object.
    * @param route The route to go to.
    */
-  goTo(route: Route): void {
-    this.locationService_.goTo(route.getLocation());
-  }
-
-  /**
-   * @return True iff the current location is displaying the given route.
-   */
-  isDisplayed(routeFactory: IRouteFactory<any, any>): boolean {
-    return this.locationService_.hasMatch(routeFactory.getMatcher());
+  goTo(route: Route<T, any>): void {
+    this.locationService_.goTo(route.getPath());
   }
 }

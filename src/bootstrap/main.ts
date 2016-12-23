@@ -1,4 +1,4 @@
-import {Arrays} from 'external/gs_tools/src/collection';
+import {Arrays, Sets} from 'external/gs_tools/src/collection';
 import {BaseDisposable} from 'external/gs_tools/src/dispose';
 import {BaseElement, ElementRegistrar} from 'external/gs_tools/src/webc';
 import {Injector} from 'external/gs_tools/src/inject';
@@ -7,7 +7,9 @@ import {LocationService} from 'external/gs_tools/src/ui';
 import {Reflect} from 'external/gs_tools/src/util';
 import {Templates} from 'external/gs_tools/src/webc';
 
+import {AbstractRouteFactory} from '../routing/abstract-route-factory';
 import {BasicButton} from '../button/basic-button';
+import {Breadcrumb} from '../routing/breadcrumb';
 import {DefaultPalettes} from './default-palettes';
 import {Drawer} from '../section/drawer';
 import {HorizontalTab} from '../section/horizontal-tab';
@@ -24,6 +26,7 @@ import {ViewSlot} from '../tool/view-slot';
 
 const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   BasicButton,
+  Breadcrumb,
   Drawer,
   HorizontalTab,
   Icon,
@@ -101,7 +104,7 @@ export class Main extends BaseDisposable {
   /**
    * Creates a new instance of the app.
    */
-  static newInstance(): Main {
+  static newInstance(routeFactories: AbstractRouteFactory<any, any, any>[] = []): Main {
     let templates = Templates.newInstance(new Map<RegExp, string>([
       [/rgba\(11,11,11/g, 'rgba(var(--gsRgbBaseDark)'],
       [/rgba\(22,22,22/g, 'rgba(var(--gsRgbBaseNormal)'],
@@ -113,6 +116,7 @@ export class Main extends BaseDisposable {
     Injector.bindProvider(() => document, 'x.dom.document');
     Injector.bindProvider(() => window, 'x.dom.window');
     Injector.bindProvider(() => templates, 'x.gs_tools.templates');
+    Injector.bindProvider(() => routeFactories, 'x.gs_ui.routeFactories');
     Injector.bindProvider(() => locationService, 'gs.LocationService');
 
     let injector = Injector.newInstance();

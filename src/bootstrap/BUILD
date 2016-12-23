@@ -8,6 +8,7 @@ gs_ui(
       "//src/button",
       "//src/input",
       "//src/section",
+      "//src/routing",
       "//src/theming",
       "//src/tool",
     ])

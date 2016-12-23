@@ -12,13 +12,15 @@ import {RouteServiceEvents} from './route-service-events';
 
 
 describe('routing.RouteService', () => {
+  let routeFactories: any[];
   let mockLocationService;
-  let service: RouteService;
+  let service: RouteService<any>;
 
   beforeEach(() => {
+    routeFactories = [];
     mockLocationService = Mocks.listenable('LocationService');
-    mockLocationService.getMatches = jasmine.createSpy('LocationService.getMatches');
-    service = new RouteService(mockLocationService);
+    mockLocationService.getPath = jasmine.createSpy('LocationService.getPath');
+    service = new RouteService(mockLocationService, routeFactories);
     TestDispose.add(mockLocationService, service);
   });
 
@@ -41,34 +43,72 @@ describe('routing.RouteService', () => {
           service['onLocationChanged_'],
           service);
     });
+
+    it('should initialize the route factory map', () => {
+      let type1 = Mocks.object('type1');
+      let mockFactory1 = jasmine.createSpyObj('Factory1', ['getType']);
+      mockFactory1.getType.and.returnValue(type1);
+
+      let type2 = Mocks.object('type2');
+      let mockFactory2 = jasmine.createSpyObj('Factory2', ['getType']);
+      mockFactory2.getType.and.returnValue(type2);
+
+      routeFactories.push(mockFactory1, mockFactory2);
+
+      service[Reflect.__initialize]();
+
+      assert(service['routeFactoryMap_']).to.haveEntries([
+        [type1, mockFactory1],
+        [type2, mockFactory2]
+      ]);
+    });
   });
 
-  describe('getMatches', () => {
-    it('should return the correct matches', () => {
-      let matcher = 'matcher';
-      let populatedMatches = Mocks.object('populatedMatches');
-      let mockRouteFactory =
-          jasmine.createSpyObj('RouteFactory', ['getMatcher', 'populateMatches']);
-      mockRouteFactory.getMatcher.and.returnValue(matcher);
-      mockRouteFactory.populateMatches.and.returnValue(populatedMatches);
+  describe('getRoute', () => {
+    it('should return the first matching route', () => {
+      let path = 'path';
+      mockLocationService.getPath.and.returnValue(path);
 
-      let matches = Mocks.object('matches');
-      mockLocationService.getMatches.and.returnValue(matches);
+      let route = Mocks.object('route');
+      let mockFactory1 = jasmine.createSpyObj('Factory1', ['createFromPath']);
+      mockFactory1.createFromPath.and.returnValue(null);
 
-      assert(service.getMatches(mockRouteFactory)).to.equal(populatedMatches);
-      assert(mockRouteFactory.populateMatches).to.haveBeenCalledWith(matches);
-      assert(mockLocationService.getMatches).to.haveBeenCalledWith(matcher);
+      let mockFactory2 = jasmine.createSpyObj('Factory2', ['createFromPath']);
+      mockFactory2.createFromPath.and.returnValue(route);
+
+      let mockFactory3 = jasmine.createSpyObj('Factory3', ['createFromPath']);
+      mockFactory3.createFromPath.and.returnValue(Mocks.object('route2'));
+
+      routeFactories.push(mockFactory1, mockFactory2, mockFactory3);
+
+      assert(service.getRoute()).to.equal(route);
+      assert(mockFactory1.createFromPath).to.haveBeenCalledWith(path);
+      assert(mockFactory2.createFromPath).to.haveBeenCalledWith(path);
+      assert(mockFactory3.createFromPath).toNot.haveBeenCalled();
     });
 
-    it('should return null if there are no matches', () => {
-      let matcher = 'matcher';
-      let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['getMatcher']);
-      mockRouteFactory.getMatcher.and.returnValue(matcher);
+    it('should return null if there are no matching routes', () => {
+      mockLocationService.getPath.and.returnValue('path');
 
-      mockLocationService.getMatches.and.returnValue(null);
+      let mockFactory = jasmine.createSpyObj('Factory', ['createFromPath']);
+      mockFactory.createFromPath.and.returnValue(null);
 
-      assert(service.getMatches(mockRouteFactory)).to.equal(null);
-      assert(mockLocationService.getMatches).to.haveBeenCalledWith(matcher);
+      routeFactories.push(mockFactory);
+
+      assert(service.getRoute()).to.equal(null);
+    });
+  });
+
+  describe('getRouteFactory', () => {
+    it('should return the factory that matches the type', () => {
+      let type = Mocks.object('type');
+      let factory = Mocks.object('factory');
+      service['routeFactoryMap_'].set(type, factory);
+      assert(service.getRouteFactory(type)).to.equal(factory);
+    });
+
+    it('should return null if there are no factories matching the type', () => {
+      assert(service.getRouteFactory('type')).to.equal(null);
     });
   });
 
@@ -76,39 +116,13 @@ describe('routing.RouteService', () => {
     it('should go to the correct location', () => {
       mockLocationService.goTo = jasmine.createSpy('LocationService#goTo');
 
-      let location = 'location';
-      let mockRoute = jasmine.createSpyObj('Route', ['getLocation']);
-      mockRoute.getLocation.and.returnValue(location);
+      let path = 'path';
+      let mockRoute = jasmine.createSpyObj('Route', ['getPath']);
+      mockRoute.getPath.and.returnValue(path);
 
       service.goTo(mockRoute);
 
-      assert(mockLocationService.goTo).to.haveBeenCalledWith(location);
-    });
-  });
-
-  describe('isDisplayed', () => {
-    it('should return true if the location service has a match', () => {
-      let matcher = 'matcher';
-      let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['getMatcher']);
-      mockRouteFactory.getMatcher.and.returnValue(matcher);
-
-      mockLocationService.hasMatch = jasmine.createSpy('LocationService#hasMatch');
-      mockLocationService.hasMatch.and.returnValue(true);
-
-      assert(service.isDisplayed(mockRouteFactory)).to.beTrue();
-      assert(mockLocationService.hasMatch).to.haveBeenCalledWith(matcher);
-    });
-
-    it('should return false if the location service does not have a match', () => {
-      let matcher = 'matcher';
-      let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['getMatcher']);
-      mockRouteFactory.getMatcher.and.returnValue(matcher);
-
-      mockLocationService.hasMatch = jasmine.createSpy('LocationService#hasMatch');
-      mockLocationService.hasMatch.and.returnValue(false);
-
-      assert(service.isDisplayed(mockRouteFactory)).to.beFalse();
-      assert(mockLocationService.hasMatch).to.haveBeenCalledWith(matcher);
+      assert(mockLocationService.goTo).to.haveBeenCalledWith(path);
     });
   });
 });

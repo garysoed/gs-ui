@@ -1,32 +1,46 @@
-import {IRouteFactory} from './interfaces';
-import {Route} from './route';
+import {AbstractRouteFactory} from './abstract-route-factory';
 
 
-export class SimpleRouteFactory implements IRouteFactory<void, void> {
-  private readonly location_: string;
+export class SimpleRouteFactory<T>
+    extends AbstractRouteFactory<T, {}, {}> {
+  private readonly path_: string;
+  private readonly name_: string;
 
-  constructor(location: string) {
-    this.location_ = location;
-  }
-
-  /**
-   * Creates a new Route object.
-   *
-   * @return A new instance of the route.
-   */
-  create(): Route {
-    return new Route(this.location_);
-  }
-
-  /**
-   * @return The matcher string to query the location service.
-   */
-  getMatcher(): string {
-    return `${this.location_}$`;
+  constructor(
+      type: T,
+      path: string,
+      name: string,
+      parent: AbstractRouteFactory<T, {}, {}> | null = null) {
+    super(type, parent);
+    this.path_ = path;
+    this.name_ = name;
   }
 
   /**
    * @override
    */
-  populateMatches(matches: {[key: string]: string}): void { }
+  protected getRelativeMatchParams_(matches: {[key: string]: string}): {} {
+    return {};
+  }
+
+  /**
+   * @override
+   */
+  protected getRelativeMatcher_(): string {
+    return this.getRelativePath_();
+  }
+
+  /**
+   * @override
+   */
+  protected getRelativePath_(): string {
+    return this.path_;
+  }
+
+  /**
+   * @override
+   */
+  getName(): Promise<string> {
+    return Promise.resolve(this.name_);
+  }
 }

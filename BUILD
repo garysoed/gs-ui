@@ -64,6 +64,7 @@ filegroup(
     srcs = [
         "//src/button:template",
         "//src/input:template",
+        "//src/routing:template",
         "//src/section:template",
         "//src/theming:template",
         "//src/theming:common-style_templatepack",

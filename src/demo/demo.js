@@ -38,7 +38,7 @@ for (var i in paletteNames) {
   var name = paletteNames[i];
   palettes.push({name: name, palette: gs.ui.DefaultPalettes[name]});
 }
-var main = gs.ui.Main.newInstance();
+var main = gs.ui.Main.newInstance(window['routeFactories']);
 
 function updateTheme() {
   var theme = gs.ui.Theme.newInstance(
