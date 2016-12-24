@@ -66,6 +66,34 @@ describe('routing.RouteService', () => {
     });
   });
 
+  describe('getParams', () => {
+    it('should return the correct params', () => {
+      let path = 'path';
+      spyOn(service, 'getPath').and.returnValue(path);
+
+      let params = Mocks.object('params');
+      let mockRoute = jasmine.createSpyObj('Route', ['getParams']);
+      mockRoute.getParams.and.returnValue(params);
+
+      let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['createFromPath']);
+      mockRouteFactory.createFromPath.and.returnValue(mockRoute);
+
+      assert(service.getParams(mockRouteFactory)).to.equal(params);
+      assert(mockRouteFactory.createFromPath).to.haveBeenCalledWith(path);
+    });
+
+    it('should return null if the path does not match the route factory', () => {
+      let path = 'path';
+      spyOn(service, 'getPath').and.returnValue(path);
+
+      let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['createFromPath']);
+      mockRouteFactory.createFromPath.and.returnValue(null);
+
+      assert(service.getParams(mockRouteFactory)).to.beNull();
+      assert(mockRouteFactory.createFromPath).to.haveBeenCalledWith(path);
+    });
+  });
+
   describe('getPath', () => {
     it('should return the path', () => {
       let path = 'path';
@@ -128,15 +156,19 @@ describe('routing.RouteService', () => {
 
   describe('goTo', () => {
     it('should go to the correct location', () => {
+      let params = Mocks.object('params');
       mockLocationService.goTo = jasmine.createSpy('LocationService#goTo');
 
       let path = 'path';
       let mockRoute = jasmine.createSpyObj('Route', ['getPath']);
       mockRoute.getPath.and.returnValue(path);
+      let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['create']);
+      mockRouteFactory.create.and.returnValue(mockRoute);
 
-      service.goTo(mockRoute);
+      service.goTo(mockRouteFactory, params);
 
       assert(mockLocationService.goTo).to.haveBeenCalledWith(path);
+      assert(mockRouteFactory.create).to.haveBeenCalledWith(params);
     });
   });
 });

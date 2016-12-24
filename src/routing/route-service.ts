@@ -53,6 +53,19 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
   }
 
   /**
+   * @param routeFactory Route factory to use to retrieve the params.
+   * @return The params for the current path, or null if it does not match the given route factory.
+   */
+  getParams<P, PP>(routeFactory: AbstractRouteFactory<T, PP, P>): P & PP | null {
+    let route = routeFactory.createFromPath(this.getPath());
+    if (route === null) {
+      return null;
+    }
+
+    return route.getParams();
+  }
+
+  /**
    * @return The current path.
    */
   getPath(): string {
@@ -86,9 +99,10 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
 
   /**
    * Go to the given route object.
-   * @param route The route to go to.
+   * @param routeFactory Factory to generate the route.
+   * @param params Parameters to generate the route.
    */
-  goTo(route: Route<T, any>): void {
-    this.locationService_.goTo(route.getPath());
+  goTo<P, PP>(routeFactory: AbstractRouteFactory<T, PP, P>, params: P & PP): void {
+    this.locationService_.goTo(routeFactory.create(params).getPath());
   }
 }
