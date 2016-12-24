@@ -12,15 +12,15 @@ import {RouteServiceEvents} from './route-service-events';
 
 
 describe('routing.RouteService', () => {
-  let routeFactories: any[];
+  let mockRouteFactoryService;
   let mockLocationService;
   let service: RouteService<any>;
 
   beforeEach(() => {
-    routeFactories = [];
+    mockRouteFactoryService = jasmine.createSpyObj('RouteFactoryService', ['getFactories']);
     mockLocationService = Mocks.listenable('LocationService');
     mockLocationService.getPath = jasmine.createSpy('LocationService.getPath');
-    service = new RouteService(mockLocationService, routeFactories);
+    service = new RouteService(mockLocationService, mockRouteFactoryService);
     TestDispose.add(mockLocationService, service);
   });
 
@@ -35,6 +35,8 @@ describe('routing.RouteService', () => {
   describe('[Reflect.__initialize]', () => {
     it('should listen to the CHANGED event on the location service', () => {
       spyOn(mockLocationService, 'on').and.callThrough();
+
+      mockRouteFactoryService.getFactories.and.returnValue([]);
 
       service[Reflect.__initialize]();
 
@@ -53,14 +55,22 @@ describe('routing.RouteService', () => {
       let mockFactory2 = jasmine.createSpyObj('Factory2', ['getType']);
       mockFactory2.getType.and.returnValue(type2);
 
-      routeFactories.push(mockFactory1, mockFactory2);
+      mockRouteFactoryService.getFactories.and.returnValue([mockFactory1, mockFactory2]);
 
       service[Reflect.__initialize]();
 
       assert(service['routeFactoryMap_']).to.haveEntries([
         [type1, mockFactory1],
-        [type2, mockFactory2]
+        [type2, mockFactory2],
       ]);
+    });
+  });
+
+  describe('getPath', () => {
+    it('should return the path', () => {
+      let path = 'path';
+      mockLocationService.getPath.and.returnValue(path);
+      assert(service.getPath()).to.equal(path);
     });
   });
 
@@ -79,7 +89,11 @@ describe('routing.RouteService', () => {
       let mockFactory3 = jasmine.createSpyObj('Factory3', ['createFromPath']);
       mockFactory3.createFromPath.and.returnValue(Mocks.object('route2'));
 
-      routeFactories.push(mockFactory1, mockFactory2, mockFactory3);
+      mockRouteFactoryService.getFactories.and.returnValue([
+        mockFactory1,
+        mockFactory2,
+        mockFactory3,
+      ]);
 
       assert(service.getRoute()).to.equal(route);
       assert(mockFactory1.createFromPath).to.haveBeenCalledWith(path);
@@ -93,7 +107,7 @@ describe('routing.RouteService', () => {
       let mockFactory = jasmine.createSpyObj('Factory', ['createFromPath']);
       mockFactory.createFromPath.and.returnValue(null);
 
-      routeFactories.push(mockFactory);
+      mockRouteFactoryService.getFactories.and.returnValue([mockFactory]);
 
       assert(service.getRoute()).to.equal(null);
     });

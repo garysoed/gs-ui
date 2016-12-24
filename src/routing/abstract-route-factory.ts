@@ -9,10 +9,10 @@ import {Route} from './route';
  * Base class for all route factories.
  *
  * @param <T> Enum type of the route factories.
- * @param <A> Arguments for creating a route.
- * @param <P> Type of the parent route factory.
+ * @param <PP> Arguments for creating a route for the parent factory.
+ * @param <P> Arguments for creating a route.
  */
-export abstract class AbstractRouteFactory<T, PP, P extends PP> {
+export abstract class AbstractRouteFactory<T, PP, P> {
   protected readonly type_: T;
   protected readonly parent_: AbstractRouteFactory<T, any, PP> | null;
 
@@ -43,7 +43,7 @@ export abstract class AbstractRouteFactory<T, PP, P extends PP> {
    * @return Path created using the given params. This path is not prefixed by the path created
    *    by the ancestors.
    */
-  protected abstract getRelativePath_(params: P): string
+  protected abstract getRelativePath_(params: P & PP): string
 
   /**
    * @return The full matcher for this factory.
@@ -62,19 +62,20 @@ export abstract class AbstractRouteFactory<T, PP, P extends PP> {
    * @return Parsed object containing the matches that this factory and its ancestors can
    *    recognize.
    */
-  private getMatchParams_(matches: {[key: string]: string}): P {
+  private getMatchParams_(matches: {[key: string]: string}): P & PP {
     let currentMatchParams = this.getRelativeMatchParams_(matches);
     if (this.parent_ !== null) {
-      Jsons.mixin(this.parent_.getMatchParams_(matches), currentMatchParams);
+      return Jsons.mixin(this.parent_.getMatchParams_(matches), currentMatchParams);
+    } else {
+      return <P & PP> currentMatchParams;
     }
-    return currentMatchParams;
   }
 
   /**
    * @param params Params to create the path.
    * @return The path created from the given params.
    */
-  create(params: P): Route<T, P> {
+  create(params: P & PP): Route<T, P & PP> {
     return new Route(this.type_, this.getPath(params), params);
   }
 
@@ -82,7 +83,7 @@ export abstract class AbstractRouteFactory<T, PP, P extends PP> {
    * @param path Path to create the route object from.
    * @return Route object matching the path, or null if there are none.
    */
-  createFromPath(path: string) : Route<T, P> | null {
+  createFromPath(path: string): Route<T, P & PP> | null {
     let matches = Locations.getMatches(path, `${this.getMatcher_()}$`);
     return matches === null ? null : this.create(this.getMatchParams_(matches));
   }
@@ -92,7 +93,7 @@ export abstract class AbstractRouteFactory<T, PP, P extends PP> {
    * @return Array of names of the current route and its ancestors. The oldest ancestors come
    *    first in the array.
    */
-  getCascadeNames(params: P): Promise<string>[] {
+  getCascadeNames(params: P & PP): Promise<string>[] {
     let names: Promise<string>[] = [];
     let current: AbstractRouteFactory<any, any, any> | null = this;
     while (current !== null) {
@@ -110,7 +111,7 @@ export abstract class AbstractRouteFactory<T, PP, P extends PP> {
    * @return Array of paths for the current route and its ancestors. The oldest ancestors come
    *    first in the array.
    */
-  getCascadePaths(params: P): string[] {
+  getCascadePaths(params: P & PP): string[] {
     let paths: string[] = [];
     let current: AbstractRouteFactory<any, any, any> | null = this;
     while (current !== null) {
@@ -127,13 +128,13 @@ export abstract class AbstractRouteFactory<T, PP, P extends PP> {
    * @param params Param to generate the name.
    * @return Promise that will be resolved with the name of the route produced by the factory.
    */
-  abstract getName(params: P): Promise<string>;
+  abstract getName(params: P & PP): Promise<string>;
 
   /**
    * @param params Params to generate the path.
    * @return Full path for the given param.
    */
-  getPath(params: P): string {
+  getPath(params: P & PP): string {
     let currentPath = this.getRelativePath_(params);
     if (this.parent_ === null) {
       return currentPath;

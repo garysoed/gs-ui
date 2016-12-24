@@ -72,11 +72,16 @@
       var routeFactoryA = new gs.ui.SimpleRouteFactory(Types.A, '/a', 'Page A');
       var routeFactoryB = new gs.ui.SimpleRouteFactory(Types.B, '/b', 'Page B', routeFactoryA);
       var routeFactoryC = new gs.ui.SimpleRouteFactory(Types.C, '/c', 'Page C', routeFactoryB);
-      window['routeFactories'] = [
-        routeFactoryA,
-        routeFactoryB,
-        routeFactoryC
-      ];
+      var RouteFactoryService = function() { };
+      RouteFactoryService.prototype.getFactories = function() {
+        return [
+          routeFactoryA,
+          routeFactoryB,
+          routeFactoryC
+        ]
+      };
+
+      window['routeFactoryServiceCtor'] = RouteFactoryService;
     </script>
     <script src="demo.js"></script>
   </body>
