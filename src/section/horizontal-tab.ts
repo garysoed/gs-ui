@@ -1,3 +1,5 @@
+import {Interval, sequenced} from 'external/gs_tools/src/async';
+import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
 import {
   Animation,
   AnimationEasing,
@@ -5,8 +7,6 @@ import {
   customElement,
   handle,
   StringParser} from 'external/gs_tools/src/webc';
-import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
-import {Interval, sequenced} from 'external/gs_tools/src/async';
 
 import {Event} from '../const/event';
 

@@ -1,3 +1,4 @@
+import {inject} from 'external/gs_tools/src/inject';
 import {
   bind,
   BooleanParser,
@@ -5,11 +6,11 @@ import {
   DomBridge,
   handle,
   StringParser} from 'external/gs_tools/src/webc';
-import {inject} from 'external/gs_tools/src/inject';
 
 import {BaseActionElement} from '../common/base-action-element';
-import {RadioButtonService} from './radio-button-service';
 import {ThemeService} from '../theming/theme-service';
+
+import {RadioButtonService} from './radio-button-service';
 
 
 @customElement({

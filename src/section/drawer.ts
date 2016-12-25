@@ -1,3 +1,4 @@
+import {inject} from 'external/gs_tools/src/inject';
 import {
   bind,
   BooleanParser,
@@ -5,7 +6,6 @@ import {
   DomBridge,
   handle,
   StringParser} from 'external/gs_tools/src/webc';
-import {inject} from 'external/gs_tools/src/inject';
 
 import {BaseThemedElement} from '../common/base-themed-element';
 import {ThemeService} from '../theming/theme-service';

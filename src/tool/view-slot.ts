@@ -1,8 +1,8 @@
 import {Arrays} from 'external/gs_tools/src/collection';
-import {customElement, StringParser} from 'external/gs_tools/src/webc';
-import {Doms, LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
-import {inject} from 'external/gs_tools/src/inject';
 import {Iterables} from 'external/gs_tools/src/collection';
+import {inject} from 'external/gs_tools/src/inject';
+import {Doms, LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
+import {customElement, StringParser} from 'external/gs_tools/src/webc';
 
 import {BaseThemedElement} from '../common/base-themed-element';
 import {ThemeService} from '../theming/theme-service';

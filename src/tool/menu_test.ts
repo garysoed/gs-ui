@@ -5,8 +5,9 @@ import {ListenableDom} from 'external/gs_tools/src/event';
 import {Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 
-import {AnchorLocation} from './anchor-location';
 import {Event} from '../const/event';
+
+import {AnchorLocation} from './anchor-location';
 import {Menu} from './menu';
 
 

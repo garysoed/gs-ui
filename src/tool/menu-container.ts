@@ -1,3 +1,6 @@
+import {Jsons} from 'external/gs_tools/src/collection';
+import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
+import {inject} from 'external/gs_tools/src/inject';
 import {
   Animation,
   AnimationEasing,
@@ -5,9 +8,6 @@ import {
   customElement,
   FloatParser,
   handle} from 'external/gs_tools/src/webc';
-import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
-import {inject} from 'external/gs_tools/src/inject';
-import {Jsons} from 'external/gs_tools/src/collection';
 
 import {AnchorLocation} from './anchor-location';
 import {AnchorLocationParser} from './anchor-location-parser';

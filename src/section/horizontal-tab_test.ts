@@ -1,11 +1,11 @@
 import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
-import {Animation} from 'external/gs_tools/src/webc';
-import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
 import {Interval} from 'external/gs_tools/src/async';
+import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
 import {Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
+import {Animation} from 'external/gs_tools/src/webc';
 
 import {HorizontalTab} from './horizontal-tab';
 

@@ -1,27 +1,28 @@
 import {Arrays} from 'external/gs_tools/src/collection';
 import {BaseDisposable} from 'external/gs_tools/src/dispose';
-import {BaseElement, ElementRegistrar} from 'external/gs_tools/src/webc';
-import {Injector} from 'external/gs_tools/src/inject';
 import {ListenableDom} from 'external/gs_tools/src/event';
+import {Injector} from 'external/gs_tools/src/inject';
 import {LocationService} from 'external/gs_tools/src/ui';
 import {Reflect} from 'external/gs_tools/src/util';
+import {BaseElement, ElementRegistrar} from 'external/gs_tools/src/webc';
 import {Templates} from 'external/gs_tools/src/webc';
 
 import {BasicButton} from '../button/basic-button';
-import {Breadcrumb} from '../routing/breadcrumb';
-import {DefaultPalettes} from './default-palettes';
-import {Drawer} from '../section/drawer';
-import {HorizontalTab} from '../section/horizontal-tab';
-import {Icon} from '../tool/icon';
-import {IndefiniteLoading} from '../tool/indefinite-loading';
-import {IRouteFactoryService} from '../routing/i-route-factory-service';
-import {Menu} from '../tool/menu';
-import {MenuContainer} from '../tool/menu-container';
 import {RadioButton} from '../input/radio-button';
 import {TextInput} from '../input/text-input';
+import {Breadcrumb} from '../routing/breadcrumb';
+import {IRouteFactoryService} from '../routing/i-route-factory-service';
+import {Drawer} from '../section/drawer';
+import {HorizontalTab} from '../section/horizontal-tab';
 import {Theme} from '../theming/theme';
 import {ThemeService} from '../theming/theme-service';
+import {Icon} from '../tool/icon';
+import {IndefiniteLoading} from '../tool/indefinite-loading';
+import {Menu} from '../tool/menu';
+import {MenuContainer} from '../tool/menu-container';
 import {ViewSlot} from '../tool/view-slot';
+
+import {DefaultPalettes} from './default-palettes';
 
 
 const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [

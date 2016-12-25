@@ -1,3 +1,6 @@
+import {Interval} from 'external/gs_tools/src/async';
+import {DomEvent} from 'external/gs_tools/src/event';
+import {inject} from 'external/gs_tools/src/inject';
 import {
   bind,
   BooleanParser,
@@ -5,9 +8,6 @@ import {
   DomBridge,
   handle,
   StringParser} from 'external/gs_tools/src/webc';
-import {DomEvent} from 'external/gs_tools/src/event';
-import {inject} from 'external/gs_tools/src/inject';
-import {Interval} from 'external/gs_tools/src/async';
 
 import {BaseActionElement} from '../common/base-action-element';
 import {ThemeService} from '../theming/theme-service';

@@ -4,7 +4,7 @@ TestBase.setup();
 import {Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 
-import {Breadcrumb, crumbGenerator, crumbDataSetter} from './breadcrumb';
+import {Breadcrumb, crumbDataSetter, crumbGenerator} from './breadcrumb';
 import {RouteServiceEvents} from './route-service-events';
 
 

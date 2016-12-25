@@ -8,6 +8,7 @@ gs_ui(
       "@gs_tools//src",
       "//src/bootstrap",
       "//src/routing",
+      "//src/tool",
     ])
 
 ts_library(

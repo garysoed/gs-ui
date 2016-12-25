@@ -1,14 +1,15 @@
 import {Arrays} from 'external/gs_tools/src/collection';
-import {bind, customElement, DomBridge} from 'external/gs_tools/src/webc';
 import {inject} from 'external/gs_tools/src/inject';
+import {bind, customElement, DomBridge} from 'external/gs_tools/src/webc';
 
 import {BaseThemedElement} from '../common/base-themed-element';
-import {RouteService} from './route-service';
-import {RouteServiceEvents} from './route-service-events';
 import {ThemeService} from '../theming/theme-service';
+import {RouteService} from './route-service';
+
+import {RouteServiceEvents} from './route-service-events';
+
 
 export const __FULL_PATH = Symbol('fullPath');
-
 
 type CrumbData = {name: string, url: string};
 

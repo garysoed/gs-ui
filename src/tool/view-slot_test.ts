@@ -2,10 +2,10 @@ import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
 import {Arrays} from 'external/gs_tools/src/collection';
-import {Doms} from 'external/gs_tools/src/ui';
-import {LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
 import {Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
+import {LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
+import {Doms} from 'external/gs_tools/src/ui';
 
 import {__FULL_PATH, ViewSlot} from './view-slot';
 

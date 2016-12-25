@@ -4,8 +4,9 @@ TestBase.setup();
 import {Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 
-import {BaseActionElement} from './base-action-element';
 import {Event} from '../const/event';
+
+import {BaseActionElement} from './base-action-element';
 
 
 describe('common.BaseActionElement', () => {
