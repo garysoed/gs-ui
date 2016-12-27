@@ -3,7 +3,7 @@
     background-color: transparent;
     border: none;
     border-bottom: 2px solid var(--gsInputLine);
-    color: var(--gsInputText);
+    color: var(--gsInputNumber);
     font-family: var(--gsFontFamily);
     font-size: var(--gsFontSizeRoot);
     line-height: 22px;
@@ -17,23 +17,29 @@
   }
 
   :host {
-    --gsInputText: var(--gsColorPassiveFG);
+    --gsInputNumber: var(--gsColorPassiveFG);
     --gsInputLine: var(--gsColorActionFG);
     cursor: pointer;
   }
 
   :host([disabled]) {
     --gsInputLine: var(--gsColorActionDisabledFG);
-    --gsInputText: var(--gsColorSecondaryFG);
+    --gsInputNumber: var(--gsColorSecondaryFG);
     cursor: default;
   }
 
   :host(:not([disabled]):hover) {
     --gsInputLine: var(--gsColorAccent);
   }
+
+  #input::-webkit-inner-spin-button,
+  #input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 </style>
 <div class="root">
   <div>
-    <input id="input" type="text">
+    <input id="input" type="number" step="1">
   </div>
 </div>

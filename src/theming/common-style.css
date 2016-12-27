@@ -35,6 +35,23 @@ code {
   padding: 2 .2rem;
 }
 
+fieldset {
+  border: 2px solid var(--gsColorActionFG);
+  padding: 1rem 1rem 2rem 1rem;
+}
+
+fieldset:hover, fieldset:focus {
+  border-color: var(--gsColorActionFocusFG);
+}
+
+legend {
+  color: var(--gsColorActionFG);
+}
+
+fieldset:hover > legend, fieldset:focus > legend {
+  color: var(--gsColorActionFocusFG);
+}
+
 /* Layouts */
 [layout] {
   display: flex;

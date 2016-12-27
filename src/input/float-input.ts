@@ -5,8 +5,8 @@ import {
   BooleanParser,
   customElement,
   DomBridge,
-  handle,
-  StringParser} from 'external/gs_tools/src/webc';
+  FloatParser,
+  handle} from 'external/gs_tools/src/webc';
 
 import {ThemeService} from '../theming/theme-service';
 
@@ -14,12 +14,12 @@ import {BaseInput} from './base-input';
 
 
 @customElement({
-  tag: 'gs-text-input',
-  templateKey: 'src/input/text-input',
+  tag: 'gs-float-input',
+  templateKey: 'src/input/float-input',
 })
-export class TextInput extends BaseInput<string> {
-  @bind(null).attribute('gs-value', StringParser)
-  private readonly boundGsValueBridge_: DomBridge<string>;
+export class FloatInput extends BaseInput<number> {
+  @bind(null).attribute('gs-value', FloatParser)
+  private readonly boundGsValueBridge_: DomBridge<number>;
 
   @bind('#input').attribute('disabled', BooleanParser)
   private readonly boundInputDisabledBridge_: DomBridge<boolean>;
@@ -30,9 +30,9 @@ export class TextInput extends BaseInput<string> {
   constructor(@inject('theming.ThemeService') themeService: ThemeService) {
     super(
         themeService,
+        DomBridge.of<number>(),
         DomBridge.of<string>(),
-        DomBridge.of<string>(),
-        StringParser);
+        FloatParser);
     this.boundGsValueBridge_ = this.gsValueBridge_;
     this.boundInputDisabledBridge_ = this.inputDisabledBridge_;
     this.boundInputValueBridge_ = this.inputValueBridge_;
@@ -43,8 +43,21 @@ export class TextInput extends BaseInput<string> {
    *
    * @param newValue The value it was changed to.
    */
-  @handle(null).attributeChange('gs-value', StringParser)
-  protected onGsValueChange_(newValue: string): void {
+  @handle(null).attributeChange('gs-value', FloatParser)
+  protected onGsValueChange_(newValue: number): void {
     super.onGsValueChange_(newValue);
+  }
+
+  /**
+   * @override
+   */
+  protected isValueChanged_(oldValue: number | null, newValue: number | null): boolean {
+    if (newValue !== null
+        && oldValue !== null
+        && Number.isNaN(oldValue)
+        && Number.isNaN(newValue)) {
+      return false;
+    }
+    return super.isValueChanged_(oldValue, newValue);
   }
 }

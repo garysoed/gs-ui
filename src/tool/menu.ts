@@ -44,6 +44,9 @@ export class Menu extends BaseElement {
         elementTarget['gsAnchorPoint']);
   }
 
+  /**
+   * @override
+   */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
     this.menuRoot_ = <HTMLElement> element.shadowRoot.querySelector('.root');

@@ -11,7 +11,7 @@
         margin-right: .5rem;
       }
 
-      .container > gs-text-input {
+      .container > gs-float-input {
         flex: 1;
       }
 
@@ -38,13 +38,13 @@
         <label>
           Input:
         </label>
-        <gs-text-input gs-value="Default value"></gs-text-input>
+        <gs-float-input gs-value="12.34"></gs-float-input>
       </div>
       <div class="container">
         <label>
           Disabled:
         </label>
-        <gs-text-input disabled gs-value="Default value"></gs-text-input>
+        <gs-float-input disabled gs-value="22.33"></gs-float-input>
       </div>
       <div>
         <div>Value:</div>
@@ -85,7 +85,7 @@
     <script>
       document.querySelectorAll('section.cell').forEach(function(cell) {
         var valueEl = cell.querySelector('.value');
-        cell.querySelector('gs-text-input:not([disabled])').addEventListener(
+        cell.querySelector('gs-float-input:not([disabled])').addEventListener(
             'change',
             function(event) {
               valueEl.innerText = event.target.getAttribute('gs-value');

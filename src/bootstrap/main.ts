@@ -8,6 +8,7 @@ import {BaseElement, ElementRegistrar} from 'external/gs_tools/src/webc';
 import {Templates} from 'external/gs_tools/src/webc';
 
 import {BasicButton} from '../button/basic-button';
+import {FloatInput} from '../input/float-input';
 import {RadioButton} from '../input/radio-button';
 import {TextInput} from '../input/text-input';
 import {Breadcrumb} from '../routing/breadcrumb';
@@ -20,6 +21,7 @@ import {Icon} from '../tool/icon';
 import {IndefiniteLoading} from '../tool/indefinite-loading';
 import {Menu} from '../tool/menu';
 import {MenuContainer} from '../tool/menu-container';
+import {MenuItem} from '../tool/menu-item';
 import {ViewSlot} from '../tool/view-slot';
 
 import {DefaultPalettes} from './default-palettes';
@@ -32,8 +34,10 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   HorizontalTab,
   Icon,
   IndefiniteLoading,
+  FloatInput,
   Menu,
   MenuContainer,
+  MenuItem,
   RadioButton,
   TextInput,
   ViewSlot,
