@@ -1,0 +1,51 @@
+<style>
+  #editor {
+    font-family: 'Ubuntu Mono', monospace;
+    position: absolute;
+
+    --gsCodeInputColorComment: var(--gsColorPassivePrimaryBG);
+    --gsCodeInputColorType: var(--gsColorActionFG);
+    --gsCodeInputColorSelection: var(--gsColorActionPrimaryFocusFG);
+    --gsCodeInputColorString: var(--gsColorSecondaryFG);
+  }
+
+  #editor .ace_comment {
+    color: var(--gsCodeInputColorComment);
+    font-style: italic;
+  }
+
+  #editor .ace_keyword,
+  #editor .ace_type {
+    color: var(--gsCodeInputColorType);
+  }
+
+  #editor .ace_keyword {
+    font-weight: 700;
+  }
+
+  #editor .ace_marker-layer .ace_selection {
+    background-color: var(--gsCodeInputColorSelection);
+    opacity: .5;
+  }
+
+  #editor .ace_string {
+    color: var(--gsCodeInputColorString);
+    font-style: italic;
+  }
+
+  #editor .ace_active-line {
+    background-color: var(--gsCodeInputColorSelection);
+    opacity: .3;
+  }
+
+  #editor .ace_cursor {
+    border-left-color: var(--gsCodeInputColorSelection);
+  }
+
+  #editor .ace_function {
+    font-style: italic;
+  }
+</style>
+
+<div fill-parent id="editor">
+</div>

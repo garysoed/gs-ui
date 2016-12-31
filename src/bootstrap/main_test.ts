@@ -48,6 +48,7 @@ describe('bootstrap.Main', () => {
 
   describe('newInstance', () => {
     it('should set up correctly', () => {
+      let ace = Mocks.object('ace');
       let routeFactoryServiceCtor = Mocks.object('routeFactoryServiceCtor');
       let templates = Mocks.object('templates');
       spyOn(Templates, 'newInstance').and.returnValue(templates);
@@ -61,7 +62,10 @@ describe('bootstrap.Main', () => {
 
       spyOn(ElementRegistrar, 'newInstance').and.returnValue(mockRegistrar);
 
-      let main = Main.newInstance(routeFactoryServiceCtor);
+      let main = Main.newInstance({
+        ace: ace,
+        routeFactoryServiceCtor: routeFactoryServiceCtor,
+      });
       TestDispose.add(main);
 
       assert(main['injector_']).to.equal(mockInjector);
@@ -76,11 +80,12 @@ describe('bootstrap.Main', () => {
       assert(TestInject.getBoundValue('x.gs_tools.templates')()).to.equal(templates);
       assert(TestInject.getBoundValue('x.gs_ui.routeFactoryService'))
           .to.equal(routeFactoryServiceCtor);
+      assert(TestInject.getBoundValue('x.ace')()).to.equal(ace);
 
       assert(Templates.newInstance).to.haveBeenCalledWith(Matchers.any(Map));
     });
 
-    it('should not throw error if route factory ctor is null', () => {
+    it('should not throw error if config is empty', () => {
       let mockThemeService = jasmine.createSpyObj('ThemeService', ['initialize', 'install']);
       let mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'instantiate']);
       mockInjector.instantiate.and.returnValue(mockThemeService);
@@ -91,7 +96,7 @@ describe('bootstrap.Main', () => {
       spyOn(ElementRegistrar, 'newInstance').and.returnValue(mockRegistrar);
 
       assert(() => {
-        TestDispose.add(Main.newInstance(null));
+        TestDispose.add(Main.newInstance({}));
       }).toNot.throw();
     });
 

@@ -22,6 +22,7 @@
     "exclude": [
     ],
     "include": [
+        "typings/globals/**/*.d.ts",
         "src/**/*.ts",
         "external/gs_tools/declarations/**/*.d.ts",
         "external/gs_tools/src/**/*.ts",

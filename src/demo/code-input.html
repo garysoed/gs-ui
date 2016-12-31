@@ -1,0 +1,83 @@
+<html>
+  <head>
+    <script src="../../node_modules/x-tag/src/core.js"></script>
+    <script src="../../bazel-genfiles/pack.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js"></script>
+    <style>
+      .container {
+        display: flex;
+      }
+
+      .container > label {
+        margin-right: .5rem;
+      }
+
+      .container > gs-text-input {
+        flex: 1;
+      }
+
+      .row {
+        display: flex;
+      }
+
+      .cell {
+        flex: 1;
+        padding: 1rem;
+        position: relative;
+      }
+
+      .value {
+        height: var(--gsLineHeight);
+        padding-left: .5rem;
+      }
+    </style>
+    <link rel="stylesheet" href="demo.css">
+  </head>
+  <body>
+    <template id="template">
+      <gs-code-input gs-language="javascript"></gs-code-input>
+    </template>
+
+    <section fill-parent layout="column">
+      <section class="row" flex>
+        <section class="cell gs-theme-normal"></section>
+        <section class="cell gs-theme-normal-hilite"></section>
+      </section>
+      <section class="row" flex>
+        <section class="cell gs-theme-invert"></section>
+        <section class="cell gs-theme-invert-hilite"></section>
+      </section>
+    </section>
+
+    <gs-basic-button class="colorPicker gs-theme-normal gs-primary">
+      <div gs-content><gs-icon>color_lens</gs-icon></div>
+      <gs-menu>
+        <div class="menuRoot gs-theme-normal" gs-content selected-tab="base">
+          <div class="colorPickerMenu base"></div>
+          <div class="colorPickerMenu accent"></div>
+          <gs-horizontal-tab gs-selected-tab="base">
+            <gs-basic-button gs-tab-id="base">
+              <div gs-content>Base</div>
+            </gs-basic-button>
+            <gs-basic-button gs-tab-id="accent">
+              <div gs-content>Accent</div>
+            </gs-basic-button>
+          </gs-horizontal-tab>
+        </div>
+      </gs-menu>
+    </gs-basic-button>
+
+    <script src="demo.js"></script>
+    <script>
+      var CODE = 'function foo(items, nada) {\n'
+          + '  for (var i=0; i<items.length; i++) {\n'
+          + '    alert(items[i] + "juhu\\n");\n'
+          + '  }	// Real Tab.\n'
+          + '}';
+      var inputs = document.querySelectorAll('gs-code-input');
+      inputs.forEach(function(input) {
+        input.setAttribute('gs-value', CODE);
+      });
+    </script>
+  </body>
+</html>

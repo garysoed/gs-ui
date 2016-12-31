@@ -8,6 +8,7 @@ import {BaseElement, ElementRegistrar} from 'external/gs_tools/src/webc';
 import {Templates} from 'external/gs_tools/src/webc';
 
 import {BasicButton} from '../button/basic-button';
+import {CodeInput} from '../input/code-input';
 import {FloatInput} from '../input/float-input';
 import {RadioButton} from '../input/radio-button';
 import {TextInput} from '../input/text-input';
@@ -30,6 +31,7 @@ import {DefaultPalettes} from './default-palettes';
 const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   BasicButton,
   Breadcrumb,
+  CodeInput,
   Drawer,
   HorizontalTab,
   Icon,
@@ -109,8 +111,10 @@ export class Main extends BaseDisposable {
   /**
    * Creates a new instance of the app.
    */
-  static newInstance(
-      routeFactoryServiceCtor: gs.ICtor<IRouteFactoryService<any>> | null = null): Main {
+  static newInstance(config: {
+        ace?: AceAjax.Ace,
+        routeFactoryServiceCtor?: gs.ICtor<IRouteFactoryService<any>>,
+      } = {}): Main {
     let templates = Templates.newInstance(new Map<RegExp, string>([
       [/rgba\(11,11,11/g, 'rgba(var(--gsRgbBaseDark)'],
       [/rgba\(22,22,22/g, 'rgba(var(--gsRgbBaseNormal)'],
@@ -122,8 +126,11 @@ export class Main extends BaseDisposable {
     Injector.bindProvider(() => document, 'x.dom.document');
     Injector.bindProvider(() => window, 'x.dom.window');
     Injector.bindProvider(() => templates, 'x.gs_tools.templates');
-    if (routeFactoryServiceCtor !== null) {
-      Injector.bind(routeFactoryServiceCtor, 'x.gs_ui.routeFactoryService');
+    if (!!config.routeFactoryServiceCtor) {
+      Injector.bind(config.routeFactoryServiceCtor, 'x.gs_ui.routeFactoryService');
+    }
+    if (!!config.ace) {
+      Injector.bindProvider(() => config.ace, 'x.ace');
     }
     Injector.bindProvider(() => locationService, 'gs.LocationService');
 

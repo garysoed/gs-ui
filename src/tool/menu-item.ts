@@ -1,10 +1,10 @@
-import {inject} from 'external/gs_tools/src/inject';
 import {DomEvent} from 'external/gs_tools/src/event';
-import {bind, customElement, StringParser, handle, DomBridge} from 'external/gs_tools/src/webc';
+import {inject} from 'external/gs_tools/src/inject';
+import {bind, customElement, DomBridge, handle, StringParser} from 'external/gs_tools/src/webc';
 
-import {BaseThemedElement} from '../common';
-import {ThemeService} from '../theming';
-import {MenuService} from '../tool';
+import {BaseThemedElement} from '../common/base-themed-element';
+import {ThemeService} from '../theming/theme-service';
+import {MenuService} from '../tool/menu-service';
 
 
 @customElement({
