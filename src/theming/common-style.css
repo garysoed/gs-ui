@@ -156,9 +156,9 @@ fieldset:hover > legend, fieldset:focus > legend {
   --gsColorPassiveBG: var(--gsThemeNormal);
   --gsColorPassiveFG: var(--gsThemeWhite);
   --gsColorPassivePrimaryBG: var(--gsThemeBlackFFFF);
-  --gsColorSecondaryFG: var(--gsThemeWhiteFF);
+  --gsColorSecondaryFG: var(--gsThemeWhiteFFF);
   --gsColorActionBG: var(--gsThemeNormal);
-  --gsColorActionFG: var(--gsThemeWhite);
+  --gsColorActionFG: var(--gsThemeWhiteFF);
   --gsColorActionFocusFG: var(--gsThemeAccent);
   --gsColorActionDisabledFG: var(--gsThemeWhiteFF);
   --gsColorActionPrimaryBG: var(--gsThemeWhite);
@@ -188,9 +188,9 @@ fieldset:hover > legend, fieldset:focus > legend {
   --gsColorPassiveBG: var(--gsThemeLight);
   --gsColorPassiveFG: var(--gsThemeBlack);
   --gsColorPassivePrimaryBG: var(--gsThemeWhiteFFF);
-  --gsColorSecondaryFG: var(--gsThemeBlackFF);
+  --gsColorSecondaryFG: var(--gsThemeBlackFFF);
   --gsColorActionBG: var(--gsThemeLight);
-  --gsColorActionFG: var(--gsThemeBlack);
+  --gsColorActionFG: var(--gsThemeBlackFF);
   --gsColorActionFocusFG: var(--gsThemeAccent);
   --gsColorActionDisabledFG: var(--gsThemeBlackFFF);
   --gsColorActionPrimaryBG: var(--gsThemeBlack);
