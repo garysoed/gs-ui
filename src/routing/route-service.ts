@@ -103,6 +103,14 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
    * @param params Parameters to generate the route.
    */
   goTo<P, PP>(routeFactory: AbstractRouteFactory<T, PP, P>, params: P & PP): void {
-    this.locationService_.goTo(routeFactory.create(params).getPath());
+    this.goToPath(routeFactory.create(params).getPath());
+  }
+
+  /**
+   * Navigate to the given path.
+   * @param path The path to navigate to.
+   */
+  goToPath(path: string): void {
+    this.locationService_.goTo(path);
   }
 }

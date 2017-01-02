@@ -157,3 +157,5 @@ var theme = gs.ui.Theme.newInstance(
     gs.ui.DefaultPalettes[accent]);
 main.bootstrap(theme);
 main.applyTheme(document);
+
+window['main'] = main;

@@ -9,6 +9,7 @@ import {Templates} from 'external/gs_tools/src/webc';
 
 import {BasicButton} from '../button/basic-button';
 import {CodeInput} from '../input/code-input';
+import {FileInput} from '../input/file-input';
 import {FloatInput} from '../input/float-input';
 import {RadioButton} from '../input/radio-button';
 import {TextInput} from '../input/text-input';
@@ -36,6 +37,7 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   HorizontalTab,
   Icon,
   IndefiniteLoading,
+  FileInput,
   FloatInput,
   Menu,
   MenuContainer,

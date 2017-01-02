@@ -157,7 +157,6 @@ describe('routing.RouteService', () => {
   describe('goTo', () => {
     it('should go to the correct location', () => {
       let params = Mocks.object('params');
-      mockLocationService.goTo = jasmine.createSpy('LocationService#goTo');
 
       let path = 'path';
       let mockRoute = jasmine.createSpyObj('Route', ['getPath']);
@@ -165,10 +164,21 @@ describe('routing.RouteService', () => {
       let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['create']);
       mockRouteFactory.create.and.returnValue(mockRoute);
 
+      spyOn(service, 'goToPath');
+
       service.goTo(mockRouteFactory, params);
 
-      assert(mockLocationService.goTo).to.haveBeenCalledWith(path);
+      assert(service.goToPath).to.haveBeenCalledWith(path);
       assert(mockRouteFactory.create).to.haveBeenCalledWith(params);
+    });
+  });
+
+  describe('goToPath', () => {
+    it('should navigate to the given path', () => {
+      mockLocationService.goTo = jasmine.createSpy('LocationService#goTo');
+      let path = 'path';
+      service.goToPath(path);
+      assert(mockLocationService.goTo).to.haveBeenCalledWith(path);
     });
   });
 });

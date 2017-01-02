@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <script src="../../node_modules/x-tag/src/core.js"></script>
+    <script src="../../bazel-genfiles/pack.js"></script>
+    <style>
+      .cell {
+        flex: 1;
+        padding: 0 0 1rem 1rem;
+        position: relative;
+      }
+    </style>
+
+    <link rel="stylesheet" href="demo.css">
+  </head>
+  <body>
+    <template id="template">
+      <gs-file-input></gs-file-input>
+    </template>
+
+    <section fill-parent layout="column">
+      <section class="row" flex layout="row">
+        <section class="cell gs-theme-normal"></section>
+        <section class="cell gs-theme-normal-hilite"></section>
+      </section>
+      <section class="row" flex layout="row">
+        <section class="cell gs-theme-invert"></section>
+        <section class="cell gs-theme-invert-hilite"></section>
+      </section>
+    </section>
+
+    <gs-basic-button class="colorPicker gs-theme-normal gs-primary">
+      <div gs-content><gs-icon>color_lens</gs-icon></div>
+      <gs-menu>
+        <div class="menuRoot gs-theme-normal" gs-content selected-tab="base">
+          <div class="colorPickerMenu base"></div>
+          <div class="colorPickerMenu accent"></div>
+          <gs-horizontal-tab gs-selected-tab="base">
+            <gs-basic-button gs-tab-id="base">
+              <div gs-content>Base</div>
+            </gs-basic-button>
+            <gs-basic-button gs-tab-id="accent">
+              <div gs-content>Accent</div>
+            </gs-basic-button>
+          </gs-horizontal-tab>
+        </div>
+      </gs-menu>
+    </gs-basic-button>
+
+    <script src="demo.js"></script>
+    <script>
+      var injector = main.injector;
+      var mutationObserver = new MutationObserver(function(records) {
+        var fileService = injector.getBoundValue('gs.input.FileService');
+        records.forEach(function(record) {
+          var bundleId = record.target.getAttribute('gs-bundle-id');
+          fileService
+              .processBundle(bundleId)
+              .then(function(results) {
+                let output = '';
+                results.forEach(function(content, file) {
+                  output += file.name + ': ' + content + '\n';
+                });
+                alert(output);
+              });
+        });
+      });
+
+      document.querySelectorAll('gs-file-input').forEach(function(input) {
+        mutationObserver.observe(input, {attributeFilter: ['gs-bundle-id'], attributes: true});
+      });
+    </script>
+  </body>
+</html>
