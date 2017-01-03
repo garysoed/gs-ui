@@ -204,23 +204,40 @@ describe('input.FileInput', () => {
   });
 
   describe('onGsBundleIdChanged_', () => {
-    it('should delete the previous bundle if there is a previous bundle', () => {
-      let mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
-      input['deleteBundleFn_'] = mockDeleteBundleFn;
+    it('should delete the previous bundle if there is a previous bundle and the old value is '
+        + 'not null',
+        () => {
+          let mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
+          input['deleteBundleFn_'] = mockDeleteBundleFn;
 
-      spyOn(input, 'updateDisplay_');
+          spyOn(input, 'updateDisplay_');
 
-      input['onGsBundleIdChanged_']();
+          input['onGsBundleIdChanged_']('newValue', 'oldValue');
 
-      assert(mockDeleteBundleFn).to.haveBeenCalledWith();
-      assert(input['updateDisplay_']).to.haveBeenCalledWith();
-    });
+          assert(mockDeleteBundleFn).to.haveBeenCalledWith();
+          assert(input['updateDisplay_']).to.haveBeenCalledWith();
+        });
+
+
+    it('should not delete the previous bundle if there is a previous bundle but the old value is '
+        + 'null',
+        () => {
+          let mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
+          input['deleteBundleFn_'] = mockDeleteBundleFn;
+
+          spyOn(input, 'updateDisplay_');
+
+          input['onGsBundleIdChanged_']('newValue', null);
+
+          assert(mockDeleteBundleFn).toNot.haveBeenCalled();
+          assert(input['updateDisplay_']).to.haveBeenCalledWith();
+        });
 
     it('should not throw error if there is no previous bundle', () => {
       spyOn(input, 'updateDisplay_');
 
       assert(() => {
-        input['onGsBundleIdChanged_']();
+        input['onGsBundleIdChanged_']('newValue', 'oldValue');
       }).toNot.throw();
     });
   });

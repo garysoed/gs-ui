@@ -121,6 +121,10 @@ fieldset:hover > legend, fieldset:focus > legend {
   top: 0;
 }
 
+[hidden] {
+  display: none;
+}
+
 /* Theming */
 .gs-theme-normal,
 .gs-theme-normal-hilite,

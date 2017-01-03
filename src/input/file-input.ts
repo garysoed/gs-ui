@@ -112,8 +112,8 @@ export class FileInput extends BaseThemedElement {
   }
 
   @handle(null).attributeChange('gs-bundle-id', StringParser)
-  protected onGsBundleIdChanged_(): void {
-    if (this.deleteBundleFn_ !== null) {
+  protected onGsBundleIdChanged_(newValue: string | null, oldValue: string | null): void {
+    if (this.deleteBundleFn_ !== null && oldValue !== null) {
       this.deleteBundleFn_();
     }
     this.updateDisplay_();
