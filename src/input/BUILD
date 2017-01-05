@@ -7,4 +7,5 @@ gs_ui(
         "@gs_tools//src",
         "//src/common",
         "//src/theming",
+        "//src/tool",
     ]);

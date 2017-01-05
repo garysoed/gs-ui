@@ -1,16 +1,32 @@
 <style>
-  #icon {
-    --gsIconFontSize: 4rem;
-  }
-
   #root {
     color: var(--gsColorSecondaryFG);
+    text-align: center;
+  }
+
+  #root gs-icon {
+    --gsIconFontSize: 4rem;
+	  perspective: 1000px;
   }
 </style>
 
 <div fill-parent id="root" flex-align="center" flex-justify="center" layout="column">
-  <div flex-align="center" layout="column">
-    <gs-icon id="icon"></gs-icon>
-    <div id="message"></div>
-  </div>
+  <gs-switch id="switch">
+    <div flex-align="center" gs-when="initial" id="initial" layout="column">
+      <gs-icon>file_upload</gs-icon>
+      <div id="initialMessage"></div>
+    </div>
+    <div flex-align="center" gs-when="dragging" id="drop" layout="column">
+      <gs-icon>file_download</gs-icon>
+      <div>Drop the file here</div>
+    </div>
+    <div flex-align="center" gs-when="dropped" id="main" layout="column">
+      <gs-icon>insert_drive_file</gs-icon>
+      <div id="droppedMessage"></div>
+    </div>
+    <div flex-align="center" gs-when="error" id="error" layout="column">
+      <gs-icon>error</gs-icon>
+      <div>Invalid file type</div>
+    </div>
+  </gs-switch>
 </div>
