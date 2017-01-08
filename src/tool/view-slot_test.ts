@@ -123,7 +123,7 @@ describe('tool.ViewSlot', () => {
 
       let mockChildNoPath = jasmine.createSpyObj('ChildNoPath', ['getAttribute']);
       mockChildNoPath.getAttribute.and.returnValue(null);
-      spyOn(Arrays, 'fromHtmlCollection').and
+      spyOn(Arrays, 'fromItemList').and
           .returnValue(Arrays.of([mockChildNoPath, mockChildWithPath]));
 
       let appendedPath = 'appendedPath';
@@ -144,7 +144,7 @@ describe('tool.ViewSlot', () => {
       assert(mockLocationService.hasMatch).to.haveBeenCalledWith(appendedPath);
       assert(mockChildWithPath.getAttribute).to.haveBeenCalledWith('gs-view-path');
       assert(mockChildNoPath.getAttribute).to.haveBeenCalledWith('gs-view-path');
-      assert(Arrays.fromHtmlCollection).to.haveBeenCalledWith(children);
+      assert(Arrays.fromItemList).to.haveBeenCalledWith(children);
     });
 
     it('should set no elements to active if there are no active elements', () => {
@@ -157,7 +157,7 @@ describe('tool.ViewSlot', () => {
 
       let mockChild = jasmine.createSpyObj('Child', ['getAttribute']);
       mockChild.getAttribute.and.returnValue(null);
-      spyOn(Arrays, 'fromHtmlCollection').and.returnValue(Arrays.of([mockChild]));
+      spyOn(Arrays, 'fromItemList').and.returnValue(Arrays.of([mockChild]));
 
       spyOn(viewSlot, 'setRootElVisible_');
       spyOn(viewSlot, 'setActiveElement_');

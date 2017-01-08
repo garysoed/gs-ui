@@ -22,6 +22,7 @@ h1 {
 h2 {
   font-size: 2rem;
   font-weight: var(--gsFontWeightNormal);
+  line-height: 3rem;
 }
 
 h3 {

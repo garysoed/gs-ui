@@ -7,10 +7,10 @@ import {SimpleRouteFactory} from './simple-route-factory';
 describe('routing.SimpleRouteFactory', () => {
   const NAME = 'NAME';
   const PATH = 'PATH';
-  let factory: SimpleRouteFactory<any>;
+  let factory: SimpleRouteFactory<any, any>;
 
   beforeEach(() => {
-    factory = new SimpleRouteFactory<any>('type', PATH, NAME);
+    factory = new SimpleRouteFactory<any, any>('type', PATH, NAME);
   });
 
   describe('getRelativeMatchParams_', () => {

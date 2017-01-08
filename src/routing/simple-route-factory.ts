@@ -1,8 +1,8 @@
 import {AbstractRouteFactory} from './abstract-route-factory';
 
 
-export class SimpleRouteFactory<T>
-    extends AbstractRouteFactory<T, {}, {}> {
+export class SimpleRouteFactory<T, PR>
+    extends AbstractRouteFactory<T, {}, PR, PR> {
   private readonly path_: string;
   private readonly name_: string;
 
@@ -10,7 +10,7 @@ export class SimpleRouteFactory<T>
       type: T,
       path: string,
       name: string,
-      parent: AbstractRouteFactory<T, {}, {}> | null = null) {
+      parent: AbstractRouteFactory<T, {}, PR, any> | null = null) {
     super(type, parent);
     this.path_ = path;
     this.name_ = name;

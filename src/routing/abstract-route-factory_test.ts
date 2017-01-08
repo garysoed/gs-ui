@@ -8,7 +8,7 @@ import {AbstractRouteFactory} from './abstract-route-factory';
 
 const TYPE = Mocks.object('type');
 
-class TestFactory extends AbstractRouteFactory<any, any, any> {
+class TestFactory extends AbstractRouteFactory<any, any, any, any> {
   constructor(parent: TestFactory | null) {
     super(TYPE, parent);
   }

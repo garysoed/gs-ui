@@ -133,7 +133,7 @@ export class FileInput extends BaseThemedElement {
       }
 
       let {id, deleteFn} =
-          this.fileService_.addBundle(Arrays.fromFileList(event.dataTransfer.files).asArray());
+          this.fileService_.addBundle(Arrays.fromItemList(event.dataTransfer.files).asArray());
       this.deleteBundleFn_ = deleteFn;
       this.gsBundleIdBridge_.set(id);
     }

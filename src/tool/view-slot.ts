@@ -80,7 +80,7 @@ export class ViewSlot extends BaseThemedElement {
     if (listenableElement !== null) {
       let element = listenableElement.getEventTarget();
       let targetEl = Arrays
-          .fromHtmlCollection(element.children)
+          .fromItemList(element.children)
           .find((child: Element) => {
             let path = child.getAttribute('gs-view-path');
             return !!path && this.locationService_

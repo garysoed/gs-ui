@@ -18,7 +18,7 @@ import {RouteServiceEvents} from './route-service-events';
 export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
   private readonly locationService_: LocationService;
   private readonly routeFactoryService_: IRouteFactoryService<T>;
-  private readonly routeFactoryMap_: Map<T, AbstractRouteFactory<T, any, any>>;
+  private readonly routeFactoryMap_: Map<T, AbstractRouteFactory<T, any, any, any>>;
 
   constructor(
       @inject('gs.LocationService') locationService: LocationService,
@@ -47,7 +47,7 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
 
     Arrays
         .of(this.routeFactoryService_.getFactories())
-        .forEach((factory: AbstractRouteFactory<T, any, any>) => {
+        .forEach((factory: AbstractRouteFactory<T, any, any, any>) => {
           this.routeFactoryMap_.set(factory.getType(), factory);
         });
   }
@@ -56,7 +56,7 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
    * @param routeFactory Route factory to use to retrieve the params.
    * @return The params for the current path, or null if it does not match the given route factory.
    */
-  getParams<P, PP>(routeFactory: AbstractRouteFactory<T, PP, P>): P & PP | null {
+  getParams<CR>(routeFactory: AbstractRouteFactory<T, any, CR, any>): CR | null {
     let route = routeFactory.createFromPath(this.getPath());
     if (route === null) {
       return null;
@@ -80,7 +80,10 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
     let route: Route<T, any> | null = null;
     Arrays
         .of(this.routeFactoryService_.getFactories())
-        .forOf((factory: AbstractRouteFactory<T, any, any>, index: number, breakFn: () => void) => {
+        .forOf((
+            factory: AbstractRouteFactory<T, any, any, any>,
+            index: number,
+            breakFn: () => void) => {
           route = factory.createFromPath(path);
           if (route !== null) {
             breakFn();
@@ -93,7 +96,7 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
    * @param type Type of RouteFactory to return.
    * @return The RouteFactory matching the given type, or null if there are none.
    */
-  getRouteFactory(type: T): AbstractRouteFactory<T, any, any> | null {
+  getRouteFactory(type: T): AbstractRouteFactory<T, any, any, any> | null {
     return this.routeFactoryMap_.get(type) || null;
   }
 
@@ -102,7 +105,7 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
    * @param routeFactory Factory to generate the route.
    * @param params Parameters to generate the route.
    */
-  goTo<P, PP>(routeFactory: AbstractRouteFactory<T, PP, P>, params: P & PP): void {
+  goTo<CR>(routeFactory: AbstractRouteFactory<T, any, CR, any>, params: CR): void {
     this.goToPath(routeFactory.create(params).getPath());
   }
 
