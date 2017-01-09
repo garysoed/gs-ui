@@ -108,7 +108,8 @@ describe('tool.MenuContainer', () => {
 
       container['onFinishAnimate_']();
 
-      assert(mockRootElement.classList.remove).to.haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
+      assert(mockRootElement.classList.remove).to
+          .haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
       assert(mockElement.dispatch).to.haveBeenCalledWith(
           OverlayContainer.HIDE_EVENT,
           Matchers.any(Function));
@@ -126,7 +127,8 @@ describe('tool.MenuContainer', () => {
         container['onFinishAnimate_']();
       }).toNot.throw();
 
-      assert(mockRootElement.classList.remove).to.haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
+      assert(mockRootElement.classList.remove).to
+          .haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
     });
   });
 

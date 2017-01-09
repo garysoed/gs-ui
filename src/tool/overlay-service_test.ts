@@ -8,13 +8,13 @@ import {TestDispose} from 'external/gs_tools/src/testing';
 
 import {AnchorLocation} from './anchor-location';
 import {Anchors} from './anchors';
-import {OverlayContainer} from './menu-container';
+import {OverlayContainer} from './overlay-container';
 import {OverlayService} from './overlay-service';
 
 
 describe('gs.tool.OverlayService', () => {
   let mockDocument;
-  let service;
+  let service: OverlayService;
   let window;
 
   beforeEach(() => {
@@ -24,8 +24,8 @@ describe('gs.tool.OverlayService', () => {
     TestDispose.add(service);
   });
 
-  describe('getMenuContainerEl_', () => {
-    it('should create the menu container element correctly', () => {
+  describe('getOverlayContainerEl_', () => {
+    it('should create the overlay container element correctly', () => {
       mockDocument.querySelector.and.returnValue(null);
 
       let menuContainerEl = Mocks.object('menuContainerEl');
@@ -37,14 +37,14 @@ describe('gs.tool.OverlayService', () => {
       let listenableContainer = Mocks.disposable('listenableContainer');
       spyOn(ListenableDom, 'of').and.returnValue(listenableContainer);
 
-      assert(service['getMenuContainerEl_']()).to.equal(listenableContainer);
+      assert(service['getOverlayContainerEl_']()).to.equal(listenableContainer);
       assert(ListenableDom.of).to.haveBeenCalledWith(menuContainerEl);
       assert(mockBody.appendChild).to.haveBeenCalledWith(menuContainerEl);
       assert(mockDocument.createElement).to.haveBeenCalledWith('gs-overlay-container');
       assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-overlay-container');
     });
 
-    it('should grab the menu container element if one already exists', () => {
+    it('should grab the overlay container element if one already exists', () => {
       let menuContainerEl = Mocks.object('menuContainerEl');
       mockDocument.querySelector.and.returnValue(menuContainerEl);
 
@@ -54,7 +54,7 @@ describe('gs.tool.OverlayService', () => {
       let listenableContainer = Mocks.disposable('listenableContainer');
       spyOn(ListenableDom, 'of').and.returnValue(listenableContainer);
 
-      assert(service['getMenuContainerEl_']()).to.equal(listenableContainer);
+      assert(service['getOverlayContainerEl_']()).to.equal(listenableContainer);
       assert(ListenableDom.of).to.haveBeenCalledWith(menuContainerEl);
       assert(mockDocument.createElement).toNot.haveBeenCalled();
       assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-overlay-container');
@@ -63,9 +63,9 @@ describe('gs.tool.OverlayService', () => {
     it('should return the existing menu container element', () => {
       let listenableContainer = Mocks.disposable('listenableContainer');
       TestDispose.add(listenableContainer);
-      service['menuContainerEl_'] = listenableContainer;
+      service['overlayContainerEl_'] = listenableContainer;
 
-      assert(service['getMenuContainerEl_']()).to.equal(listenableContainer);
+      assert(service['getOverlayContainerEl_']()).to.equal(listenableContainer);
       assert(mockDocument.querySelector).toNot.haveBeenCalled();
     });
   });
@@ -203,28 +203,26 @@ describe('gs.tool.OverlayService', () => {
     });
   });
 
-  describe('hideMenu', () => {
+  describe('hideOverlay', () => {
     it('should hide the menu container', () => {
       let mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['hide']);
-      spyOn(service, 'getMenuContainerEl_').and
+      spyOn(service, 'getOverlayContainerEl_').and
           .returnValue({getEventTarget: () => mockMenuContainer});
-      service.hideMenu();
+      service.hideOverlay();
       assert(mockMenuContainer.hide).to.haveBeenCalledWith();
     });
   });
 
-  describe('showMenu', () => {
+  describe('showOverlay', () => {
     let anchorElement;
-    let mockMenu;
 
     beforeEach(() => {
-      mockMenu = jasmine.createSpyObj('Menu', ['appendChild', 'querySelector']);
       anchorElement = Mocks.object('anchorElement');
     });
 
     it('should open the menu container correctly', (done: any) => {
+      let mockOverlayParent = jasmine.createSpyObj('OverlayParent', ['appendChild']);
       let menuContent = Mocks.object('menuContent');
-      mockMenu.querySelector.and.returnValue(menuContent);
 
       let anchorTarget = AnchorLocation.TOP_LEFT;
       let anchorPoint = AnchorLocation.BOTTOM_RIGHT;
@@ -241,7 +239,7 @@ describe('gs.tool.OverlayService', () => {
             handler();
             return Mocks.disposable('ListenableMenuContainer.once');
           });
-      spyOn(service, 'getMenuContainerEl_').and.returnValue(mockListenableMenuContainer);
+      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockListenableMenuContainer);
 
       let mockAnchorTargetWatcher = jasmine
           .createSpyObj('AnchorTargetWatcher', ['dispose', 'on', 'start']);
@@ -250,9 +248,15 @@ describe('gs.tool.OverlayService', () => {
       spyOn(service, 'onTick_');
       spyOn(service, 'setAnchorTarget_');
 
-      service.showMenu(mockMenu, anchorElement, anchorTarget, anchorPoint)
+      service
+          .showOverlay(
+              mockOverlayParent,
+              menuContent,
+              anchorElement,
+              anchorTarget,
+              anchorPoint)
           .then(() => {
-            assert(mockMenu.appendChild).to.haveBeenCalledWith(menuContent);
+            assert(mockOverlayParent.appendChild).to.haveBeenCalledWith(menuContent);
             assert(mockAnchorTargetWatcher.dispose).to.haveBeenCalledWith();
 
             assert(mockMenuContainerEl.show).to.haveBeenCalledWith();
@@ -277,25 +281,6 @@ describe('gs.tool.OverlayService', () => {
 
             assert(Interval.newInstance)
                 .to.haveBeenCalledWith(OverlayService['ANCHOR_TARGET_INTERVAL_']);
-
-            assert(mockMenu.querySelector).to.haveBeenCalledWith('[gs-content]');
-            done();
-          }, done.fail);
-    });
-
-    it('should do nothing if there is no menu content', (done: any) => {
-      mockMenu.querySelector.and.returnValue(null);
-
-      let mockMenuContainerEl = jasmine.createSpyObj('MenuContainerEl', ['appendChild', 'show']);
-      spyOn(service, 'getMenuContainerEl_').and.returnValue({eventTarget: mockMenuContainerEl});
-      service
-          .showMenu(
-              mockMenu,
-              anchorElement,
-              AnchorLocation.TOP_LEFT,
-              AnchorLocation.BOTTOM_RIGHT)
-          .then(() => {
-            assert(mockMenuContainerEl.show).toNot.haveBeenCalled();
             done();
           }, done.fail);
     });

@@ -16,7 +16,7 @@ describe('tool.Menu', () => {
   let mockMenuService;
 
   beforeEach(() => {
-    mockMenuService = jasmine.createSpyObj('MenuService', ['showMenu']);
+    mockMenuService = jasmine.createSpyObj('MenuService', ['showOverlay']);
     menu = new Menu(mockMenuService);
     TestDispose.add(menu);
   });
@@ -26,16 +26,24 @@ describe('tool.Menu', () => {
       let parentElement = Mocks.object('parentElement');
       let anchorPoint = AnchorLocation.BOTTOM_LEFT;
       let anchorTarget = AnchorLocation.TOP_RIGHT;
-      let eventTarget = Mocks.object('eventTarget');
-      eventTarget.parentElement = parentElement;
-      eventTarget['gsAnchorPoint'] = anchorPoint;
-      eventTarget['gsAnchorTarget'] = anchorTarget;
+      let menuContent = Mocks.object('menuContent');
 
-      menu['element_'] = {getEventTarget: () => eventTarget};
+      let mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
+      mockEventTarget.querySelector.and.returnValue(menuContent);
+      mockEventTarget.parentElement = parentElement;
+      mockEventTarget['gsAnchorPoint'] = anchorPoint;
+      mockEventTarget['gsAnchorTarget'] = anchorTarget;
+
+      menu['element_'] = {getEventTarget: () => mockEventTarget};
       menu['onAction_']();
 
-      assert(mockMenuService.showMenu)
-          .to.haveBeenCalledWith(eventTarget, parentElement, anchorTarget, anchorPoint);
+      assert(mockMenuService.showOverlay).to.haveBeenCalledWith(
+          mockEventTarget,
+          menuContent,
+          parentElement,
+          anchorTarget,
+          anchorPoint);
+      assert(mockEventTarget.querySelector).to.haveBeenCalledWith('[gs-content]');
     });
 
     it('should not throw error if there are no elements', () => {

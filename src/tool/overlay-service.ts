@@ -97,6 +97,7 @@ export class OverlayService extends BaseDisposable {
    * @return Promise that will be resolved when the overlay is hidden.
    */
   showOverlay(
+      overlayParent: Element,
       overlayContent: Element | null,
       anchorElement: HTMLElement,
       anchorTarget: AnchorLocation,
@@ -122,7 +123,7 @@ export class OverlayService extends BaseDisposable {
           OverlayContainer.HIDE_EVENT,
           () => {
             anchorTargetWatcher.dispose();
-            overlayContent.appendChild(overlayContent);
+            overlayParent.appendChild(overlayContent);
             resolve();
           },
           false));

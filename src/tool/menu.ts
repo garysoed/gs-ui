@@ -38,6 +38,7 @@ export class Menu extends BaseElement {
 
     let elementTarget = element.getEventTarget();
     this.overlayService_.showOverlay(
+        elementTarget,
         elementTarget.querySelector('[gs-content]'),
         elementTarget.parentElement,
         elementTarget['gsAnchorTarget'],
