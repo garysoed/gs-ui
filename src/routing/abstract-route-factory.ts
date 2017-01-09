@@ -43,7 +43,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    * @return Path created using the given params. This path is not prefixed by the path created
    *    by the ancestors.
    */
-  protected abstract getRelativePath_(params: PR): string
+  protected abstract getRelativePath_(params: CP): string
 
   /**
    * @return The full matcher for this factory.

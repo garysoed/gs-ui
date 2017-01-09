@@ -53,6 +53,21 @@ fieldset:hover > legend, fieldset:focus > legend {
   color: var(--gsColorActionFocusFG);
 }
 
+/* Table styling */
+table {
+  border-collapse: collapse;
+  font-size: var(--gsFontSizeRoot);
+}
+
+table tr:nth-child(2n) {
+  background-color: var(--gsThemeNormalFFFF);
+}
+
+td {
+  border: 1px solid var(--gsColorActionFG);
+  padding: .5rem;
+}
+
 /* Layouts */
 [layout] {
   display: flex;

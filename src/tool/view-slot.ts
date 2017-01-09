@@ -2,7 +2,7 @@ import {Arrays} from 'external/gs_tools/src/collection';
 import {Iterables} from 'external/gs_tools/src/collection';
 import {inject} from 'external/gs_tools/src/inject';
 import {Doms, LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
-import {customElement, StringParser} from 'external/gs_tools/src/webc';
+import {BooleanParser, customElement, StringParser} from 'external/gs_tools/src/webc';
 
 import {BaseThemedElement} from '../common/base-themed-element';
 import {ThemeService} from '../theming/theme-service';
@@ -49,14 +49,15 @@ export class ViewSlot extends BaseThemedElement {
     let listenableElement = this.getElement();
     if (listenableElement !== null) {
       let element = listenableElement.getEventTarget();
-      let currentActive = element.querySelector('[gs-view-active="true"]');
+      let currentActive = element
+          .querySelector(`[gs-view-active="${BooleanParser.stringify(true)}"]`);
       if (currentActive !== null) {
-        currentActive.setAttribute('gs-view-active', 'false');
+        currentActive.setAttribute('gs-view-active', BooleanParser.stringify(false));
       }
     }
 
     if (targetEl !== null) {
-      targetEl.setAttribute('gs-view-active', 'true');
+      targetEl.setAttribute('gs-view-active', BooleanParser.stringify(true));
     }
   }
 
