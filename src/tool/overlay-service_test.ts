@@ -8,11 +8,11 @@ import {TestDispose} from 'external/gs_tools/src/testing';
 
 import {AnchorLocation} from './anchor-location';
 import {Anchors} from './anchors';
-import {MenuContainer} from './menu-container';
-import {MenuService} from './menu-service';
+import {OverlayContainer} from './menu-container';
+import {OverlayService} from './overlay-service';
 
 
-describe('tool.MenuService', () => {
+describe('gs.tool.OverlayService', () => {
   let mockDocument;
   let service;
   let window;
@@ -20,7 +20,7 @@ describe('tool.MenuService', () => {
   beforeEach(() => {
     mockDocument = jasmine.createSpyObj('Document', ['createElement', 'querySelector']);
     window = Mocks.object('window');
-    service = new MenuService(mockDocument, window);
+    service = new OverlayService(mockDocument, window);
     TestDispose.add(service);
   });
 
@@ -40,8 +40,8 @@ describe('tool.MenuService', () => {
       assert(service['getMenuContainerEl_']()).to.equal(listenableContainer);
       assert(ListenableDom.of).to.haveBeenCalledWith(menuContainerEl);
       assert(mockBody.appendChild).to.haveBeenCalledWith(menuContainerEl);
-      assert(mockDocument.createElement).to.haveBeenCalledWith('gs-menu-container');
-      assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-menu-container');
+      assert(mockDocument.createElement).to.haveBeenCalledWith('gs-overlay-container');
+      assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-overlay-container');
     });
 
     it('should grab the menu container element if one already exists', () => {
@@ -57,7 +57,7 @@ describe('tool.MenuService', () => {
       assert(service['getMenuContainerEl_']()).to.equal(listenableContainer);
       assert(ListenableDom.of).to.haveBeenCalledWith(menuContainerEl);
       assert(mockDocument.createElement).toNot.haveBeenCalled();
-      assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-menu-container');
+      assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-overlay-container');
     });
 
     it('should return the existing menu container element', () => {
@@ -257,7 +257,7 @@ describe('tool.MenuService', () => {
 
             assert(mockMenuContainerEl.show).to.haveBeenCalledWith();
             assert(mockListenableMenuContainer.once).to.haveBeenCalledWith(
-                MenuContainer.HIDE_EVENT,
+                OverlayContainer.HIDE_EVENT,
                 Matchers.any(Function),
                 false);
 
@@ -276,7 +276,7 @@ describe('tool.MenuService', () => {
                 .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
 
             assert(Interval.newInstance)
-                .to.haveBeenCalledWith(MenuService['ANCHOR_TARGET_INTERVAL_']);
+                .to.haveBeenCalledWith(OverlayService['ANCHOR_TARGET_INTERVAL_']);
 
             assert(mockMenu.querySelector).to.haveBeenCalledWith('[gs-content]');
             done();

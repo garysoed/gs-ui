@@ -4,11 +4,11 @@ import {bind, customElement, DomBridge, handle, StringParser} from 'external/gs_
 
 import {BaseThemedElement} from '../common/base-themed-element';
 import {ThemeService} from '../theming/theme-service';
-import {MenuService} from '../tool/menu-service';
+import {OverlayService} from '../tool/overlay-service';
 
 
 @customElement({
-  dependencies: [MenuService],
+  dependencies: [OverlayService],
   tag: 'gs-menu-item',
   templateKey: 'src/tool/menu-item',
 })
@@ -16,11 +16,11 @@ export class MenuItem extends BaseThemedElement {
   @bind('#content').innerText()
   private readonly nameBridge_: DomBridge<string>;
 
-  private readonly menuService_: MenuService;
+  private readonly menuService_: OverlayService;
 
   constructor(
       @inject('theming.ThemeService') themeService: ThemeService,
-      @inject('tool.MenuService') menuService: MenuService) {
+      @inject('gs.tool.OverlayService') menuService: OverlayService) {
     super(themeService);
     this.menuService_ = menuService;
     this.nameBridge_ = DomBridge.of<string>();
@@ -33,6 +33,6 @@ export class MenuItem extends BaseThemedElement {
 
   @handle(null).event(DomEvent.CLICK)
   protected onClicked_(): void {
-    this.menuService_.hideMenu();
+    this.menuService_.hideOverlay();
   }
 }

@@ -20,10 +20,10 @@ import {Anchors} from './anchors';
     'gsAnchorTargetX': FloatParser,
     'gsAnchorTargetY': FloatParser,
   },
-  tag: 'gs-menu-container',
-  templateKey: 'src/tool/menu-container',
+  tag: 'gs-overlay-container',
+  templateKey: 'src/tool/overlay-container',
 })
-export class MenuContainer extends BaseElement {
+export class OverlayContainer extends BaseElement {
   static HIDE_EVENT: string = 'gs-hide';
   static SHOW_EVENT: string = 'gs-show';
 
@@ -85,7 +85,7 @@ export class MenuContainer extends BaseElement {
    * Hides the menu container.
    */
   private hide_(): void {
-    let animate = MenuContainer.HIDE_ANIMATION_.applyTo(this.containerEl_.getEventTarget());
+    let animate = OverlayContainer.HIDE_ANIMATION_.applyTo(this.containerEl_.getEventTarget());
     let listenableAnimate = ListenableDom.of(animate);
     this.addDisposable(listenableAnimate);
 
@@ -103,11 +103,11 @@ export class MenuContainer extends BaseElement {
    * Handles the event when animate is done.
    */
   private onFinishAnimate_(): void {
-    this.rootEl_.getEventTarget().classList.remove(MenuContainer.SHOW_CLASS_);
+    this.rootEl_.getEventTarget().classList.remove(OverlayContainer.SHOW_CLASS_);
 
     let element = this.getElement();
     if (element !== null) {
-      element.dispatch(MenuContainer.HIDE_EVENT, () => {});
+      element.dispatch(OverlayContainer.HIDE_EVENT, () => {});
     }
   }
 
@@ -145,9 +145,9 @@ export class MenuContainer extends BaseElement {
     let element = this.getElement();
     if (element !== null) {
       element.dispatch(
-          MenuContainer.SHOW_EVENT,
+          OverlayContainer.SHOW_EVENT,
           () => {
-            MenuContainer.BASE_SHOW_ANIMATION_
+            OverlayContainer.BASE_SHOW_ANIMATION_
                 .appendKeyframe({
                   height: `${contentHeight}px`,
                   opacity: 1,
@@ -155,7 +155,7 @@ export class MenuContainer extends BaseElement {
                 })
                 .applyTo(this.containerEl_.getEventTarget());
 
-            this.rootEl_.getEventTarget().classList.add(MenuContainer.SHOW_CLASS_);
+            this.rootEl_.getEventTarget().classList.add(OverlayContainer.SHOW_CLASS_);
           });
     }
   }

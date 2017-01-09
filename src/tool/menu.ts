@@ -6,7 +6,7 @@ import {Event} from '../const/event';
 
 import {AnchorLocation} from './anchor-location';
 import {AnchorLocationParser} from './anchor-location-parser';
-import {MenuService} from './menu-service';
+import {OverlayService} from './overlay-service';
 
 
 @customElement({
@@ -15,7 +15,7 @@ import {MenuService} from './menu-service';
     'gsAnchorTarget': AnchorLocationParser,
   },
   dependencies: [
-    MenuService,
+    OverlayService,
   ],
   tag: 'gs-menu',
   templateKey: 'src/tool/menu',
@@ -23,7 +23,7 @@ import {MenuService} from './menu-service';
 export class Menu extends BaseElement {
   private menuRoot_: HTMLElement;
 
-  constructor(@inject('tool.MenuService') private menuService_: MenuService) {
+  constructor(@inject('gs.tool.OverlayService') private overlayService_: OverlayService) {
     super();
   }
 
@@ -37,8 +37,8 @@ export class Menu extends BaseElement {
     }
 
     let elementTarget = element.getEventTarget();
-    this.menuService_.showMenu(
-        elementTarget,
+    this.overlayService_.showOverlay(
+        elementTarget.querySelector('[gs-content]'),
         elementTarget.parentElement,
         elementTarget['gsAnchorTarget'],
         elementTarget['gsAnchorPoint']);

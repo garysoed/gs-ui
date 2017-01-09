@@ -22,8 +22,8 @@ import {ThemeService} from '../theming/theme-service';
 import {Icon} from '../tool/icon';
 import {IndefiniteLoading} from '../tool/indefinite-loading';
 import {Menu} from '../tool/menu';
-import {MenuContainer} from '../tool/menu-container';
 import {MenuItem} from '../tool/menu-item';
+import {OverlayContainer} from '../tool/overlay-container';
 import {ViewSlot} from '../tool/view-slot';
 
 import {DefaultPalettes} from './default-palettes';
@@ -40,7 +40,7 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   FileInput,
   FloatInput,
   Menu,
-  MenuContainer,
+  OverlayContainer,
   MenuItem,
   RadioButton,
   TextInput,

@@ -8,7 +8,7 @@ import {TestDispose} from 'external/gs_tools/src/testing';
 
 import {AnchorLocation} from './anchor-location';
 import {Anchors} from './anchors';
-import {MenuContainer} from './menu-container';
+import {OverlayContainer} from './overlay-container';
 
 
 describe('tool.MenuContainer', () => {
@@ -18,7 +18,7 @@ describe('tool.MenuContainer', () => {
   beforeEach(() => {
     window = Mocks.object('window');
 
-    container = new MenuContainer(window);
+    container = new OverlayContainer(window);
     TestDispose.add(container);
   });
 
@@ -67,7 +67,7 @@ describe('tool.MenuContainer', () => {
       container['containerEl_'] = {getEventTarget: () => containerEl};
 
       let animate = Mocks.object('animate');
-      spyOn(MenuContainer['HIDE_ANIMATION_'], 'applyTo').and.returnValue(animate);
+      spyOn(OverlayContainer['HIDE_ANIMATION_'], 'applyTo').and.returnValue(animate);
 
       let mockListenableAnimate =
           jasmine.createSpyObj('ListenableAnimate', ['dispose', 'once']);
@@ -83,7 +83,7 @@ describe('tool.MenuContainer', () => {
 
       assert(mockListenableAnimate.once)
           .to.haveBeenCalledWith(DomEvent.FINISH, container['onFinishAnimate_'], container);
-      assert(MenuContainer['HIDE_ANIMATION_'].applyTo).to.haveBeenCalledWith(containerEl);
+      assert(OverlayContainer['HIDE_ANIMATION_'].applyTo).to.haveBeenCalledWith(containerEl);
       assert(ListenableDom.of).to.haveBeenCalledWith(animate);
     });
   });
@@ -108,9 +108,9 @@ describe('tool.MenuContainer', () => {
 
       container['onFinishAnimate_']();
 
-      assert(mockRootElement.classList.remove).to.haveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
+      assert(mockRootElement.classList.remove).to.haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
       assert(mockElement.dispatch).to.haveBeenCalledWith(
-          MenuContainer.HIDE_EVENT,
+          OverlayContainer.HIDE_EVENT,
           Matchers.any(Function));
     });
 
@@ -126,7 +126,7 @@ describe('tool.MenuContainer', () => {
         container['onFinishAnimate_']();
       }).toNot.throw();
 
-      assert(mockRootElement.classList.remove).to.haveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
+      assert(mockRootElement.classList.remove).to.haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
     });
   });
 
@@ -175,19 +175,19 @@ describe('tool.MenuContainer', () => {
               });
 
           let mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
-          spyOn(MenuContainer['BASE_SHOW_ANIMATION_'], 'appendKeyframe').and
+          spyOn(OverlayContainer['BASE_SHOW_ANIMATION_'], 'appendKeyframe').and
               .returnValue(mockAnimation);
 
           container['show_']();
 
           assert(mockListenableElement.dispatch).to.haveBeenCalledWith(
-              MenuContainer.SHOW_EVENT,
+              OverlayContainer.SHOW_EVENT,
               Matchers.any(Function));
 
           mockListenableElement.dispatch.calls.argsFor(0)[1]();
-          assert(mockClassList.add).to.haveBeenCalledWith(MenuContainer['SHOW_CLASS_']);
+          assert(mockClassList.add).to.haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
           assert(mockAnimation.applyTo).to.haveBeenCalledWith(containerEl);
-          assert(MenuContainer['BASE_SHOW_ANIMATION_'].appendKeyframe).to.haveBeenCalledWith(
+          assert(OverlayContainer['BASE_SHOW_ANIMATION_'].appendKeyframe).to.haveBeenCalledWith(
               jasmine.objectContaining({
                 height: `${height}px`,
                 width: `${width}px`,
@@ -226,7 +226,7 @@ describe('tool.MenuContainer', () => {
           });
 
       let mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
-      spyOn(MenuContainer['BASE_SHOW_ANIMATION_'], 'appendKeyframe').and
+      spyOn(OverlayContainer['BASE_SHOW_ANIMATION_'], 'appendKeyframe').and
           .returnValue(mockAnimation);
 
       assert(() => {
