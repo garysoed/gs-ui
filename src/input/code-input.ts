@@ -1,4 +1,3 @@
-
 import {inject} from 'external/gs_tools/src/inject';
 import {Enums} from 'external/gs_tools/src/typescript';
 import {Reflect} from 'external/gs_tools/src/util';
@@ -19,6 +18,7 @@ import {BaseInput} from './base-input';
 
 
 export enum Languages {
+  HANDLEBARS,
   JAVASCRIPT,
   TYPESCRIPT,
 }
@@ -80,6 +80,9 @@ export class CodeInput extends BaseInput<string> {
   @bind(null).attribute('gs-value', StringParser)
   private readonly boundGsValueBridge_: DomBridge<string>;
 
+  @bind(null).attribute('gs-show-gutter', BooleanParser)
+  private readonly gsShowGutterBridge_: DomBridge<boolean>;
+
   @bind('#editor').attribute('disabled', BooleanParser)
   private readonly boundInputDisabledBridge_: DomBridge<boolean>;
 
@@ -106,6 +109,7 @@ export class CodeInput extends BaseInput<string> {
     this.boundInputDisabledBridge_ = this.inputDisabledBridge_;
     this.editorValueBinder_ = new EditorValueBinder();
     this.editorValueBridge_ = this.inputValueBridge_;
+    this.gsShowGutterBridge_ = DomBridge.of<boolean>();
   }
 
   /**
@@ -130,6 +134,13 @@ export class CodeInput extends BaseInput<string> {
     }
   }
 
+  @handle(null).attributeChange('gs-show-gutter', BooleanParser)
+  protected onGsShowGutterAttrChange_(newValue: boolean | null): void {
+    if (this.editor_ !== null) {
+      this.editor_.renderer.setShowGutter(newValue === null ? true : newValue);
+    }
+  }
+
   /**
    * @override
    */
@@ -144,6 +155,9 @@ export class CodeInput extends BaseInput<string> {
    * @override
    */
   onCreated(element: HTMLElement): void {
+    if (this.gsShowGutterBridge_.get() === null) {
+      this.gsShowGutterBridge_.set(true);
+    }
     this.editor_ = this.ace_.edit(<HTMLElement> element.shadowRoot.querySelector('#editor'));
     this.editorValueBinder_.setEditor(this.editor_);
 

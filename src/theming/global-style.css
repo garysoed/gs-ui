@@ -16,6 +16,7 @@ body {
   margin: 0;
 
   --gsFontFamily: 'Ubuntu', sans-serif;
+  --gsFontFamilyCode: 'Ubuntu Mono', monospace;
   --gsFontSizeRoot: 13px;
   --gsLineHeight: 24px;
   --gsZIndexMenuBackdrop: 100;

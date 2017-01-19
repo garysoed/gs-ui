@@ -32,8 +32,8 @@ h3 {
 code {
   background-color: var(--gsColorPassivePrimaryBG);
   border-radius: .4rem;
-  font-family: 'Ubuntu Mono', monospace;
-  padding: 2 .2rem;
+  font-family: var(--gsFontFamilyCode);
+  padding: .2rem;
 }
 
 fieldset {

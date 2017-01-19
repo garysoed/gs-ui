@@ -112,6 +112,7 @@ export class Main extends BaseDisposable {
 
   /**
    * Creates a new instance of the app.
+   * TODO: Make a builder
    */
   static newInstance(config: {
         ace?: AceAjax.Ace,

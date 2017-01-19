@@ -115,6 +115,41 @@ describe('input.CodeInput', () => {
     });
   });
 
+  describe('onGsShowGutterAttrChange_', () => {
+    it('should set the show gutter to true if the new value is true', () => {
+      let mockRenderer = jasmine.createSpyObj('Renderer', ['setShowGutter']);
+      let mockEditor = jasmine.createSpyObj('Editor', ['destroy']);
+      mockEditor.renderer = mockRenderer;
+      input['editor_'] = mockEditor;
+      input['onGsShowGutterAttrChange_'](true);
+      assert(mockRenderer.setShowGutter).to.haveBeenCalledWith(true);
+    });
+
+    it('should set the show gutter to false if the new value is false', () => {
+      let mockRenderer = jasmine.createSpyObj('Renderer', ['setShowGutter']);
+      let mockEditor = jasmine.createSpyObj('Editor', ['destroy']);
+      mockEditor.renderer = mockRenderer;
+      input['editor_'] = mockEditor;
+      input['onGsShowGutterAttrChange_'](false);
+      assert(mockRenderer.setShowGutter).to.haveBeenCalledWith(false);
+    });
+
+    it('should set the show gutter to true if the new value is null', () => {
+      let mockRenderer = jasmine.createSpyObj('Renderer', ['setShowGutter']);
+      let mockEditor = jasmine.createSpyObj('Editor', ['destroy']);
+      mockEditor.renderer = mockRenderer;
+      input['editor_'] = mockEditor;
+      input['onGsShowGutterAttrChange_'](null);
+      assert(mockRenderer.setShowGutter).to.haveBeenCalledWith(true);
+    });
+
+    it('should not throw errors there are no editors', () => {
+      assert(() => {
+        input['onGsShowGutterAttrChange_'](true);
+      }).toNot.throw();
+    });
+  });
+
   describe('disposeInternal', () => {
     it('should destroy the editor if there is one', () => {
       let mockEditor = jasmine.createSpyObj('Editor', ['destroy']);
@@ -156,6 +191,9 @@ describe('input.CodeInput', () => {
       let aceInnerHtml = 'aceInnerHtml';
       mockDocument.getElementById.and.returnValue({innerHTML: aceInnerHtml});
 
+      spyOn(input['gsShowGutterBridge_'], 'get').and.returnValue(null);
+      spyOn(input['gsShowGutterBridge_'], 'set');
+
       spyOn(input['editorValueBinder_'], 'setEditor');
 
       input.onCreated(element);
@@ -166,6 +204,7 @@ describe('input.CodeInput', () => {
       assert(mockDocument.getElementById).to.haveBeenCalledWith('ace_editor.css');
       assert(input['editorValueBinder_'].setEditor).to.haveBeenCalledWith(mockEditor);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('#editor');
+      assert(input['gsShowGutterBridge_'].set).to.haveBeenCalledWith(true);
     });
 
     it('should throw error if the ace editor CSS style cannot be found', () => {
@@ -185,11 +224,44 @@ describe('input.CodeInput', () => {
 
       mockDocument.getElementById.and.returnValue(null);
 
+      spyOn(input['gsShowGutterBridge_'], 'get').and.returnValue(true);
+
       spyOn(input['editorValueBinder_'], 'setEditor');
 
       assert(() => {
         input.onCreated(element);
       }).to.throwError(/css not found/);
+    });
+
+    it('should not override the show gutter attribute value if it is non null', () => {
+      mockAce.edit.and.returnValue(jasmine.createSpyObj(
+          'Editor',
+          [
+            'destroy',
+            'setFontSize',
+            'setHighlightActiveLine',
+            'setReadOnly',
+          ]));
+
+      let styleEl = Mocks.object('styleEl');
+      let mockOwnerDocument = jasmine.createSpyObj('OwnerDocument', ['createElement']);
+      mockOwnerDocument.createElement.and.returnValue(styleEl);
+
+      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['appendChild', 'querySelector']);
+      let element = Mocks.object('element');
+      element.ownerDocument = mockOwnerDocument;
+      element.shadowRoot = mockShadowRoot;
+
+      mockDocument.getElementById.and.returnValue({innerHTML: 'aceInnerHtml'});
+
+      spyOn(input['gsShowGutterBridge_'], 'get').and.returnValue(true);
+      spyOn(input['gsShowGutterBridge_'], 'set');
+
+      spyOn(input['editorValueBinder_'], 'setEditor');
+
+      input.onCreated(element);
+
+      assert(input['gsShowGutterBridge_'].set).toNot.haveBeenCalled();
     });
   });
 });

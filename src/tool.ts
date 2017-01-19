@@ -1,1 +1,1 @@
-export {OverlayService} from './tool/menu-service';
+export {OverlayService} from './tool/overlay-service';
