@@ -23,10 +23,17 @@ describe('tool.Menu', () => {
 
   describe('onAction_', () => {
     it('should call the menu service correctly', () => {
+      let parentWidth = 123;
       let parentElement = Mocks.object('parentElement');
+      parentElement.clientWidth = parentWidth;
+      spyOn(menu['gsFitParentWidthBridge_'], 'get').and.returnValue(true);
+
       let anchorPoint = AnchorLocation.BOTTOM_LEFT;
       let anchorTarget = AnchorLocation.TOP_RIGHT;
+
+      let menuContentStyle = Mocks.object('menuContentStyle');
       let menuContent = Mocks.object('menuContent');
+      menuContent.style = menuContentStyle;
 
       let mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
       mockEventTarget.querySelector.and.returnValue(menuContent);
@@ -44,6 +51,28 @@ describe('tool.Menu', () => {
           anchorTarget,
           anchorPoint);
       assert(mockEventTarget.querySelector).to.haveBeenCalledWith('[gs-content]');
+      assert(menuContentStyle.width).to.equal(`${parentWidth}px`);
+    });
+
+    it('should not set the width to the parent element if fit-parent-width is not set', () => {
+      let parentElement = Mocks.object('parentElement');
+      parentElement.clientWidth = 123;
+      spyOn(menu['gsFitParentWidthBridge_'], 'get').and.returnValue(false);
+
+      let menuContentStyle = Mocks.object('menuContentStyle');
+      let menuContent = Mocks.object('menuContent');
+      menuContent.style = menuContentStyle;
+
+      let mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
+      mockEventTarget.querySelector.and.returnValue(menuContent);
+      mockEventTarget.parentElement = parentElement;
+      mockEventTarget['gsAnchorPoint'] = AnchorLocation.BOTTOM_LEFT;
+      mockEventTarget['gsAnchorTarget'] = AnchorLocation.TOP_RIGHT;
+
+      menu['element_'] = {getEventTarget: () => mockEventTarget};
+      menu['onAction_']();
+
+      assert(menuContentStyle.width).toNot.beDefined();
     });
 
     it('should not throw error if there are no elements', () => {

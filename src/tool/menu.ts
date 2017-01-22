@@ -1,6 +1,11 @@
 import {ListenableDom} from 'external/gs_tools/src/event';
 import {inject} from 'external/gs_tools/src/inject';
-import {BaseElement, customElement} from 'external/gs_tools/src/webc';
+import {
+  BaseElement,
+  bind,
+  BooleanParser,
+  customElement,
+  DomBridge} from 'external/gs_tools/src/webc';
 
 import {Event} from '../const/event';
 
@@ -21,10 +26,16 @@ import {OverlayService} from './overlay-service';
   templateKey: 'src/tool/menu',
 })
 export class Menu extends BaseElement {
+  @bind(null).attribute('gs-fit-parent-width', BooleanParser)
+  private readonly gsFitParentWidthBridge_: DomBridge<boolean>;
+
+  private readonly overlayService_: OverlayService;
   private menuRoot_: HTMLElement;
 
-  constructor(@inject('gs.tool.OverlayService') private overlayService_: OverlayService) {
+  constructor(@inject('gs.tool.OverlayService') overlayService: OverlayService) {
     super();
+    this.overlayService_ = overlayService;
+    this.gsFitParentWidthBridge_ = DomBridge.of<boolean>();
   }
 
   /**
@@ -37,10 +48,17 @@ export class Menu extends BaseElement {
     }
 
     let elementTarget = element.getEventTarget();
+    let parentElement = elementTarget.parentElement;
+    let menuContent = <HTMLElement> elementTarget.querySelector('[gs-content]');
+
+    if (!!this.gsFitParentWidthBridge_.get()) {
+      menuContent.style.width = `${parentElement.clientWidth}px`;
+    }
+
     this.overlayService_.showOverlay(
         elementTarget,
-        elementTarget.querySelector('[gs-content]'),
-        elementTarget.parentElement,
+        menuContent,
+        parentElement,
         elementTarget['gsAnchorTarget'],
         elementTarget['gsAnchorPoint']);
   }
