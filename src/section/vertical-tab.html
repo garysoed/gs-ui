@@ -1,0 +1,31 @@
+<style>
+  content::content > * {
+    display: block;
+    flex: 1;
+  }
+
+  .highlight-container {
+    position: relative;
+    width: .4rem;
+  }
+
+  .highlight {
+    background-color: var(--gsColorActionFocusFG);
+    position: absolute;
+    width: .4rem;
+  }
+
+  .root {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+  }
+</style>
+<div class="root" layout="row">
+  <div class="tabs" flex>
+    <content select="[gs-tab-id]"></content>
+  </div>
+  <div class="highlight-container">
+    <div class="highlight"></div>
+  </div>
+</div>
