@@ -17,6 +17,7 @@ import {Breadcrumb} from '../routing/breadcrumb';
 import {IRouteFactoryService} from '../routing/i-route-factory-service';
 import {Drawer} from '../section/drawer';
 import {HorizontalTab} from '../section/horizontal-tab';
+import {VerticalTab} from '../section/vertical-tab';
 import {Theme} from '../theming/theme';
 import {ThemeService} from '../theming/theme-service';
 import {Icon} from '../tool/icon';
@@ -44,6 +45,7 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
   MenuItem,
   RadioButton,
   TextInput,
+  VerticalTab,
   ViewSlot,
 ];
 

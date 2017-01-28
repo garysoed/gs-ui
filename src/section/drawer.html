@@ -1,5 +1,6 @@
 <style>
   #root {
+    background-color: var(--gsColorPassiveBG);
     overflow: hidden;
     transition: width .2s;
     width: var(--gsDrawerCollapsedWidth);
@@ -11,7 +12,7 @@
   }
 </style>
 
-<div id="root" layout="row" flex-justify="flex-start">
+<div id="root" layout="row" fill-parent flex-justify="flex-start">
   <div flex>
     <content select="[gs-content]"></content>
   </div>
