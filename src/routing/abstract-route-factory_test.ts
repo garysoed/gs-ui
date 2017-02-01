@@ -97,7 +97,7 @@ describe('routing.AbstractRouteFactory', () => {
   });
 
   describe('getCascadeNames', () => {
-    it('should return the correct names', (done: any) => {
+    it('should return the correct names', async (done: any) => {
       let name = 'name';
       spyOn(factory, 'getName').and.returnValue(Promise.resolve(name));
 
@@ -105,14 +105,10 @@ describe('routing.AbstractRouteFactory', () => {
       spyOn(parentFactory, 'getName').and.returnValue(Promise.resolve(parentName));
 
       let params = Mocks.object('params');
-      Promise
-          .all(factory.getCascadeNames(params))
-          .then((names: string[]) => {
-            assert(names).to.equal([parentName, name]);
-            assert(parentFactory.getName).to.haveBeenCalledWith(params);
-            assert(factory.getName).to.haveBeenCalledWith(params);
-            done();
-          }, done.fail);
+      let names = await Promise.all(factory.getCascadeNames(params));
+      assert(names).to.equal([parentName, name]);
+      assert(parentFactory.getName).to.haveBeenCalledWith(params);
+      assert(factory.getName).to.haveBeenCalledWith(params);
     });
   });
 

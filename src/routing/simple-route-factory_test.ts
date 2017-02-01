@@ -32,12 +32,9 @@ describe('routing.SimpleRouteFactory', () => {
   });
 
   describe('getName', () => {
-    it('should resolve with the correct name', (done: any) => {
-      factory.getName()
-          .then((name: string) => {
-            assert(name).to.equal(NAME);
-            done();
-          }, done.fail);
+    it('should resolve with the correct name', async (done: any) => {
+      let name = await factory.getName();
+      assert(name).to.equal(NAME);
     });
   });
 });

@@ -67,7 +67,7 @@ describe('routing.Breadcrumb', () => {
   });
 
   describe('onRouteChanged_', () => {
-    it('should set the bridge with the correct data', (done: any) => {
+    it('should set the bridge with the correct data', async (done: any) => {
       let name1 = 'name1';
       let url1 = 'url1';
 
@@ -93,20 +93,17 @@ describe('routing.Breadcrumb', () => {
 
       spyOn(breadcrumb['crumbBridge_'], 'set');
 
-      breadcrumb['onRouteChanged_']()
-          .then(() => {
-            assert(breadcrumb['crumbBridge_'].set).to.haveBeenCalledWith([
-              {name: name1, url: url1},
-              {name: name2, url: url2},
-            ]);
-            assert(mockRouteFactory.getCascadePaths).to.haveBeenCalledWith(params);
-            assert(mockRouteFactory.getCascadeNames).to.haveBeenCalledWith(params);
-            assert(mockRouteService.getRouteFactory).to.haveBeenCalledWith(type);
-            done();
-          }, done.fail);
+      await breadcrumb['onRouteChanged_']();
+      assert(breadcrumb['crumbBridge_'].set).to.haveBeenCalledWith([
+        {name: name1, url: url1},
+        {name: name2, url: url2},
+      ]);
+      assert(mockRouteFactory.getCascadePaths).to.haveBeenCalledWith(params);
+      assert(mockRouteFactory.getCascadeNames).to.haveBeenCalledWith(params);
+      assert(mockRouteService.getRouteFactory).to.haveBeenCalledWith(type);
     });
 
-    it('should not update the bridge if the route factory cannot be found', (done: any) => {
+    it('should not update the bridge if the route factory cannot be found', async (done: any) => {
       let type = Mocks.object('type');
       let params = Mocks.object('params');
       let mockRoute = jasmine.createSpyObj('Route', ['getParams', 'getType']);
@@ -120,24 +117,18 @@ describe('routing.Breadcrumb', () => {
 
       spyOn(breadcrumb['crumbBridge_'], 'set');
 
-      breadcrumb['onRouteChanged_']()
-          .then(() => {
-            assert(breadcrumb['crumbBridge_'].set).toNot.haveBeenCalled();
-            done();
-          }, done.fail);
+      await breadcrumb['onRouteChanged_']();
+      assert(breadcrumb['crumbBridge_'].set).toNot.haveBeenCalled();
     });
 
-    it('should not update the bridge if there are no routes', (done: any) => {
+    it('should not update the bridge if there are no routes', async (done: any) => {
       mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
           .and.returnValue(null);
 
       spyOn(breadcrumb['crumbBridge_'], 'set');
 
-      breadcrumb['onRouteChanged_']()
-          .then(() => {
-            assert(breadcrumb['crumbBridge_'].set).toNot.haveBeenCalled();
-            done();
-          }, done.fail);
+      await breadcrumb['onRouteChanged_']();
+      assert(breadcrumb['crumbBridge_'].set).toNot.haveBeenCalled();
     });
   });
 

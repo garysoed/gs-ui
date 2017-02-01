@@ -192,7 +192,7 @@ describe('section.BaseTab', () => {
   });
 
   describe('updateHighlight_', () => {
-    it('should grab the destination start and length correctly', (done: any) => {
+    it('should grab the destination start and length correctly', async (done: any) => {
       let start = 12;
       let length = 34;
       let selectedId = 'selectedId';
@@ -208,17 +208,14 @@ describe('section.BaseTab', () => {
 
       spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
 
-      tab['updateHighlight_']()
-          .then(() => {
-            assert(tab['setHighlight_']).to.haveBeenCalledWith(start, length);
-            assert(mockElement.querySelector).to.haveBeenCalledWith(`[gs-tab-id="${selectedId}"]`);
-            assert(tab['getStartPosition']).to.haveBeenCalledWith(selectedTab);
-            assert(tab['getLength']).to.haveBeenCalledWith(selectedTab);
-            done();
-          }, done.fail);
+      await tab['updateHighlight_']();
+      assert(tab['setHighlight_']).to.haveBeenCalledWith(start, length);
+      assert(mockElement.querySelector).to.haveBeenCalledWith(`[gs-tab-id="${selectedId}"]`);
+      assert(tab['getStartPosition']).to.haveBeenCalledWith(selectedTab);
+      assert(tab['getLength']).to.haveBeenCalledWith(selectedTab);
     });
 
-    it('should shrink to 0 length if there are no selected Ids', (done: any) => {
+    it('should shrink to 0 length if there are no selected Ids', async (done: any) => {
       let start = 12;
       let length = 34;
 
@@ -230,22 +227,19 @@ describe('section.BaseTab', () => {
 
       spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
 
-      tab['updateHighlight_']()
-          .then(() => {
-            assert(tab['setHighlight_']).to.haveBeenCalledWith(29, 34);
-            done();
-          }, done.fail);
+      await tab['updateHighlight_']();
+      assert(tab['setHighlight_']).to.haveBeenCalledWith(29, 34);
     });
 
-    it('should reject if there are no elements', (done: any) => {
+    it('should reject if there are no elements', async (done: any) => {
       tab['element_'] = null;
 
-      tab['updateHighlight_']().then(
-          done.fail,
-          (error: string) => {
-            assert(error).to.match(/elements are found/);
-            done();
-          });
+      try {
+        await tab['updateHighlight_']();
+        done.fail();
+      } catch (e) {
+        assert(<string> e).to.match(/elements are found/);
+      }
     });
   });
 

@@ -108,7 +108,7 @@ describe('input.FileService', () => {
   });
 
   describe('processBundle', () => {
-    it('should return a map of files and its corresponding content', (done: any) => {
+    it('should return a map of files and its corresponding content', async (done: any) => {
       let bundleId = 'bundleId';
 
       let file1 = Mocks.object('file1');
@@ -125,29 +125,21 @@ describe('input.FileService', () => {
       });
       spyOn(service, 'getBundle').and.returnValue([file1, file2]);
 
-      service
-          .processBundle(bundleId)
-          .then((map: Map<File, string>) => {
-            assert(map).to.haveEntries([
-              [file1, content1],
-              [file2, content2],
-            ]);
-            assert(service['processFile_']).to.haveBeenCalledWith(file1);
-            assert(service['processFile_']).to.haveBeenCalledWith(file2);
-            assert(service.getBundle).to.haveBeenCalledWith(bundleId);
-            done();
-          }, done.fail);
+      let map = await service.processBundle(bundleId);
+      assert(map!).to.haveEntries([
+        [file1, content1],
+        [file2, content2],
+      ]);
+      assert(service['processFile_']).to.haveBeenCalledWith(file1);
+      assert(service['processFile_']).to.haveBeenCalledWith(file2);
+      assert(service.getBundle).to.haveBeenCalledWith(bundleId);
     });
 
-    it('should return null if the bundle does not exist', (done: any) => {
+    it('should return null if the bundle does not exist', async (done: any) => {
       spyOn(service, 'getBundle').and.returnValue(null);
 
-      service
-          .processBundle('bundleId')
-          .then((map: any) => {
-            assert(map).to.beNull();
-            done();
-          }, done.fail);
+      let map = await service.processBundle('bundleId');
+      assert(map).to.beNull();
     });
   });
 });

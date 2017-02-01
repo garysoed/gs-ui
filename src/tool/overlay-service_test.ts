@@ -220,7 +220,7 @@ describe('gs.tool.OverlayService', () => {
       anchorElement = Mocks.object('anchorElement');
     });
 
-    it('should open the menu container correctly', (done: any) => {
+    it('should open the menu container correctly', async (done: any) => {
       let mockOverlayParent = jasmine.createSpyObj('OverlayParent', ['appendChild']);
       let menuContent = Mocks.object('menuContent');
 
@@ -248,41 +248,37 @@ describe('gs.tool.OverlayService', () => {
       spyOn(service, 'onTick_');
       spyOn(service, 'setAnchorTarget_');
 
-      service
-          .showOverlay(
-              mockOverlayParent,
-              menuContent,
-              anchorElement,
-              anchorTarget,
-              anchorPoint)
-          .then(() => {
-            assert(mockOverlayParent.appendChild).to.haveBeenCalledWith(menuContent);
-            assert(mockAnchorTargetWatcher.dispose).to.haveBeenCalledWith();
+      await service.showOverlay(
+          mockOverlayParent,
+          menuContent,
+          anchorElement,
+          anchorTarget,
+          anchorPoint);
+      assert(mockOverlayParent.appendChild).to.haveBeenCalledWith(menuContent);
+      assert(mockAnchorTargetWatcher.dispose).to.haveBeenCalledWith();
 
-            assert(mockMenuContainerEl.show).to.haveBeenCalledWith();
-            assert(mockListenableMenuContainer.once).to.haveBeenCalledWith(
-                OverlayContainer.HIDE_EVENT,
-                Matchers.any(Function),
-                false);
+      assert(mockMenuContainerEl.show).to.haveBeenCalledWith();
+      assert(mockListenableMenuContainer.once).to.haveBeenCalledWith(
+          OverlayContainer.HIDE_EVENT,
+          Matchers.any(Function),
+          false);
 
-            assert(service['setAnchorTarget_'])
-                .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
-            assert(mockMenuContainerEl['gsAnchorPoint']).to.equal(anchorPoint);
-            assert(mockMenuContainerEl.appendChild).to.haveBeenCalledWith(menuContent);
+      assert(service['setAnchorTarget_'])
+          .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
+      assert(mockMenuContainerEl['gsAnchorPoint']).to.equal(anchorPoint);
+      assert(mockMenuContainerEl.appendChild).to.haveBeenCalledWith(menuContent);
 
-            assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();
-            assert(mockAnchorTargetWatcher.on).to.haveBeenCalledWith(
-                Interval.TICK_EVENT,
-                Matchers.any(Function),
-                service);
-            mockAnchorTargetWatcher.on.calls.argsFor(0)[1]();
-            assert(service['onTick_'])
-                .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
+      assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();
+      assert(mockAnchorTargetWatcher.on).to.haveBeenCalledWith(
+          Interval.TICK_EVENT,
+          Matchers.any(Function),
+          service);
+      mockAnchorTargetWatcher.on.calls.argsFor(0)[1]();
+      assert(service['onTick_'])
+          .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
 
-            assert(Interval.newInstance)
-                .to.haveBeenCalledWith(OverlayService['ANCHOR_TARGET_INTERVAL_']);
-            done();
-          }, done.fail);
+      assert(Interval.newInstance)
+          .to.haveBeenCalledWith(OverlayService['ANCHOR_TARGET_INTERVAL_']);
     });
   });
 });

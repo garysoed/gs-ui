@@ -2,7 +2,7 @@ import {
   TestAsync,
   TestDispose,
   TestInject,
-  TestEvent,
+  TestJasmine,
   TestSetup} from 'external/gs_tools/src/testing';
 
 
@@ -12,8 +12,8 @@ export {assert, Matchers} from 'external/gs_tools/src/jasmine';
 const TEST_SETUP = new TestSetup([
   TestAsync,
   TestDispose,
-  TestEvent,
   TestInject,
+  TestJasmine,
 ]);
 
 let initialized = false;

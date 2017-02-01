@@ -72,7 +72,7 @@ export class Breadcrumb<T> extends BaseThemedElement {
   /**
    * Handles event when the route is changed.
    */
-  private onRouteChanged_(): Promise<void> {
+  private async onRouteChanged_(): Promise<void> {
     let route = this.routeService_.getRoute();
     if (route === null) {
       return Promise.resolve();
@@ -95,22 +95,17 @@ export class Breadcrumb<T> extends BaseThemedElement {
           return Promise.all(pair);
         })
         .asArray();
-    return Promise
-        .all(promises)
-        .then((data: [string, string][]) => {
-          return Arrays
-              .of(data)
-              .map(([name, url]: [string, string]) => {
-                return {
-                  name: name,
-                  url: url,
-                };
-              })
-              .asArray();
+    let data = await Promise.all(promises);
+    let crumbData = Arrays
+        .of(data)
+        .map(([name, url]: [string, string]) => {
+          return {
+            name: name,
+            url: url,
+          };
         })
-        .then((crumbData: CrumbData[]) => {
-          this.crumbBridge_.set(crumbData);
-        });
+        .asArray();
+    this.crumbBridge_.set(crumbData);
   }
 
   /**

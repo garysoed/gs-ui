@@ -77,7 +77,7 @@ export class FileService {
    * @return Promise that will be resolved with a map of File to its content, or null if the
    *     bundle ID does not exist.
    */
-  processBundle(bundleId: string): Promise<Map<File, string> | null> {
+  async processBundle(bundleId: string): Promise<Map<File, string> | null> {
     let files = this.getBundle(bundleId);
     if (files === null) {
       return Promise.resolve(null);
@@ -92,9 +92,7 @@ export class FileService {
           ]);
         })
         .asArray();
-    return Promise.all(promises)
-        .then((entries: [File, string][]) => {
-          return new Map(entries);
-        });
+    let entries = await Promise.all(promises);
+    return new Map(entries);
   }
 }
