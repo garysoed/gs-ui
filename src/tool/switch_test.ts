@@ -18,19 +18,19 @@ describe('tool.Switch', () => {
   describe('onGsValueChange_', () => {
     it('should set the select attribute correctly', () => {
       let value = 'value';
-      spyOn(switchEl['selectBridge_'], 'set');
+      spyOn(switchEl['selectHook_'], 'set');
 
       switchEl['onGsValueChange_'](value);
 
-      assert(switchEl['selectBridge_'].set).to.haveBeenCalledWith(`[gs-when="${value}"]`);
+      assert(switchEl['selectHook_'].set).to.haveBeenCalledWith(`[gs-when="${value}"]`);
     });
 
     it('should delete the select attribute if value is null', () => {
-      spyOn(switchEl['selectBridge_'], 'delete');
+      spyOn(switchEl['selectHook_'], 'delete');
 
       switchEl['onGsValueChange_'](null);
 
-      assert(switchEl['selectBridge_'].delete).to.haveBeenCalledWith();
+      assert(switchEl['selectHook_'].delete).to.haveBeenCalledWith();
     });
   });
 });

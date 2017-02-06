@@ -23,14 +23,14 @@ describe('input.FileInput', () => {
       mockFileService.getBundle.and.returnValue(bundle);
 
       let bundleId = 'bundleId';
-      spyOn(input['gsBundleIdBridge_'], 'get').and.returnValue(bundleId);
+      spyOn(input['gsBundleIdHook_'], 'get').and.returnValue(bundleId);
 
       assert(input['getFiles_']()).to.equal(bundle);
       assert(mockFileService.getBundle).to.haveBeenCalledWith(bundleId);
     });
 
     it('should return null if there are no bundle IDs', () => {
-      spyOn(input['gsBundleIdBridge_'], 'get').and.returnValue(null);
+      spyOn(input['gsBundleIdHook_'], 'get').and.returnValue(null);
 
       assert(input['getFiles_']()).to.beNull();
       assert(mockFileService.getBundle).toNot.haveBeenCalled();
@@ -42,7 +42,7 @@ describe('input.FileInput', () => {
       let mimeType1 = 'mimeType1';
       let mimeType2 = 'mimeType2';
 
-      spyOn(input['gsMimeTypesBridge_'], 'get').and.returnValue([mimeType1, mimeType2]);
+      spyOn(input['gsMimeTypesHook_'], 'get').and.returnValue([mimeType1, mimeType2]);
 
       let dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.items = [{type: mimeType1}, {type: mimeType2}];
@@ -54,7 +54,7 @@ describe('input.FileInput', () => {
       let mimeType1 = 'mimeType1';
       let mimeType2 = 'mimeType2';
 
-      spyOn(input['gsMimeTypesBridge_'], 'get').and.returnValue([mimeType1, mimeType2]);
+      spyOn(input['gsMimeTypesHook_'], 'get').and.returnValue([mimeType1, mimeType2]);
 
       let dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.items = [{type: mimeType1}, {type: 'otherMimeType'}];
@@ -63,7 +63,7 @@ describe('input.FileInput', () => {
     });
 
     it('should return true if there are no mime types', () => {
-      spyOn(input['gsMimeTypesBridge_'], 'get').and.returnValue(null);
+      spyOn(input['gsMimeTypesHook_'], 'get').and.returnValue(null);
 
       let dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.items = [{type: 'mimeType1'}, {type: 'mimeType2'}];
@@ -106,12 +106,12 @@ describe('input.FileInput', () => {
         + 'valid',
         () => {
           let dataTransfer = Mocks.object('dataTransfer');
-          spyOn(input['switchGsValueBridge_'], 'set');
+          spyOn(input['switchGsValueHook_'], 'set');
           spyOn(input, 'isValid_').and.returnValue(true);
 
           input['onDragEnter_'](<any> {dataTransfer: dataTransfer});
 
-          assert(input['switchGsValueBridge_'].set).to.haveBeenCalledWith('dragging');
+          assert(input['switchGsValueHook_'].set).to.haveBeenCalledWith('dragging');
           assert(input['isValid_']).to.haveBeenCalledWith(dataTransfer);
           assert(input['dragDepth_']).to.equal(1);
         });
@@ -120,24 +120,24 @@ describe('input.FileInput', () => {
         + 'invalid',
         () => {
           let dataTransfer = Mocks.object('dataTransfer');
-          spyOn(input['switchGsValueBridge_'], 'set');
+          spyOn(input['switchGsValueHook_'], 'set');
           spyOn(input, 'isValid_').and.returnValue(false);
 
           input['onDragEnter_'](<any> {dataTransfer: dataTransfer});
 
-          assert(input['switchGsValueBridge_'].set).to.haveBeenCalledWith('error');
+          assert(input['switchGsValueHook_'].set).to.haveBeenCalledWith('error');
           assert(input['isValid_']).to.haveBeenCalledWith(dataTransfer);
           assert(input['dragDepth_']).to.equal(1);
         });
 
     it('should not set the switch if drag depth is 0', () => {
       input['dragDepth_'] = -2;
-      spyOn(input['switchGsValueBridge_'], 'set');
+      spyOn(input['switchGsValueHook_'], 'set');
       spyOn(input, 'isValid_').and.returnValue(true);
 
       input['onDragEnter_'](<any> {dataTransfer: Mocks.object('dataTransfer')});
 
-      assert(input['switchGsValueBridge_'].set).toNot.haveBeenCalled();
+      assert(input['switchGsValueHook_'].set).toNot.haveBeenCalled();
       assert(input['dragDepth_']).to.equal(-1);
     });
   });
@@ -145,44 +145,44 @@ describe('input.FileInput', () => {
   describe('onDragLeave_', () => {
     it('should decrement the drag depth and set the switch to "dropped" if there is a file',
         () => {
-          spyOn(input['switchGsValueBridge_'], 'set');
+          spyOn(input['switchGsValueHook_'], 'set');
           spyOn(input, 'getFiles_').and.returnValue([{}, {}]);
 
           input['onDragLeave_']();
 
-          assert(input['switchGsValueBridge_'].set).to.haveBeenCalledWith('dropped');
+          assert(input['switchGsValueHook_'].set).to.haveBeenCalledWith('dropped');
           assert(input['dragDepth_']).to.equal(-1);
         });
 
     it('should decrement the drag depth and set the switch to "initial" if there are no files',
         () => {
-          spyOn(input['switchGsValueBridge_'], 'set');
+          spyOn(input['switchGsValueHook_'], 'set');
           spyOn(input, 'getFiles_').and.returnValue([]);
 
           input['onDragLeave_']();
 
-          assert(input['switchGsValueBridge_'].set).to.haveBeenCalledWith('initial');
+          assert(input['switchGsValueHook_'].set).to.haveBeenCalledWith('initial');
           assert(input['dragDepth_']).to.equal(-1);
         });
 
     it('should decrement the drag depth and set the switch to "initial" if there are no bundles',
         () => {
-          spyOn(input['switchGsValueBridge_'], 'set');
+          spyOn(input['switchGsValueHook_'], 'set');
           spyOn(input, 'getFiles_').and.returnValue(null);
 
           input['onDragLeave_']();
 
-          assert(input['switchGsValueBridge_'].set).to.haveBeenCalledWith('initial');
+          assert(input['switchGsValueHook_'].set).to.haveBeenCalledWith('initial');
           assert(input['dragDepth_']).to.equal(-1);
         });
 
     it('should not set the switch if drag dept is more than 0', () => {
       input['dragDepth_'] = 3;
-      spyOn(input['switchGsValueBridge_'], 'set');
+      spyOn(input['switchGsValueHook_'], 'set');
 
       input['onDragLeave_']();
 
-      assert(input['switchGsValueBridge_'].set).toNot.haveBeenCalled();
+      assert(input['switchGsValueHook_'].set).toNot.haveBeenCalled();
       assert(input['dragDepth_']).to.equal(2);
     });
   });
@@ -209,12 +209,12 @@ describe('input.FileInput', () => {
       mockFileService.addBundle.and.returnValue({deleteFn: deleteBundleFn, id: bundleId});
 
       spyOn(input, 'isValid_').and.returnValue(true);
-      spyOn(input['gsBundleIdBridge_'], 'set');
+      spyOn(input['gsBundleIdHook_'], 'set');
       spyOn(input, 'onDragLeave_');
 
       assert(input['onDrop_'](mockEvent)).to.beFalse();
       assert(input['onDragLeave_']).to.haveBeenCalledWith();
-      assert(input['gsBundleIdBridge_'].set).to.haveBeenCalledWith(bundleId);
+      assert(input['gsBundleIdHook_'].set).to.haveBeenCalledWith(bundleId);
       assert(input['deleteBundleFn_']).to.equal(deleteBundleFn);
       assert(mockFileService.addBundle).to.haveBeenCalledWith(files);
       assert(mockEvent.preventDefault).to.haveBeenCalledWith();
@@ -237,7 +237,7 @@ describe('input.FileInput', () => {
       input['deleteBundleFn_'] = mockDeleteBundleFn;
 
       spyOn(input, 'isValid_').and.returnValue(true);
-      spyOn(input['gsBundleIdBridge_'], 'set');
+      spyOn(input['gsBundleIdHook_'], 'set');
       spyOn(input, 'onDragLeave_');
 
       input['onDrop_'](mockEvent);
@@ -257,7 +257,7 @@ describe('input.FileInput', () => {
       mockFileService.addBundle.and.returnValue({deleteFn: deleteBundleFn, id: 'bundleId'});
 
       spyOn(input, 'isValid_').and.returnValue(false);
-      spyOn(input['gsBundleIdBridge_'], 'set');
+      spyOn(input['gsBundleIdHook_'], 'set');
       spyOn(input, 'onDragLeave_');
 
       input['onDrop_'](mockEvent);
@@ -274,7 +274,7 @@ describe('input.FileInput', () => {
           input['deleteBundleFn_'] = mockDeleteBundleFn;
 
           spyOn(input, 'getFiles_').and.returnValue(null);
-          spyOn(input['switchGsValueBridge_'], 'set');
+          spyOn(input['switchGsValueHook_'], 'set');
 
           input['onGsBundleIdChanged_']('newValue', 'oldValue');
 
@@ -289,7 +289,7 @@ describe('input.FileInput', () => {
           input['deleteBundleFn_'] = mockDeleteBundleFn;
 
           spyOn(input, 'getFiles_').and.returnValue(null);
-          spyOn(input['switchGsValueBridge_'], 'set');
+          spyOn(input['switchGsValueHook_'], 'set');
 
           input['onGsBundleIdChanged_']('newValue', null);
 
@@ -301,42 +301,42 @@ describe('input.FileInput', () => {
           let filename1 = 'filename1';
           let filename2 = 'filename2';
           spyOn(input, 'getFiles_').and.returnValue([{name: filename1}, {name: filename2}]);
-          spyOn(input['droppedMessageInnerTextBridge_'], 'set');
-          spyOn(input['switchGsValueBridge_'], 'set');
+          spyOn(input['droppedMessageInnerTextHook_'], 'set');
+          spyOn(input['switchGsValueHook_'], 'set');
 
           input['onGsBundleIdChanged_']('bundleId', null);
 
-          assert(input['droppedMessageInnerTextBridge_'].set).to
+          assert(input['droppedMessageInnerTextHook_'].set).to
               .haveBeenCalledWith(`Added file(s): ${filename1}, ${filename2}`);
-          assert(input['switchGsValueBridge_'].set).to.haveBeenCalledWith('dropped');
+          assert(input['switchGsValueHook_'].set).to.haveBeenCalledWith('dropped');
         });
 
     it('should set the switch to initial if there are no bundles', () => {
       spyOn(input, 'getFiles_').and.returnValue(null);
-      spyOn(input['switchGsValueBridge_'], 'set');
+      spyOn(input['switchGsValueHook_'], 'set');
 
       input['onGsBundleIdChanged_']('bundleId', null);
 
-      assert(input['switchGsValueBridge_'].set).to.haveBeenCalledWith('initial');
+      assert(input['switchGsValueHook_'].set).to.haveBeenCalledWith('initial');
     });
   });
 
   describe('onGsLabelChanged_', () => {
     it('should set the initial message correctly', () => {
       let label = 'label';
-      spyOn(input['initialMessageInnerTextBridge_'], 'set');
+      spyOn(input['initialMessageInnerTextHook_'], 'set');
 
       input['onGsLabelChanged_'](label);
 
-      assert(input['initialMessageInnerTextBridge_'].set).to.haveBeenCalledWith(label);
+      assert(input['initialMessageInnerTextHook_'].set).to.haveBeenCalledWith(label);
     });
 
     it('should set the initial message to the default message if there are no labels', () => {
-      spyOn(input['initialMessageInnerTextBridge_'], 'set');
+      spyOn(input['initialMessageInnerTextHook_'], 'set');
 
       input['onGsLabelChanged_'](null);
 
-      assert(input['initialMessageInnerTextBridge_'].set).to
+      assert(input['initialMessageInnerTextHook_'].set).to
           .haveBeenCalledWith(Matchers.stringMatching(/Drop a file/));
     });
   });

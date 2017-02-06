@@ -4,7 +4,7 @@ import {
   bind,
   BooleanParser,
   customElement,
-  DomBridge,
+  DomHook,
   handle,
   StringParser} from 'external/gs_tools/src/webc';
 
@@ -19,23 +19,23 @@ import {BaseInput} from './base-input';
 })
 export class TextInput extends BaseInput<string> {
   @bind(null).attribute('gs-value', StringParser)
-  private readonly boundGsValueBridge_: DomBridge<string>;
+  private readonly boundGsValueHook_: DomHook<string>;
 
   @bind('#input').attribute('disabled', BooleanParser)
-  private readonly boundInputDisabledBridge_: DomBridge<boolean>;
+  private readonly boundInputDisabledHook_: DomHook<boolean>;
 
   @bind('#input').property('value')
-  private readonly boundInputValueBridge_: DomBridge<string>;
+  private readonly boundInputValueHook_: DomHook<string>;
 
   constructor(@inject('theming.ThemeService') themeService: ThemeService) {
     super(
         themeService,
-        DomBridge.of<string>(),
-        DomBridge.of<string>(),
+        DomHook.of<string>(),
+        DomHook.of<string>(),
         StringParser);
-    this.boundGsValueBridge_ = this.gsValueBridge_;
-    this.boundInputDisabledBridge_ = this.inputDisabledBridge_;
-    this.boundInputValueBridge_ = this.inputValueBridge_;
+    this.boundGsValueHook_ = this.gsValueHook_;
+    this.boundInputDisabledHook_ = this.inputDisabledHook_;
+    this.boundInputValueHook_ = this.inputValueHook_;
   }
 
   /**

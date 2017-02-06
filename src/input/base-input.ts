@@ -2,7 +2,7 @@ import {Interval} from 'external/gs_tools/src/async';
 import {DomEvent} from 'external/gs_tools/src/event';
 import {
   BooleanParser,
-  DomBridge,
+  DomHook,
   handle,
   IAttributeParser} from 'external/gs_tools/src/webc';
 
@@ -14,22 +14,22 @@ export abstract class BaseInput<T> extends BaseActionElement {
   private static INPUT_INTERVAL_: number = 500;
 
   protected readonly valueParser_: IAttributeParser<T>;
-  protected readonly gsValueBridge_: DomBridge<T>;
-  protected readonly inputDisabledBridge_: DomBridge<boolean>;
-  protected readonly inputValueBridge_: DomBridge<string>;
+  protected readonly gsValueHook_: DomHook<T>;
+  protected readonly inputDisabledHook_: DomHook<boolean>;
+  protected readonly inputValueHook_: DomHook<string>;
 
   private readonly interval_: Interval;
   private inputEl_: HTMLInputElement | null = null;
 
   constructor(
       themeService: ThemeService,
-      gsValueBridge: DomBridge<T>,
-      valueBridge: DomBridge<string>,
+      gsValueHook: DomHook<T>,
+      valueHook: DomHook<string>,
       valueParser: IAttributeParser<T>) {
     super(themeService);
-    this.gsValueBridge_ = gsValueBridge;
-    this.inputDisabledBridge_ = DomBridge.of<boolean>(true);
-    this.inputValueBridge_ = valueBridge;
+    this.gsValueHook_ = gsValueHook;
+    this.inputDisabledHook_ = DomHook.of<boolean>(true);
+    this.inputValueHook_ = valueHook;
     this.valueParser_ = valueParser;
     this.interval_ = new Interval(BaseInput.INPUT_INTERVAL_);
     this.addDisposable(this.interval_);
@@ -53,9 +53,9 @@ export abstract class BaseInput<T> extends BaseActionElement {
    * @param newValue The value it was changed to.
    */
   protected onGsValueChange_(newValue: T): void {
-    let parsedValue = this.valueParser_.parse(this.inputValueBridge_.get());
+    let parsedValue = this.valueParser_.parse(this.inputValueHook_.get());
     if (this.isValueChanged_(parsedValue, newValue)) {
-      this.inputValueBridge_.set(this.valueParser_.stringify(newValue));
+      this.inputValueHook_.set(this.valueParser_.stringify(newValue));
     }
   }
 
@@ -66,15 +66,15 @@ export abstract class BaseInput<T> extends BaseActionElement {
    */
   @handle(null).attributeChange('disabled', BooleanParser)
   protected onDisabledChange_(newValue: boolean): void {
-    this.inputDisabledBridge_.set(newValue);
+    this.inputDisabledHook_.set(newValue);
   }
 
   /**
    * Handler called when the input element fires a change event.
    */
   protected onInputTick_(): void {
-    let previousValue = this.gsValueBridge_.get();
-    let parsedNewValue: T | null = this.valueParser_.parse(this.inputValueBridge_.get());
+    let previousValue = this.gsValueHook_.get();
+    let parsedNewValue: T | null = this.valueParser_.parse(this.inputValueHook_.get());
     if (parsedNewValue === null) {
       return;
     }
@@ -83,7 +83,7 @@ export abstract class BaseInput<T> extends BaseActionElement {
       return;
     }
 
-    this.gsValueBridge_.set(parsedNewValue);
+    this.gsValueHook_.set(parsedNewValue);
     let element = this.getElement();
     if (element !== null) {
       element.dispatch(DomEvent.CHANGE);

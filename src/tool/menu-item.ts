@@ -1,6 +1,6 @@
 import {DomEvent} from 'external/gs_tools/src/event';
 import {inject} from 'external/gs_tools/src/inject';
-import {bind, customElement, DomBridge, handle, StringParser} from 'external/gs_tools/src/webc';
+import {bind, customElement, DomHook, handle, StringParser} from 'external/gs_tools/src/webc';
 
 import {BaseThemedElement} from '../common/base-themed-element';
 import {ThemeService} from '../theming/theme-service';
@@ -14,7 +14,7 @@ import {OverlayService} from '../tool/overlay-service';
 })
 export class MenuItem extends BaseThemedElement {
   @bind('#content').innerText()
-  private readonly nameBridge_: DomBridge<string>;
+  private readonly nameHook_: DomHook<string>;
 
   private readonly menuService_: OverlayService;
 
@@ -23,12 +23,12 @@ export class MenuItem extends BaseThemedElement {
       @inject('gs.tool.OverlayService') menuService: OverlayService) {
     super(themeService);
     this.menuService_ = menuService;
-    this.nameBridge_ = DomBridge.of<string>();
+    this.nameHook_ = DomHook.of<string>();
   }
 
   @handle(null).attributeChange('gs-content', StringParser)
   protected onDataAttributeChange_(newContent: string): void {
-    this.nameBridge_.set(newContent);
+    this.nameHook_.set(newContent);
   }
 
   @handle(null).event(DomEvent.CLICK)

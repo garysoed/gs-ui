@@ -4,7 +4,7 @@ import {
   bind,
   BooleanParser,
   customElement,
-  DomBridge,
+  DomHook,
   FloatParser,
   handle} from 'external/gs_tools/src/webc';
 
@@ -19,23 +19,23 @@ import {BaseInput} from './base-input';
 })
 export class FloatInput extends BaseInput<number> {
   @bind(null).attribute('gs-value', FloatParser)
-  private readonly boundGsValueBridge_: DomBridge<number>;
+  private readonly boundGsValueHook_: DomHook<number>;
 
   @bind('#input').attribute('disabled', BooleanParser)
-  private readonly boundInputDisabledBridge_: DomBridge<boolean>;
+  private readonly boundInputDisabledHook_: DomHook<boolean>;
 
   @bind('#input').property('value')
-  private readonly boundInputValueBridge_: DomBridge<string>;
+  private readonly boundInputValueHook_: DomHook<string>;
 
   constructor(@inject('theming.ThemeService') themeService: ThemeService) {
     super(
         themeService,
-        DomBridge.of<number>(),
-        DomBridge.of<string>(),
+        DomHook.of<number>(),
+        DomHook.of<string>(),
         FloatParser);
-    this.boundGsValueBridge_ = this.gsValueBridge_;
-    this.boundInputDisabledBridge_ = this.inputDisabledBridge_;
-    this.boundInputValueBridge_ = this.inputValueBridge_;
+    this.boundGsValueHook_ = this.gsValueHook_;
+    this.boundInputDisabledHook_ = this.inputDisabledHook_;
+    this.boundInputValueHook_ = this.inputValueHook_;
   }
 
   /**

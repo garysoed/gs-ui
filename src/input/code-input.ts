@@ -6,7 +6,7 @@ import {
   bind,
   BooleanParser,
   customElement,
-  DomBridge,
+  DomHook,
   EnumParser,
   handle,
   IDomBinder,
@@ -78,15 +78,15 @@ export class EditorValueBinder implements IDomBinder<string> {
 export class CodeInput extends BaseInput<string> {
 
   @bind(null).attribute('gs-value', StringParser)
-  private readonly boundGsValueBridge_: DomBridge<string>;
+  private readonly boundGsValueHook_: DomHook<string>;
 
   @bind(null).attribute('gs-show-gutter', BooleanParser)
-  private readonly gsShowGutterBridge_: DomBridge<boolean>;
+  private readonly gsShowGutterHook_: DomHook<boolean>;
 
   @bind('#editor').attribute('disabled', BooleanParser)
-  private readonly boundInputDisabledBridge_: DomBridge<boolean>;
+  private readonly boundInputDisabledHook_: DomHook<boolean>;
 
-  private readonly editorValueBridge_: DomBridge<string>;
+  private readonly editorValueHook_: DomHook<string>;
 
   private readonly ace_: AceAjax.Ace;
   private readonly document_: Document;
@@ -99,24 +99,24 @@ export class CodeInput extends BaseInput<string> {
       @inject('x.dom.document') document: Document) {
     super(
         themeService,
-        DomBridge.of<string>(),
-        DomBridge.of<string>(),
+        DomHook.of<string>(),
+        DomHook.of<string>(),
         StringParser);
     this.ace_ = ace;
     this.document_ = document;
     this.editor_ = null;
-    this.boundGsValueBridge_ = this.gsValueBridge_;
-    this.boundInputDisabledBridge_ = this.inputDisabledBridge_;
+    this.boundGsValueHook_ = this.gsValueHook_;
+    this.boundInputDisabledHook_ = this.inputDisabledHook_;
     this.editorValueBinder_ = new EditorValueBinder();
-    this.editorValueBridge_ = this.inputValueBridge_;
-    this.gsShowGutterBridge_ = DomBridge.of<boolean>();
+    this.editorValueHook_ = this.inputValueHook_;
+    this.gsShowGutterHook_ = DomHook.of<boolean>();
   }
 
   /**
    * Handles initialization.
    */
   [Reflect.__initialize](): void {
-    this.editorValueBridge_.open(this.editorValueBinder_);
+    this.editorValueHook_.open(this.editorValueBinder_);
   }
 
   /**
@@ -155,8 +155,8 @@ export class CodeInput extends BaseInput<string> {
    * @override
    */
   onCreated(element: HTMLElement): void {
-    if (this.gsShowGutterBridge_.get() === null) {
-      this.gsShowGutterBridge_.set(true);
+    if (this.gsShowGutterHook_.get() === null) {
+      this.gsShowGutterHook_.set(true);
     }
     this.editor_ = this.ace_.edit(<HTMLElement> element.shadowRoot.querySelector('#editor'));
     this.editorValueBinder_.setEditor(this.editor_);

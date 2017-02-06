@@ -1,5 +1,5 @@
 import {inject} from 'external/gs_tools/src/inject';
-import {bind, customElement, DomBridge, handle, StringParser} from 'external/gs_tools/src/webc';
+import {bind, customElement, DomHook, handle, StringParser} from 'external/gs_tools/src/webc';
 
 import {BaseThemedElement} from '../common/base-themed-element';
 import {ThemeService} from '../theming/theme-service';
@@ -14,20 +14,20 @@ import {ThemeService} from '../theming/theme-service';
 })
 export class Switch extends BaseThemedElement {
   @bind('#content').attribute('select', StringParser)
-  private readonly selectBridge_: DomBridge<string>;
+  private readonly selectHook_: DomHook<string>;
 
   constructor(
       @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-    this.selectBridge_ = DomBridge.of<string>(true);
+    this.selectHook_ = DomHook.of<string>(true);
   }
 
   @handle(null).attributeChange('gs-value', StringParser)
   protected onGsValueChange_(value: string | null): void {
     if (value === null) {
-      this.selectBridge_.delete();
+      this.selectHook_.delete();
     } else {
-      this.selectBridge_.set(`[gs-when="${value}"]`);
+      this.selectHook_.set(`[gs-when="${value}"]`);
     }
   }
 }

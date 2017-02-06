@@ -5,7 +5,7 @@ import {
   bind,
   BooleanParser,
   customElement,
-  DomBridge} from 'external/gs_tools/src/webc';
+  DomHook} from 'external/gs_tools/src/webc';
 
 import {Event} from '../const/event';
 
@@ -27,7 +27,7 @@ import {OverlayService} from './overlay-service';
 })
 export class Menu extends BaseElement {
   @bind(null).attribute('gs-fit-parent-width', BooleanParser)
-  private readonly gsFitParentWidthBridge_: DomBridge<boolean>;
+  private readonly gsFitParentWidthHook_: DomHook<boolean>;
 
   private readonly overlayService_: OverlayService;
   private menuRoot_: HTMLElement;
@@ -35,7 +35,7 @@ export class Menu extends BaseElement {
   constructor(@inject('gs.tool.OverlayService') overlayService: OverlayService) {
     super();
     this.overlayService_ = overlayService;
-    this.gsFitParentWidthBridge_ = DomBridge.of<boolean>();
+    this.gsFitParentWidthHook_ = DomHook.of<boolean>();
   }
 
   /**
@@ -51,7 +51,7 @@ export class Menu extends BaseElement {
     let parentElement = elementTarget.parentElement;
     let menuContent = <HTMLElement> elementTarget.querySelector('[gs-content]');
 
-    if (!!this.gsFitParentWidthBridge_.get()) {
+    if (!!this.gsFitParentWidthHook_.get()) {
       menuContent.style.width = `${parentElement.clientWidth}px`;
     }
 

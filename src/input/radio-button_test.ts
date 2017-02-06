@@ -69,14 +69,14 @@ describe('input.RadioButton', () => {
     it('should update the service', () => {
       let value = true;
       spyOn(button, 'updateService_');
-      spyOn(button['gsCheckedBridge_'], 'get').and.returnValue(value);
+      spyOn(button['gsCheckedHook_'], 'get').and.returnValue(value);
       button['onGsGroupChanged_']();
       assert(button['updateService_']).to.haveBeenCalledWith(value);
     });
 
     it('should update the service to not checked if the bridge value is null', () => {
       spyOn(button, 'updateService_');
-      spyOn(button['gsCheckedBridge_'], 'get').and.returnValue(null);
+      spyOn(button['gsCheckedHook_'], 'get').and.returnValue(null);
       button['onGsGroupChanged_']();
       assert(button['updateService_']).to.haveBeenCalledWith(false);
     });

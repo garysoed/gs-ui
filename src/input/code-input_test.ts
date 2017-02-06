@@ -75,11 +75,11 @@ describe('input.CodeInput', () => {
 
   describe('[Reflect.__initialize]', () => {
     it('should open the editor value bridge', () => {
-      spyOn(input['editorValueBridge_'], 'open');
+      spyOn(input['editorValueHook_'], 'open');
 
       input[Reflect.__initialize]();
 
-      assert(input['editorValueBridge_'].open).to.haveBeenCalledWith(input['editorValueBinder_']);
+      assert(input['editorValueHook_'].open).to.haveBeenCalledWith(input['editorValueBinder_']);
     });
   });
 
@@ -191,8 +191,8 @@ describe('input.CodeInput', () => {
       let aceInnerHtml = 'aceInnerHtml';
       mockDocument.getElementById.and.returnValue({innerHTML: aceInnerHtml});
 
-      spyOn(input['gsShowGutterBridge_'], 'get').and.returnValue(null);
-      spyOn(input['gsShowGutterBridge_'], 'set');
+      spyOn(input['gsShowGutterHook_'], 'get').and.returnValue(null);
+      spyOn(input['gsShowGutterHook_'], 'set');
 
       spyOn(input['editorValueBinder_'], 'setEditor');
 
@@ -204,7 +204,7 @@ describe('input.CodeInput', () => {
       assert(mockDocument.getElementById).to.haveBeenCalledWith('ace_editor.css');
       assert(input['editorValueBinder_'].setEditor).to.haveBeenCalledWith(mockEditor);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('#editor');
-      assert(input['gsShowGutterBridge_'].set).to.haveBeenCalledWith(true);
+      assert(input['gsShowGutterHook_'].set).to.haveBeenCalledWith(true);
     });
 
     it('should throw error if the ace editor CSS style cannot be found', () => {
@@ -224,7 +224,7 @@ describe('input.CodeInput', () => {
 
       mockDocument.getElementById.and.returnValue(null);
 
-      spyOn(input['gsShowGutterBridge_'], 'get').and.returnValue(true);
+      spyOn(input['gsShowGutterHook_'], 'get').and.returnValue(true);
 
       spyOn(input['editorValueBinder_'], 'setEditor');
 
@@ -254,14 +254,14 @@ describe('input.CodeInput', () => {
 
       mockDocument.getElementById.and.returnValue({innerHTML: 'aceInnerHtml'});
 
-      spyOn(input['gsShowGutterBridge_'], 'get').and.returnValue(true);
-      spyOn(input['gsShowGutterBridge_'], 'set');
+      spyOn(input['gsShowGutterHook_'], 'get').and.returnValue(true);
+      spyOn(input['gsShowGutterHook_'], 'set');
 
       spyOn(input['editorValueBinder_'], 'setEditor');
 
       input.onCreated(element);
 
-      assert(input['gsShowGutterBridge_'].set).toNot.haveBeenCalled();
+      assert(input['gsShowGutterHook_'].set).toNot.haveBeenCalled();
     });
   });
 });

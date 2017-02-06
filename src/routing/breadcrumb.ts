@@ -1,6 +1,6 @@
 import {Arrays} from 'external/gs_tools/src/collection';
 import {inject} from 'external/gs_tools/src/inject';
-import {bind, customElement, DomBridge} from 'external/gs_tools/src/webc';
+import {bind, customElement, DomHook} from 'external/gs_tools/src/webc';
 
 import {BaseThemedElement} from '../common/base-themed-element';
 import {ThemeService} from '../theming/theme-service';
@@ -53,7 +53,7 @@ export function crumbDataSetter(data: CrumbData, element: Element): void {
 })
 export class Breadcrumb<T> extends BaseThemedElement {
   @bind('#container').childrenElements<CrumbData>(crumbGenerator, crumbDataSetter)
-  private readonly crumbBridge_: DomBridge<CrumbData[]>;
+  private readonly crumbHook_: DomHook<CrumbData[]>;
 
   private readonly routeService_: RouteService<T>;
 
@@ -65,7 +65,7 @@ export class Breadcrumb<T> extends BaseThemedElement {
       @inject('gs.routing.RouteService') routeService: RouteService<T>,
       @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-    this.crumbBridge_ = DomBridge.of<CrumbData[]>();
+    this.crumbHook_ = DomHook.of<CrumbData[]>();
     this.routeService_ = routeService;
   }
 
@@ -105,7 +105,7 @@ export class Breadcrumb<T> extends BaseThemedElement {
           };
         })
         .asArray();
-    this.crumbBridge_.set(crumbData);
+    this.crumbHook_.set(crumbData);
   }
 
   /**

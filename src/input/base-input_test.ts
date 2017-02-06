@@ -12,15 +12,15 @@ import {BaseInput} from './base-input';
 class Input extends BaseInput<string> { }
 
 describe('input.BaseInput', () => {
-  let mockGsValueBridge;
-  let mockValueBridge;
+  let mockGsValueHook;
+  let mockValueHook;
   let input: Input;
 
   beforeEach(() => {
-    mockGsValueBridge = jasmine.createSpyObj('GsValueBridge', ['get', 'set']);
-    mockValueBridge = jasmine.createSpyObj('ValueBridge', ['get', 'set']);
+    mockGsValueHook = jasmine.createSpyObj('GsValueHook', ['get', 'set']);
+    mockValueHook = jasmine.createSpyObj('ValueHook', ['get', 'set']);
     let mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
-    input = new Input(mockThemeService, mockGsValueBridge, mockValueBridge, StringParser);
+    input = new Input(mockThemeService, mockGsValueHook, mockValueHook, StringParser);
     TestDispose.add(input);
   });
 
@@ -63,39 +63,39 @@ describe('input.BaseInput', () => {
   describe('onGsValueChange_', () => {
     it('should update the input target value', () => {
       let value = 'value';
-      mockValueBridge.get.and.returnValue(null);
+      mockValueHook.get.and.returnValue(null);
 
       input['onGsValueChange_'](value);
 
-      assert(mockValueBridge.set).to.haveBeenCalledWith(value);
+      assert(mockValueHook.set).to.haveBeenCalledWith(value);
     });
 
     it('should not update the input value if it is the same', () => {
       let value = 'value';
-      mockValueBridge.get.and.returnValue(value);
+      mockValueHook.get.and.returnValue(value);
 
       input['onGsValueChange_'](value);
 
-      assert(mockValueBridge.set).toNot.haveBeenCalled();
+      assert(mockValueHook.set).toNot.haveBeenCalled();
     });
   });
 
   describe('onDisabledChange_', () => {
     it('should set the value to the input element', () => {
       let value = true;
-      spyOn(input['inputDisabledBridge_'], 'set');
+      spyOn(input['inputDisabledHook_'], 'set');
       input['onDisabledChange_'](value);
-      assert(input['inputDisabledBridge_'].set).to.haveBeenCalledWith(value);
+      assert(input['inputDisabledHook_'].set).to.haveBeenCalledWith(value);
     });
   });
 
   describe('onInputTick_', () => {
     it('should set the new value and dispatch a CHANGE event', () => {
       let oldValue = 'oldValue';
-      mockGsValueBridge.get.and.returnValue(oldValue);
+      mockGsValueHook.get.and.returnValue(oldValue);
 
       let value = 'value';
-      mockValueBridge.get.and.returnValue(value);
+      mockValueHook.get.and.returnValue(value);
 
       let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
 
@@ -103,14 +103,14 @@ describe('input.BaseInput', () => {
 
       input['onInputTick_']();
 
-      assert(mockGsValueBridge.set).to.haveBeenCalledWith(value);
+      assert(mockGsValueHook.set).to.haveBeenCalledWith(value);
       assert(mockElement.dispatch).to.haveBeenCalledWith(DomEvent.CHANGE);
     });
 
     it('should not set the new value if the value does not change', () => {
       let value = 'value';
-      mockValueBridge.get.and.returnValue(value);
-      mockGsValueBridge.get.and.returnValue(value);
+      mockValueHook.get.and.returnValue(value);
+      mockGsValueHook.get.and.returnValue(value);
 
       let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
 
@@ -118,20 +118,20 @@ describe('input.BaseInput', () => {
 
       input['onInputTick_']();
 
-      assert(mockGsValueBridge.set).toNot.haveBeenCalled();
+      assert(mockGsValueHook.set).toNot.haveBeenCalled();
       assert(mockElement.dispatch).toNot.haveBeenCalled();
     });
 
     it('should not dispatch event if there are no elements', () => {
       let value = 'value';
-      mockValueBridge.get.and.returnValue(value);
-      mockGsValueBridge.get.and.returnValue('oldValue');
+      mockValueHook.get.and.returnValue(value);
+      mockGsValueHook.get.and.returnValue('oldValue');
 
       spyOn(input, 'getElement').and.returnValue(null);
 
       input['onInputTick_']();
 
-      assert(mockGsValueBridge.set).to.haveBeenCalledWith(value);
+      assert(mockGsValueHook.set).to.haveBeenCalledWith(value);
     });
   });
 

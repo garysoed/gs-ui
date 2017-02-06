@@ -26,7 +26,7 @@ describe('tool.Menu', () => {
       let parentWidth = 123;
       let parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = parentWidth;
-      spyOn(menu['gsFitParentWidthBridge_'], 'get').and.returnValue(true);
+      spyOn(menu['gsFitParentWidthHook_'], 'get').and.returnValue(true);
 
       let anchorPoint = AnchorLocation.BOTTOM_LEFT;
       let anchorTarget = AnchorLocation.TOP_RIGHT;
@@ -57,7 +57,7 @@ describe('tool.Menu', () => {
     it('should not set the width to the parent element if fit-parent-width is not set', () => {
       let parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = 123;
-      spyOn(menu['gsFitParentWidthBridge_'], 'get').and.returnValue(false);
+      spyOn(menu['gsFitParentWidthHook_'], 'get').and.returnValue(false);
 
       let menuContentStyle = Mocks.object('menuContentStyle');
       let menuContent = Mocks.object('menuContent');

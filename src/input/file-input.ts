@@ -5,7 +5,7 @@ import {
   ArrayParser,
   bind,
   customElement,
-  DomBridge,
+  DomHook,
   handle,
   StringParser} from 'external/gs_tools/src/webc';
 
@@ -26,19 +26,19 @@ import {FileService} from './file-service';
 })
 export class FileInput extends BaseThemedElement {
   @bind(null).attribute('gs-bundle-id', StringParser)
-  private readonly gsBundleIdBridge_: DomBridge<string>;
+  private readonly gsBundleIdHook_: DomHook<string>;
 
   @bind(null).attribute('gs-mime-types', ArrayParser(StringParser))
-  private readonly gsMimeTypesBridge_: DomBridge<string[]>;
+  private readonly gsMimeTypesHook_: DomHook<string[]>;
 
   @bind('#initialMessage').innerText()
-  private readonly initialMessageInnerTextBridge_: DomBridge<string>;
+  private readonly initialMessageInnerTextHook_: DomHook<string>;
 
   @bind('#droppedMessage').innerText()
-  private readonly droppedMessageInnerTextBridge_: DomBridge<string>;
+  private readonly droppedMessageInnerTextHook_: DomHook<string>;
 
   @bind('#switch').attribute('gs-value', StringParser)
-  private readonly switchGsValueBridge_: DomBridge<string>;
+  private readonly switchGsValueHook_: DomHook<string>;
 
   private readonly fileService_: FileService;
 
@@ -51,19 +51,19 @@ export class FileInput extends BaseThemedElement {
     super(themeService);
     this.deleteBundleFn_ = null;
     this.dragDepth_ = 0;
-    this.droppedMessageInnerTextBridge_ = DomBridge.of<string>();
+    this.droppedMessageInnerTextHook_ = DomHook.of<string>();
     this.fileService_ = fileService;
-    this.gsBundleIdBridge_ = DomBridge.of<string>();
-    this.gsMimeTypesBridge_ = DomBridge.of<string[]>();
-    this.initialMessageInnerTextBridge_ = DomBridge.of<string>();
-    this.switchGsValueBridge_ = DomBridge.of<string>();
+    this.gsBundleIdHook_ = DomHook.of<string>();
+    this.gsMimeTypesHook_ = DomHook.of<string[]>();
+    this.initialMessageInnerTextHook_ = DomHook.of<string>();
+    this.switchGsValueHook_ = DomHook.of<string>();
   }
 
   /**
    * @return Files that have been attached, or null if there are none.
    */
   private getFiles_(): File[] | null {
-    let bundleId = this.gsBundleIdBridge_.get();
+    let bundleId = this.gsBundleIdHook_.get();
     if (bundleId === null) {
       return null;
     }
@@ -76,7 +76,7 @@ export class FileInput extends BaseThemedElement {
    * @return True iff the given data transfer object is valid.
    */
   private isValid_(dataTransfer: DataTransfer): boolean {
-    let mimeTypesArray = this.gsMimeTypesBridge_.get();
+    let mimeTypesArray = this.gsMimeTypesHook_.get();
     if (mimeTypesArray === null) {
       return true;
     }
@@ -102,9 +102,9 @@ export class FileInput extends BaseThemedElement {
     this.dragDepth_++;
     if (this.dragDepth_ > 0) {
       if (this.isValid_(event.dataTransfer)) {
-        this.switchGsValueBridge_.set('dragging');
+        this.switchGsValueHook_.set('dragging');
       } else {
-        this.switchGsValueBridge_.set('error');
+        this.switchGsValueHook_.set('error');
       }
     }
   }
@@ -115,9 +115,9 @@ export class FileInput extends BaseThemedElement {
     if (this.dragDepth_ <= 0) {
       let files = this.getFiles_();
       if (files === null || files.length <= 0) {
-        this.switchGsValueBridge_.set('initial');
+        this.switchGsValueHook_.set('initial');
       } else {
-        this.switchGsValueBridge_.set('dropped');
+        this.switchGsValueHook_.set('dropped');
       }
     }
   }
@@ -135,7 +135,7 @@ export class FileInput extends BaseThemedElement {
       let {id, deleteFn} =
           this.fileService_.addBundle(Arrays.fromItemList(event.dataTransfer.files).asArray());
       this.deleteBundleFn_ = deleteFn;
-      this.gsBundleIdBridge_.set(id);
+      this.gsBundleIdHook_.set(id);
     }
 
     return false;
@@ -149,11 +149,11 @@ export class FileInput extends BaseThemedElement {
 
     let files = this.getFiles_();
     if (files === null) {
-      this.switchGsValueBridge_.set('initial');
+      this.switchGsValueHook_.set('initial');
       return;
     }
 
-    this.switchGsValueBridge_.set('dropped');
+    this.switchGsValueHook_.set('dropped');
 
     // TODO: sort the file names.
     let fileNames = Arrays
@@ -164,7 +164,7 @@ export class FileInput extends BaseThemedElement {
         .asArray()
         .join(', ');
     // TODO: Differentiate between 1 attachment vs multiple.
-    this.droppedMessageInnerTextBridge_.set(`Added file(s): ${fileNames}`);
+    this.droppedMessageInnerTextHook_.set(`Added file(s): ${fileNames}`);
   }
 
   /**
@@ -172,6 +172,6 @@ export class FileInput extends BaseThemedElement {
    */
   @handle(null).attributeChange('gs-label', StringParser)
   protected onGsLabelChanged_(label: string | null): void {
-    this.initialMessageInnerTextBridge_.set(label || 'Drop a file here to upload');
+    this.initialMessageInnerTextHook_.set(label || 'Drop a file here to upload');
   }
 }
