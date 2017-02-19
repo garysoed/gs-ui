@@ -17,18 +17,22 @@ import {ThemeService} from '../theming/theme-service';
 })
 export class Drawer extends BaseThemedElement {
   @bind('#root').classList()
-  private readonly classListHook_: DomHook<Set<string>>;
+  readonly classListHook_: DomHook<Set<string>>;
+
+  @bind('#container').property('style')
+  readonly containerStyleHook_: DomHook<CSSStyleDeclaration>;
 
   @bind('#root').attribute('flex-justify', StringParser)
-  private readonly flexJustifyHook_: DomHook<string>;
+  readonly flexJustifyHook_: DomHook<string>;
 
   @bind('#root').property('style')
-  private readonly rootStyleHook_: DomHook<CSSStyleDeclaration>;
+  readonly rootStyleHook_: DomHook<CSSStyleDeclaration>;
 
   constructor(
       @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
     this.classListHook_ = DomHook.of<Set<string>>();
+    this.containerStyleHook_ = DomHook.of<CSSStyleDeclaration>();
     this.flexJustifyHook_ = DomHook.of<string>();
     this.rootStyleHook_ = DomHook.of<CSSStyleDeclaration>();
   }
@@ -40,12 +44,19 @@ export class Drawer extends BaseThemedElement {
    */
   @handle(null).attributeChange('gs-anchor-point', StringParser)
   protected onAnchorPointChanged_(anchorPoint: string): void {
+    const style = this.containerStyleHook_.get();
+    if (style === null) {
+      return;
+    }
+
     switch (anchorPoint.toLowerCase()) {
       case 'left':
-        this.flexJustifyHook_.set('flex-start');
+        style.left = '0';
+        style.right = null;
         break;
       case 'right':
-        this.flexJustifyHook_.set('flex-end');
+        style.left = null;
+        style.right = '0';
         break;
       default:
         throw Error(`Invalid anchor point ${anchorPoint}`);
@@ -59,7 +70,7 @@ export class Drawer extends BaseThemedElement {
    */
   @handle(null).attributeChange('gs-is-expanded', BooleanParser)
   protected onIsExpandedChanged_(isExpanded: boolean): void {
-    let classListSet = this.classListHook_.get() || new Set();
+    const classListSet = this.classListHook_.get() || new Set();
     if (isExpanded) {
       classListSet.add('expanded');
     } else {
@@ -75,7 +86,7 @@ export class Drawer extends BaseThemedElement {
    */
   @handle(null).attributeChange('gs-min-width', StringParser)
   protected onMinWidthChanged_(width: string): void {
-    let styleDeclaration = this.rootStyleHook_.get();
+    const styleDeclaration = this.rootStyleHook_.get();
     if (styleDeclaration !== null) {
       styleDeclaration.setProperty('--gsDrawerCollapsedWidth', width);
     }
@@ -88,7 +99,7 @@ export class Drawer extends BaseThemedElement {
    */
   @handle(null).attributeChange('gs-max-width', StringParser)
   protected onMaxWidthChanged_(width: string): void {
-    let styleDeclaration = this.rootStyleHook_.get();
+    const styleDeclaration = this.rootStyleHook_.get();
     if (styleDeclaration !== null) {
       styleDeclaration.setProperty('--gsDrawerExpandedWidth', width);
     }

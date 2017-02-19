@@ -3,6 +3,8 @@ import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
 import {
   Animation,
   AnimationEasing,
+  bind,
+  DomHook,
   handle,
   StringParser} from 'external/gs_tools/src/webc';
 
@@ -13,6 +15,9 @@ import {ThemeService} from '../theming/theme-service';
 
 export abstract class BaseTab extends BaseThemedElement {
   static CHANGE_EVENT: string = 'gse-tab-change';
+
+  @bind(null).attribute('gs-selected-tab', StringParser)
+  readonly selectedTabHook_: DomHook<string>;
 
   private highlightContainerEl_: ListenableDom<HTMLElement>;
   private highlightEl_: HTMLElement;
@@ -25,12 +30,13 @@ export abstract class BaseTab extends BaseThemedElement {
   constructor(themeService: ThemeService) {
     super(themeService);
     this.interval_ = Interval.newInstance(500);
+    this.selectedTabHook_ = DomHook.of<string>();
     this.addDisposable(this.interval_);
   }
 
   private onAction_(event: Event): void {
-    let target = <HTMLElement> event.target;
-    this.setAttribute('gsSelectedTab', target.getAttribute('gs-tab-id') || '');
+    const target = <HTMLElement> event.target;
+    this.selectedTabHook_.set(target.getAttribute('gs-tab-id') || '');
   }
 
   private onMutate_(): void {
@@ -42,7 +48,7 @@ export abstract class BaseTab extends BaseThemedElement {
    */
   @handle(null).attributeChange('gs-selected-tab', StringParser)
   protected onSelectedTabChanged_(): void {
-    let element = this.getElement();
+    const element = this.getElement();
     if (element !== null) {
       element.dispatch(BaseTab.CHANGE_EVENT, () => {});
     }
@@ -57,7 +63,7 @@ export abstract class BaseTab extends BaseThemedElement {
    * Sets the highlight to move to the given position and length.
    * @param start Start position to move the highlight element to.
    * @param length Length to stretch the highlight element to.
-   * @return Promise that will be resolved when the animation is completed.
+   * @return Promise that will be resolved when the animation is compconsted.
    */
   private setHighlight_(start: number, length: number): Promise<void> {
     if (start === this.highlightStart_ && length === this.highlightLength_) {
@@ -67,13 +73,13 @@ export abstract class BaseTab extends BaseThemedElement {
     if (this.highlightLength_ === 0) {
       this.highlightStart_ = start + length / 2;
     }
-    let animation = Animation.newInstance(
+    const animation = Animation.newInstance(
         [
           this.getAnimationKeyframe(this.highlightStart_, this.highlightLength_),
           this.getAnimationKeyframe(start, length),
         ],
         {duration: 300, easing: AnimationEasing.EASE_OUT_EXPO});
-    let animate = ListenableDom.of(animation.applyTo(this.highlightEl_));
+    const animate = ListenableDom.of(animation.applyTo(this.highlightEl_));
     this.addDisposable(animate);
     return new Promise<void>((resolve: () => void) => {
       this.addDisposable(animate.once(DomEvent.FINISH, () => {
@@ -83,29 +89,6 @@ export abstract class BaseTab extends BaseThemedElement {
         resolve();
       }, this));
     });
-  }
-
-  @sequenced()
-  private updateHighlight_(): Promise<void> {
-    let selectedId = this.getAttribute('gsSelectedTab');
-    let destinationStart;
-    let destinationHeight;
-    let element = this.getElement();
-    if (element === null) {
-      return Promise.reject('No elements are found');
-    }
-
-    if (selectedId) {
-      let selectedTab = <HTMLElement> element.getEventTarget()
-          .querySelector(`[gs-tab-id="${selectedId}"]`);
-      destinationStart = this.getStartPosition(selectedTab);
-      destinationHeight = this.getLength(selectedTab);
-    } else {
-      destinationStart = this.highlightStart_ + this.highlightLength_ / 2;
-      destinationHeight = this.highlightLength_;
-    }
-
-    return this.setHighlight_(destinationStart, destinationHeight);
   }
 
   /**
@@ -141,7 +124,7 @@ export abstract class BaseTab extends BaseThemedElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    let shadowRoot = element.shadowRoot;
+    const shadowRoot = element.shadowRoot;
     this.highlightContainerEl_ = ListenableDom
         .of(<HTMLElement> shadowRoot.querySelector('.highlight-container'));
     this.highlightEl_ = <HTMLElement> shadowRoot.querySelector('.highlight');
@@ -161,9 +144,32 @@ export abstract class BaseTab extends BaseThemedElement {
    * @override
    */
   onInserted(): void {
-    let element = this.getElement();
+    const element = this.getElement();
     if (element !== null) {
       element.on(Event.ACTION, this.onAction_, this);
     }
+  }
+
+  @sequenced()
+  private updateHighlight_(): Promise<void> {
+    const selectedId = this.selectedTabHook_.get();
+    let destinationStart;
+    let destinationHeight;
+    const element = this.getElement();
+    if (element === null) {
+      return Promise.reject('No elements are found');
+    }
+
+    if (selectedId !== null) {
+      const selectedTab = <HTMLElement> element.getEventTarget()
+          .querySelector(`[gs-tab-id="${selectedId}"]`);
+      destinationStart = this.getStartPosition(selectedTab);
+      destinationHeight = this.getLength(selectedTab);
+    } else {
+      destinationStart = this.highlightStart_ + this.highlightLength_ / 2;
+      destinationHeight = this.highlightLength_;
+    }
+
+    return this.setHighlight_(destinationStart, destinationHeight);
   }
 }

@@ -16,15 +16,28 @@ describe('section.Drawer', () => {
   });
 
   describe('onAnchorPointChanged_', () => {
-    it('should set the flex justify value correctly', () => {
-      spyOn(drawer['flexJustifyHook_'], 'set');
+    it('should set the style correctly if the anchor point is "left"', () => {
+      const style = Mocks.object('style');
+      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(style);
 
       drawer['onAnchorPointChanged_']('left');
 
-      assert(drawer['flexJustifyHook_'].set).to.haveBeenCalledWith('flex-start');
+      assert(style.left).to.equal('0');
+      assert(style.right).to.beNull();
+    });
+
+    it('should set the style correctly if the anchor point is "right"', () => {
+      const style = Mocks.object('style');
+      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(style);
+
+      drawer['onAnchorPointChanged_']('right');
+
+      assert(style.left).to.beNull();
+      assert(style.right).to.equal('0');
     });
 
     it('should throw error if the value is invalid', () => {
+      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(Mocks.object('style'));
       assert(() => {
         drawer['onAnchorPointChanged_']('unknown');
       }).to.throwError(/Invalid anchor point/);

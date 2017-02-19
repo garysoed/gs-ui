@@ -1,19 +1,27 @@
 <style>
-  #root {
+  #container {
+    bottom: 0;
+    position: absolute;
+    top: 0;
+  }
+
+  #root #container {
     background-color: var(--gsColorPassiveBG);
     overflow: hidden;
     transition: width .2s;
     width: var(--gsDrawerCollapsedWidth);
   }
 
-  #root.expanded {
+  #root.expanded #container {
     transition: width .2s;
     width: var(--gsDrawerExpandedWidth);
   }
 </style>
 
-<div id="root" layout="row" fill-parent flex-justify="flex-start">
-  <div flex>
-    <content select="[gs-content]"></content>
+<div fill-parent id="root">
+  <div id="container" layout="row">
+    <div flex>
+      <content id="content" select="[gs-content]"></content>
+    </div>
   </div>
 </div>

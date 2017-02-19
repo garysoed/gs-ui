@@ -44,11 +44,11 @@ describe('section.BaseTab', () => {
       let mockTarget = jasmine.createSpyObj('Target', ['getAttribute']);
       mockTarget.getAttribute.and.returnValue(attribute);
 
-      spyOn(tab, 'setAttribute');
+      spyOn(tab.selectedTabHook_, 'set');
 
       tab['onAction_'](<Event> {target: mockTarget});
 
-      assert(tab.setAttribute).to.haveBeenCalledWith('gsSelectedTab', attribute);
+      assert(tab.selectedTabHook_.set).to.haveBeenCalledWith(attribute);
       assert(mockTarget.getAttribute).to.haveBeenCalledWith('gs-tab-id');
     });
   });
@@ -191,58 +191,6 @@ describe('section.BaseTab', () => {
     });
   });
 
-  describe('updateHighlight_', () => {
-    it('should grab the destination start and length correctly', async (done: any) => {
-      let start = 12;
-      let length = 34;
-      let selectedId = 'selectedId';
-
-      let selectedTab = Mocks.object('selectedTab');
-      spyOn(tab, 'getStartPosition').and.returnValue(start);
-      spyOn(tab, 'getLength').and.returnValue(length);
-
-      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
-      mockElement.querySelector.and.returnValue(selectedTab);
-      mockElement['gsSelectedTab'] = selectedId;
-      tab['element_'] = <ListenableDom<HTMLElement>> {getEventTarget: () => mockElement};
-
-      spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
-
-      await tab['updateHighlight_']();
-      assert(tab['setHighlight_']).to.haveBeenCalledWith(start, length);
-      assert(mockElement.querySelector).to.haveBeenCalledWith(`[gs-tab-id="${selectedId}"]`);
-      assert(tab['getStartPosition']).to.haveBeenCalledWith(selectedTab);
-      assert(tab['getLength']).to.haveBeenCalledWith(selectedTab);
-    });
-
-    it('should shrink to 0 length if there are no selected Ids', async (done: any) => {
-      let start = 12;
-      let length = 34;
-
-      tab['highlightStart_'] = start;
-      tab['highlightLength_'] = length;
-
-      let element = Mocks.object('element');
-      tab['element_'] = <ListenableDom<HTMLElement>> {getEventTarget: () => element};
-
-      spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
-
-      await tab['updateHighlight_']();
-      assert(tab['setHighlight_']).to.haveBeenCalledWith(29, 34);
-    });
-
-    it('should reject if there are no elements', async (done: any) => {
-      tab['element_'] = null;
-
-      try {
-        await tab['updateHighlight_']();
-        done.fail();
-      } catch (e) {
-        assert(<string> e).to.match(/elements are found/);
-      }
-    });
-  });
-
   describe('onCreated', () => {
     it('should initialize correctly', () => {
       let tabContainer = Mocks.object('tabContainer');
@@ -302,6 +250,60 @@ describe('section.BaseTab', () => {
       assert(() => {
         tab.onInserted();
       }).toNot.throw();
+    });
+  });
+
+  describe('updateHighlight_', () => {
+    it('should grab the destination start and length correctly', async (done: any) => {
+      let start = 12;
+      let length = 34;
+      let selectedId = 'selectedId';
+      spyOn(tab.selectedTabHook_, 'get').and.returnValue(selectedId);
+
+      let selectedTab = Mocks.object('selectedTab');
+      spyOn(tab, 'getStartPosition').and.returnValue(start);
+      spyOn(tab, 'getLength').and.returnValue(length);
+
+      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      mockElement.querySelector.and.returnValue(selectedTab);
+      tab['element_'] = <ListenableDom<HTMLElement>> {getEventTarget: () => mockElement};
+
+      spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
+
+      await tab['updateHighlight_']();
+      assert(tab['setHighlight_']).to.haveBeenCalledWith(start, length);
+      assert(mockElement.querySelector).to.haveBeenCalledWith(`[gs-tab-id="${selectedId}"]`);
+      assert(tab['getStartPosition']).to.haveBeenCalledWith(selectedTab);
+      assert(tab['getLength']).to.haveBeenCalledWith(selectedTab);
+    });
+
+    it('should shrink to 0 length if there are no selected Ids', async (done: any) => {
+      let start = 12;
+      let length = 34;
+      spyOn(tab.selectedTabHook_, 'get').and.returnValue(null);
+
+      tab['highlightStart_'] = start;
+      tab['highlightLength_'] = length;
+
+      let element = Mocks.object('element');
+      tab['element_'] = <ListenableDom<HTMLElement>> {getEventTarget: () => element};
+
+      spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
+
+      await tab['updateHighlight_']();
+      assert(tab['setHighlight_']).to.haveBeenCalledWith(29, 34);
+    });
+
+    it('should reject if there are no elements', async (done: any) => {
+      spyOn(tab.selectedTabHook_, 'get').and.returnValue(null);
+      tab['element_'] = null;
+
+      try {
+        await tab['updateHighlight_']();
+        done.fail();
+      } catch (e) {
+        assert(<string> e).to.match(/elements are found/);
+      }
     });
   });
 });
