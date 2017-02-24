@@ -1,4 +1,4 @@
-import {Interval, sequenced} from 'external/gs_tools/src/async';
+import {atomic, Interval} from 'external/gs_tools/src/async';
 import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
 import {
   Animation,
@@ -150,7 +150,7 @@ export abstract class BaseTab extends BaseThemedElement {
     }
   }
 
-  @sequenced()
+  @atomic()
   private updateHighlight_(): Promise<void> {
     const selectedId = this.selectedTabHook_.get();
     let destinationStart;
