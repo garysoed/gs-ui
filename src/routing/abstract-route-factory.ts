@@ -1,16 +1,17 @@
-import {Arrays} from 'external/gs_tools/src/collection';
-import {Jsons} from 'external/gs_tools/src/collection';
-import {Locations} from 'external/gs_tools/src/ui';
+import { Arrays } from 'external/gs_tools/src/collection';
+import { Jsons } from 'external/gs_tools/src/collection';
+import { Locations } from 'external/gs_tools/src/ui';
 
-import {Route} from './route';
+import { Route } from '../routing/route';
 
 
 /**
  * Base class for all route factories.
  *
  * @param <T> Enum type of the route factories.
- * @param <A> Arguments for creating a route for the ancestors factory.
- * @param <P> Arguments for creating a route.
+ * @param <CP> Parameters for the current part of the path.
+ * @param <CR> Parameters for the entire path.
+ * @param <PR> Full parameters of the parent path. CR = CP & CR.
  */
 export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
   protected readonly type_: T;
@@ -49,7 +50,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    * @return The full matcher for this factory.
    */
   private getMatcher_(): string {
-    let currentMatcher = this.getRelativeMatcher_();
+    const currentMatcher = this.getRelativeMatcher_();
     if (this.parent_ === null) {
       return currentMatcher;
     } else {
@@ -63,7 +64,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    *    recognize.
    */
   private getMatchParams_(matches: {[key: string]: string}): CR {
-    let currentMatchParams = this.getRelativeMatchParams_(matches);
+    const currentMatchParams = this.getRelativeMatchParams_(matches);
     if (this.parent_ !== null) {
       return <CR> Jsons.mixin(this.parent_.getMatchParams_(matches), currentMatchParams);
     } else {
@@ -84,7 +85,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    * @return Route object matching the path, or null if there are none.
    */
   createFromPath(path: string): Route<T, CR> | null {
-    let matches = Locations.getMatches(path, `${this.getMatcher_()}$`);
+    const matches = Locations.getMatches(path, `${this.getMatcher_()}$`);
     return matches === null ? null : this.create(this.getMatchParams_(matches));
   }
 
@@ -94,7 +95,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    *    first in the array.
    */
   getCascadeNames(params: CR): Promise<string>[] {
-    let names: Promise<string>[] = [];
+    const names: Promise<string>[] = [];
     let current: AbstractRouteFactory<any, any, any, any> | null = this;
     while (current !== null) {
       names.push(current.getName(params));
@@ -112,7 +113,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    *    first in the array.
    */
   getCascadePaths(params: CR): string[] {
-    let paths: string[] = [];
+    const paths: string[] = [];
     let current: AbstractRouteFactory<any, any, any, any> | null = this;
     while (current !== null) {
       paths.push(current.getPath(params));
@@ -135,7 +136,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    * @return Full path for the given param.
    */
   getPath(params: CR): string {
-    let currentPath = this.getRelativePath_(params);
+    const currentPath = this.getRelativePath_(params);
     if (this.parent_ === null) {
       return currentPath;
     } else {
