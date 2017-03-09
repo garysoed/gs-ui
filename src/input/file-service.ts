@@ -1,7 +1,7 @@
-import {Arrays} from 'external/gs_tools/src/collection';
-import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
-import {bind} from 'external/gs_tools/src/inject';
-import {SimpleIdGenerator} from 'external/gs_tools/src/random';
+import { Arrays, Maps } from 'external/gs_tools/src/collection';
+import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
+import { bind } from 'external/gs_tools/src/inject';
+import { SimpleIdGenerator } from 'external/gs_tools/src/random';
 
 
 @bind('gs.input.FileService')
@@ -28,8 +28,8 @@ export class FileService {
     return new Promise<string[]>((
         resolve: (data: string[]) => void,
         reject: (error: any) => void) => {
-      let fileReader = this.createFileReader_();
-      let listenableFileReader = ListenableDom.of<FileReader>(fileReader);
+      const fileReader = this.createFileReader_();
+      const listenableFileReader = ListenableDom.of<FileReader>(fileReader);
       listenableFileReader.on(
           DomEvent.LOADEND,
           () => {
@@ -50,11 +50,7 @@ export class FileService {
    * @return Object containing the bundle ID and a function to delete the bundle.
    */
   addBundle(files: File[]): {id: string, deleteFn: () => void} {
-    let id = this.idGenerator_.generate();
-    while (this.bundles_.has(id)) {
-      id = this.idGenerator_.resolveConflict(id);
-    }
-
+    const id = this.idGenerator_.generate(Maps.of(this.bundles_).keys().asArray());
     this.bundles_.set(id, files);
     return {
       deleteFn: function(): void {
@@ -78,12 +74,12 @@ export class FileService {
    *     bundle ID does not exist.
    */
   async processBundle(bundleId: string): Promise<Map<File, string> | null> {
-    let files = this.getBundle(bundleId);
+    const files = this.getBundle(bundleId);
     if (files === null) {
       return Promise.resolve(null);
     }
 
-    let promises = Arrays
+    const promises = Arrays
         .of(files)
         .map((file: File) => {
           return Promise.all(<[File, Promise<string>]> [
@@ -92,7 +88,7 @@ export class FileService {
           ]);
         })
         .asArray();
-    let entries = await Promise.all(promises);
+    const entries = await Promise.all(promises);
     return new Map(entries);
   }
 }

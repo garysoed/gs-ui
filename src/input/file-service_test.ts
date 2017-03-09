@@ -1,10 +1,10 @@
-import {assert, Matchers, TestBase} from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
-import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
-import {Mocks} from 'external/gs_tools/src/mock';
+import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
+import { Mocks } from 'external/gs_tools/src/mock';
 
-import {FileService} from './file-service';
+import { FileService } from '../input/file-service';
 
 
 describe('input.FileService', () => {
@@ -16,17 +16,17 @@ describe('input.FileService', () => {
 
   describe('processFile_', () => {
     it('should resolve with the file content correctly', (done: any) => {
-      let mockListenableFileReader =
+      const mockListenableFileReader =
           jasmine.createSpyObj('ListenableFileReader', ['dispose', 'on']);
       spyOn(ListenableDom, 'of').and.returnValue(mockListenableFileReader);
 
-      let content = 'content';
-      let mockFileReader = jasmine.createSpyObj('FileReader', ['readAsText']);
+      const content = 'content';
+      const mockFileReader = jasmine.createSpyObj('FileReader', ['readAsText']);
       mockFileReader.result = content;
       mockFileReader.readyState = 2;
       spyOn(service, 'createFileReader_').and.returnValue(mockFileReader);
 
-      let file = Mocks.object('file');
+      const file = Mocks.object('file');
 
       service['processFile_'](file)
           .then((actualContent: string) => {
@@ -44,16 +44,16 @@ describe('input.FileService', () => {
     });
 
     it('should reject if the file loading ends before done loading', (done: any) => {
-      let mockListenableFileReader =
+      const mockListenableFileReader =
           jasmine.createSpyObj('ListenableFileReader', ['dispose', 'on']);
       spyOn(ListenableDom, 'of').and.returnValue(mockListenableFileReader);
 
-      let mockFileReader = jasmine.createSpyObj('FileReader', ['readAsText']);
+      const mockFileReader = jasmine.createSpyObj('FileReader', ['readAsText']);
       mockFileReader.result = 'content';
       mockFileReader.readyState = 1;
       spyOn(service, 'createFileReader_').and.returnValue(mockFileReader);
 
-      let file = Mocks.object('file');
+      const file = Mocks.object('file');
 
       service['processFile_'](file)
           .then(
@@ -68,34 +68,32 @@ describe('input.FileService', () => {
   });
 
   describe('addBundle', () => {
-    it('should add the bundle correctly and return the bundle ID and the delete function', () => {
-      let id1 = 'id1';
-      spyOn(service['idGenerator_'], 'generate').and.returnValue(id1);
+    it('should add the bundle correctly and return the bundle ID and the deconste function', () => {
+      const id = 'id';
+      spyOn(service['idGenerator_'], 'generate').and.returnValue(id);
 
-      let id2 = 'id2';
-      spyOn(service['idGenerator_'], 'resolveConflict').and.returnValue(id2);
+      const otherId = 'otherId';
+      const otherBundle = Mocks.object('otherBundle');
+      service['bundles_'].set(otherId, otherBundle);
 
-      let otherBundle = Mocks.object('otherBundle');
-      service['bundles_'].set(id1, otherBundle);
+      const bundle = Mocks.object('bundle');
+      const {deleteFn, id: actualId} = service.addBundle(bundle);
 
-      let bundle = Mocks.object('bundle');
-      let {deleteFn, id} = service.addBundle(bundle);
-
-      assert(id).to.equal(id2);
-      assert(service['bundles_']).to.haveEntries([[id1, otherBundle], [id2, bundle]]);
+      assert(actualId).to.equal(id);
+      assert(service['bundles_']).to.haveEntries([[otherId, otherBundle], [id, bundle]]);
 
       deleteFn();
-      assert(service['bundles_']).to.haveEntries([[id1, otherBundle]]);
+      assert(service['bundles_']).to.haveEntries([[otherId, otherBundle]]);
 
-      assert(service['idGenerator_'].resolveConflict).to.haveBeenCalledWith(id1);
+      assert(service['idGenerator_'].generate).to.haveBeenCalledWith([otherId]);
     });
   });
 
   describe('getBundle', () => {
     it('should return the correct bundoe of files', () => {
-      let file1 = Mocks.object('file1');
-      let file2 = Mocks.object('file2');
-      let bundleId = 'bundleId';
+      const file1 = Mocks.object('file1');
+      const file2 = Mocks.object('file2');
+      const bundleId = 'bundleId';
 
       service['bundles_'].set(bundleId, [file1, file2]);
 
@@ -109,12 +107,12 @@ describe('input.FileService', () => {
 
   describe('processBundle', () => {
     it('should return a map of files and its corresponding content', async (done: any) => {
-      let bundleId = 'bundleId';
+      const bundleId = 'bundleId';
 
-      let file1 = Mocks.object('file1');
-      let file2 = Mocks.object('file2');
-      let content1 = 'content1';
-      let content2 = 'content2';
+      const file1 = Mocks.object('file1');
+      const file2 = Mocks.object('file2');
+      const content1 = 'content1';
+      const content2 = 'content2';
       spyOn(service, 'processFile_').and.callFake((file: File) => {
         switch (file) {
           case file1:
@@ -125,7 +123,7 @@ describe('input.FileService', () => {
       });
       spyOn(service, 'getBundle').and.returnValue([file1, file2]);
 
-      let map = await service.processBundle(bundleId);
+      const map = await service.processBundle(bundleId);
       assert(map!).to.haveEntries([
         [file1, content1],
         [file2, content2],
@@ -138,7 +136,7 @@ describe('input.FileService', () => {
     it('should return null if the bundle does not exist', async (done: any) => {
       spyOn(service, 'getBundle').and.returnValue(null);
 
-      let map = await service.processBundle('bundleId');
+      const map = await service.processBundle('bundleId');
       assert(map).to.beNull();
     });
   });
