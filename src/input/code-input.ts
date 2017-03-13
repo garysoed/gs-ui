@@ -1,7 +1,8 @@
-import {inject} from 'external/gs_tools/src/inject';
-import {Enums} from 'external/gs_tools/src/typescript';
-import {Reflect} from 'external/gs_tools/src/util';
-import {Validate} from 'external/gs_tools/src/valid';
+import { Interval } from 'external/gs_tools/src/async';
+import { inject } from 'external/gs_tools/src/inject';
+import { Enums } from 'external/gs_tools/src/typescript';
+import { Reflect } from 'external/gs_tools/src/util';
+import { Validate } from 'external/gs_tools/src/valid';
 import {
   bind,
   BooleanParser,
@@ -10,15 +11,17 @@ import {
   EnumParser,
   handle,
   IDomBinder,
-  StringParser} from 'external/gs_tools/src/webc';
+  StringParser } from 'external/gs_tools/src/webc';
 
-import {ThemeService} from '../theming/theme-service';
+import { ThemeService } from '../theming/theme-service';
 
-import {BaseInput} from './base-input';
+import { BaseInput } from './base-input';
 
 
 export enum Languages {
+  CSS,
   HANDLEBARS,
+  HTML,
   JAVASCRIPT,
   TYPESCRIPT,
 }
@@ -155,18 +158,24 @@ export class CodeInput extends BaseInput<string> {
    * @override
    */
   onCreated(element: HTMLElement): void {
+    super.onCreated(element);
     if (this.gsShowGutterHook_.get() === null) {
       this.gsShowGutterHook_.set(true);
     }
     this.editor_ = this.ace_.edit(<HTMLElement> element.shadowRoot.querySelector('#editor'));
     this.editorValueBinder_.setEditor(this.editor_);
 
-    super.onCreated(element);
-
     this.editor_.setHighlightActiveLine(true);
-
     this.editor_.setReadOnly(false);
     this.editor_.setFontSize('14px');
+
+    this.editor_.session.setTabSize(2);
+    this.editor_.session.setUseSoftTabs(true);
+
+    const interval = Interval.newInstance(500);
+    this.addDisposable(interval);
+    this.addDisposable(interval.on(Interval.TICK_EVENT, this.onTick_, this));
+    interval.start();
 
     let aceCss = this.document_.getElementById('ace_editor.css');
     if (aceCss === null) {
@@ -175,5 +184,14 @@ export class CodeInput extends BaseInput<string> {
     let styleEl = element.ownerDocument.createElement('style');
     styleEl.innerHTML = aceCss.innerHTML;
     element.shadowRoot.appendChild(styleEl);
-  };
+  }
+
+  /**
+   * Called when the interval ticks.
+   */
+  private onTick_(): void {
+    if (this.editor_ !== null) {
+      this.editor_.resize();
+    }
+  }
 }
