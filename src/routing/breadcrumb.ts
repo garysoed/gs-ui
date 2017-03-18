@@ -1,6 +1,6 @@
 import { Arrays } from 'external/gs_tools/src/collection';
 import { inject } from 'external/gs_tools/src/inject';
-import { bind, customElement, DomHook } from 'external/gs_tools/src/webc';
+import { bind, ChildElementDataHelper, customElement, DomHook } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
@@ -14,60 +14,45 @@ export const __FULL_PATH = Symbol('fullPath');
 type CrumbData = {name: string, url: string};
 
 
-/**
- * Creates an element that represents a crumb.
- * @param document The owner document.
- * @return Element representing a crumb.
- */
-export function crumbGenerator(document: Document): Element {
-  const rootCrumb = document.createElement('div');
-  rootCrumb.classList.add('crumb');
-  rootCrumb.setAttribute('layout', 'row');
-  rootCrumb.setAttribute('flex-align', 'center');
+export const CRUMB_DATA_HELPER: ChildElementDataHelper<CrumbData> = {
+  create(document: Document): Element {
+    const rootCrumb = document.createElement('div');
+    rootCrumb.classList.add('crumb');
+    rootCrumb.setAttribute('layout', 'row');
+    rootCrumb.setAttribute('flex-align', 'center');
 
-  const link = document.createElement('a');
-  const arrow = document.createElement('gs-icon');
-  arrow.textContent = 'keyboard_arrow_right';
-  rootCrumb.appendChild(link);
-  rootCrumb.appendChild(arrow);
-  return rootCrumb;
-}
+    const link = document.createElement('a');
+    const arrow = document.createElement('gs-icon');
+    arrow.textContent = 'keyboard_arrow_right';
+    rootCrumb.appendChild(link);
+    rootCrumb.appendChild(arrow);
+    return rootCrumb;
+  },
 
+  get(element: Element): CrumbData | null {
+    const linkEl = element.querySelector('a');
+    const href = linkEl.href;
+    if (!href.startsWith('#')) {
+      return null;
+    }
 
-/**
- * Gets the data from the element.
- * @param element Element to get the data from.
- * @return Data from the element.
- */
-export function crumbDataGetter(element: Element): CrumbData | null {
-  const linkEl = element.querySelector('a');
-  const href = linkEl.href;
-  if (!href.startsWith('#')) {
-    return null;
-  }
+    const name = linkEl.textContent;
+    if (name === null) {
+      return null;
+    }
 
-  const name = linkEl.textContent;
-  if (name === null) {
-    return null;
-  }
+    return {
+      name,
+      url: href.substr(1),
+    };
+  },
 
-  return {
-    name,
-    url: href.substr(1),
-  };
-}
-
-
-/**
- * Sets the data to the crumb element.
- * @param data Data to set.
- * @param element The crumb element.
- */
-export function crumbDataSetter(data: CrumbData, element: Element): void {
-  const linkEl = element.querySelector('a');
-  linkEl.href = `#${data.url}`;
-  linkEl.textContent = data.name;
-}
+  set(data: CrumbData, element: Element): void {
+    const linkEl = element.querySelector('a');
+    linkEl.href = `#${data.url}`;
+    linkEl.textContent = data.name;
+  },
+};
 
 @customElement({
   dependencies: [
@@ -77,7 +62,7 @@ export function crumbDataSetter(data: CrumbData, element: Element): void {
   templateKey: 'src/routing/breadcrumb',
 })
 export class Breadcrumb<T> extends BaseThemedElement {
-  @bind('#container').childrenElements<CrumbData>(crumbGenerator, crumbDataGetter, crumbDataSetter)
+  @bind('#container').childrenElements<CrumbData>(CRUMB_DATA_HELPER)
   private readonly crumbHook_: DomHook<CrumbData[]>;
 
   private readonly routeService_: RouteService<T>;

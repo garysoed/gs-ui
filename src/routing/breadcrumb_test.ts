@@ -1,34 +1,23 @@
-import {assert, TestBase} from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import {Mocks} from 'external/gs_tools/src/mock';
-import {TestDispose} from 'external/gs_tools/src/testing';
+import { Mocks } from 'external/gs_tools/src/mock';
+import { TestDispose } from 'external/gs_tools/src/testing';
 
-import {Breadcrumb, crumbDataGetter, crumbDataSetter, crumbGenerator} from './breadcrumb';
-import {RouteServiceEvents} from './route-service-events';
+import { Breadcrumb, CRUMB_DATA_HELPER } from './breadcrumb';
+import { RouteServiceEvents } from './route-service-events';
 
 
-describe('routing.Breadcrumb', () => {
-  let breadcrumb: Breadcrumb<any>;
-  let mockRouteService;
-
-  beforeEach(() => {
-    mockRouteService = Mocks.listenable('RouteService');
-    TestDispose.add(mockRouteService);
-    let mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
-    breadcrumb = new Breadcrumb<any>(mockRouteService, mockThemeService);
-    TestDispose.add(breadcrumb);
-  });
-
-  describe('crumbGenerator', () => {
+describe('CRUMB_DATA_HELPER', () => {
+  describe('create', () => {
     it('should create the element correctly', () => {
-      let mockClassList = jasmine.createSpyObj('ClassList', ['add']);
-      let mockRootEl = jasmine.createSpyObj('RootEl', ['appendChild', 'setAttribute']);
+      const mockClassList = jasmine.createSpyObj('ClassList', ['add']);
+      const mockRootEl = jasmine.createSpyObj('RootEl', ['appendChild', 'setAttribute']);
       mockRootEl.classList = mockClassList;
 
-      let linkEl = Mocks.object('linkEl');
-      let arrowEl = Mocks.object('arrowEl');
-      let mockDocument = jasmine.createSpyObj('Document', ['createElement']);
+      const linkEl = Mocks.object('linkEl');
+      const arrowEl = Mocks.object('arrowEl');
+      const mockDocument = jasmine.createSpyObj('Document', ['createElement']);
       mockDocument.createElement.and.callFake((name: string) => {
         switch (name) {
           case 'div':
@@ -40,7 +29,7 @@ describe('routing.Breadcrumb', () => {
         }
       });
 
-      assert(crumbGenerator(mockDocument)).to.equal(mockRootEl);
+      assert(CRUMB_DATA_HELPER.create(mockDocument, Mocks.object('instance'))).to.equal(mockRootEl);
       assert(mockRootEl.appendChild).to.haveBeenCalledWith(arrowEl);
       assert(mockRootEl.appendChild).to.haveBeenCalledWith(linkEl);
       assert(arrowEl.textContent).to.equal('keyboard_arrow_right');
@@ -50,7 +39,7 @@ describe('routing.Breadcrumb', () => {
     });
   });
 
-  describe('crumbDataGetter', () => {
+  describe('get', () => {
     it('should return the correct data', () => {
       const url = 'url';
       const name = 'name';
@@ -59,7 +48,7 @@ describe('routing.Breadcrumb', () => {
       linkEl.textContent = name;
       const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(linkEl);
-      assert(crumbDataGetter(mockElement)).to.equal({name, url});
+      assert(CRUMB_DATA_HELPER.get(mockElement)).to.equal({name, url});
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
 
@@ -70,7 +59,7 @@ describe('routing.Breadcrumb', () => {
       linkEl.textContent = null;
       const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(linkEl);
-      assert(crumbDataGetter(mockElement)).to.beNull();
+      assert(CRUMB_DATA_HELPER.get(mockElement)).to.beNull();
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
 
@@ -80,44 +69,58 @@ describe('routing.Breadcrumb', () => {
       linkEl.textContent = null;
       const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(linkEl);
-      assert(crumbDataGetter(mockElement)).to.beNull();
+      assert(CRUMB_DATA_HELPER.get(mockElement)).to.beNull();
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
   });
 
-  describe('crumbDataSetter', () => {
+  describe('set', () => {
     it('should set the data correctly', () => {
-      let linkEl = Mocks.object('linkEl');
-      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      const linkEl = Mocks.object('linkEl');
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(linkEl);
 
-      let url = 'url';
-      let name = 'name';
-      crumbDataSetter({name: name, url: url}, mockElement);
+      const url = 'url';
+      const name = 'name';
+      CRUMB_DATA_HELPER.set({name: name, url: url}, mockElement, Mocks.object('instance'));
 
       assert(linkEl.textContent).to.equal(name);
       assert(linkEl.href).to.equal(`#${url}`);
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
   });
+});
+
+
+describe('routing.Breadcrumb', () => {
+  let breadcrumb: Breadcrumb<any>;
+  let mockRouteService;
+
+  beforeEach(() => {
+    mockRouteService = Mocks.listenable('RouteService');
+    TestDispose.add(mockRouteService);
+    const mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
+    breadcrumb = new Breadcrumb<any>(mockRouteService, mockThemeService);
+    TestDispose.add(breadcrumb);
+  });
 
   describe('onRouteChanged_', () => {
     it('should set the bridge with the correct data', async (done: any) => {
-      let name1 = 'name1';
-      let url1 = 'url1';
+      const name1 = 'name1';
+      const url1 = 'url1';
 
-      let name2 = 'name2';
-      let url2 = 'url2';
+      const name2 = 'name2';
+      const url2 = 'url2';
 
-      let mockRouteFactory =
+      const mockRouteFactory =
           jasmine.createSpyObj('RouteFactory', ['getCascadeNames', 'getCascadePaths']);
       mockRouteFactory.getCascadeNames.and
           .returnValue([Promise.resolve(name1), Promise.resolve(name2)]);
       mockRouteFactory.getCascadePaths.and.returnValue([url1, url2]);
 
-      let type = Mocks.object('type');
-      let params = Mocks.object('params');
-      let mockRoute = jasmine.createSpyObj('Route', ['getParams', 'getType']);
+      const type = Mocks.object('type');
+      const params = Mocks.object('params');
+      const mockRoute = jasmine.createSpyObj('Route', ['getParams', 'getType']);
       mockRoute.getParams.and.returnValue(params);
       mockRoute.getType.and.returnValue(type);
 
@@ -139,9 +142,9 @@ describe('routing.Breadcrumb', () => {
     });
 
     it('should not update the bridge if the route factory cannot be found', async (done: any) => {
-      let type = Mocks.object('type');
-      let params = Mocks.object('params');
-      let mockRoute = jasmine.createSpyObj('Route', ['getParams', 'getType']);
+      const type = Mocks.object('type');
+      const params = Mocks.object('params');
+      const mockRoute = jasmine.createSpyObj('Route', ['getParams', 'getType']);
       mockRoute.getParams.and.returnValue(params);
       mockRoute.getType.and.returnValue(type);
 
