@@ -1,12 +1,12 @@
-import {Arrays} from 'external/gs_tools/src/collection';
-import {inject} from 'external/gs_tools/src/inject';
-import {bind, customElement, DomHook} from 'external/gs_tools/src/webc';
+import { Arrays } from 'external/gs_tools/src/collection';
+import { inject } from 'external/gs_tools/src/inject';
+import { bind, customElement, DomHook } from 'external/gs_tools/src/webc';
 
-import {BaseThemedElement} from '../common/base-themed-element';
-import {ThemeService} from '../theming/theme-service';
-import {RouteService} from './route-service';
+import { BaseThemedElement } from '../common/base-themed-element';
+import { ThemeService } from '../theming/theme-service';
+import { RouteService } from './route-service';
 
-import {RouteServiceEvents} from './route-service-events';
+import { RouteServiceEvents } from './route-service-events';
 
 
 export const __FULL_PATH = Symbol('fullPath');
@@ -20,18 +20,43 @@ type CrumbData = {name: string, url: string};
  * @return Element representing a crumb.
  */
 export function crumbGenerator(document: Document): Element {
-  let rootCrumb = document.createElement('div');
+  const rootCrumb = document.createElement('div');
   rootCrumb.classList.add('crumb');
   rootCrumb.setAttribute('layout', 'row');
   rootCrumb.setAttribute('flex-align', 'center');
 
-  let link = document.createElement('a');
-  let arrow = document.createElement('gs-icon');
+  const link = document.createElement('a');
+  const arrow = document.createElement('gs-icon');
   arrow.textContent = 'keyboard_arrow_right';
   rootCrumb.appendChild(link);
   rootCrumb.appendChild(arrow);
   return rootCrumb;
 }
+
+
+/**
+ * Gets the data from the element.
+ * @param element Element to get the data from.
+ * @return Data from the element.
+ */
+export function crumbDataGetter(element: Element): CrumbData | null {
+  const linkEl = element.querySelector('a');
+  const href = linkEl.href;
+  if (!href.startsWith('#')) {
+    return null;
+  }
+
+  const name = linkEl.textContent;
+  if (name === null) {
+    return null;
+  }
+
+  return {
+    name,
+    url: href.substr(1),
+  };
+}
+
 
 /**
  * Sets the data to the crumb element.
@@ -39,7 +64,7 @@ export function crumbGenerator(document: Document): Element {
  * @param element The crumb element.
  */
 export function crumbDataSetter(data: CrumbData, element: Element): void {
-  let linkEl = element.querySelector('a');
+  const linkEl = element.querySelector('a');
   linkEl.href = `#${data.url}`;
   linkEl.textContent = data.name;
 }
@@ -52,7 +77,7 @@ export function crumbDataSetter(data: CrumbData, element: Element): void {
   templateKey: 'src/routing/breadcrumb',
 })
 export class Breadcrumb<T> extends BaseThemedElement {
-  @bind('#container').childrenElements<CrumbData>(crumbGenerator, crumbDataSetter)
+  @bind('#container').childrenElements<CrumbData>(crumbGenerator, crumbDataGetter, crumbDataSetter)
   private readonly crumbHook_: DomHook<CrumbData[]>;
 
   private readonly routeService_: RouteService<T>;
@@ -73,30 +98,30 @@ export class Breadcrumb<T> extends BaseThemedElement {
    * Handles event when the route is changed.
    */
   private async onRouteChanged_(): Promise<void> {
-    let route = this.routeService_.getRoute();
+    const route = this.routeService_.getRoute();
     if (route === null) {
       return Promise.resolve();
     }
 
-    let params = route.getParams();
-    let routeFactory = this.routeService_.getRouteFactory(route.getType());
+    const params = route.getParams();
+    const routeFactory = this.routeService_.getRouteFactory(route.getType());
 
     if (!routeFactory) {
       return Promise.resolve();
     }
 
-    let names = routeFactory.getCascadeNames(params);
-    let paths = routeFactory.getCascadePaths(params);
+    const names = routeFactory.getCascadeNames(params);
+    const paths = routeFactory.getCascadePaths(params);
 
-    let promises = Arrays
+    const promises = Arrays
         .of(names)
         .zip(paths)
         .mapElement((pair: [Promise<string>, string]) => {
           return Promise.all(pair);
         })
         .asArray();
-    let data = await Promise.all(promises);
-    let crumbData = Arrays
+    const data = await Promise.all(promises);
+    const crumbData = Arrays
         .of(data)
         .map(([name, url]: [string, string]) => {
           return {

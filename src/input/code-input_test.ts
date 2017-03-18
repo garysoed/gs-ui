@@ -1,12 +1,12 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
+import { Interval } from 'external/gs_tools/src/async';
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 import { Reflect } from 'external/gs_tools/src/util';
 
 import { CodeInput, EditorValueBinder, Languages } from './code-input';
-import { Interval } from "external/gs_tools/src/async";
 
 
 describe('input.EditorValueBinder', () => {
@@ -199,11 +199,12 @@ describe('input.CodeInput', () => {
 
       spyOn(input['editorValueBinder_'], 'setEditor');
 
-      const deregisterFn = Mocks.object('deregisterFn');
-      const mockInterval = jasmine.createSpyObj('Interval', ['on', 'start']);
-      mockInterval.on.and.returnValue(deregisterFn);
+      const mockDeregisterFn = jasmine.createSpyObj('DeregisterFn', ['dispose']);
+      const mockInterval = jasmine.createSpyObj('Interval', ['dispose', 'on', 'start']);
+      mockInterval.on.and.returnValue(mockDeregisterFn);
+      spyOn(Interval, 'newInstance').and.returnValue(mockInterval);
 
-      spyOn(input, 'addDisposable');
+      spyOn(input, 'addDisposable').and.callThrough();
 
       input.onCreated(element);
 
@@ -217,10 +218,11 @@ describe('input.CodeInput', () => {
       assert(mockInterval.on).to.haveBeenCalledWith(Interval.TICK_EVENT, input['onTick_'], input);
       assert(mockInterval.start).to.haveBeenCalledWith();
       assert(input.addDisposable).to.haveBeenCalledWith(mockInterval);
-      assert(input.addDisposable).to.haveBeenCalledWith(deregisterFn);
+      assert(input.addDisposable).to.haveBeenCalledWith(mockDeregisterFn);
     });
 
     it('should throw error if the ace editor CSS style cannot be found', () => {
+      const mockSession = jasmine.createSpyObj('Session', ['setTabSize', 'setUseSoftTabs']);
       const mockEditor = jasmine.createSpyObj(
           'Editor',
           [
@@ -229,6 +231,7 @@ describe('input.CodeInput', () => {
             'setHighlightActiveLine',
             'setReadOnly',
           ]);
+      mockEditor.session = mockSession;
       mockAce.edit.and.returnValue(mockEditor);
 
       const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['appendChild', 'querySelector']);
@@ -247,14 +250,17 @@ describe('input.CodeInput', () => {
     });
 
     it('should not override the show gutter attribute value if it is non null', () => {
-      mockAce.edit.and.returnValue(jasmine.createSpyObj(
+      const mockEditor = jasmine.createSpyObj(
           'Editor',
           [
             'destroy',
             'setFontSize',
             'setHighlightActiveLine',
             'setReadOnly',
-          ]));
+          ]);
+      const mockSession = jasmine.createSpyObj('Session', ['setTabSize', 'setUseSoftTabs']);
+      mockEditor.session = mockSession;
+      mockAce.edit.and.returnValue(mockEditor);
 
       const styleEl = Mocks.object('styleEl');
       const mockOwnerDocument = jasmine.createSpyObj('OwnerDocument', ['createElement']);
@@ -279,14 +285,14 @@ describe('input.CodeInput', () => {
   });
 
   describe('onTick_', () => {
-    fit('should resize the editor if available', () => {
+    it('should resize the editor if available', () => {
       const mockEditor = jasmine.createSpyObj('Editor', ['destroy', 'resize']);
       input['editor_'] = mockEditor;
       input['onTick_']();
       assert(mockEditor.resize).to.haveBeenCalledWith();
     });
 
-    fit('should not throw error if editor is not available', () => {
+    it('should not throw error if editor is not available', () => {
       assert(() => {
         input['onTick_']();
       }).toNot.throw();

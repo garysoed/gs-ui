@@ -4,7 +4,7 @@ TestBase.setup();
 import {Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 
-import {Breadcrumb, crumbDataSetter, crumbGenerator} from './breadcrumb';
+import {Breadcrumb, crumbDataGetter, crumbDataSetter, crumbGenerator} from './breadcrumb';
 import {RouteServiceEvents} from './route-service-events';
 
 
@@ -47,6 +47,41 @@ describe('routing.Breadcrumb', () => {
       assert(mockRootEl.setAttribute).to.haveBeenCalledWith('flex-align', 'center');
       assert(mockRootEl.setAttribute).to.haveBeenCalledWith('layout', 'row');
       assert(mockClassList.add).to.haveBeenCalledWith('crumb');
+    });
+  });
+
+  describe('crumbDataGetter', () => {
+    it('should return the correct data', () => {
+      const url = 'url';
+      const name = 'name';
+      const linkEl = Mocks.object('linkEl');
+      linkEl.href = `#${url}`;
+      linkEl.textContent = name;
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      mockElement.querySelector.and.returnValue(linkEl);
+      assert(crumbDataGetter(mockElement)).to.equal({name, url});
+      assert(mockElement.querySelector).to.haveBeenCalledWith('a');
+    });
+
+    it('should return null if there are no text contents', () => {
+      const url = 'url';
+      const linkEl = Mocks.object('linkEl');
+      linkEl.href = `#${url}`;
+      linkEl.textContent = null;
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      mockElement.querySelector.and.returnValue(linkEl);
+      assert(crumbDataGetter(mockElement)).to.beNull();
+      assert(mockElement.querySelector).to.haveBeenCalledWith('a');
+    });
+
+    it('should return null if the href does not start with #', () => {
+      const linkEl = Mocks.object('linkEl');
+      linkEl.href = `url`;
+      linkEl.textContent = null;
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      mockElement.querySelector.and.returnValue(linkEl);
+      assert(crumbDataGetter(mockElement)).to.beNull();
+      assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
   });
 
