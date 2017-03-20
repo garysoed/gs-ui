@@ -1,12 +1,12 @@
-import {assert, TestBase} from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import {DomEvent} from 'external/gs_tools/src/event';
-import {Mocks} from 'external/gs_tools/src/mock';
-import {TestDispose} from 'external/gs_tools/src/testing';
-import {StringParser} from 'external/gs_tools/src/webc';
+import { DomEvent } from 'external/gs_tools/src/event';
+import { Mocks } from 'external/gs_tools/src/mock';
+import { TestDispose } from 'external/gs_tools/src/testing';
+import { StringParser } from 'external/gs_tools/src/webc';
 
-import {BaseInput} from './base-input';
+import { BaseInput } from './base-input';
 
 
 class Input extends BaseInput<string> { }

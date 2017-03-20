@@ -1,10 +1,10 @@
-import {inject} from 'external/gs_tools/src/inject';
+import { inject } from 'external/gs_tools/src/inject';
 import {
   customElement,
-  StringParser} from 'external/gs_tools/src/webc';
-import {ThemeService} from '../theming/theme-service';
+  StringParser } from 'external/gs_tools/src/webc';
+import { ThemeService } from '../theming/theme-service';
 
-import {BaseTab} from './base-tab';
+import { BaseTab } from './base-tab';
 
 
 @customElement({

@@ -1,4 +1,4 @@
-import {AbstractRouteFactory} from './abstract-route-factory';
+import { AbstractRouteFactory } from './abstract-route-factory';
 
 
 export class SimpleRouteFactory<T, PR>

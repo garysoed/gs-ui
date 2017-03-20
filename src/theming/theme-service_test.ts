@@ -1,9 +1,9 @@
-import {assert, TestBase} from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import {Fakes, Mocks} from 'external/gs_tools/src/mock';
+import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 
-import {ThemeService} from './theme-service';
+import { ThemeService } from './theme-service';
 
 
 describe('theming.ThemeService', () => {

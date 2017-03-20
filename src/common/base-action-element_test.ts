@@ -1,12 +1,12 @@
-import {assert, Matchers, TestBase} from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
-import {Mocks} from 'external/gs_tools/src/mock';
-import {TestDispose} from 'external/gs_tools/src/testing';
+import { Mocks } from 'external/gs_tools/src/mock';
+import { TestDispose } from 'external/gs_tools/src/testing';
 
-import {Event} from '../const/event';
+import { Event } from '../const/event';
 
-import {BaseActionElement} from './base-action-element';
+import { BaseActionElement } from './base-action-element';
 
 
 describe('common.BaseActionElement', () => {

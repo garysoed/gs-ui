@@ -1,1 +1,1 @@
-export {Event} from './const/event';
+export { Event } from './const/event';

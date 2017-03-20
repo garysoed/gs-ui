@@ -1,13 +1,13 @@
-import {assert, Matchers, TestBase} from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
-import {Interval} from 'external/gs_tools/src/async';
-import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
-import {Fakes, Mocks} from 'external/gs_tools/src/mock';
-import {TestDispose} from 'external/gs_tools/src/testing';
-import {Animation} from 'external/gs_tools/src/webc';
+import { Interval } from 'external/gs_tools/src/async';
+import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
+import { Fakes, Mocks } from 'external/gs_tools/src/mock';
+import { TestDispose } from 'external/gs_tools/src/testing';
+import { Animation } from 'external/gs_tools/src/webc';
 
-import {BaseTab} from './base-tab';
+import { BaseTab } from './base-tab';
 
 
 class TestTab extends BaseTab {

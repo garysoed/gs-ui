@@ -1,5 +1,5 @@
-import {IColor} from 'external/gs_tools/src/color';
-import {Validate} from 'external/gs_tools/src/valid';
+import { IColor } from 'external/gs_tools/src/color';
+import { Validate } from 'external/gs_tools/src/valid';
 
 
 /**

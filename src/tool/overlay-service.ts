@@ -1,11 +1,11 @@
-import {Interval} from 'external/gs_tools/src/async';
-import {BaseDisposable} from 'external/gs_tools/src/dispose';
-import {ListenableDom} from 'external/gs_tools/src/event';
-import {bind, inject} from 'external/gs_tools/src/inject';
+import { Interval } from 'external/gs_tools/src/async';
+import { BaseDisposable } from 'external/gs_tools/src/dispose';
+import { ListenableDom } from 'external/gs_tools/src/event';
+import { bind, inject } from 'external/gs_tools/src/inject';
 
-import {AnchorLocation} from '../tool/anchor-location';
-import {Anchors} from '../tool/anchors';
-import {OverlayContainer} from '../tool/overlay-container';
+import { AnchorLocation } from '../tool/anchor-location';
+import { Anchors } from '../tool/anchors';
+import { OverlayContainer } from '../tool/overlay-container';
 
 
 @bind('gs.tool.OverlayService', [OverlayContainer])

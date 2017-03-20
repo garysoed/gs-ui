@@ -1,10 +1,10 @@
-import {assert, TestBase} from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import {Mocks} from 'external/gs_tools/src/mock';
+import { Mocks } from 'external/gs_tools/src/mock';
 
-import {AnchorLocation} from './anchor-location';
-import {Anchors} from './anchors';
+import { AnchorLocation } from './anchor-location';
+import { Anchors } from './anchors';
 
 
 describe('tool.Anchors', () => {

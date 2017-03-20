@@ -1,6 +1,6 @@
-import {RgbColor} from 'external/gs_tools/src/color';
+import { RgbColor } from 'external/gs_tools/src/color';
 
-import {Palette} from '../theming/palette';
+import { Palette } from '../theming/palette';
 
 
 /**

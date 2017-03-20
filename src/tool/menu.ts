@@ -1,17 +1,17 @@
-import {ListenableDom} from 'external/gs_tools/src/event';
-import {inject} from 'external/gs_tools/src/inject';
+import { ListenableDom } from 'external/gs_tools/src/event';
+import { inject } from 'external/gs_tools/src/inject';
 import {
   BaseElement,
   bind,
   BooleanParser,
   customElement,
-  DomHook} from 'external/gs_tools/src/webc';
+  DomHook } from 'external/gs_tools/src/webc';
 
-import {Event} from '../const/event';
+import { Event } from '../const/event';
 
-import {AnchorLocation} from './anchor-location';
-import {AnchorLocationParser} from './anchor-location-parser';
-import {OverlayService} from './overlay-service';
+import { AnchorLocation } from './anchor-location';
+import { AnchorLocationParser } from './anchor-location-parser';
+import { OverlayService } from './overlay-service';
 
 
 @customElement({

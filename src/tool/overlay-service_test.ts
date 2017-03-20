@@ -1,15 +1,15 @@
-import {assert, Matchers, TestBase} from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
-import {Interval} from 'external/gs_tools/src/async';
-import {ListenableDom} from 'external/gs_tools/src/event';
-import {Fakes, Mocks} from 'external/gs_tools/src/mock';
-import {TestDispose} from 'external/gs_tools/src/testing';
+import { Interval } from 'external/gs_tools/src/async';
+import { ListenableDom } from 'external/gs_tools/src/event';
+import { Fakes, Mocks } from 'external/gs_tools/src/mock';
+import { TestDispose } from 'external/gs_tools/src/testing';
 
-import {AnchorLocation} from './anchor-location';
-import {Anchors} from './anchors';
-import {OverlayContainer} from './overlay-container';
-import {OverlayService} from './overlay-service';
+import { AnchorLocation } from './anchor-location';
+import { Anchors } from './anchors';
+import { OverlayContainer } from './overlay-container';
+import { OverlayService } from './overlay-service';
 
 
 describe('gs.tool.OverlayService', () => {

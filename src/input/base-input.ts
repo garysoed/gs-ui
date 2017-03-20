@@ -1,13 +1,13 @@
-import {Interval} from 'external/gs_tools/src/async';
-import {DomEvent} from 'external/gs_tools/src/event';
+import { Interval } from 'external/gs_tools/src/async';
+import { DomEvent } from 'external/gs_tools/src/event';
 import {
   BooleanParser,
   DomHook,
   handle,
-  IAttributeParser} from 'external/gs_tools/src/webc';
+  IAttributeParser } from 'external/gs_tools/src/webc';
 
-import {BaseActionElement} from '../common/base-action-element';
-import {ThemeService} from '../theming/theme-service';
+import { BaseActionElement } from '../common/base-action-element';
+import { ThemeService } from '../theming/theme-service';
 
 
 export abstract class BaseInput<T> extends BaseActionElement {

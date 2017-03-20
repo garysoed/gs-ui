@@ -1,1 +1,1 @@
-export {BaseThemedElement} from './common/base-themed-element';
+export { BaseThemedElement } from './common/base-themed-element';

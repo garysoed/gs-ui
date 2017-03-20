@@ -1,1 +1,1 @@
-export {FileService} from './input/file-service';
+export { FileService } from './input/file-service';

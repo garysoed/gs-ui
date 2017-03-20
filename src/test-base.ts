@@ -3,10 +3,10 @@ import {
   TestDispose,
   TestInject,
   TestJasmine,
-  TestSetup} from 'external/gs_tools/src/testing';
+  TestSetup } from 'external/gs_tools/src/testing';
 
 
-export {assert, Matchers} from 'external/gs_tools/src/jasmine';
+export { assert, Matchers } from 'external/gs_tools/src/jasmine';
 
 
 const TEST_SETUP = new TestSetup([

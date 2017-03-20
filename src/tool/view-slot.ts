@@ -1,11 +1,11 @@
-import {Arrays} from 'external/gs_tools/src/collection';
-import {Iterables} from 'external/gs_tools/src/collection';
-import {inject} from 'external/gs_tools/src/inject';
-import {Doms, LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
-import {BooleanParser, customElement, StringParser} from 'external/gs_tools/src/webc';
+import { Arrays } from 'external/gs_tools/src/collection';
+import { Iterables } from 'external/gs_tools/src/collection';
+import { inject } from 'external/gs_tools/src/inject';
+import { Doms, LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
+import { BooleanParser, customElement, StringParser } from 'external/gs_tools/src/webc';
 
-import {BaseThemedElement} from '../common/base-themed-element';
-import {ThemeService} from '../theming/theme-service';
+import { BaseThemedElement } from '../common/base-themed-element';
+import { ThemeService } from '../theming/theme-service';
 
 export const __FULL_PATH = Symbol('fullPath');
 

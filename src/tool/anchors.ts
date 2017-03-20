@@ -1,4 +1,4 @@
-import {AnchorLocation} from './anchor-location';
+import { AnchorLocation } from './anchor-location';
 
 
 export class Anchors {

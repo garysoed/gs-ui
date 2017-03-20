@@ -1,16 +1,16 @@
-import {atomic, Interval} from 'external/gs_tools/src/async';
-import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
+import { atomic, Interval } from 'external/gs_tools/src/async';
+import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
 import {
   Animation,
   AnimationEasing,
   bind,
   DomHook,
   handle,
-  StringParser} from 'external/gs_tools/src/webc';
+  StringParser } from 'external/gs_tools/src/webc';
 
-import {BaseThemedElement} from '../common/base-themed-element';
-import {Event} from '../const/event';
-import {ThemeService} from '../theming/theme-service';
+import { BaseThemedElement } from '../common/base-themed-element';
+import { Event } from '../const/event';
+import { ThemeService } from '../theming/theme-service';
 
 
 export abstract class BaseTab extends BaseThemedElement {

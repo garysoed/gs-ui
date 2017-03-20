@@ -1,6 +1,6 @@
-import {BaseElement} from 'external/gs_tools/src/webc';
+import { BaseElement } from 'external/gs_tools/src/webc';
 
-import {ThemeService} from '../theming/theme-service';
+import { ThemeService } from '../theming/theme-service';
 
 
 export class BaseThemedElement extends BaseElement {

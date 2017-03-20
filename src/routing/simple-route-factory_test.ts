@@ -1,7 +1,7 @@
-import {assert, TestBase} from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import {SimpleRouteFactory} from './simple-route-factory';
+import { SimpleRouteFactory } from './simple-route-factory';
 
 
 describe('routing.SimpleRouteFactory', () => {

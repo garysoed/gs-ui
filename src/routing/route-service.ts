@@ -1,13 +1,13 @@
-import {Arrays} from 'external/gs_tools/src/collection';
-import {BaseListenable} from 'external/gs_tools/src/event';
-import {bind, inject} from 'external/gs_tools/src/inject';
-import {LocationService, LocationServiceEvents} from 'external/gs_tools/src/ui';
-import {Reflect} from 'external/gs_tools/src/util';
+import { Arrays } from 'external/gs_tools/src/collection';
+import { BaseListenable } from 'external/gs_tools/src/event';
+import { bind, inject } from 'external/gs_tools/src/inject';
+import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
+import { Reflect } from 'external/gs_tools/src/util';
 
-import {AbstractRouteFactory} from './abstract-route-factory';
-import {IRouteFactoryService} from './i-route-factory-service';
-import {Route} from './route';
-import {RouteServiceEvents} from './route-service-events';
+import { AbstractRouteFactory } from './abstract-route-factory';
+import { IRouteFactoryService } from './i-route-factory-service';
+import { Route } from './route';
+import { RouteServiceEvents } from './route-service-events';
 
 
 @bind(

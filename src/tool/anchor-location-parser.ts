@@ -1,7 +1,7 @@
-import {Enums} from 'external/gs_tools/src/typescript';
-import {IAttributeParser} from 'external/gs_tools/src/webc';
+import { Enums } from 'external/gs_tools/src/typescript';
+import { IAttributeParser } from 'external/gs_tools/src/webc';
 
-import {AnchorLocation} from './anchor-location';
+import { AnchorLocation } from './anchor-location';
 
 
 /**

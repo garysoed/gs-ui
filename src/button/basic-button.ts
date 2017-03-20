@@ -1,8 +1,8 @@
-import {inject} from 'external/gs_tools/src/inject';
-import {customElement} from 'external/gs_tools/src/webc';
+import { inject } from 'external/gs_tools/src/inject';
+import { customElement } from 'external/gs_tools/src/webc';
 
-import {BaseActionElement} from '../common/base-action-element';
-import {ThemeService} from '../theming/theme-service';
+import { BaseActionElement } from '../common/base-action-element';
+import { ThemeService } from '../theming/theme-service';
 
 
 @customElement({

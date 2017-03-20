@@ -1,14 +1,14 @@
-import {inject} from 'external/gs_tools/src/inject';
+import { inject } from 'external/gs_tools/src/inject';
 import {
   bind,
   BooleanParser,
   customElement,
   DomHook,
   handle,
-  StringParser} from 'external/gs_tools/src/webc';
+  StringParser } from 'external/gs_tools/src/webc';
 
-import {BaseThemedElement} from '../common/base-themed-element';
-import {ThemeService} from '../theming/theme-service';
+import { BaseThemedElement } from '../common/base-themed-element';
+import { ThemeService } from '../theming/theme-service';
 
 
 @customElement({

@@ -1,7 +1,7 @@
-import {assert, TestBase} from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import {Palette} from './palette';
+import { Palette } from './palette';
 
 
 describe('theming.Palette', () => {

@@ -1,12 +1,12 @@
-import {assert, TestBase} from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import {Mocks} from 'external/gs_tools/src/mock';
-import {TestDispose} from 'external/gs_tools/src/testing';
+import { Mocks } from 'external/gs_tools/src/mock';
+import { TestDispose } from 'external/gs_tools/src/testing';
 
-import {BaseActionElement} from '../common/base-action-element';
+import { BaseActionElement } from '../common/base-action-element';
 
-import {RadioButton} from './radio-button';
+import { RadioButton } from './radio-button';
 
 
 describe('input.RadioButton', () => {

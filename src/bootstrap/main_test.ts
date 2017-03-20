@@ -1,15 +1,15 @@
-import {assert, Matchers, TestBase} from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
-import {Injector} from 'external/gs_tools/src/inject';
-import {Mocks} from 'external/gs_tools/src/mock';
-import {TestDispose, TestInject} from 'external/gs_tools/src/testing';
-import {ElementRegistrar} from 'external/gs_tools/src/webc';
-import {Templates} from 'external/gs_tools/src/webc';
+import { Injector } from 'external/gs_tools/src/inject';
+import { Mocks } from 'external/gs_tools/src/mock';
+import { TestDispose, TestInject } from 'external/gs_tools/src/testing';
+import { ElementRegistrar } from 'external/gs_tools/src/webc';
+import { Templates } from 'external/gs_tools/src/webc';
 
-import {ThemeService} from '../theming/theme-service';
+import { ThemeService } from '../theming/theme-service';
 
-import {Main} from './main';
+import { Main } from './main';
 
 
 describe('bootstrap.Main', () => {

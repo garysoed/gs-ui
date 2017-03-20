@@ -1,8 +1,8 @@
-import {assert, TestBase} from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import {AnchorLocation} from './anchor-location';
-import {AnchorLocationParser} from './anchor-location-parser';
+import { AnchorLocation } from './anchor-location';
+import { AnchorLocationParser } from './anchor-location-parser';
 
 
 describe('tool.AnchorLocationParser', () => {

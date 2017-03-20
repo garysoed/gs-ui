@@ -1,16 +1,16 @@
 
-import {inject} from 'external/gs_tools/src/inject';
+import { inject } from 'external/gs_tools/src/inject';
 import {
   bind,
   BooleanParser,
   customElement,
   DomHook,
   handle,
-  StringParser} from 'external/gs_tools/src/webc';
+  StringParser } from 'external/gs_tools/src/webc';
 
-import {ThemeService} from '../theming/theme-service';
+import { ThemeService } from '../theming/theme-service';
 
-import {BaseInput} from './base-input';
+import { BaseInput } from './base-input';
 
 
 @customElement({
