@@ -1,7 +1,7 @@
 import {assert, Matchers, TestBase} from '../test-base';
 TestBase.setup();
 
-import {Mocks} from 'external/gs_tools/src/mock';
+import {Fakes, Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 
 import {FileInput} from './file-input';
@@ -19,10 +19,10 @@ describe('input.FileInput', () => {
 
   describe('getFiles_', () => {
     it('should return the attached files', () => {
-      let bundle = Mocks.object('bundle');
+      const bundle = Mocks.object('bundle');
       mockFileService.getBundle.and.returnValue(bundle);
 
-      let bundleId = 'bundleId';
+      const bundleId = 'bundleId';
       spyOn(input['gsBundleIdHook_'], 'get').and.returnValue(bundleId);
 
       assert(input['getFiles_']()).to.equal(bundle);
@@ -39,24 +39,24 @@ describe('input.FileInput', () => {
 
   describe('isValid_', () => {
     it('should return true if every item has one of the specified mime type', () => {
-      let mimeType1 = 'mimeType1';
-      let mimeType2 = 'mimeType2';
+      const mimeType1 = 'mimeType1';
+      const mimeType2 = 'mimeType2';
 
       spyOn(input['gsMimeTypesHook_'], 'get').and.returnValue([mimeType1, mimeType2]);
 
-      let dataTransfer = Mocks.object('dataTransfer');
+      const dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.items = [{type: mimeType1}, {type: mimeType2}];
 
       assert(input['isValid_'](dataTransfer)).to.beTrue();
     });
 
     it('should return false if an item does not have any of the specified mime type', () => {
-      let mimeType1 = 'mimeType1';
-      let mimeType2 = 'mimeType2';
+      const mimeType1 = 'mimeType1';
+      const mimeType2 = 'mimeType2';
 
       spyOn(input['gsMimeTypesHook_'], 'get').and.returnValue([mimeType1, mimeType2]);
 
-      let dataTransfer = Mocks.object('dataTransfer');
+      const dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.items = [{type: mimeType1}, {type: 'otherMimeType'}];
 
       assert(input['isValid_'](dataTransfer)).to.beFalse();
@@ -65,7 +65,7 @@ describe('input.FileInput', () => {
     it('should return true if there are no mime types', () => {
       spyOn(input['gsMimeTypesHook_'], 'get').and.returnValue(null);
 
-      let dataTransfer = Mocks.object('dataTransfer');
+      const dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.items = [{type: 'mimeType1'}, {type: 'mimeType2'}];
 
       assert(input['isValid_'](dataTransfer)).to.beTrue();
@@ -76,8 +76,8 @@ describe('input.FileInput', () => {
     it('should prevent default the event and set the drop effect correctly if valid', () => {
       spyOn(input, 'isValid_').and.returnValue(true);
 
-      let dataTransfer = Mocks.object('dataTransfer');
-      let mockEvent = jasmine.createSpyObj('Event', ['preventDefault']);
+      const dataTransfer = Mocks.object('dataTransfer');
+      const mockEvent = jasmine.createSpyObj('Event', ['preventDefault']);
       mockEvent.dataTransfer = dataTransfer;
 
       input['onDragover_'](mockEvent);
@@ -90,8 +90,8 @@ describe('input.FileInput', () => {
     it('should do nothing if not valid', () => {
       spyOn(input, 'isValid_').and.returnValue(false);
 
-      let dataTransfer = Mocks.object('dataTransfer');
-      let mockEvent = jasmine.createSpyObj('Event', ['preventDefault']);
+      const dataTransfer = Mocks.object('dataTransfer');
+      const mockEvent = jasmine.createSpyObj('Event', ['preventDefault']);
       mockEvent.dataTransfer = dataTransfer;
 
       input['onDragover_'](mockEvent);
@@ -105,7 +105,7 @@ describe('input.FileInput', () => {
     it('should increment the drag depth and set the switch to "dragging" if data transfer is '
         + 'valid',
         () => {
-          let dataTransfer = Mocks.object('dataTransfer');
+          const dataTransfer = Mocks.object('dataTransfer');
           spyOn(input['switchGsValueHook_'], 'set');
           spyOn(input, 'isValid_').and.returnValue(true);
 
@@ -119,7 +119,7 @@ describe('input.FileInput', () => {
     it('should increment the drag depth and set the switch to "error" if data transfer is '
         + 'invalid',
         () => {
-          let dataTransfer = Mocks.object('dataTransfer');
+          const dataTransfer = Mocks.object('dataTransfer');
           spyOn(input['switchGsValueHook_'], 'set');
           spyOn(input, 'isValid_').and.returnValue(false);
 
@@ -189,23 +189,23 @@ describe('input.FileInput', () => {
 
   describe('onDrop_', () => {
     it('should prevent default and add the bundle correctly if valid', () => {
-      let file1 = Mocks.object('file1');
-      let file2 = Mocks.object('file2');
-      let files = [file1, file2];
-      let mockFileList = jasmine.createSpyObj('FileList', ['item']);
-      mockFileList.item.and.callFake((index: number) => {
+      const file1 = Mocks.object('file1');
+      const file2 = Mocks.object('file2');
+      const files = [file1, file2];
+      const mockFileList = jasmine.createSpyObj('FileList', ['item']);
+      Fakes.build(mockFileList.item).call((index: number) => {
         return files[index];
       });
       mockFileList.length = 2;
 
-      let dataTransfer = Mocks.object('dataTransfer');
+      const dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.files = mockFileList;
 
-      let mockEvent = jasmine.createSpyObj('Event', ['preventDefault', 'stopPropagation']);
+      const mockEvent = jasmine.createSpyObj('Event', ['preventDefault', 'stopPropagation']);
       mockEvent.dataTransfer = dataTransfer;
 
-      let bundleId = 'bundleId';
-      let deleteBundleFn = Mocks.object('deleteBundleFn');
+      const bundleId = 'bundleId';
+      const deleteBundleFn = Mocks.object('deleteBundleFn');
       mockFileService.addBundle.and.returnValue({deleteFn: deleteBundleFn, id: bundleId});
 
       spyOn(input, 'isValid_').and.returnValue(true);
@@ -223,17 +223,17 @@ describe('input.FileInput', () => {
     });
 
     it('should delete the previous bundle if valid and exist', () => {
-      let files = Mocks.object('files');
-      let dataTransfer = Mocks.object('dataTransfer');
+      const files = Mocks.object('files');
+      const dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.files = files;
 
-      let mockEvent = jasmine.createSpyObj('Event', ['preventDefault', 'stopPropagation']);
+      const mockEvent = jasmine.createSpyObj('Event', ['preventDefault', 'stopPropagation']);
       mockEvent.dataTransfer = dataTransfer;
 
       mockFileService.addBundle.and
           .returnValue({deleteFn: Mocks.object('deleteBundleFn'), id: 'bundleId'});
 
-      let mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
+      const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
       input['deleteBundleFn_'] = mockDeleteBundleFn;
 
       spyOn(input, 'isValid_').and.returnValue(true);
@@ -246,14 +246,14 @@ describe('input.FileInput', () => {
     });
 
     it('should do nothing if not valid', () => {
-      let files = Mocks.object('files');
-      let dataTransfer = Mocks.object('dataTransfer');
+      const files = Mocks.object('files');
+      const dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.files = files;
 
-      let mockEvent = jasmine.createSpyObj('Event', ['preventDefault', 'stopPropagation']);
+      const mockEvent = jasmine.createSpyObj('Event', ['preventDefault', 'stopPropagation']);
       mockEvent.dataTransfer = dataTransfer;
 
-      let deleteBundleFn = Mocks.object('deleteBundleFn');
+      const deleteBundleFn = Mocks.object('deleteBundleFn');
       mockFileService.addBundle.and.returnValue({deleteFn: deleteBundleFn, id: 'bundleId'});
 
       spyOn(input, 'isValid_').and.returnValue(false);
@@ -270,7 +270,7 @@ describe('input.FileInput', () => {
     it('should delete the previous bundle if there is a previous bundle and the old value is '
         + 'not null',
         () => {
-          let mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
+          const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
           input['deleteBundleFn_'] = mockDeleteBundleFn;
 
           spyOn(input, 'getFiles_').and.returnValue(null);
@@ -285,7 +285,7 @@ describe('input.FileInput', () => {
     it('should not delete the previous bundle if there is a previous bundle but the old value is '
         + 'null',
         () => {
-          let mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
+          const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
           input['deleteBundleFn_'] = mockDeleteBundleFn;
 
           spyOn(input, 'getFiles_').and.returnValue(null);
@@ -298,8 +298,8 @@ describe('input.FileInput', () => {
 
     it('should set the switch to dropped and the dropped message correctly if there is a bundle',
         () => {
-          let filename1 = 'filename1';
-          let filename2 = 'filename2';
+          const filename1 = 'filename1';
+          const filename2 = 'filename2';
           spyOn(input, 'getFiles_').and.returnValue([{name: filename1}, {name: filename2}]);
           spyOn(input['droppedMessageInnerTextHook_'], 'set');
           spyOn(input['switchGsValueHook_'], 'set');
@@ -323,7 +323,7 @@ describe('input.FileInput', () => {
 
   describe('onGsLabelChanged_', () => {
     it('should set the initial message correctly', () => {
-      let label = 'label';
+      const label = 'label';
       spyOn(input['initialMessageInnerTextHook_'], 'set');
 
       input['onGsLabelChanged_'](label);

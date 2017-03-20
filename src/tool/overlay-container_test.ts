@@ -3,7 +3,7 @@ TestBase.setup();
 
 import {Jsons} from 'external/gs_tools/src/collection';
 import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
-import {Mocks} from 'external/gs_tools/src/mock';
+import {Fakes, Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 
 import {AnchorLocation} from './anchor-location';
@@ -171,8 +171,8 @@ describe('tool.MenuContainer', () => {
           let mockClassList = jasmine.createSpyObj('ClassList', ['add']);
           rootEl.classList = mockClassList;
 
-          spyOn(Jsons, 'setTemporaryValue').and.callFake(
-              (json: any, substitutions: any, callback: any) => {
+          Fakes.build(spyOn(Jsons, 'setTemporaryValue'))
+              .call((json: any, substitutions: any, callback: any) => {
                 callback();
               });
 
@@ -222,8 +222,8 @@ describe('tool.MenuContainer', () => {
       distributedElement.clientWidth = 456;
       mockContentEl.getDistributedNodes.and.returnValue([distributedElement]);
 
-      spyOn(Jsons, 'setTemporaryValue').and.callFake(
-          (json: any, substitutions: any, callback: any) => {
+      Fakes.build(spyOn(Jsons, 'setTemporaryValue'))
+          .call((json: any, substitutions: any, callback: any) => {
             callback();
           });
 
@@ -362,20 +362,11 @@ describe('tool.MenuContainer', () => {
       let rootEl = Mocks.object('rootEl');
 
       let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.callFake((query: string) => {
-        switch (query) {
-          case '.backdrop':
-            return backdropEl;
-          case '.container':
-            return containerEl;
-          case '.root':
-            return rootEl;
-          case 'content':
-            return contentEl;
-          default:
-            return null;
-        }
-      });
+      Fakes.build(mockShadowRoot.querySelector)
+          .when('.backdrop').return(backdropEl)
+          .when('.container').return(containerEl)
+          .when('.root').return(rootEl)
+          .when('content').return(contentEl);
       let element = Mocks.object('element');
       element.ownerDocument = document;
       element.shadowRoot = mockShadowRoot;

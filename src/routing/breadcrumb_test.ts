@@ -1,7 +1,7 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import { Mocks } from 'external/gs_tools/src/mock';
+import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { Breadcrumb, CRUMB_DATA_HELPER } from './breadcrumb';
@@ -18,16 +18,10 @@ describe('CRUMB_DATA_HELPER', () => {
       const linkEl = Mocks.object('linkEl');
       const arrowEl = Mocks.object('arrowEl');
       const mockDocument = jasmine.createSpyObj('Document', ['createElement']);
-      mockDocument.createElement.and.callFake((name: string) => {
-        switch (name) {
-          case 'div':
-            return mockRootEl;
-          case 'a':
-            return linkEl;
-          case 'gs-icon':
-            return arrowEl;
-        }
-      });
+      Fakes.build(mockDocument.createElement)
+          .when('div').return(mockRootEl)
+          .when('a').return(linkEl)
+          .when('gs-icon').return(arrowEl);
 
       assert(CRUMB_DATA_HELPER.create(mockDocument, Mocks.object('instance'))).to.equal(mockRootEl);
       assert(mockRootEl.appendChild).to.haveBeenCalledWith(arrowEl);

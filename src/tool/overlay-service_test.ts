@@ -3,7 +3,7 @@ TestBase.setup();
 
 import {Interval} from 'external/gs_tools/src/async';
 import {ListenableDom} from 'external/gs_tools/src/event';
-import {Mocks} from 'external/gs_tools/src/mock';
+import {Fakes, Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 
 import {AnchorLocation} from './anchor-location';
@@ -28,13 +28,13 @@ describe('gs.tool.OverlayService', () => {
     it('should create the overlay container element correctly', () => {
       mockDocument.querySelector.and.returnValue(null);
 
-      let menuContainerEl = Mocks.object('menuContainerEl');
+      const menuContainerEl = Mocks.object('menuContainerEl');
       mockDocument.createElement.and.returnValue(menuContainerEl);
 
-      let mockBody = jasmine.createSpyObj('Body', ['appendChild']);
+      const mockBody = jasmine.createSpyObj('Body', ['appendChild']);
       mockDocument.body = mockBody;
 
-      let listenableContainer = Mocks.disposable('listenableContainer');
+      const listenableContainer = Mocks.disposable('listenableContainer');
       spyOn(ListenableDom, 'of').and.returnValue(listenableContainer);
 
       assert(service['getOverlayContainerEl_']()).to.equal(listenableContainer);
@@ -45,13 +45,13 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should grab the overlay container element if one already exists', () => {
-      let menuContainerEl = Mocks.object('menuContainerEl');
+      const menuContainerEl = Mocks.object('menuContainerEl');
       mockDocument.querySelector.and.returnValue(menuContainerEl);
 
-      let mockBody = jasmine.createSpyObj('Body', ['appendChild']);
+      const mockBody = jasmine.createSpyObj('Body', ['appendChild']);
       mockDocument.body = mockBody;
 
-      let listenableContainer = Mocks.disposable('listenableContainer');
+      const listenableContainer = Mocks.disposable('listenableContainer');
       spyOn(ListenableDom, 'of').and.returnValue(listenableContainer);
 
       assert(service['getOverlayContainerEl_']()).to.equal(listenableContainer);
@@ -61,7 +61,7 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should return the existing menu container element', () => {
-      let listenableContainer = Mocks.disposable('listenableContainer');
+      const listenableContainer = Mocks.disposable('listenableContainer');
       TestDispose.add(listenableContainer);
       service['overlayContainerEl_'] = listenableContainer;
 
@@ -72,9 +72,9 @@ describe('gs.tool.OverlayService', () => {
 
   describe('onTick_', () => {
     it('should set the anchor target', () => {
-      let menuContainerEl = Mocks.object('menuContainerEl');
-      let anchorTarget = Mocks.object('anchorTarget');
-      let anchorElement = Mocks.object('anchorElement');
+      const menuContainerEl = Mocks.object('menuContainerEl');
+      const anchorTarget = Mocks.object('anchorTarget');
+      const anchorElement = Mocks.object('anchorElement');
 
       spyOn(service, 'setAnchorTarget_');
 
@@ -93,9 +93,9 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should set the correct X and Y for TOP_LEFT', () => {
-      let menuContainerEl = Mocks.object('menuContainerEl');
-      let left = 12;
-      let top = 34;
+      const menuContainerEl = Mocks.object('menuContainerEl');
+      const left = 12;
+      const top = 34;
 
       mockParentElement.getBoundingClientRect.and.returnValue({
         left: left,
@@ -112,10 +112,10 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should set the correct X and Y for TOP_RIGHT', () => {
-      let menuContainerEl = Mocks.object('menuContainerEl');
-      let left = 12;
-      let top = 34;
-      let width = 56;
+      const menuContainerEl = Mocks.object('menuContainerEl');
+      const left = 12;
+      const top = 34;
+      const width = 56;
 
       mockParentElement.getBoundingClientRect.and.returnValue({
         left: left,
@@ -133,11 +133,11 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should set the correct X and Y for BOTTOM_RIGHT', () => {
-      let menuContainerEl = Mocks.object('menuContainerEl');
-      let left = 12;
-      let top = 34;
-      let width = 56;
-      let height = 78;
+      const menuContainerEl = Mocks.object('menuContainerEl');
+      const left = 12;
+      const top = 34;
+      const width = 56;
+      const height = 78;
 
       mockParentElement.getBoundingClientRect.and.returnValue({
         height: height,
@@ -156,10 +156,10 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should set the correct X and T for BOTTOM_LEFT', () => {
-      let menuContainerEl = Mocks.object('menuContainerEl');
-      let left = 12;
-      let top = 34;
-      let height = 78;
+      const menuContainerEl = Mocks.object('menuContainerEl');
+      const left = 12;
+      const top = 34;
+      const height = 78;
 
       mockParentElement.getBoundingClientRect.and.returnValue({
         height: height,
@@ -177,11 +177,11 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should resolve auto location if the anchor target is AUTO', () => {
-      let menuContainerEl = Mocks.object('menuContainerEl');
-      let left = 12;
-      let top = 34;
-      let width = 56;
-      let height = 78;
+      const menuContainerEl = Mocks.object('menuContainerEl');
+      const left = 12;
+      const top = 34;
+      const width = 56;
+      const height = 78;
 
       mockParentElement.getBoundingClientRect.and.returnValue({
         height: height,
@@ -205,7 +205,7 @@ describe('gs.tool.OverlayService', () => {
 
   describe('hideOverlay', () => {
     it('should hide the menu container', () => {
-      let mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['hide']);
+      const mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['hide']);
       spyOn(service, 'getOverlayContainerEl_').and
           .returnValue({getEventTarget: () => mockMenuContainer});
       service.hideOverlay();
@@ -221,27 +221,27 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should open the menu container correctly', async (done: any) => {
-      let mockOverlayParent = jasmine.createSpyObj('OverlayParent', ['appendChild']);
-      let menuContent = Mocks.object('menuContent');
+      const mockOverlayParent = jasmine.createSpyObj('OverlayParent', ['appendChild']);
+      const menuContent = Mocks.object('menuContent');
 
-      let anchorTarget = AnchorLocation.TOP_LEFT;
-      let anchorPoint = AnchorLocation.BOTTOM_RIGHT;
+      const anchorTarget = AnchorLocation.TOP_LEFT;
+      const anchorPoint = AnchorLocation.BOTTOM_RIGHT;
 
-      let mockMenuContainerEl = jasmine.createSpyObj(
+      const mockMenuContainerEl = jasmine.createSpyObj(
           'MenuContainerEl',
           ['appendChild', 'show']);
-      let mockListenableMenuContainer = jasmine.createSpyObj(
+      const mockListenableMenuContainer = jasmine.createSpyObj(
           'ListenableMenuContainer',
           ['getEventTarget', 'once']);
       mockListenableMenuContainer.getEventTarget.and.returnValue(mockMenuContainerEl);
-      mockListenableMenuContainer.once.and
-          .callFake((eventType: any, handler: () => void, useCapture: any) => {
+      Fakes.build(mockListenableMenuContainer.once)
+          .call((eventType: any, handler: () => void, useCapture: any) => {
             handler();
             return Mocks.disposable('ListenableMenuContainer.once');
           });
       spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockListenableMenuContainer);
 
-      let mockAnchorTargetWatcher = jasmine
+      const mockAnchorTargetWatcher = jasmine
           .createSpyObj('AnchorTargetWatcher', ['dispose', 'on', 'start']);
       spyOn(Interval, 'newInstance').and.returnValue(mockAnchorTargetWatcher);
 

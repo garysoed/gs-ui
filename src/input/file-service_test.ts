@@ -2,7 +2,7 @@ import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
 import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
-import { Mocks } from 'external/gs_tools/src/mock';
+import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 
 import { FileService } from '../input/file-service';
 
@@ -113,14 +113,9 @@ describe('input.FileService', () => {
       const file2 = Mocks.object('file2');
       const content1 = 'content1';
       const content2 = 'content2';
-      spyOn(service, 'processFile_').and.callFake((file: File) => {
-        switch (file) {
-          case file1:
-            return content1;
-          case file2:
-            return content2;
-        }
-      });
+      Fakes.build(spyOn(service, 'processFile_'))
+          .when(file1).return(content1)
+          .when(file2).return(content2);
       spyOn(service, 'getBundle').and.returnValue([file1, file2]);
 
       const map = await service.processBundle(bundleId);

@@ -2,7 +2,7 @@ import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
 import {ListenableDom} from 'external/gs_tools/src/event';
-import {Mocks} from 'external/gs_tools/src/mock';
+import {Fakes, Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 
 import {Event} from '../const/event';
@@ -23,19 +23,19 @@ describe('tool.Menu', () => {
 
   describe('onAction_', () => {
     it('should call the menu service correctly', () => {
-      let parentWidth = 123;
-      let parentElement = Mocks.object('parentElement');
+      const parentWidth = 123;
+      const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = parentWidth;
       spyOn(menu['gsFitParentWidthHook_'], 'get').and.returnValue(true);
 
-      let anchorPoint = AnchorLocation.BOTTOM_LEFT;
-      let anchorTarget = AnchorLocation.TOP_RIGHT;
+      const anchorPoint = AnchorLocation.BOTTOM_LEFT;
+      const anchorTarget = AnchorLocation.TOP_RIGHT;
 
-      let menuContentStyle = Mocks.object('menuContentStyle');
-      let menuContent = Mocks.object('menuContent');
+      const menuContentStyle = Mocks.object('menuContentStyle');
+      const menuContent = Mocks.object('menuContent');
       menuContent.style = menuContentStyle;
 
-      let mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
+      const mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
       mockEventTarget.querySelector.and.returnValue(menuContent);
       mockEventTarget.parentElement = parentElement;
       mockEventTarget['gsAnchorPoint'] = anchorPoint;
@@ -55,15 +55,15 @@ describe('tool.Menu', () => {
     });
 
     it('should not set the width to the parent element if fit-parent-width is not set', () => {
-      let parentElement = Mocks.object('parentElement');
+      const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = 123;
       spyOn(menu['gsFitParentWidthHook_'], 'get').and.returnValue(false);
 
-      let menuContentStyle = Mocks.object('menuContentStyle');
-      let menuContent = Mocks.object('menuContent');
+      const menuContentStyle = Mocks.object('menuContentStyle');
+      const menuContent = Mocks.object('menuContent');
       menuContent.style = menuContentStyle;
 
-      let mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
+      const mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
       mockEventTarget.querySelector.and.returnValue(menuContent);
       mockEventTarget.parentElement = parentElement;
       mockEventTarget['gsAnchorPoint'] = AnchorLocation.BOTTOM_LEFT;
@@ -92,31 +92,26 @@ describe('tool.Menu', () => {
     });
 
     it('should initialize correctly', () => {
-      let anchorPoint = AnchorLocation.BOTTOM_LEFT;
-      let anchorTarget = AnchorLocation.TOP_RIGHT;
+      const anchorPoint = AnchorLocation.BOTTOM_LEFT;
+      const anchorTarget = AnchorLocation.TOP_RIGHT;
       element['gsAnchorTarget'] = anchorTarget;
       element['gsAnchorPoint'] = anchorPoint;
 
-      let mockListenableElement = Mocks.disposable('ListenableElement');
+      const mockListenableElement = Mocks.disposable('ListenableElement');
 
-      let parentElement = Mocks.object('parentElement');
+      const parentElement = Mocks.object('parentElement');
       element.parentElement = parentElement;
-      let mockListenableParentElement =
+      const mockListenableParentElement =
           jasmine.createSpyObj('ListenableParentElement', ['dispose', 'on']);
       mockListenableParentElement.on.and
           .returnValue(Mocks.disposable('ListenableParentElement.on'));
 
-      spyOn(ListenableDom, 'of').and.callFake((eventTarget: any) => {
-        switch (eventTarget) {
-          case element:
-            return mockListenableElement;
-          case parentElement:
-            return mockListenableParentElement;
-        }
-      });
+      Fakes.build(spyOn(ListenableDom, 'of'))
+          .when(element).return(mockListenableElement)
+          .when(parentElement).return(mockListenableParentElement);
 
-      let rootElement = Mocks.object('rootElement');
-      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
+      const rootElement = Mocks.object('rootElement');
+      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(rootElement);
       element.shadowRoot = mockShadowRoot;
 
@@ -136,23 +131,18 @@ describe('tool.Menu', () => {
     });
 
     it('should default the anchor target to AUTO', () => {
-      let parentElement = Mocks.object('parentElement');
+      const parentElement = Mocks.object('parentElement');
       element.parentElement = parentElement;
-      let mockListenableParentElement =
+      const mockListenableParentElement =
           jasmine.createSpyObj('ListenableParentElement', ['dispose', 'on']);
       mockListenableParentElement.on.and
           .returnValue(Mocks.disposable('ListenableParentElement.on'));
 
-      spyOn(ListenableDom, 'of').and.callFake((eventTarget: any) => {
-        switch (eventTarget) {
-          case element:
-            return Mocks.disposable('ListenableElement');
-          case parentElement:
-            return mockListenableParentElement;
-        }
-      });
+      Fakes.build(spyOn(ListenableDom, 'of'))
+          .when(element).return(Mocks.disposable('ListenableElement'))
+          .when(parentElement).return(mockListenableParentElement);
 
-      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
+      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(Mocks.object('rootElement'));
       element.shadowRoot = mockShadowRoot;
 
@@ -164,23 +154,18 @@ describe('tool.Menu', () => {
     });
 
     it('should default the anchor point to AUTO', () => {
-      let parentElement = Mocks.object('parentElement');
+      const parentElement = Mocks.object('parentElement');
       element.parentElement = parentElement;
-      let mockListenableParentElement =
+      const mockListenableParentElement =
           jasmine.createSpyObj('ListenableParentElement', ['dispose', 'on']);
       mockListenableParentElement.on.and
           .returnValue(Mocks.disposable('ListenableParentElement.on'));
 
-      spyOn(ListenableDom, 'of').and.callFake((eventTarget: any) => {
-        switch (eventTarget) {
-          case element:
-            return Mocks.disposable('ListenableElement');
-          case parentElement:
-            return mockListenableParentElement;
-        }
-      });
+      Fakes.build(spyOn(ListenableDom, 'of'))
+          .when(element).return(Mocks.disposable('ListenableElement'))
+          .when(parentElement).return(mockListenableParentElement);
 
-      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
+      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(Mocks.object('rootElement'));
       element.shadowRoot = mockShadowRoot;
 

@@ -1,7 +1,7 @@
 import {assert, TestBase} from '../test-base';
 TestBase.setup();
 
-import {Mocks} from 'external/gs_tools/src/mock';
+import {Fakes, Mocks} from 'external/gs_tools/src/mock';
 
 import {ThemeService} from './theme-service';
 
@@ -19,12 +19,12 @@ describe('theming.ThemeService', () => {
 
   describe('applyTheme', () => {
     it('should append the style element correctly', () => {
-      let styleEl = Mocks.object('styleEl');
-      let mockCssTemplateEl = jasmine.createSpyObj('CssTemplateEl', ['querySelector']);
+      const styleEl = Mocks.object('styleEl');
+      const mockCssTemplateEl = jasmine.createSpyObj('CssTemplateEl', ['querySelector']);
       mockCssTemplateEl.querySelector.and.returnValue(styleEl);
-      let mockRoot = jasmine.createSpyObj('Root', ['appendChild']);
+      const mockRoot = jasmine.createSpyObj('Root', ['appendChild']);
 
-      let cssTemplate = 'cssTemplate';
+      const cssTemplate = 'cssTemplate';
       mockTemplates.getTemplate.and.returnValue(cssTemplate);
 
       spyOn(service['parser_'], 'parseFromString').and.returnValue(mockCssTemplateEl);
@@ -38,16 +38,16 @@ describe('theming.ThemeService', () => {
     });
 
     it('should append the style element to the document head if root is document', () => {
-      let styleEl = Mocks.object('styleEl');
-      let mockCssTemplateEl = jasmine.createSpyObj('CssTemplateEl', ['querySelector']);
+      const styleEl = Mocks.object('styleEl');
+      const mockCssTemplateEl = jasmine.createSpyObj('CssTemplateEl', ['querySelector']);
       mockCssTemplateEl.querySelector.and.returnValue(styleEl);
-      let mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
+      const mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
 
-      let document = Mocks.object('document');
+      const document = Mocks.object('document');
       document.head = mockHeadEl;
       Object.setPrototypeOf(document, Document.prototype);
 
-      let cssTemplate = 'cssTemplate';
+      const cssTemplate = 'cssTemplate';
       mockTemplates.getTemplate.and.returnValue(cssTemplate);
 
       spyOn(service['parser_'], 'parseFromString').and.returnValue(mockCssTemplateEl);
@@ -58,7 +58,7 @@ describe('theming.ThemeService', () => {
     });
 
     it('should throw error if the common template is not available', () => {
-      let mockRootEl = Mocks.object('RootEl');
+      const mockRootEl = Mocks.object('RootEl');
       mockTemplates.getTemplate.and.returnValue(null);
 
       assert(() => {
@@ -69,15 +69,15 @@ describe('theming.ThemeService', () => {
 
   describe('initialize', () => {
     it('should initialize the app correctly', () => {
-      let mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
+      const mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
 
       mockDocument.querySelector.and.returnValue(mockHeadEl);
 
-      let cssTemplate = 'cssTemplate';
+      const cssTemplate = 'cssTemplate';
       mockTemplates.getTemplate.and.returnValue(cssTemplate);
 
-      let styleEl = Mocks.object('styleEl');
-      let mockParsedCss = jasmine.createSpyObj('ParsedCss', ['querySelector']);
+      const styleEl = Mocks.object('styleEl');
+      const mockParsedCss = jasmine.createSpyObj('ParsedCss', ['querySelector']);
       mockParsedCss.querySelector.and.returnValue(styleEl);
       spyOn(service['parser_'], 'parseFromString').and.returnValue(mockParsedCss);
 
@@ -108,20 +108,15 @@ describe('theming.ThemeService', () => {
 
   describe('install', () => {
     it('should append the correct template to the header element', () => {
-      let themeStyleEl = Mocks.object('themeStyleEl');
+      const themeStyleEl = Mocks.object('themeStyleEl');
       mockDocument.createElement.and.returnValue(themeStyleEl);
 
-      let mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
-      mockDocument.querySelector.and.callFake((query: string) => {
-        switch (query) {
-          case 'head':
-            return mockHeadEl;
-          default:
-            return null;
-        }
-      });
+      const mockHeadEl = jasmine.createSpyObj('HeadEl', ['appendChild']);
+      Fakes.build(mockDocument.querySelector)
+          .when('head').return(mockHeadEl)
+          .else().return(null);
 
-      let theme = Mocks.object('theme');
+      const theme = Mocks.object('theme');
       theme['base'] = {
         'dark': {getBlue: () => 3, getGreen: () => 2, getRed: () => 1},
         'light': {getBlue: () => 6, getGreen: () => 5, getRed: () => 4},
@@ -145,12 +140,12 @@ describe('theming.ThemeService', () => {
     });
 
     it('should reuse the previous style element', () => {
-      let themeStyleEl = Mocks.object('themeStyleEl');
+      const themeStyleEl = Mocks.object('themeStyleEl');
       themeStyleEl.innerHTML = 'oldInnerHTML';
 
       mockDocument.querySelector.and.returnValue(themeStyleEl);
 
-      let theme = Mocks.object('theme');
+      const theme = Mocks.object('theme');
       theme['base'] = {
         'dark': {getBlue: () => 3, getGreen: () => 2, getRed: () => 1},
         'light': {getBlue: () => 6, getGreen: () => 5, getRed: () => 4},

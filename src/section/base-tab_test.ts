@@ -3,7 +3,7 @@ TestBase.setup();
 
 import {Interval} from 'external/gs_tools/src/async';
 import {DomEvent, ListenableDom} from 'external/gs_tools/src/event';
-import {Mocks} from 'external/gs_tools/src/mock';
+import {Fakes, Mocks} from 'external/gs_tools/src/mock';
 import {TestDispose} from 'external/gs_tools/src/testing';
 import {Animation} from 'external/gs_tools/src/webc';
 
@@ -40,8 +40,8 @@ describe('section.BaseTab', () => {
 
   describe('onAction_', () => {
     it('should update the selected tab', () => {
-      let attribute = 'attribute';
-      let mockTarget = jasmine.createSpyObj('Target', ['getAttribute']);
+      const attribute = 'attribute';
+      const mockTarget = jasmine.createSpyObj('Target', ['getAttribute']);
       mockTarget.getAttribute.and.returnValue(attribute);
 
       spyOn(tab.selectedTabHook_, 'set');
@@ -63,7 +63,7 @@ describe('section.BaseTab', () => {
 
   describe('onSelectedTabChanged_', () => {
     it('should dispatch the change event and update highlight', () => {
-      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+      const mockElement = jasmine.createSpyObj('Element', ['dispatch']);
       tab['element_'] = mockElement;
       spyOn(tab, 'updateHighlight_');
 
@@ -75,7 +75,7 @@ describe('section.BaseTab', () => {
     });
 
     it('should not update any events if there are no elements', () => {
-      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+      const mockElement = jasmine.createSpyObj('Element', ['dispatch']);
       tab['element_'] = null;
       spyOn(tab, 'updateHighlight_');
 
@@ -96,36 +96,31 @@ describe('section.BaseTab', () => {
 
   describe('setHighlight_', () => {
     it('should update the highlight element correctly', (done: any) => {
-      let currentStart = 12;
-      let currentLength = 34;
-      let targetStart = 56;
-      let targetLength = 78;
+      const currentStart = 12;
+      const currentLength = 34;
+      const targetStart = 56;
+      const targetLength = 78;
 
       tab['highlightStart_'] = currentStart;
       tab['highlightLength_'] = currentLength;
 
-      let animate = Mocks.object('animate');
-      let mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
+      const animate = Mocks.object('animate');
+      const mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
       mockAnimation.applyTo.and.returnValue(animate);
       spyOn(Animation, 'newInstance').and.returnValue(mockAnimation);
 
-      let mockListenableAnimate = jasmine.createSpyObj('ListenableAnimate', ['dispose', 'once']);
+      const mockListenableAnimate = jasmine.createSpyObj('ListenableAnimate', ['dispose', 'once']);
       mockListenableAnimate.once.and.returnValue(Mocks.disposable('Animate.once'));
       spyOn(ListenableDom, 'of').and.returnValue(mockListenableAnimate);
 
-      let highlightEl = Mocks.object('highlightEl');
+      const highlightEl = Mocks.object('highlightEl');
       tab['highlightEl_'] = highlightEl;
 
-      let keyframe1 = Mocks.object('keyframe1');
-      let keyframe2 = Mocks.object('keyframe2');
-      spyOn(tab, 'getAnimationKeyframe').and.callFake((start: any) => {
-        switch (start) {
-          case currentStart:
-            return keyframe1;
-          case targetStart:
-            return keyframe2;
-        }
-      });
+      const keyframe1 = Mocks.object('keyframe1');
+      const keyframe2 = Mocks.object('keyframe2');
+      Fakes.build(spyOn(tab, 'getAnimationKeyframe'))
+          .when(currentStart).return(keyframe1)
+          .when(targetStart).return(keyframe2);
 
       spyOn(tab, 'setHighlightEl');
 
@@ -152,17 +147,17 @@ describe('section.BaseTab', () => {
     });
 
     it('should set the start to the destination midpoint if the current length is 0', () => {
-      let targetStart = 56;
-      let targetLength = 78;
+      const targetStart = 56;
+      const targetLength = 78;
 
       tab['highlightStart_'] = 12;
       tab['highlightLength_'] = 0;
 
-      let mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
+      const mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
       mockAnimation.applyTo.and.returnValue(Mocks.object('animate'));
       spyOn(Animation, 'newInstance').and.returnValue(mockAnimation);
 
-      let mockListenableAnimate =
+      const mockListenableAnimate =
           jasmine.createSpyObj('ListenableAnimate', ['dispose', 'once']);
       mockListenableAnimate.once.and.returnValue(Mocks.disposable('Animate.once'));
       spyOn(ListenableDom, 'of').and.returnValue(mockListenableAnimate);
@@ -177,8 +172,8 @@ describe('section.BaseTab', () => {
     });
 
     it('should not update if the highlight is up to date', () => {
-      let targetStart = 56;
-      let targetLength = 78;
+      const targetStart = 56;
+      const targetLength = 78;
 
       tab['highlightStart_'] = targetStart;
       tab['highlightLength_'] = targetLength;
@@ -193,22 +188,16 @@ describe('section.BaseTab', () => {
 
   describe('onCreated', () => {
     it('should initialize correctly', () => {
-      let tabContainer = Mocks.object('tabContainer');
-      let highlightEl = Mocks.object('highlightEl');
-      let highlightContainer = Mocks.object('highlightContainer');
+      const tabContainer = Mocks.object('tabContainer');
+      const highlightEl = Mocks.object('highlightEl');
+      const highlightContainer = Mocks.object('highlightContainer');
 
-      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.callFake((query: string) => {
-        switch (query) {
-          case '.highlight-container':
-            return highlightContainer;
-          case '.highlight':
-            return highlightEl;
-          case '.tab-container':
-            return tabContainer;
-        }
-      });
-      let element = Mocks.object('element');
+      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
+      Fakes.build(mockShadowRoot.querySelector)
+          .when('.highlight-container').return(highlightContainer)
+          .when('.highlight').return(highlightEl)
+          .when('.tab-container').return(tabContainer);
+      const element = Mocks.object('element');
       element.shadowRoot = mockShadowRoot;
 
       spyOn(tab, 'onTick_');
@@ -232,7 +221,7 @@ describe('section.BaseTab', () => {
 
   describe('onInserted', () => {
     it('should listen to the gse-action event', () => {
-      let mockElement = jasmine.createSpyObj('Element', ['on']);
+      const mockElement = jasmine.createSpyObj('Element', ['on']);
       tab['element_'] = mockElement;
 
       spyOn(tab, 'onAction_');
@@ -255,16 +244,16 @@ describe('section.BaseTab', () => {
 
   describe('updateHighlight_', () => {
     it('should grab the destination start and length correctly', async (done: any) => {
-      let start = 12;
-      let length = 34;
-      let selectedId = 'selectedId';
+      const start = 12;
+      const length = 34;
+      const selectedId = 'selectedId';
       spyOn(tab.selectedTabHook_, 'get').and.returnValue(selectedId);
 
-      let selectedTab = Mocks.object('selectedTab');
+      const selectedTab = Mocks.object('selectedTab');
       spyOn(tab, 'getStartPosition').and.returnValue(start);
       spyOn(tab, 'getLength').and.returnValue(length);
 
-      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(selectedTab);
       tab['element_'] = <ListenableDom<HTMLElement>> {getEventTarget: () => mockElement};
 
@@ -278,14 +267,14 @@ describe('section.BaseTab', () => {
     });
 
     it('should shrink to 0 length if there are no selected Ids', async (done: any) => {
-      let start = 12;
-      let length = 34;
+      const start = 12;
+      const length = 34;
       spyOn(tab.selectedTabHook_, 'get').and.returnValue(null);
 
       tab['highlightStart_'] = start;
       tab['highlightLength_'] = length;
 
-      let element = Mocks.object('element');
+      const element = Mocks.object('element');
       tab['element_'] = <ListenableDom<HTMLElement>> {getEventTarget: () => element};
 
       spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
