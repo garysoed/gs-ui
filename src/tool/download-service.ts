@@ -43,7 +43,7 @@ export class DownloadService {
    */
   downloadJson(json: gs.IJson, filename: string): void {
     const blob = this.createBlob_(
-        [JSON.stringify(json, null, 2)],
+        [JSON.stringify(json, null)],
         {type: 'application/json'});
     this.download(blob, filename);
   }
