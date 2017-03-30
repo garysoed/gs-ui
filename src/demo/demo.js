@@ -1,41 +1,13 @@
 'use strict';
 
-var base = 'crimson';
-var accent = 'brightgreen';
+var base = 'torchred';
+var accent = 'cerulean';
 
 var accentPickerMenu = document.querySelector('.colorPickerMenu.accent');
 var basePickerMenu = document.querySelector('.colorPickerMenu.base');
-var paletteNames = [
-  'red',
-  'vermilion',
-  'safetyorange',
-  'darkorange',
-  'orange',
-  'amber',
-  'gold',
-  'goldenyellow',
-  'yellow',
-  'electriclime',
-  'springbud',
-  'brightgreen',
-  'freespeechgreen',
-  'jade',
-  'persiangreen',
-  'denim',
-  'egyptianblue',
-  'persianblue',
-  'ultramarine',
-  'bluediamond',
-  'purpleheart',
-  'darkmagenta',
-  'violetred',
-  'crimson',
-  'grey'
-];
 
 var palettes = [];
-for (var i in paletteNames) {
-  var name = paletteNames[i];
+for (var name in gs.ui.DefaultPalettes) {
   palettes.push({name: name, palette: gs.ui.DefaultPalettes[name]});
 }
 var main = gs.ui.Main.newInstance({
@@ -87,7 +59,7 @@ for (var r = 0; r < 5; r++) {
     var palette = palettes[i].palette;
     var name = palettes[i].name;
 
-    var normal = palette.normal;
+    var normal = palette;
     var cellEl = document.createElement('div');
     cellEl.style.backgroundColor =
         'rgb(' + [normal.getRed(), normal.getGreen(), normal.getBlue()].join(',') +')';
@@ -97,13 +69,13 @@ for (var r = 0; r < 5; r++) {
     cellEl.setAttribute('data-name', name);
     cellEl.addEventListener('click', onClickBase.bind(null, name));
 
-    var light = palette.light;
+    var light = palette;
     var lightCell = document.createElement('div');
     lightCell.style.backgroundColor =
         'rgb(' + [light.getRed(), light.getGreen(), light.getBlue()].join(',') + ')';
     cellEl.appendChild(lightCell);
 
-    var dark = palette.dark;
+    var dark = palette;
     var darkCell = document.createElement('div');
     darkCell.style.backgroundColor =
         'rgb(' + [dark.getRed(), dark.getGreen(), dark.getBlue()].join(',') + ')';
@@ -123,7 +95,7 @@ for (var r = 0; r < 5; r++) {
     var palette = palettes[i].palette;
     var name = palettes[i].name;
 
-    var color = palette.accent;
+    var color = palette;
     var cellEl = document.createElement('div');
     cellEl.style.backgroundColor =
         'rgb(' + [color.getRed(), color.getGreen(), color.getBlue()].join(',') +')';

@@ -1,9 +1,11 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
+import { RgbColor } from 'external/gs_tools/src/color';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 
-import { ThemeService } from './theme-service';
+import { Theme } from '../theming/theme';
+import { ThemeService } from '../theming/theme-service';
 
 
 describe('theming.ThemeService', () => {
@@ -116,21 +118,12 @@ describe('theming.ThemeService', () => {
           .when('head').return(mockHeadEl)
           .else().return(null);
 
-      const theme = Mocks.object('theme');
-      theme['base'] = {
-        'dark': {getBlue: () => 3, getGreen: () => 2, getRed: () => 1},
-        'light': {getBlue: () => 6, getGreen: () => 5, getRed: () => 4},
-        'normal': {getBlue: () => 9, getGreen: () => 8, getRed: () => 7},
-      };
-      theme['accent'] = {
-        'accent': {getBlue: () => 12, getGreen: () => 11, getRed: () => 10},
-      };
+      const theme = Theme.newInstance(
+          RgbColor.newInstance(255, 255, 255),
+          RgbColor.newInstance(0, 0, 0));
 
       service.install(theme);
-
-      assert(themeStyleEl.innerHTML).to.equal(
-          'body{--gsRgbAccent:10,11,12;--gsRgbBaseDark:1,2,3;' +
-          '--gsRgbBaseLight:4,5,6;--gsRgbBaseNormal:7,8,9;}');
+      assert(themeStyleEl.innerHTML).to.equal(jasmine.stringMatching(/body{--/));
       assert(themeStyleEl.id).to.equal('gs-theme');
 
       assert(mockHeadEl.appendChild).to.haveBeenCalledWith(themeStyleEl);
@@ -145,22 +138,13 @@ describe('theming.ThemeService', () => {
 
       mockDocument.querySelector.and.returnValue(themeStyleEl);
 
-      const theme = Mocks.object('theme');
-      theme['base'] = {
-        'dark': {getBlue: () => 3, getGreen: () => 2, getRed: () => 1},
-        'light': {getBlue: () => 6, getGreen: () => 5, getRed: () => 4},
-        'normal': {getBlue: () => 9, getGreen: () => 8, getRed: () => 7},
-      };
-      theme['accent'] = {
-        'accent': {getBlue: () => 12, getGreen: () => 11, getRed: () => 10},
-      };
+      const theme = Theme.newInstance(
+          RgbColor.newInstance(255, 255, 255),
+          RgbColor.newInstance(0, 0, 0));
 
       service.install(theme);
 
-      assert(themeStyleEl.innerHTML).to.equal(
-          'body{--gsRgbAccent:10,11,12;--gsRgbBaseDark:1,2,3;' +
-          '--gsRgbBaseLight:4,5,6;--gsRgbBaseNormal:7,8,9;}');
-
+      assert(themeStyleEl.innerHTML).to.equal(jasmine.stringMatching(/body{--/));
       assert(mockDocument.querySelector).to.haveBeenCalledWith('style#gs-theme');
       assert(mockDocument.createElement).toNot.haveBeenCalled();
     });

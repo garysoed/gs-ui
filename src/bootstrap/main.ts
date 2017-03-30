@@ -51,7 +51,7 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
 
 const DEFAULT_THEME_: Theme = Theme.newInstance(
     DefaultPalettes.vermilion,
-    DefaultPalettes.jade);
+    DefaultPalettes.cerulean);
 
 
 /**
@@ -120,13 +120,8 @@ export class Main extends BaseDisposable {
         ace?: AceAjax.Ace,
         routeFactoryServiceCtor?: gs.ICtor<IRouteFactoryService<any>>,
       } = {}): Main {
-    let templates = Templates.newInstance(new Map<RegExp, string>([
-      [/rgba\(11,11,11/g, 'rgba(var(--gsRgbBaseDark)'],
-      [/rgba\(22,22,22/g, 'rgba(var(--gsRgbBaseNormal)'],
-      [/rgba\(33,33,33/g, 'rgba(var(--gsRgbBaseLight)'],
-      [/rgba\(44,44,44/g, 'rgba(var(--gsRgbAccent)'],
-    ]));
-    let locationService = Reflect.construct(LocationService, [ListenableDom.of(window)]);
+    const templates = Templates.newInstance();
+    const locationService = Reflect.construct(LocationService, [ListenableDom.of(window)]);
 
     Injector.bindProvider(() => document, 'x.dom.document');
     Injector.bindProvider(() => window, 'x.dom.window');
@@ -139,8 +134,8 @@ export class Main extends BaseDisposable {
     }
     Injector.bindProvider(() => locationService, 'gs.LocationService');
 
-    let injector = Injector.newInstance();
-    let themeService = injector.instantiate<ThemeService>(ThemeService);
+    const injector = Injector.newInstance();
+    const themeService = injector.instantiate<ThemeService>(ThemeService);
     themeService.initialize();
     return new Main(
         injector,

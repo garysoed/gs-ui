@@ -1,0 +1,145 @@
+<html>
+  <head>
+    <script src="../../node_modules/x-tag/src/core.js"></script>
+    <script src="../../bazel-genfiles/pack.js"></script>
+    <style>
+      .action {
+        background-color: var(--gsColorActionBG);
+        color: var(--gsColorActionFG);
+      }
+
+      .actionDisabled {
+        background-color: var(--gsColorActionBG);
+        color: var(--gsColorActionDisabledFG);
+      }
+
+      .actionFocused {
+        background-color: var(--gsColorActionBG);
+        color: var(--gsColorActionFocusFG);
+      }
+
+      .actionPrimary {
+        background-color: var(--gsColorActionPrimaryBG);
+        color: var(--gsColorActionPrimaryFG);
+      }
+
+      .actionPrimaryDisabled {
+        background-color: var(--gsColorActionPrimaryDisabledBG);
+        color: var(--gsColorActionPrimaryDisabledFG);
+      }
+
+      .actionPrimaryFocused {
+        background-color: var(--gsColorActionPrimaryFocusBG);
+        color: var(--gsColorActionPrimaryFocusFG);
+      }
+
+      .header > div {
+        height: 8rem;
+        line-height: 8rem;
+        transform: translateY(1.2rem) rotate(-90deg);
+        white-space: nowrap;
+        width: 3.5rem;
+      }
+
+      .heading {
+        color: var(--gsColorHeaderFG);
+      }
+
+      .primaryPassive {
+        background-color: var(--gsColorPassivePrimaryBG);
+      }
+
+      .row {
+        display: flex;
+        width: 60rem;
+      }
+
+      .rowLabel {
+        padding-top: 8rem;
+      }
+
+      .rowLabel > div {
+        height: 3.5rem;
+        line-height: 3.5rem;
+        padding: 0 1rem;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .table > div {
+        font-size: 2rem;
+        height: 3.5rem;
+        line-height: 3.5rem;
+        text-align: center;
+        width: 3.5rem;
+      }
+    </style>
+
+    <link rel="stylesheet" href="demo.css">
+  </head>
+  <body>
+    <template id="template">
+      <div class="table" layout="column">
+        <div>A</div>
+        <div class="heading">A</div>
+        <div class="primaryPassive">A</div>
+        <div class="gs-secondary">A</div>
+        <div class="action">A</div>
+        <div class="actionFocused">A</div>
+        <div class="actionDisabled">A</div>
+        <div class="actionPrimary">A</div>
+        <div class="actionPrimaryFocused">A</div>
+        <div class="actionPrimaryDisabled">A</div>
+      </div>
+    </template>
+
+    <section layout="row">
+      <div class="rowLabel" layout="column">
+        <div>Passive</div>
+        <div>Header</div>
+        <div>Primary Passive</div>
+        <div>Secondary</div>
+        <div>Action</div>
+        <div>Action (Focused)</div>
+        <div>Action (Disabled)</div>
+        <div>Primary Action</div>
+        <div>Primary Action (Focused)</div>
+        <div>Primary Action (Disabled)</div>
+      </div>
+      <section layout="column">
+        <section class="header" layout="row">
+          <div>Normal</div>
+          <div>Normal highlight</div>
+          <div>Inverted</div>
+          <div>Inverted highlight</div>
+        </section>
+        <section layout="row">
+          <section class="cell gs-theme-normal"></section>
+          <section class="cell gs-theme-normal-hilite"></section>
+          <section class="cell gs-theme-invert"></section>
+          <section class="cell gs-theme-invert-hilite"></section>
+        </section>
+      </section>
+    </section>
+
+    <gs-basic-button class="colorPicker gs-theme-normal gs-primary">
+      <div gs-content><gs-icon>color_lens</gs-icon></div>
+      <gs-menu>
+        <div class="menuRoot gs-theme-normal" gs-content selected-tab="base">
+          <div class="colorPickerMenu base"></div>
+          <div class="colorPickerMenu accent"></div>
+          <gs-horizontal-tab gs-selected-tab="base">
+            <gs-basic-button gs-tab-id="base">
+              <div gs-content>Base</div>
+            </gs-basic-button>
+            <gs-basic-button gs-tab-id="accent">
+              <div gs-content>Accent</div>
+            </gs-basic-button>
+          </gs-horizontal-tab>
+        </div>
+      </gs-menu>
+    </gs-basic-button>
+
+    <script src="demo.js"></script>
+  </body>
+</html>

@@ -18,8 +18,8 @@ describe('bootstrap.Main', () => {
   let main;
 
   beforeEach(() => {
-    let injector = Mocks.object('injector');
-    let locationService = Mocks.disposable('LocationService');
+    const injector = Mocks.object('injector');
+    const locationService = Mocks.disposable('LocationService');
     mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme', 'install']);
     mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
     main = new Main(injector, locationService, mockThemeService, mockRegistrar);
@@ -28,7 +28,7 @@ describe('bootstrap.Main', () => {
 
   describe('applyTheme', () => {
     it('should apply the theme correctly', () => {
-      let targetEl = Mocks.object('targetEl');
+      const targetEl = Mocks.object('targetEl');
       main.applyTheme(targetEl);
       assert(mockThemeService.applyTheme).to.haveBeenCalledWith(targetEl);
     });
@@ -36,9 +36,9 @@ describe('bootstrap.Main', () => {
 
   describe('bootstrap', () => {
     it('should set up correctly', () => {
-      let customElement1 = Mocks.object('customElement1');
-      let customElement2 = Mocks.object('customElement2');
-      let theme = Mocks.object('theme');
+      const customElement1 = Mocks.object('customElement1');
+      const customElement2 = Mocks.object('customElement2');
+      const theme = Mocks.object('theme');
       main.bootstrap(theme, [customElement1, customElement2]);
       assert(mockRegistrar.register).to.haveBeenCalledWith(customElement1);
       assert(mockRegistrar.register).to.haveBeenCalledWith(customElement2);
@@ -48,21 +48,21 @@ describe('bootstrap.Main', () => {
 
   describe('newInstance', () => {
     it('should set up correctly', () => {
-      let ace = Mocks.object('ace');
-      let routeFactoryServiceCtor = Mocks.object('routeFactoryServiceCtor');
-      let templates = Mocks.object('templates');
+      const ace = Mocks.object('ace');
+      const routeFactoryServiceCtor = Mocks.object('routeFactoryServiceCtor');
+      const templates = Mocks.object('templates');
       spyOn(Templates, 'newInstance').and.returnValue(templates);
 
-      let mockThemeService = jasmine.createSpyObj('ThemeService', ['initialize', 'install']);
-      let mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'instantiate']);
+      const mockThemeService = jasmine.createSpyObj('ThemeService', ['initialize', 'install']);
+      const mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'instantiate']);
       mockInjector.instantiate.and.returnValue(mockThemeService);
       spyOn(Injector, 'newInstance').and.returnValue(mockInjector);
 
-      let mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
+      const mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
 
       spyOn(ElementRegistrar, 'newInstance').and.returnValue(mockRegistrar);
 
-      let main = Main.newInstance({
+      const main = Main.newInstance({
         ace: ace,
         routeFactoryServiceCtor: routeFactoryServiceCtor,
       });
@@ -82,16 +82,16 @@ describe('bootstrap.Main', () => {
           .to.equal(routeFactoryServiceCtor);
       assert(TestInject.getBoundValue('x.ace')()).to.equal(ace);
 
-      assert(Templates.newInstance).to.haveBeenCalledWith(Matchers.any(Map));
+      assert(Templates.newInstance).to.haveBeenCalledWith();
     });
 
     it('should not throw error if config is empty', () => {
-      let mockThemeService = jasmine.createSpyObj('ThemeService', ['initialize', 'install']);
-      let mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'instantiate']);
+      const mockThemeService = jasmine.createSpyObj('ThemeService', ['initialize', 'install']);
+      const mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'instantiate']);
       mockInjector.instantiate.and.returnValue(mockThemeService);
       spyOn(Injector, 'newInstance').and.returnValue(mockInjector);
 
-      let mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
+      const mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
 
       spyOn(ElementRegistrar, 'newInstance').and.returnValue(mockRegistrar);
 

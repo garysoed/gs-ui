@@ -25,7 +25,7 @@
   }
 
   :host(:not([disabled]):hover) {
-    --gsButtonFG: var(--gsColorAccent);
+    --gsButtonFG: var(--gsColorActionFocusFG);
   }
 
   /* Primary button */
@@ -37,6 +37,11 @@
   :host(.gs-primary[disabled]) {
     --gsButtonFG: var(--gsColorActionPrimaryDisabledFG);
     --gsButtonBG: var(--gsColorActionPrimaryDisabledBG);
+  }
+
+  :host(.gs-primary:not([disabled]):hover) {
+    --gsButtonFG: var(--gsColorActionPrimaryFocusFG);
+    --gsButtonBG: var(--gsColorActionPrimaryFocusBG);
   }
 </style>
 <div class="root">
