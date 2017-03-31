@@ -5,6 +5,10 @@
     top: 0;
   }
 
+  #item {
+    position: absolute;
+  }
+
   #root #container {
     background-color: var(--gsColorPassiveBG);
     overflow: hidden;
@@ -20,7 +24,7 @@
 
 <div fill-parent id="root">
   <div id="container" layout="row">
-    <div flex>
+    <div flex id="item">
       <content id="content" select="[gs-content]"></content>
     </div>
   </div>

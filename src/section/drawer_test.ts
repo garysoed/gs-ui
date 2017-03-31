@@ -15,6 +15,35 @@ describe('section.Drawer', () => {
     TestDispose.add(drawer);
   });
 
+  describe('onAlignContentChanged_', () => {
+    it('should set the style correctly if the anchor point is "left"', () => {
+      const style = Mocks.object('style');
+      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(style);
+
+      drawer['onAlignContentChanged_']('left');
+
+      assert(style.left).to.equal('0');
+      assert(style.right).to.beNull();
+    });
+
+    it('should set the style correctly if the anchor point is "right"', () => {
+      const style = Mocks.object('style');
+      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(style);
+
+      drawer['onAlignContentChanged_']('right');
+
+      assert(style.left).to.beNull();
+      assert(style.right).to.equal('0');
+    });
+
+    it('should throw error if the value is invalid', () => {
+      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(Mocks.object('style'));
+      assert(() => {
+        drawer['onAlignContentChanged_']('unknown');
+      }).to.throwError(/Invalid align point/);
+    });
+  });
+
   describe('onAnchorPointChanged_', () => {
     it('should set the style correctly if the anchor point is "left"', () => {
       const style = Mocks.object('style');

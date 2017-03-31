@@ -65,11 +65,11 @@ table {
 }
 
 table tr:nth-child(2n) {
-  background-color: var(--gsThemeNormalLightest);
+  background-color: var(--gsColorPassivePrimaryBG);
 }
 
 td {
-  border: 1px solid var(--gsColorActionFG);
+  border: 1px solid var(--gsColorHeaderFG);
   padding: .5rem;
 }
 

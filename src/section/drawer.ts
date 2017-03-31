@@ -25,6 +25,9 @@ export class Drawer extends BaseThemedElement {
   @bind('#root').attribute('flex-justify', StringParser)
   readonly flexJustifyHook_: DomHook<string>;
 
+  @bind('#item').property('style')
+  readonly itemStyleHook_: DomHook<CSSStyleDeclaration>;
+
   @bind('#root').property('style')
   readonly rootStyleHook_: DomHook<CSSStyleDeclaration>;
 
@@ -34,7 +37,29 @@ export class Drawer extends BaseThemedElement {
     this.classListHook_ = DomHook.of<Set<string>>();
     this.containerStyleHook_ = DomHook.of<CSSStyleDeclaration>();
     this.flexJustifyHook_ = DomHook.of<string>();
+    this.itemStyleHook_ = DomHook.of<CSSStyleDeclaration>();
     this.rootStyleHook_ = DomHook.of<CSSStyleDeclaration>();
+  }
+
+  @handle(null).attributeChange('gs-align-content', StringParser)
+  protected onAlignContentChanged_(alignPoint: string): void {
+    const style = this.itemStyleHook_.get();
+    if (style === null) {
+      return;
+    }
+
+    switch (alignPoint.toLowerCase()) {
+      case 'left':
+        style.left = '0';
+        style.right = null;
+        break;
+      case 'right':
+        style.left = null;
+        style.right = '0';
+        break;
+      default:
+        throw Error(`Invalid align point ${alignPoint}`);
+    }
   }
 
   /**
