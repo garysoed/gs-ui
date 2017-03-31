@@ -224,7 +224,8 @@ export class Theme {
 
   @cache()
   getBlackOnAccent(): Color {
-    return Colors.getContrast(BLACK, this.getAccent()) ? WHITE : BLACK;
+    const accent = this.getAccent();
+    return Colors.getContrast(BLACK, accent) > Colors.getContrast(WHITE, accent) ? BLACK : WHITE;
   }
 
   /**

@@ -29,6 +29,22 @@
         height: var(--gsLineHeight);
         padding-left: .5rem;
       }
+
+      #contrastContainer {
+        bottom: 0;
+        height: 3.5rem;
+        position: absolute;
+        right: 0;
+        width: 3.5rem;
+      }
+
+      #contrastContent {
+        width: 9rem;
+      }
+
+      #contrastInput {
+        padding: 1rem;
+      }
     </style>
     <link rel="stylesheet" href="demo.css">
   </head>
@@ -80,6 +96,22 @@
         </div>
       </gs-menu>
     </gs-basic-button>
+
+    <div class="gs-theme-normal" id="contrastContainer">
+      <gs-drawer
+          gs-align-content="left"
+          gs-anchor-point="right"
+          gs-min-width="3.5rem"
+          gs-max-width="9rem"
+          id="contrastDrawer">
+        <div gs-content id="contrastContent" layout="row">
+          <gs-basic-button class="gs-primary" id="contrastButton">
+            <gs-icon gs-content>accessibility</gs-icon>
+          </gs-basic-button>
+          <gs-float-input flex gs-value="4.5" id="contrastInput"></gs-float-input>
+        </div>
+      </gs-drawer>
+    </div>
 
     <script src="demo.js"></script>
     <script>

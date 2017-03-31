@@ -808,6 +808,26 @@ describe('theming.Theme', () => {
     });
   });
 
+  describe('getBlackOnAccent', () => {
+    it('should return BLACK if it has a bigger contrast', () => {
+      Fakes.build(spyOn(Colors, 'getContrast'))
+          .when(BLACK).return(34)
+          .when(WHITE).return(12);
+      assert(theme.getBlackOnAccent()).to.equal(BLACK);
+      assert(Colors.getContrast).to.haveBeenCalledWith(BLACK, accent);
+      assert(Colors.getContrast).to.haveBeenCalledWith(WHITE, accent);
+    });
+
+    it('should return WHITE if it has a bigger contrast', () => {
+      Fakes.build(spyOn(Colors, 'getContrast'))
+          .when(BLACK).return(12)
+          .when(WHITE).return(34);
+      assert(theme.getBlackOnAccent()).to.equal(WHITE);
+      assert(Colors.getContrast).to.haveBeenCalledWith(BLACK, accent);
+      assert(Colors.getContrast).to.haveBeenCalledWith(WHITE, accent);
+    });
+  });
+
   describe('getForegroundFade_', () => {
     it('should return the correct color', () => {
       const foreground = Mocks.object('foreground');

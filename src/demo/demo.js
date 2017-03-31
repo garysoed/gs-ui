@@ -2,6 +2,7 @@
 
 var base = 'torchred';
 var accent = 'cerulean';
+var contrast = 4.5;
 
 var accentPickerMenu = document.querySelector('.colorPickerMenu.accent');
 var basePickerMenu = document.querySelector('.colorPickerMenu.base');
@@ -18,7 +19,8 @@ var main = gs.ui.Main.newInstance({
 function updateTheme() {
   var theme = gs.ui.Theme.newInstance(
       gs.ui.DefaultPalettes[base],
-      gs.ui.DefaultPalettes[accent]);
+      gs.ui.DefaultPalettes[accent],
+      contrast);
   main.setTheme(theme);
 }
 
@@ -124,9 +126,31 @@ document.querySelectorAll('section.cell').forEach(function(el) {
   el.innerHTML = templateEl.innerHTML;
 });
 
+var contrastButton = document.querySelector('#contrastButton');
+var contrastDrawer = document.querySelector('#contrastDrawer');
+contrastButton.addEventListener('click', function() {
+  var value = contrastDrawer.getAttribute('gs-is-expanded') === 'true';
+  contrastDrawer.setAttribute('gs-is-expanded', !value);
+});
+
+var contrastInput = document.querySelector('#contrastInput');
+contrastInput.setAttribute('gs-value', contrast);
+var mutationObserver = new MutationObserver(function(records) {
+  records.forEach(function() {
+    var newContrast = Number.parseFloat(contrastInput.getAttribute('gs-value'));
+    if (!Number.isNaN(newContrast)) {
+      contrast = newContrast;
+      updateTheme();
+    }
+  });
+});
+mutationObserver.observe(contrastInput, {attributes: true, attributeFilter: ['gs-value']});
+
+
 var theme = gs.ui.Theme.newInstance(
     gs.ui.DefaultPalettes[base],
-    gs.ui.DefaultPalettes[accent]);
+    gs.ui.DefaultPalettes[accent],
+    contrast);
 main.bootstrap(theme);
 main.applyTheme(document);
 
