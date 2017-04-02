@@ -8,9 +8,9 @@ var accentPickerMenu = document.querySelector('.colorPickerMenu.accent');
 var basePickerMenu = document.querySelector('.colorPickerMenu.base');
 
 var palettes = [];
-for (var name in gs.ui.DefaultPalettes) {
-  palettes.push({name: name, palette: gs.ui.DefaultPalettes[name]});
-}
+gs.ui.DefaultPalettes.getNames().forEach(function(name) {
+  palettes.push({name: name, palette: gs.ui.DefaultPalettes.get(name)});
+});
 var main = gs.ui.Main.newInstance({
   ace: window['ace'],
   routeFactoryServiceCtor: window['routeFactoryServiceCtor'] || null
@@ -18,8 +18,8 @@ var main = gs.ui.Main.newInstance({
 
 function updateTheme() {
   var theme = gs.ui.Theme.newInstance(
-      gs.ui.DefaultPalettes[base],
-      gs.ui.DefaultPalettes[accent],
+      gs.ui.DefaultPalettes.get(base),
+      gs.ui.DefaultPalettes.get(accent),
       contrast);
   main.setTheme(theme);
 }
@@ -148,8 +148,8 @@ mutationObserver.observe(contrastInput, {attributes: true, attributeFilter: ['gs
 
 
 var theme = gs.ui.Theme.newInstance(
-    gs.ui.DefaultPalettes[base],
-    gs.ui.DefaultPalettes[accent],
+    gs.ui.DefaultPalettes.get(base),
+    gs.ui.DefaultPalettes.get(accent),
     contrast);
 main.bootstrap(theme);
 main.applyTheme(document);

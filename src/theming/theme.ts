@@ -103,7 +103,7 @@ export class Theme {
 
     return true
         // Normal colors
-        && Colors.getContrast(baseNormalDarkest, WHITE) >= contrast
+        && Colors.getContrast(baseNormalDark, WHITE) >= contrast
         && Colors.getContrast(BLACK, baseNormalLightest) >= contrast
 
         // Normal Highlights
@@ -138,6 +138,10 @@ export class Theme {
   }
 
   getAccent(): Color {
+    return this.accent_;
+  }
+
+  getAccentHue(): Color {
     return this.accent_;
   }
 
@@ -181,6 +185,10 @@ export class Theme {
     return Theme.createShade_(this.base_, 0.5 - this.baseDistance_ * 2, reverseMode);
   }
 
+  getBaseHue(): Color {
+    return this.base_;
+  }
+
   @cache()
   getBaseLight(reverseMode: boolean): Color {
     return Theme.createShade_(this.base_, 0.5 + this.baseDistance_, reverseMode);
@@ -194,6 +202,10 @@ export class Theme {
   @cache()
   getBlackFade(): Color {
     return Theme.getForegroundFade_(BLACK, this.getBaseLight(true), this.contrast_ * 2 / 3);
+  }
+
+  getContrast(): number {
+    return this.contrast_;
   }
 
   /**

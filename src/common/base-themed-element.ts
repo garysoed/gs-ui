@@ -4,7 +4,7 @@ import { ThemeService } from '../theming/theme-service';
 
 
 export class BaseThemedElement extends BaseElement {
-  private themeService_: ThemeService;
+  protected readonly themeService_: ThemeService;
 
   /**
    * @param themeService

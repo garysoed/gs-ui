@@ -3,6 +3,7 @@ TestBase.setup();
 
 import { RgbColor } from 'external/gs_tools/src/color';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
+import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { Theme } from '../theming/theme';
 import { ThemeService } from '../theming/theme-service';
@@ -11,12 +12,15 @@ import { ThemeService } from '../theming/theme-service';
 describe('theming.ThemeService', () => {
   let mockDocument;
   let mockTemplates;
-  let service;
+  let mockWindow;
+  let service: ThemeService;
 
   beforeEach(() => {
     mockDocument = jasmine.createSpyObj('Document', ['createElement', 'querySelector']);
     mockTemplates = jasmine.createSpyObj('Templates', ['getTemplate']);
-    service = new ThemeService(mockTemplates, mockDocument);
+    mockWindow = jasmine.createSpyObj('Window', ['getComputedStyle']);
+    service = new ThemeService(mockTemplates, mockWindow, mockDocument);
+    TestDispose.add(service);
   });
 
   describe('applyTheme', () => {
@@ -147,6 +151,50 @@ describe('theming.ThemeService', () => {
       assert(themeStyleEl.innerHTML).to.equal(jasmine.stringMatching(/body{--/));
       assert(mockDocument.querySelector).to.haveBeenCalledWith('style#gs-theme');
       assert(mockDocument.createElement).toNot.haveBeenCalled();
+    });
+  });
+
+  describe('isHighlightMode', () => {
+    it('should return true if the element is in highlight mode', () => {
+      const element = Mocks.object('element');
+      const mockComputedStyle = jasmine.createSpyObj('ComputedStyle', ['getPropertyValue']);
+      mockComputedStyle.getPropertyValue.and.returnValue('  true');
+      mockWindow.getComputedStyle.and.returnValue(mockComputedStyle);
+      assert(service.isHighlightMode(element)).to.beTrue();
+      assert(mockComputedStyle.getPropertyValue).to.haveBeenCalledWith('--gsColorHighlightMode');
+      assert(mockWindow.getComputedStyle).to.haveBeenCalledWith(element);
+    });
+
+    it('should return false if the element is not in highlight mode', () => {
+      const element = Mocks.object('element');
+      const mockComputedStyle = jasmine.createSpyObj('ComputedStyle', ['getPropertyValue']);
+      mockComputedStyle.getPropertyValue.and.returnValue('  false ');
+      mockWindow.getComputedStyle.and.returnValue(mockComputedStyle);
+      assert(service.isHighlightMode(element)).to.beFalse();
+      assert(mockComputedStyle.getPropertyValue).to.haveBeenCalledWith('--gsColorHighlightMode');
+      assert(mockWindow.getComputedStyle).to.haveBeenCalledWith(element);
+    });
+  });
+
+  describe('isReversedMode', () => {
+    it('should return true if the element is in reversed mode', () => {
+      const element = Mocks.object('element');
+      const mockComputedStyle = jasmine.createSpyObj('ComputedStyle', ['getPropertyValue']);
+      mockComputedStyle.getPropertyValue.and.returnValue('  true');
+      mockWindow.getComputedStyle.and.returnValue(mockComputedStyle);
+      assert(service.isReversedMode(element)).to.beTrue();
+      assert(mockComputedStyle.getPropertyValue).to.haveBeenCalledWith('--gsColorReverseMode');
+      assert(mockWindow.getComputedStyle).to.haveBeenCalledWith(element);
+    });
+
+    it('should return false if the element is not in reversed mode', () => {
+      const element = Mocks.object('element');
+      const mockComputedStyle = jasmine.createSpyObj('ComputedStyle', ['getPropertyValue']);
+      mockComputedStyle.getPropertyValue.and.returnValue('  false ');
+      mockWindow.getComputedStyle.and.returnValue(mockComputedStyle);
+      assert(service.isReversedMode(element)).to.beFalse();
+      assert(mockComputedStyle.getPropertyValue).to.haveBeenCalledWith('--gsColorReverseMode');
+      assert(mockWindow.getComputedStyle).to.haveBeenCalledWith(element);
     });
   });
 });

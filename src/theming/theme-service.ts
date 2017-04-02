@@ -1,25 +1,33 @@
 import { Maps } from 'external/gs_tools/src/collection';
 import { Color } from 'external/gs_tools/src/color';
+import { BaseListenable } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { Validate } from 'external/gs_tools/src/valid';
-import { Templates } from 'external/gs_tools/src/webc';
+import { BooleanParser, Templates } from 'external/gs_tools/src/webc';
 
-import { Theme } from './theme';
+import { ThemeServiceEvents } from '../const/theme-service-events';
+import { Theme } from '../theming/theme';
 
 
 @bind('theming.ThemeService')
-export class ThemeService {
+export class ThemeService extends BaseListenable<ThemeServiceEvents> {
   private readonly document_: Document;
   private readonly parser_: DOMParser;
   private readonly templates_: Templates;
+  private readonly window_: Window;
   private initialized_: boolean = false;
+  private theme_: Theme | null;
 
   constructor(
       @inject('x.gs_tools.templates') templates: Templates,
+      @inject('x.dom.window') windowRef: Window = window,
       @inject('x.dom.document') document: Document = window.document) {
+    super();
     this.document_ = document;
     this.parser_ = new DOMParser();
     this.templates_ = templates;
+    this.theme_ = null;
+    this.window_ = windowRef;
   }
 
   /**
@@ -36,6 +44,13 @@ export class ThemeService {
         .assertValid();
     const cssTemplateEl = this.parser_.parseFromString(cssTemplate!, 'text/html');
     targetEl.appendChild(cssTemplateEl.querySelector('style'));
+  }
+
+  /**
+   * @return The currently applied theme, or null if there are none.
+   */
+  getTheme(): Theme | null {
+    return this.theme_;
   }
 
   /**
@@ -106,6 +121,31 @@ export class ThemeService {
         .asArray()
         .join('');
 
-    themeStyleEl.innerHTML = `body{${vars}}`;
+    this.dispatch(
+        ThemeServiceEvents.THEME_CHANGED,
+        () => {
+          themeStyleEl.innerHTML = `body{${vars}}`;
+          this.theme_ = theme;
+        });
+  }
+
+  /**
+   * @param element
+   * @return True iff the element is highlight mode, or null if it cannot be determined.
+   */
+  isHighlightMode(element: Element): boolean | null {
+    const computedStyle = this.window_.getComputedStyle(element);
+    return BooleanParser.parse(
+        computedStyle.getPropertyValue('--gsColorHighlightMode').trim());
+  }
+
+  /**
+   * @param element
+   * @return True iff the element is reversed mode, or null if it cannot be determined.
+   */
+  isReversedMode(element: Element): boolean | null {
+    const computedStyle = this.window_.getComputedStyle(element);
+    return BooleanParser.parse(
+        computedStyle.getPropertyValue('--gsColorReverseMode').trim());
   }
 }

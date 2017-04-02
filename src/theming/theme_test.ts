@@ -321,7 +321,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(12)
+          .when(baseNormalDark, WHITE).return(12)
           .when(BLACK, baseNormalLightest).return(13)
           .when(baseReversedLightest, baseNormalDark).return(14)
           .when(WHITE, baseNormalDark).return(12)
@@ -369,7 +369,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(10)
+          .when(baseNormalDark, WHITE).return(10)
           .when(BLACK, baseNormalLightest).return(13)
           .when(baseReversedLightest, baseNormalDark).return(14)
           .when(WHITE, baseNormalDark).return(12)
@@ -401,7 +401,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(12)
+          .when(baseNormalDark, WHITE).return(12)
           .when(BLACK, baseNormalLightest).return(10)
           .when(baseReversedLightest, baseNormalDark).return(14)
           .when(WHITE, baseNormalDark).return(12)
@@ -433,7 +433,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(12)
+          .when(baseNormalDark, WHITE).return(12)
           .when(BLACK, baseNormalLightest).return(13)
           .when(baseReversedLightest, baseNormalDark).return(10)
           .when(WHITE, baseNormalDark).return(12)
@@ -465,7 +465,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(12)
+          .when(baseNormalDark, WHITE).return(12)
           .when(BLACK, baseNormalLightest).return(13)
           .when(baseReversedLightest, baseNormalDark).return(14)
           .when(WHITE, baseNormalDark).return(10)
@@ -498,7 +498,7 @@ describe('theming.Theme', () => {
           const baseColor = Mocks.object('baseColor');
 
           Fakes.build(spyOn(Colors, 'getContrast'))
-              .when(baseNormalDarkest, WHITE).return(12)
+              .when(baseNormalDark, WHITE).return(12)
               .when(BLACK, baseNormalLightest).return(13)
               .when(baseReversedLightest, baseNormalDark).return(14)
               .when(WHITE, baseNormalDark).return(12)
@@ -530,7 +530,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(12)
+          .when(baseNormalDark, WHITE).return(12)
           .when(BLACK, baseNormalLightest).return(13)
           .when(baseReversedLightest, baseNormalDark).return(14)
           .when(WHITE, baseNormalDark).return(12)
@@ -562,7 +562,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(12)
+          .when(baseNormalDark, WHITE).return(12)
           .when(BLACK, baseNormalLightest).return(13)
           .when(baseReversedLightest, baseNormalDark).return(14)
           .when(WHITE, baseNormalDark).return(12)
@@ -594,7 +594,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(12)
+          .when(baseNormalDark, WHITE).return(12)
           .when(BLACK, baseNormalLightest).return(13)
           .when(baseReversedLightest, baseNormalDark).return(14)
           .when(WHITE, baseNormalDark).return(12)
@@ -626,7 +626,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(12)
+          .when(baseNormalDark, WHITE).return(12)
           .when(BLACK, baseNormalLightest).return(13)
           .when(baseReversedLightest, baseNormalDark).return(14)
           .when(WHITE, baseNormalDark).return(12)
@@ -658,7 +658,7 @@ describe('theming.Theme', () => {
       const baseColor = Mocks.object('baseColor');
 
       Fakes.build(spyOn(Colors, 'getContrast'))
-          .when(baseNormalDarkest, WHITE).return(12)
+          .when(baseNormalDark, WHITE).return(12)
           .when(BLACK, baseNormalLightest).return(13)
           .when(baseReversedLightest, baseNormalDark).return(14)
           .when(WHITE, baseNormalDark).return(12)

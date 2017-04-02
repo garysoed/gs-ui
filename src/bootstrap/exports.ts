@@ -3,9 +3,9 @@ import { HslColor } from 'external/gs_tools/src/color';
 import { Templates } from 'external/gs_tools/src/webc';
 
 import { SimpleRouteFactory } from '../routing/simple-route-factory';
+import { DefaultPalettes } from '../theming/default-palettes';
 import { Theme } from '../theming/theme';
 
-import { DefaultPalettes } from './default-palettes';
 import { Main } from './main';
 
 

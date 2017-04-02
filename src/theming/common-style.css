@@ -164,7 +164,7 @@ td {
 .gs-theme-normal {
   --gsColorPassiveBG: var(--gsThemeWhite);
   --gsColorPassiveFG: var(--gsThemeBlack);
-  --gsColorHeaderFG: var(--gsThemeBaseNormalDarkest);
+  --gsColorHeaderFG: var(--gsThemeBaseNormalDark);
   --gsColorPassivePrimaryBG: var(--gsThemeBaseNormalLightest);
   --gsColorSecondaryFG: var(--gsThemeBlackFade);
   --gsColorActionBG: var(--gsThemeWhite);
@@ -177,6 +177,8 @@ td {
   --gsColorActionPrimaryFocusFG: var(--gsThemeBlackOnAccent);
   --gsColorActionPrimaryDisabledBG: var(--gsThemeWhite);
   --gsColorActionPrimaryDisabledFG: var(--gsThemeBlackFade);
+  --gsColorReverseMode: false;
+  --gsColorHighlightMode: false;
 }
 
 .gs-theme-normal-hilite {
@@ -195,6 +197,8 @@ td {
   --gsColorActionPrimaryFocusBG: var(--gsThemeAccent);
   --gsColorActionPrimaryDisabledBG: var(--gsThemeBaseNormalDark);
   --gsColorActionPrimaryDisabledFG: var(--gsThemeWhiteFade);
+  --gsColorReverseMode: true;
+  --gsColorHighlightMode: true;
 }
 
 .gs-theme-invert {
@@ -213,15 +217,17 @@ td {
   --gsColorActionPrimaryFocusFG: var(--gsThemeBlackOnAccent);
   --gsColorActionPrimaryDisabledBG: var(--gsThemeBlack);
   --gsColorActionPrimaryDisabledFG: var(--gsThemeWhiteFade);
+  --gsColorReverseMode: true;
+  --gsColorHighlightMode: false;
 }
 
 .gs-theme-invert-hilite {
-  --gsColorPassiveBG: var(--gsThemeBaseReversedLight);
+  --gsColorPassiveBG: var(--gsThemeBaseReversedLightest);
   --gsColorPassiveFG: var(--gsThemeBaseNormalDarkest);
   --gsColorHeaderFG: var(--gsThemeBlack);
   --gsColorPassivePrimaryBG: var(--gsThemeBaseNormalLightest);
   --gsColorSecondaryFG: var(--gsThemeBlackFade);
-  --gsColorActionBG: var(--gsThemeBaseReversedLight);
+  --gsColorActionBG: var(--gsThemeBaseReversedLightest);
   --gsColorActionFG: var(--gsThemeActionNormalDarkest);
   --gsColorActionFocusFG: var(--gsThemeAccent);
   --gsColorActionDisabledFG: var(--gsThemeBlackFade);
@@ -229,6 +235,8 @@ td {
   --gsColorActionPrimaryFG: var(--gsThemeBlack);
   --gsColorActionPrimaryFocusBG: var(--gsThemeAccent);
   --gsColorActionPrimaryFocusFG: var(--gsThemeBlackOnAccent);
-  --gsColorActionPrimaryDisabledBG: var(--gsThemeBaseReversedLight);
+  --gsColorActionPrimaryDisabledBG: var(--gsThemeBaseReversedLightest);
   --gsColorActionPrimaryDisabledFG: var(--gsThemeBlackFade);
+  --gsColorReverseMode: false;
+  --gsColorHighlightMode: true;
 }

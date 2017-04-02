@@ -1,4 +1,4 @@
-import { assert, Matchers, TestBase } from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Injector } from 'external/gs_tools/src/inject';
@@ -6,8 +6,6 @@ import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose, TestInject } from 'external/gs_tools/src/testing';
 import { ElementRegistrar } from 'external/gs_tools/src/webc';
 import { Templates } from 'external/gs_tools/src/webc';
-
-import { ThemeService } from '../theming/theme-service';
 
 import { Main } from './main';
 
@@ -54,8 +52,8 @@ describe('bootstrap.Main', () => {
       spyOn(Templates, 'newInstance').and.returnValue(templates);
 
       const mockThemeService = jasmine.createSpyObj('ThemeService', ['initialize', 'install']);
-      const mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'instantiate']);
-      mockInjector.instantiate.and.returnValue(mockThemeService);
+      const mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'getBoundValue']);
+      mockInjector.getBoundValue.and.returnValue(mockThemeService);
       spyOn(Injector, 'newInstance').and.returnValue(mockInjector);
 
       const mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
@@ -73,7 +71,7 @@ describe('bootstrap.Main', () => {
       assert(main['registrar_']).to.equal(mockRegistrar);
 
       assert(mockThemeService.initialize).to.haveBeenCalledWith();
-      assert(mockInjector.instantiate).to.haveBeenCalledWith(ThemeService);
+      assert(mockInjector.getBoundValue).to.haveBeenCalledWith('theming.ThemeService');
       assert(ElementRegistrar.newInstance).to.haveBeenCalledWith(mockInjector, templates);
       assert(TestInject.getBoundValue('x.dom.document')()).to.equal(document);
       assert(TestInject.getBoundValue('x.dom.window')()).to.equal(window);
@@ -87,8 +85,8 @@ describe('bootstrap.Main', () => {
 
     it('should not throw error if config is empty', () => {
       const mockThemeService = jasmine.createSpyObj('ThemeService', ['initialize', 'install']);
-      const mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'instantiate']);
-      mockInjector.instantiate.and.returnValue(mockThemeService);
+      const mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'getBoundValue']);
+      mockInjector.getBoundValue.and.returnValue(mockThemeService);
       spyOn(Injector, 'newInstance').and.returnValue(mockInjector);
 
       const mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);

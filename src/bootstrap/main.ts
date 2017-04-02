@@ -18,6 +18,7 @@ import { IRouteFactoryService } from '../routing/i-route-factory-service';
 import { Drawer } from '../section/drawer';
 import { HorizontalTab } from '../section/horizontal-tab';
 import { VerticalTab } from '../section/vertical-tab';
+import { DefaultPalettes } from '../theming/default-palettes';
 import { Theme } from '../theming/theme';
 import { ThemeService } from '../theming/theme-service';
 import { Icon } from '../tool/icon';
@@ -26,8 +27,6 @@ import { Menu } from '../tool/menu';
 import { MenuItem } from '../tool/menu-item';
 import { OverlayContainer } from '../tool/overlay-container';
 import { ViewSlot } from '../tool/view-slot';
-
-import { DefaultPalettes } from './default-palettes';
 
 
 const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
@@ -50,9 +49,12 @@ const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
 ];
 
 const DEFAULT_THEME_: Theme = Theme.newInstance(
-    DefaultPalettes.vermilion,
-    DefaultPalettes.cerulean);
+    DefaultPalettes.get('vermilion'),
+    DefaultPalettes.get('cerulean'));
 
+// Needed so ThemeService is loaded and bound.
+// tslint:disable-next-line:no-unused-variable
+const DEPENDENCIES = [ThemeService];
 
 /**
  * Main entry class to the app.
@@ -135,7 +137,7 @@ export class Main extends BaseDisposable {
     Injector.bindProvider(() => locationService, 'gs.LocationService');
 
     const injector = Injector.newInstance();
-    const themeService = injector.instantiate<ThemeService>(ThemeService);
+    const themeService = <ThemeService> injector.getBoundValue('theming.ThemeService');
     themeService.initialize();
     return new Main(
         injector,

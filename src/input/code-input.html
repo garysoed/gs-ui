@@ -1,15 +1,82 @@
+<style id="customStyle"></style>
 <style>
   #editor {
-    font-family: 'Ubuntu Mono', monospace;
+    background-color: var(--gsColorPassiveBG);
+    font-family: var(--gsFontFamilyCode);
     position: absolute;
+    --gsCodeInputColorActiveLine: var(--gsColorActionFocusFG);
+    --gsCodeInputColorKeyword: var(--gsColorHeaderFG);
+    --gsCodeInputColorComment: var(--gsColorSecondaryFG);
+    --gsCodeInputColorStorage: var(--gsColorPassiveFG);
+    --gsCodeInputColorSelection: var(--gsColorActionPrimaryFocusBG);
+    --gsCodeInputColorCursor: var(--gsColorActionFocusFG);
+  }
 
-    --gsCodeInputColorComment: var(--gsColorActionDisabledFG);
-    --gsCodeInputColorType: var(--gsColorActionFG);
-    --gsCodeInputColorSelection: var(--gsColorActionPrimaryFocusFG);
-    --gsCodeInputColorString: var(--gsColorSecondaryFG);
+
+  #editor .ace_keyword,
+  #editor .ace_meta,
+  #editor .ace_support.ace_class,
+  #editor .ace_support.ace_type {
+    color: var(--gsCodeInputColorKeyword);
+    font-weight: bold;
+  }
+
+  #editor .ace_constant.ace_character,
+  #editor .ace_constant.ace_other {
+    color: var(--gsCodeInputColorCharacter);
+  }
+
+  #editor .ace_constant.ace_language {
+    color: var(--gsCodeInputColorLanguage);
+  }
+
+  #editor .ace_constant.ace_numeric {
+    color: var(--gsCodeInputColorNumeric);
+  }
+
+  #editor .ace_entity.ace_name.ace_function,
+  #editor .ace_entity.ace_name.ace_tag,
+  #editor .ace_support.ace_function,
+  #editor .ace_variable,
+  #editor .ace_variable.ace_language {
+    color: var(--gsCodeInputColorVariable);
+  }
+
+  #editor .ace_storage {
+    color: var(--gsCodeInputColorStorage);
+  }
+
+  #editor .ace_string {
+    color: var(--gsCodeInputColorString);
+  }
+
+  #editor .ace_string.ace_regexp {
+    color: var(--gsCodeInputColorRegexp);
+  }
+
+  #editor .ace_comment,
+  #editor .ace_entity.ace_other.ace_attribute-name {
+    color: var(--gsCodeInputColorComment);
   }
 
   #editor .ace_comment {
+    opacity: .8;
+  }
+
+  #editor .ace_active-line {
+    background-color: var(--gsCodeInputColorActiveLine);
+    opacity: .3;
+  }
+
+  #editor .ace_cursor {
+    border-left-color: var(--gsCodeInputColorCursor);
+  }
+
+  #editor .ace_marker-layer .ace_selection {
+    background-color: var(--gsCodeInputColorSelection);
+  }
+
+  /*#editor .ace_comment {
     color: var(--gsCodeInputColorComment);
     font-style: italic;
   }
@@ -20,31 +87,15 @@
     color: var(--gsCodeInputColorType);
   }
 
-  #editor .ace_keyword {
-    font-weight: 700;
-  }
 
-  #editor .ace_marker-layer .ace_selection {
-    background-color: var(--gsCodeInputColorSelection);
-    opacity: .5;
-  }
 
   #editor .ace_string {
     color: var(--gsCodeInputColorString);
   }
 
-  #editor .ace_active-line {
-    background-color: var(--gsCodeInputColorSelection);
-    opacity: .3;
-  }
-
-  #editor .ace_cursor {
-    border-left-color: var(--gsCodeInputColorSelection);
-  }
-
   #editor .ace_function {
     font-style: italic;
-  }
+  }*/
 </style>
 
 <div fill-parent id="editor">
