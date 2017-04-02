@@ -1,12 +1,12 @@
 import { Jsons } from 'external/gs_tools/src/collection';
 import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
 import { inject } from 'external/gs_tools/src/inject';
+import { FloatParser } from 'external/gs_tools/src/parse';
 import {
   Animation,
   AnimationEasing,
   BaseElement,
   customElement,
-  FloatParser,
   handle } from 'external/gs_tools/src/webc';
 
 import { AnchorLocation } from './anchor-location';

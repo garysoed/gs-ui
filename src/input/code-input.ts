@@ -1,19 +1,18 @@
 import { Interval } from 'external/gs_tools/src/async';
 import { inject } from 'external/gs_tools/src/inject';
+import {
+  BooleanParser,
+  EnumParser,
+  StringParser } from 'external/gs_tools/src/parse';
 import { Enums } from 'external/gs_tools/src/typescript';
 import { Reflect } from 'external/gs_tools/src/util';
 import { Validate } from 'external/gs_tools/src/valid';
 import {
   bind,
-  BooleanParser,
   customElement,
   DomHook,
-  EnumParser,
   handle,
-  IDomBinder,
-  StringParser
-  ,
-} from 'external/gs_tools/src/webc';
+  IDomBinder } from 'external/gs_tools/src/webc';
 
 import { ThemeService } from '../theming/theme-service';
 

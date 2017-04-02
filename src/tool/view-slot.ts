@@ -1,8 +1,9 @@
 import { Arrays } from 'external/gs_tools/src/collection';
 import { Iterables } from 'external/gs_tools/src/collection';
 import { inject } from 'external/gs_tools/src/inject';
+import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import { Doms, LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
-import { BooleanParser, customElement, StringParser } from 'external/gs_tools/src/webc';
+import { customElement } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';

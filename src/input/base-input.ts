@@ -1,10 +1,8 @@
 import { Interval } from 'external/gs_tools/src/async';
 import { DomEvent } from 'external/gs_tools/src/event';
-import {
-  BooleanParser,
-  DomHook,
-  handle,
-  IAttributeParser } from 'external/gs_tools/src/webc';
+import { Parser } from 'external/gs_tools/src/interfaces';
+import { BooleanParser } from 'external/gs_tools/src/parse';
+import { DomHook, handle } from 'external/gs_tools/src/webc';
 
 import { BaseActionElement } from '../common/base-action-element';
 import { ThemeService } from '../theming/theme-service';
@@ -13,7 +11,7 @@ import { ThemeService } from '../theming/theme-service';
 export abstract class BaseInput<T> extends BaseActionElement {
   private static INPUT_INTERVAL_: number = 500;
 
-  protected readonly valueParser_: IAttributeParser<T>;
+  protected readonly valueParser_: Parser<T>;
   protected readonly gsValueHook_: DomHook<T>;
   protected readonly inputDisabledHook_: DomHook<boolean>;
   protected readonly inputValueHook_: DomHook<string>;
@@ -25,7 +23,7 @@ export abstract class BaseInput<T> extends BaseActionElement {
       themeService: ThemeService,
       gsValueHook: DomHook<T>,
       valueHook: DomHook<string>,
-      valueParser: IAttributeParser<T>) {
+      valueParser: Parser<T>) {
     super(themeService);
     this.gsValueHook_ = gsValueHook;
     this.inputDisabledHook_ = DomHook.of<boolean>(true);

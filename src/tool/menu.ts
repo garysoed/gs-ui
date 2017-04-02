@@ -1,9 +1,9 @@
 import { ListenableDom } from 'external/gs_tools/src/event';
 import { inject } from 'external/gs_tools/src/inject';
+import { BooleanParser } from 'external/gs_tools/src/parse';
 import {
   BaseElement,
   bind,
-  BooleanParser,
   customElement,
   DomHook } from 'external/gs_tools/src/webc';
 

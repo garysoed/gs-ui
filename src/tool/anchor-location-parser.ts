@@ -1,5 +1,5 @@
+import { Parser } from 'external/gs_tools/src/interfaces';
 import { Enums } from 'external/gs_tools/src/typescript';
-import { IAttributeParser } from 'external/gs_tools/src/webc';
 
 import { AnchorLocation } from './anchor-location';
 
@@ -7,7 +7,7 @@ import { AnchorLocation } from './anchor-location';
 /**
  * Parser for [AnchorLocation]s.
  */
-export const AnchorLocationParser: IAttributeParser<AnchorLocation> = {
+export const AnchorLocationParser: Parser<AnchorLocation> = {
   /**
    * Parses the given string to anchor locations.
    *

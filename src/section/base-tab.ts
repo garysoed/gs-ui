@@ -5,9 +5,9 @@ import {
   AnimationEasing,
   bind,
   DomHook,
-  handle,
-  StringParser } from 'external/gs_tools/src/webc';
+  handle } from 'external/gs_tools/src/webc';
 
+import { StringParser } from 'external/gs_tools/src/parse';
 import { BaseThemedElement } from '../common/base-themed-element';
 import { Event } from '../const/event';
 import { ThemeService } from '../theming/theme-service';

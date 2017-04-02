@@ -1,7 +1,6 @@
 import { inject } from 'external/gs_tools/src/inject';
-import {
-  customElement,
-  StringParser } from 'external/gs_tools/src/webc';
+import { StringParser } from 'external/gs_tools/src/parse';
+import { customElement } from 'external/gs_tools/src/webc';
 
 import { ThemeService } from '../theming/theme-service';
 

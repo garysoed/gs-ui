@@ -3,10 +3,10 @@ TestBase.setup();
 
 import { DomEvent } from 'external/gs_tools/src/event';
 import { Mocks } from 'external/gs_tools/src/mock';
+import { StringParser } from 'external/gs_tools/src/parse';
 import { TestDispose } from 'external/gs_tools/src/testing';
-import { StringParser } from 'external/gs_tools/src/webc';
 
-import { BaseInput } from './base-input';
+import { BaseInput } from '../input/base-input';
 
 
 class Input extends BaseInput<string> { }

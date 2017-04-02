@@ -2,8 +2,9 @@ import { Maps } from 'external/gs_tools/src/collection';
 import { Color } from 'external/gs_tools/src/color';
 import { BaseListenable } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
+import { BooleanParser } from 'external/gs_tools/src/parse';
 import { Validate } from 'external/gs_tools/src/valid';
-import { BooleanParser, Templates } from 'external/gs_tools/src/webc';
+import { Templates } from 'external/gs_tools/src/webc';
 
 import { ThemeServiceEvents } from '../const/theme-service-events';
 import { Theme } from '../theming/theme';

@@ -1,5 +1,6 @@
 import { inject } from 'external/gs_tools/src/inject';
-import { bind, customElement, DomHook, handle, StringParser } from 'external/gs_tools/src/webc';
+import { StringParser } from 'external/gs_tools/src/parse';
+import { bind, customElement, DomHook, handle } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
