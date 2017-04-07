@@ -1,9 +1,12 @@
 import { Interval } from 'external/gs_tools/src/async';
+import { Maps } from 'external/gs_tools/src/collection';
+import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
 import { inject } from 'external/gs_tools/src/inject';
 import {
   BooleanParser,
   EnumParser,
   StringParser } from 'external/gs_tools/src/parse';
+import { Solve, Spec } from 'external/gs_tools/src/solver';
 import { Enums } from 'external/gs_tools/src/typescript';
 import { Reflect } from 'external/gs_tools/src/util';
 import { Validate } from 'external/gs_tools/src/valid';
@@ -14,14 +17,10 @@ import {
   handle,
   IDomBinder } from 'external/gs_tools/src/webc';
 
-import { ThemeService } from '../theming/theme-service';
-
-import { Maps } from 'external/gs_tools/src/collection';
-import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
-import { Solve, Spec } from 'external/gs_tools/src/solver';
-import { DefaultPalettes } from 'src/theming/default-palettes';
 import { ThemeServiceEvents } from '../const/theme-service-events';
-import { BaseInput } from './base-input';
+import { BaseInput } from '../input/base-input';
+import { DefaultPalettes } from '../theming/default-palettes';
+import { ThemeService } from '../theming/theme-service';
 
 
 export enum Languages {

@@ -20,7 +20,7 @@ describe('section.Drawer', () => {
       const style = Mocks.object('style');
       spyOn(drawer.itemStyleHook_, 'get').and.returnValue(style);
 
-      drawer['onAlignContentChanged_']('left');
+      drawer.onAlignContentChanged_('left');
 
       assert(style.left).to.equal('0');
       assert(style.right).to.beNull();
@@ -30,7 +30,7 @@ describe('section.Drawer', () => {
       const style = Mocks.object('style');
       spyOn(drawer.itemStyleHook_, 'get').and.returnValue(style);
 
-      drawer['onAlignContentChanged_']('right');
+      drawer.onAlignContentChanged_('right');
 
       assert(style.left).to.beNull();
       assert(style.right).to.equal('0');
@@ -39,8 +39,25 @@ describe('section.Drawer', () => {
     it('should throw error if the value is invalid', () => {
       spyOn(drawer.itemStyleHook_, 'get').and.returnValue(Mocks.object('style'));
       assert(() => {
-        drawer['onAlignContentChanged_']('unknown');
+        drawer.onAlignContentChanged_('unknown');
       }).to.throwError(/Invalid align point/);
+    });
+
+    it('should not throw error if alignContent is null', () => {
+      const style = Mocks.object('style');
+      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(style);
+
+      assert(() => {
+        drawer.onAlignContentChanged_(null);
+      }).toNot.throw();
+    });
+
+    it('should not throw error if style is null', () => {
+      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(null);
+
+      assert(() => {
+        drawer.onAlignContentChanged_('left');
+      }).toNot.throw();
     });
   });
 
@@ -49,7 +66,7 @@ describe('section.Drawer', () => {
       const style = Mocks.object('style');
       spyOn(drawer.containerStyleHook_, 'get').and.returnValue(style);
 
-      drawer['onAnchorPointChanged_']('left');
+      drawer.onAnchorPointChanged_('left');
 
       assert(style.left).to.equal('0');
       assert(style.right).to.beNull();
@@ -59,7 +76,7 @@ describe('section.Drawer', () => {
       const style = Mocks.object('style');
       spyOn(drawer.containerStyleHook_, 'get').and.returnValue(style);
 
-      drawer['onAnchorPointChanged_']('right');
+      drawer.onAnchorPointChanged_('right');
 
       assert(style.left).to.beNull();
       assert(style.right).to.equal('0');
@@ -68,8 +85,25 @@ describe('section.Drawer', () => {
     it('should throw error if the value is invalid', () => {
       spyOn(drawer.containerStyleHook_, 'get').and.returnValue(Mocks.object('style'));
       assert(() => {
-        drawer['onAnchorPointChanged_']('unknown');
+        drawer.onAnchorPointChanged_('unknown');
       }).to.throwError(/Invalid anchor point/);
+    });
+
+    it('should not throw error if anchorPoint is null', () => {
+      const style = Mocks.object('style');
+      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(style);
+
+      assert(() => {
+        drawer.onAnchorPointChanged_(null);
+      }).toNot.throw();
+    });
+
+    it('should not throw error if style is null', () => {
+      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(null);
+
+      assert(() => {
+        drawer.onAnchorPointChanged_('left');
+      }).toNot.throw();
     });
   });
 

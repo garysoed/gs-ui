@@ -41,13 +41,17 @@ export class Drawer extends BaseThemedElement {
   }
 
   @handle(null).attributeChange('gs-align-content', StringParser)
-  protected onAlignContentChanged_(alignPoint: string): void {
+  onAlignContentChanged_(alignContent: string | null): void {
     const style = this.itemStyleHook_.get();
     if (style === null) {
       return;
     }
 
-    switch (alignPoint.toLowerCase()) {
+    if (alignContent === null) {
+      return;
+    }
+
+    switch (alignContent.toLowerCase()) {
       case 'left':
         style.left = '0';
         style.right = null;
@@ -57,7 +61,7 @@ export class Drawer extends BaseThemedElement {
         style.right = '0';
         break;
       default:
-        throw Error(`Invalid align point ${alignPoint}`);
+        throw Error(`Invalid align point ${alignContent}`);
     }
   }
 
@@ -67,9 +71,13 @@ export class Drawer extends BaseThemedElement {
    * @param anchorPoint The new value of the anchor point.
    */
   @handle(null).attributeChange('gs-anchor-point', StringParser)
-  protected onAnchorPointChanged_(anchorPoint: string): void {
+  onAnchorPointChanged_(anchorPoint: string | null): void {
     const style = this.containerStyleHook_.get();
     if (style === null) {
+      return;
+    }
+
+    if (anchorPoint === null) {
       return;
     }
 
