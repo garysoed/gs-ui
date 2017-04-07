@@ -97,7 +97,7 @@ describe('routing.AbstractRouteFactory', () => {
   });
 
   describe('getCascadeNames', () => {
-    it('should return the correct names', async (done: any) => {
+    it('should return the correct names', async () => {
       let name = 'name';
       spyOn(factory, 'getName').and.returnValue(Promise.resolve(name));
 

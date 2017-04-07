@@ -15,7 +15,7 @@ describe('input.FileService', () => {
   });
 
   describe('processFile_', () => {
-    it('should resolve with the file content correctly', (done: any) => {
+    it('should resolve with the file content correctly', async () => {
       const mockListenableFileReader =
           jasmine.createSpyObj('ListenableFileReader', ['dispose', 'on']);
       spyOn(ListenableDom, 'of').and.returnValue(mockListenableFileReader);
@@ -28,12 +28,7 @@ describe('input.FileService', () => {
 
       const file = Mocks.object('file');
 
-      service['processFile_'](file)
-          .then((actualContent: string) => {
-            assert(actualContent).to.equal(content);
-            assert(mockListenableFileReader.dispose).to.haveBeenCalledWith();
-            done();
-          }, done.fail);
+      const promise = service['processFile_'](file);
       assert(mockFileReader.readAsText).to.haveBeenCalledWith(file);
       assert(ListenableDom.of).to.haveBeenCalledWith(mockFileReader);
       assert(mockListenableFileReader.on).to.haveBeenCalledWith(
@@ -41,9 +36,13 @@ describe('input.FileService', () => {
           Matchers.any(Function),
           service);
       mockListenableFileReader.on.calls.argsFor(0)[1]();
+
+      const actualContent = await promise;
+      assert(actualContent).to.equal(content);
+      assert(mockListenableFileReader.dispose).to.haveBeenCalledWith();
     });
 
-    it('should reject if the file loading ends before done loading', (done: any) => {
+    it('should reject if the file loading ends before done loading', async (done: any) => {
       const mockListenableFileReader =
           jasmine.createSpyObj('ListenableFileReader', ['dispose', 'on']);
       spyOn(ListenableDom, 'of').and.returnValue(mockListenableFileReader);
@@ -55,15 +54,17 @@ describe('input.FileService', () => {
 
       const file = Mocks.object('file');
 
-      service['processFile_'](file)
-          .then(
-              done.fail,
-              (error: Error) => {
-                assert(error.message).to.equal(Matchers.stringMatching(/Error loading file/));
-                assert(mockListenableFileReader.dispose).to.haveBeenCalledWith();
-                done();
-              });
+      const promise = service['processFile_'](file);
       mockListenableFileReader.on.calls.argsFor(0)[1]();
+
+      try {
+        await promise;
+        done.fail();
+      } catch (e) {
+        const error: Error = e;
+        assert(error.message).to.equal(Matchers.stringMatching(/Error loading file/));
+        assert(mockListenableFileReader.dispose).to.haveBeenCalledWith();
+      }
     });
   });
 
@@ -106,7 +107,7 @@ describe('input.FileService', () => {
   });
 
   describe('processBundle', () => {
-    it('should return a map of files and its corresponding content', async (done: any) => {
+    it('should return a map of files and its corresponding content', async () => {
       const bundleId = 'bundleId';
 
       const file1 = Mocks.object('file1');
@@ -128,7 +129,7 @@ describe('input.FileService', () => {
       assert(service.getBundle).to.haveBeenCalledWith(bundleId);
     });
 
-    it('should return null if the bundle does not exist', async (done: any) => {
+    it('should return null if the bundle does not exist', async () => {
       spyOn(service, 'getBundle').and.returnValue(null);
 
       const map = await service.processBundle('bundleId');

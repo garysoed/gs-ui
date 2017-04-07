@@ -220,7 +220,7 @@ describe('gs.tool.OverlayService', () => {
       anchorElement = Mocks.object('anchorElement');
     });
 
-    it('should open the menu container correctly', async (done: any) => {
+    it('should open the menu container correctly', async () => {
       const mockOverlayParent = jasmine.createSpyObj('OverlayParent', ['appendChild']);
       const menuContent = Mocks.object('menuContent');
 

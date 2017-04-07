@@ -95,7 +95,7 @@ describe('section.BaseTab', () => {
   });
 
   describe('setHighlight_', () => {
-    it('should update the highlight element correctly', (done: any) => {
+    it('should update the highlight element correctly', async () => {
       const currentStart = 12;
       const currentLength = 34;
       const targetStart = 56;
@@ -124,26 +124,25 @@ describe('section.BaseTab', () => {
 
       spyOn(tab, 'setHighlightEl');
 
-      tab['setHighlight_'](targetStart, targetLength)
-          .then(() => {
-            assert(tab['setHighlightEl']).to
-                .haveBeenCalledWith(targetStart, targetLength, highlightEl);
-            assert(tab['highlightStart_']).to.equal(targetStart);
-            assert(tab['highlightLength_']).to.equal(targetLength);
-
-            assert(ListenableDom.of).to.haveBeenCalledWith(animate);
-            assert(mockAnimation.applyTo).to.haveBeenCalledWith(highlightEl);
-            assert(Animation.newInstance).to.haveBeenCalledWith(
-                [keyframe1, keyframe2],
-                Matchers.any(Object));
-            assert(tab['getAnimationKeyframe']).to.haveBeenCalledWith(currentStart, currentLength);
-            assert(tab['getAnimationKeyframe']).to.haveBeenCalledWith(targetStart, targetLength);
-            done();
-          }, done.fail);
+      const promise = tab['setHighlight_'](targetStart, targetLength);
 
       assert(mockListenableAnimate.once)
           .to.haveBeenCalledWith(DomEvent.FINISH, Matchers.any(Function), tab);
       mockListenableAnimate.once.calls.argsFor(0)[1]();
+
+      await promise;
+      assert(tab['setHighlightEl']).to
+          .haveBeenCalledWith(targetStart, targetLength, highlightEl);
+      assert(tab['highlightStart_']).to.equal(targetStart);
+      assert(tab['highlightLength_']).to.equal(targetLength);
+
+      assert(ListenableDom.of).to.haveBeenCalledWith(animate);
+      assert(mockAnimation.applyTo).to.haveBeenCalledWith(highlightEl);
+      assert(Animation.newInstance).to.haveBeenCalledWith(
+          [keyframe1, keyframe2],
+          Matchers.any(Object));
+      assert(tab['getAnimationKeyframe']).to.haveBeenCalledWith(currentStart, currentLength);
+      assert(tab['getAnimationKeyframe']).to.haveBeenCalledWith(targetStart, targetLength);
     });
 
     it('should set the start to the destination midpoint if the current length is 0', () => {
@@ -243,7 +242,7 @@ describe('section.BaseTab', () => {
   });
 
   describe('updateHighlight_', () => {
-    it('should grab the destination start and length correctly', async (done: any) => {
+    it('should grab the destination start and length correctly', async () => {
       const start = 12;
       const length = 34;
       const selectedId = 'selectedId';
@@ -266,7 +265,7 @@ describe('section.BaseTab', () => {
       assert(tab['getLength']).to.haveBeenCalledWith(selectedTab);
     });
 
-    it('should shrink to 0 length if there are no selected Ids', async (done: any) => {
+    it('should shrink to 0 length if there are no selected Ids', async () => {
       const start = 12;
       const length = 34;
       spyOn(tab.selectedTabHook_, 'get').and.returnValue(null);

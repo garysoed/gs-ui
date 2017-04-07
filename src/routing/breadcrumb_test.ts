@@ -99,7 +99,7 @@ describe('routing.Breadcrumb', () => {
   });
 
   describe('onRouteChanged_', () => {
-    it('should set the bridge with the correct data', async (done: any) => {
+    it('should set the bridge with the correct data', async () => {
       const name1 = 'name1';
       const url1 = 'url1';
 
@@ -135,7 +135,7 @@ describe('routing.Breadcrumb', () => {
       assert(mockRouteService.getRouteFactory).to.haveBeenCalledWith(type);
     });
 
-    it('should not update the bridge if the route factory cannot be found', async (done: any) => {
+    it('should not update the bridge if the route factory cannot be found', async () => {
       const type = Mocks.object('type');
       const params = Mocks.object('params');
       const mockRoute = jasmine.createSpyObj('Route', ['getParams', 'getType']);
@@ -153,7 +153,7 @@ describe('routing.Breadcrumb', () => {
       assert(breadcrumb['crumbHook_'].set).toNot.haveBeenCalled();
     });
 
-    it('should not update the bridge if there are no routes', async (done: any) => {
+    it('should not update the bridge if there are no routes', async () => {
       mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
           .and.returnValue(null);
 
