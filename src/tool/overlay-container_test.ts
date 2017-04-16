@@ -11,7 +11,7 @@ import { Anchors } from './anchors';
 import { OverlayContainer } from './overlay-container';
 
 
-describe('tool.MenuContainer', () => {
+describe('tool.OverlayContainer', () => {
   let window;
   let container;
 
@@ -24,19 +24,19 @@ describe('tool.MenuContainer', () => {
 
   describe('getAnchorPoint_', () => {
     it('should return the location resolved by Anchors if the anchor point is AUTO', () => {
-      let anchorTargetX = 12;
-      let anchorTargetY = 34;
+      const anchorTargetX = 12;
+      const anchorTargetY = 34;
 
-      let element = Mocks.object('element');
+      const element = Mocks.object('element');
       element['gsAnchorPoint'] = AnchorLocation.AUTO;
       element['gsAnchorTargetX'] = anchorTargetX;
       element['gsAnchorTargetY'] = anchorTargetY;
       container['element_'] = {getEventTarget: () => element};
 
-      let window = Mocks.object('window');
+      const window = Mocks.object('window');
       container['windowEl_'] = {getEventTarget: () => window};
 
-      let anchorLocation = AnchorLocation.TOP_LEFT;
+      const anchorLocation = AnchorLocation.TOP_LEFT;
       spyOn(Anchors, 'resolveAutoLocation').and.returnValue(anchorLocation);
 
       assert(container['getAnchorPoint_']()).to.equal(anchorLocation);
@@ -45,7 +45,7 @@ describe('tool.MenuContainer', () => {
     });
 
     it('should return the set anchor point if it is not AUTO', () => {
-      let element = Mocks.object('element');
+      const element = Mocks.object('element');
       element['gsAnchorPoint'] = AnchorLocation.TOP_RIGHT;
       container['element_'] = {getEventTarget: () => element};
 
@@ -63,18 +63,18 @@ describe('tool.MenuContainer', () => {
 
   describe('hide_', () => {
     it('should play the hide animation', () => {
-      let containerEl = Mocks.object('containerEl');
+      const containerEl = Mocks.object('containerEl');
       container['containerEl_'] = {getEventTarget: () => containerEl};
 
-      let animate = Mocks.object('animate');
+      const animate = Mocks.object('animate');
       spyOn(OverlayContainer['HIDE_ANIMATION_'], 'applyTo').and.returnValue(animate);
 
-      let mockListenableAnimate =
+      const mockListenableAnimate =
           jasmine.createSpyObj('ListenableAnimate', ['dispose', 'once']);
       mockListenableAnimate.once.and.returnValue(Mocks.disposable('ListenableAnimate.once'));
       spyOn(ListenableDom, 'of').and.returnValue(mockListenableAnimate);
 
-      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['dispatch']);
+      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['dispatch']);
       container['element_'] = mockListenableElement;
 
       spyOn(container, 'onFinishAnimate_');
@@ -98,10 +98,10 @@ describe('tool.MenuContainer', () => {
 
   describe('onFinishAnimate_', () => {
     it('should remove the SHOW class and dispatch the HIDE event', () => {
-      let mockRootElement = Mocks.element();
+      const mockRootElement = Mocks.element();
       container['rootEl_'] = {getEventTarget: () => mockRootElement};
 
-      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+      const mockElement = jasmine.createSpyObj('Element', ['dispatch']);
       spyOn(container, 'getElement').and.returnValue(mockElement);
 
       spyOn(mockRootElement.classList, 'remove');
@@ -116,7 +116,7 @@ describe('tool.MenuContainer', () => {
     });
 
     it('should not throw error if there are no elements', () => {
-      let mockRootElement = Mocks.element();
+      const mockRootElement = Mocks.element();
       container['rootEl_'] = {getEventTarget: () => mockRootElement};
 
       spyOn(container, 'getElement').and.returnValue(null);
@@ -161,14 +161,14 @@ describe('tool.MenuContainer', () => {
     it('should measure the size of the first distributed element, play the show animation, add ' +
         'the "show" class, and dispatch the show event.',
         () => {
-          let height = 123;
-          let width = 456;
-          let distributedElement = Mocks.object('distributedElement');
+          const height = 123;
+          const width = 456;
+          const distributedElement = Mocks.object('distributedElement');
           distributedElement.clientHeight = height;
           distributedElement.clientWidth = width;
           mockContentEl.getDistributedNodes.and.returnValue([distributedElement]);
 
-          let mockClassList = jasmine.createSpyObj('ClassList', ['add']);
+          const mockClassList = jasmine.createSpyObj('ClassList', ['add']);
           rootEl.classList = mockClassList;
 
           Fakes.build(spyOn(Jsons, 'setTemporaryValue'))
@@ -176,7 +176,7 @@ describe('tool.MenuContainer', () => {
                 callback();
               });
 
-          let mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
+          const mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
           spyOn(OverlayContainer['BASE_SHOW_ANIMATION_'], 'appendKeyframe').and
               .returnValue(mockAnimation);
 
@@ -206,7 +206,7 @@ describe('tool.MenuContainer', () => {
 
     it('should do nothing if the distributed element cannot be found', () => {
       mockContentEl.getDistributedNodes.and.returnValue([]);
-      let mockClassList = jasmine.createSpyObj('ClassList', ['add']);
+      const mockClassList = jasmine.createSpyObj('ClassList', ['add']);
       rootEl.classList = mockClassList;
 
       container['show_']();
@@ -217,7 +217,7 @@ describe('tool.MenuContainer', () => {
     it('should not throw error if there are no elements', () => {
       container['element_'] = null;
 
-      let distributedElement = Mocks.object('distributedElement');
+      const distributedElement = Mocks.object('distributedElement');
       distributedElement.clientHeight = 123;
       distributedElement.clientWidth = 456;
       mockContentEl.getDistributedNodes.and.returnValue([distributedElement]);
@@ -227,7 +227,7 @@ describe('tool.MenuContainer', () => {
             callback();
           });
 
-      let mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
+      const mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
       spyOn(OverlayContainer['BASE_SHOW_ANIMATION_'], 'appendKeyframe').and
           .returnValue(mockAnimation);
 
@@ -355,19 +355,19 @@ describe('tool.MenuContainer', () => {
 
   describe('onCreated', () => {
     it('should initialize correctly', () => {
-      let backdropEl = Mocks.object('backdropEl');
-      let containerEl = Mocks.object('containerEl');
-      let contentEl = Mocks.object('contentEl');
-      let document = Mocks.object('document');
-      let rootEl = Mocks.object('rootEl');
+      const backdropEl = Mocks.object('backdropEl');
+      const containerEl = Mocks.object('containerEl');
+      const contentEl = Mocks.object('contentEl');
+      const document = Mocks.object('document');
+      const rootEl = Mocks.object('rootEl');
 
-      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
+      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       Fakes.build(mockShadowRoot.querySelector)
           .when('.backdrop').return(backdropEl)
           .when('.container').return(containerEl)
           .when('.root').return(rootEl)
           .when('content').return(contentEl);
-      let element = Mocks.object('element');
+      const element = Mocks.object('element');
       element.ownerDocument = document;
       element.shadowRoot = mockShadowRoot;
       element['gsAnchorPoint'] = null;
@@ -394,11 +394,11 @@ describe('tool.MenuContainer', () => {
     });
 
     it('should use the existing anchor point if given', () => {
-      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
+      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(Mocks.object('queryResult'));
 
-      let anchorPoint = AnchorLocation.BOTTOM_RIGHT;
-      let element = Mocks.object('element');
+      const anchorPoint = AnchorLocation.BOTTOM_RIGHT;
+      const element = Mocks.object('element');
       element.ownerDocument = Mocks.object('document');
       element.shadowRoot = mockShadowRoot;
       element['gsAnchorPoint'] = anchorPoint;
@@ -411,26 +411,25 @@ describe('tool.MenuContainer', () => {
 
   describe('onInserted', () => {
     it('should listen to window resize event and update the content', () => {
-      let mockListenableWindow = jasmine.createSpyObj('ListenableWindow', ['on']);
-      mockListenableWindow.on.and.returnValue(Mocks.disposable('ListenableWindow.on'));
-      container['windowEl_'] = mockListenableWindow;
+      const listenableWindow = Mocks.object('listenableWindow');
+      container['windowEl_'] = listenableWindow;
 
-      let mockListenableBackdrop = jasmine.createSpyObj('ListenableBackdrop', ['on']);
-      mockListenableBackdrop.on.and.returnValue(Mocks.disposable('ListenableBackdrop.on'));
-      container['backdropEl_'] = mockListenableBackdrop;
+      const listenableBackdrop = Mocks.object('listenableBackdrop');
+      container['backdropEl_'] = listenableBackdrop;
 
       spyOn(container, 'onBackdropClick_');
       spyOn(container, 'onWindowResize_');
       spyOn(container, 'updateContent_');
+      spyOn(container, 'listenTo');
 
       container.onInserted();
 
       assert(container['updateContent_']).to.haveBeenCalledWith();
 
-      assert(mockListenableBackdrop.on)
-          .to.haveBeenCalledWith(DomEvent.CLICK, container['onBackdropClick_'], container);
-      assert(mockListenableWindow.on)
-          .to.haveBeenCalledWith(DomEvent.RESIZE, container['onWindowResize_'], container);
+      assert(container.listenTo).to.haveBeenCalledWith(
+          listenableBackdrop, DomEvent.CLICK, container['onBackdropClick_']);
+      assert(container.listenTo).to.haveBeenCalledWith(
+          listenableWindow, DomEvent.RESIZE, container['onWindowResize_']);
     });
   });
 });

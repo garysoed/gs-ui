@@ -1,5 +1,5 @@
 import { Arrays } from 'external/gs_tools/src/collection';
-import { BaseListenable } from 'external/gs_tools/src/event';
+import { BaseListenableListener } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
 import { Reflect } from 'external/gs_tools/src/util';
@@ -15,7 +15,7 @@ import { RouteServiceEvents } from './route-service-events';
     [
       LocationService,
     ])
-export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
+export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> {
   private readonly locationService_: LocationService;
   private readonly routeFactoryService_: IRouteFactoryService<T>;
   private readonly routeFactoryMap_: Map<T, AbstractRouteFactory<T, any, any, any>>;
@@ -40,10 +40,10 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
    * Called during initialization.
    */
   [Reflect.__initialize](): void {
-    this.addDisposable(this.locationService_.on(
+    this.listenTo(
+        this.locationService_,
         LocationServiceEvents.CHANGED,
-        this.onLocationChanged_,
-        this));
+        this.onLocationChanged_);
 
     Arrays
         .of(this.routeFactoryService_.getFactories())
@@ -57,7 +57,7 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
    * @return The params for the current path, or null if it does not match the given route factory.
    */
   getParams<CR>(routeFactory: AbstractRouteFactory<T, any, CR, any>): CR | null {
-    let route = routeFactory.createFromPath(this.getPath());
+    const route = routeFactory.createFromPath(this.getPath());
     if (route === null) {
       return null;
     }
@@ -76,7 +76,7 @@ export class RouteService<T> extends BaseListenable<RouteServiceEvents> {
    * @return The currently matching route, or null if there are none.
    */
   getRoute(): Route<T, any> | null {
-    let path = this.getPath();
+    const path = this.getPath();
     let route: Route<T, any> | null = null;
     Arrays
         .of(this.routeFactoryService_.getFactories())

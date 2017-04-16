@@ -202,7 +202,7 @@ export class CodeInput extends BaseInput<string> {
 
     const interval = Interval.newInstance(500);
     this.addDisposable(interval);
-    this.addDisposable(interval.on(Interval.TICK_EVENT, this.onTick_, this));
+    this.listenTo(interval, Interval.TICK_EVENT, this.onTick_);
     interval.start();
 
     const aceCss = this.document_.getElementById('ace_editor.css');
@@ -213,8 +213,7 @@ export class CodeInput extends BaseInput<string> {
     styleEl.innerHTML = aceCss.innerHTML;
     element.shadowRoot.appendChild(styleEl);
 
-    this.addDisposable(
-        this.themeService_.on(ThemeServiceEvents.THEME_CHANGED, this.onThemeChanged_, this));
+    this.listenTo(this.themeService_, ThemeServiceEvents.THEME_CHANGED, this.onThemeChanged_);
     this.onThemeChanged_();
   }
 

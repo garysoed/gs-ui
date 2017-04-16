@@ -123,10 +123,10 @@ export class Breadcrumb<T> extends BaseThemedElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    this.addDisposable(this.routeService_.on(
+    this.listenTo(
+        this.routeService_,
         RouteServiceEvents.CHANGED,
-        this.onRouteChanged_,
-        this));
+        this.onRouteChanged_);
   }
 
   /**

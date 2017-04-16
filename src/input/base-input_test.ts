@@ -1,6 +1,7 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
+import { Interval } from 'external/gs_tools/src/async';
 import { DomEvent } from 'external/gs_tools/src/event';
 import { Mocks } from 'external/gs_tools/src/mock';
 import { StringParser } from 'external/gs_tools/src/parse';
@@ -19,36 +20,14 @@ describe('input.BaseInput', () => {
   beforeEach(() => {
     mockGsValueHook = jasmine.createSpyObj('GsValueHook', ['get', 'set']);
     mockValueHook = jasmine.createSpyObj('ValueHook', ['get', 'set']);
-    let mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
+    const mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
     input = new Input(mockThemeService, mockGsValueHook, mockValueHook, StringParser);
     TestDispose.add(input);
   });
 
   describe('onClick_', () => {
     it('should click and focus the input element', () => {
-      let mockInputElement = jasmine.createSpyObj('InputElement', ['click', 'focus']);
-      input['inputEl_'] = mockInputElement;
-
-      spyOn(input, 'isDisabled').and.returnValue(false);
-
-      input['onClick_']();
-
-      assert(mockInputElement.click).to.haveBeenCalledWith();
-      assert(mockInputElement.focus).to.haveBeenCalledWith();
-    });
-
-    it('should do nothing if there are no input elements', () => {
-      input['inputEl_'] = null;
-
-      spyOn(input, 'isDisabled').and.returnValue(false);
-
-      assert(() => {
-        input['onClick_']();
-      }).toNot.throw();
-    });
-
-    it('should do nothing if disabled', () => {
-      let mockInputElement = jasmine.createSpyObj('InputElement', ['click', 'focus']);
+      const mockInputElement = jasmine.createSpyObj('InputElement', ['click', 'focus']);
       input['inputEl_'] = mockInputElement;
 
       spyOn(input, 'isDisabled').and.returnValue(true);
@@ -137,15 +116,19 @@ describe('input.BaseInput', () => {
 
   describe('onCreated', () => {
     it('should initialize correctly', () => {
-      let inputElement = Mocks.object('inputElement');
-      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
+      const inputElement = Mocks.object('inputElement');
+      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(inputElement);
 
-      let mockElement = Mocks.element();
+      const mockElement = Mocks.element();
       mockElement.shadowRoot = mockShadowRoot;
+
+      spyOn(input, 'listenTo');
 
       input.onCreated(mockElement);
 
+      assert(input.listenTo).to
+          .haveBeenCalledWith(input['interval_'], Interval.TICK_EVENT, input['onInputTick_']);
       assert(input['inputEl_']).to.equal(inputElement);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('input');
     });
@@ -153,7 +136,7 @@ describe('input.BaseInput', () => {
 
   describe('onInserted', () => {
     it('should start the interval', () => {
-      let element = Mocks.object('element');
+      const element = Mocks.object('element');
       spyOn(input['interval_'], 'start');
       input.onInserted(element);
 
@@ -163,7 +146,7 @@ describe('input.BaseInput', () => {
 
   describe('onRemoved', () => {
     it('should stop the interval', () => {
-      let element = Mocks.object('element');
+      const element = Mocks.object('element');
       spyOn(input['interval_'], 'stop');
       input.onRemoved(element);
 

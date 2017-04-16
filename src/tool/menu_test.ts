@@ -102,9 +102,7 @@ describe('tool.Menu', () => {
       const parentElement = Mocks.object('parentElement');
       element.parentElement = parentElement;
       const mockListenableParentElement =
-          jasmine.createSpyObj('ListenableParentElement', ['dispose', 'on']);
-      mockListenableParentElement.on.and
-          .returnValue(Mocks.disposable('ListenableParentElement.on'));
+          jasmine.createSpyObj('ListenableParentElement', ['dispose']);
 
       Fakes.build(spyOn(ListenableDom, 'of'))
           .when(element).return(mockListenableElement)
@@ -116,14 +114,15 @@ describe('tool.Menu', () => {
       element.shadowRoot = mockShadowRoot;
 
       spyOn(menu, 'onAction_');
+      spyOn(menu, 'listenTo');
 
       menu.onCreated(element);
 
       assert(element['gsAnchorPoint']).to.equal(anchorPoint);
       assert(element['gsAnchorTarget']).to.equal(anchorTarget);
 
-      assert(mockListenableParentElement.on)
-          .to.haveBeenCalledWith(Event.ACTION, menu['onAction_'], menu);
+      assert(menu.listenTo)
+          .to.haveBeenCalledWith(mockListenableParentElement, Event.ACTION, menu['onAction_']);
 
       assert(menu['menuRoot_']).to.equal(rootElement);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('.root');

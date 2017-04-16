@@ -72,8 +72,7 @@ export class Menu extends BaseElement {
 
     let listenableParentElement = ListenableDom.of(element.parentElement);
     this.addDisposable(listenableParentElement);
-    this.addDisposable(
-        listenableParentElement.on(Event.ACTION, this.onAction_, this));
+    this.listenTo(listenableParentElement, Event.ACTION, this.onAction_);
     if (element['gsAnchorTarget'] === null || element['gsAnchorTarget'] === undefined) {
       element['gsAnchorTarget'] = AnchorLocation.AUTO;
     }

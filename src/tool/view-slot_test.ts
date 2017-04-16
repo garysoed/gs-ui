@@ -182,13 +182,15 @@ describe('tool.ViewSlot', () => {
       let rootEl = Mocks.object('rootEl');
       let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(rootEl);
+      spyOn(viewSlot, 'listenTo');
+
       viewSlot.onCreated(<HTMLElement> {shadowRoot: mockShadowRoot});
       assert(viewSlot['rootEl_']).to.equal(rootEl);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('#root');
-      assert(mockLocationService.on).to.haveBeenCalledWith(
+      assert(viewSlot.listenTo).to.haveBeenCalledWith(
+          mockLocationService,
           LocationServiceEvents.CHANGED,
-          viewSlot['onLocationChanged_'],
-          viewSlot);
+          viewSlot['onLocationChanged_']);
     });
   });
 

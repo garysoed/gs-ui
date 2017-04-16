@@ -130,8 +130,7 @@ export abstract class BaseTab extends BaseThemedElement {
     this.highlightEl_ = <HTMLElement> shadowRoot.querySelector('.highlight');
     this.tabContainer_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('.tab-container'));
 
-    this.addDisposable(
-        this.interval_.on(Interval.TICK_EVENT, this.onTick_, this));
+    this.listenTo(this.interval_, Interval.TICK_EVENT, this.onTick_);
     this.interval_.start();
     this.mutationObserver_.observe(element, {childList: true});
 
@@ -146,7 +145,7 @@ export abstract class BaseTab extends BaseThemedElement {
   onInserted(): void {
     const element = this.getElement();
     if (element !== null) {
-      element.on(Event.ACTION, this.onAction_, this);
+      this.listenTo(element, Event.ACTION, this.onAction_);
     }
   }
 
@@ -161,8 +160,8 @@ export abstract class BaseTab extends BaseThemedElement {
     }
 
     if (selectedId !== null) {
-      const selectedTab = <HTMLElement> element.getEventTarget()
-          .querySelector(`[gs-tab-id="${selectedId}"]`);
+      const selectedTab = element.getEventTarget()
+          .querySelector(`[gs-tab-id="${selectedId}"]`) as HTMLElement;
       destinationStart = this.getStartPosition(selectedTab);
       destinationHeight = this.getLength(selectedTab);
     } else {

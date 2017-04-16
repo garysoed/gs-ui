@@ -3,6 +3,7 @@ TestBase.setup();
 
 import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
+import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { FileService } from '../input/file-service';
 
@@ -12,12 +13,12 @@ describe('input.FileService', () => {
 
   beforeEach(() => {
     service = new FileService();
+    TestDispose.add(service);
   });
 
   describe('processFile_', () => {
     it('should resolve with the file content correctly', async () => {
-      const mockListenableFileReader =
-          jasmine.createSpyObj('ListenableFileReader', ['dispose', 'on']);
+      const mockListenableFileReader = jasmine.createSpyObj('ListenableFileReader', ['dispose']);
       spyOn(ListenableDom, 'of').and.returnValue(mockListenableFileReader);
 
       const content = 'content';
@@ -25,17 +26,18 @@ describe('input.FileService', () => {
       mockFileReader.result = content;
       mockFileReader.readyState = 2;
       spyOn(service, 'createFileReader_').and.returnValue(mockFileReader);
+      const listenToSpy = spyOn(service, 'listenTo');
 
       const file = Mocks.object('file');
 
       const promise = service['processFile_'](file);
       assert(mockFileReader.readAsText).to.haveBeenCalledWith(file);
       assert(ListenableDom.of).to.haveBeenCalledWith(mockFileReader);
-      assert(mockListenableFileReader.on).to.haveBeenCalledWith(
+      assert(service.listenTo).to.haveBeenCalledWith(
+          mockListenableFileReader,
           DomEvent.LOADEND,
-          Matchers.any(Function),
-          service);
-      mockListenableFileReader.on.calls.argsFor(0)[1]();
+          Matchers.any(Function) as any);
+      listenToSpy.calls.argsFor(0)[2]();
 
       const actualContent = await promise;
       assert(actualContent).to.equal(content);
@@ -51,11 +53,12 @@ describe('input.FileService', () => {
       mockFileReader.result = 'content';
       mockFileReader.readyState = 1;
       spyOn(service, 'createFileReader_').and.returnValue(mockFileReader);
+      const listenToSpy = spyOn(service, 'listenTo');
 
       const file = Mocks.object('file');
 
       const promise = service['processFile_'](file);
-      mockListenableFileReader.on.calls.argsFor(0)[1]();
+      listenToSpy.calls.argsFor(0)[2]();
 
       try {
         await promise;

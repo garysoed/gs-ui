@@ -34,25 +34,25 @@ describe('routing.RouteService', () => {
 
   describe('[Reflect.__initialize]', () => {
     it('should listen to the CHANGED event on the location service', () => {
-      spyOn(mockLocationService, 'on').and.callThrough();
+      spyOn(service, 'listenTo');
 
       mockRouteFactoryService.getFactories.and.returnValue([]);
 
       service[Reflect.__initialize]();
 
-      assert(mockLocationService.on).to.haveBeenCalledWith(
+      assert(service.listenTo).to.haveBeenCalledWith(
+          mockLocationService,
           LocationServiceEvents.CHANGED,
-          service['onLocationChanged_'],
-          service);
+          service['onLocationChanged_']);
     });
 
     it('should initialize the route factory map', () => {
-      let type1 = Mocks.object('type1');
-      let mockFactory1 = jasmine.createSpyObj('Factory1', ['getType']);
+      const type1 = Mocks.object('type1');
+      const mockFactory1 = jasmine.createSpyObj('Factory1', ['getType']);
       mockFactory1.getType.and.returnValue(type1);
 
-      let type2 = Mocks.object('type2');
-      let mockFactory2 = jasmine.createSpyObj('Factory2', ['getType']);
+      const type2 = Mocks.object('type2');
+      const mockFactory2 = jasmine.createSpyObj('Factory2', ['getType']);
       mockFactory2.getType.and.returnValue(type2);
 
       mockRouteFactoryService.getFactories.and.returnValue([mockFactory1, mockFactory2]);
@@ -68,14 +68,14 @@ describe('routing.RouteService', () => {
 
   describe('getParams', () => {
     it('should return the correct params', () => {
-      let path = 'path';
+      const path = 'path';
       spyOn(service, 'getPath').and.returnValue(path);
 
-      let params = Mocks.object('params');
-      let mockRoute = jasmine.createSpyObj('Route', ['getParams']);
+      const params = Mocks.object('params');
+      const mockRoute = jasmine.createSpyObj('Route', ['getParams']);
       mockRoute.getParams.and.returnValue(params);
 
-      let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['createFromPath']);
+      const mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['createFromPath']);
       mockRouteFactory.createFromPath.and.returnValue(mockRoute);
 
       assert(service.getParams(mockRouteFactory)).to.equal(params);
@@ -83,10 +83,10 @@ describe('routing.RouteService', () => {
     });
 
     it('should return null if the path does not match the route factory', () => {
-      let path = 'path';
+      const path = 'path';
       spyOn(service, 'getPath').and.returnValue(path);
 
-      let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['createFromPath']);
+      const mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['createFromPath']);
       mockRouteFactory.createFromPath.and.returnValue(null);
 
       assert(service.getParams(mockRouteFactory)).to.beNull();
@@ -96,7 +96,7 @@ describe('routing.RouteService', () => {
 
   describe('getPath', () => {
     it('should return the path', () => {
-      let path = 'path';
+      const path = 'path';
       mockLocationService.getPath.and.returnValue(path);
       assert(service.getPath()).to.equal(path);
     });
@@ -104,17 +104,17 @@ describe('routing.RouteService', () => {
 
   describe('getRoute', () => {
     it('should return the first matching route', () => {
-      let path = 'path';
+      const path = 'path';
       mockLocationService.getPath.and.returnValue(path);
 
-      let route = Mocks.object('route');
-      let mockFactory1 = jasmine.createSpyObj('Factory1', ['createFromPath']);
+      const route = Mocks.object('route');
+      const mockFactory1 = jasmine.createSpyObj('Factory1', ['createFromPath']);
       mockFactory1.createFromPath.and.returnValue(null);
 
-      let mockFactory2 = jasmine.createSpyObj('Factory2', ['createFromPath']);
+      const mockFactory2 = jasmine.createSpyObj('Factory2', ['createFromPath']);
       mockFactory2.createFromPath.and.returnValue(route);
 
-      let mockFactory3 = jasmine.createSpyObj('Factory3', ['createFromPath']);
+      const mockFactory3 = jasmine.createSpyObj('Factory3', ['createFromPath']);
       mockFactory3.createFromPath.and.returnValue(Mocks.object('route2'));
 
       mockRouteFactoryService.getFactories.and.returnValue([
@@ -132,7 +132,7 @@ describe('routing.RouteService', () => {
     it('should return null if there are no matching routes', () => {
       mockLocationService.getPath.and.returnValue('path');
 
-      let mockFactory = jasmine.createSpyObj('Factory', ['createFromPath']);
+      const mockFactory = jasmine.createSpyObj('Factory', ['createFromPath']);
       mockFactory.createFromPath.and.returnValue(null);
 
       mockRouteFactoryService.getFactories.and.returnValue([mockFactory]);
@@ -143,8 +143,8 @@ describe('routing.RouteService', () => {
 
   describe('getRouteFactory', () => {
     it('should return the factory that matches the type', () => {
-      let type = Mocks.object('type');
-      let factory = Mocks.object('factory');
+      const type = Mocks.object('type');
+      const factory = Mocks.object('factory');
       service['routeFactoryMap_'].set(type, factory);
       assert(service.getRouteFactory(type)).to.equal(factory);
     });
@@ -156,12 +156,12 @@ describe('routing.RouteService', () => {
 
   describe('goTo', () => {
     it('should go to the correct location', () => {
-      let params = Mocks.object('params');
+      const params = Mocks.object('params');
 
-      let path = 'path';
-      let mockRoute = jasmine.createSpyObj('Route', ['getPath']);
+      const path = 'path';
+      const mockRoute = jasmine.createSpyObj('Route', ['getPath']);
       mockRoute.getPath.and.returnValue(path);
-      let mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['create']);
+      const mockRouteFactory = jasmine.createSpyObj('RouteFactory', ['create']);
       mockRouteFactory.create.and.returnValue(mockRoute);
 
       spyOn(service, 'goToPath');
@@ -176,7 +176,7 @@ describe('routing.RouteService', () => {
   describe('goToPath', () => {
     it('should navigate to the given path', () => {
       mockLocationService.goTo = jasmine.createSpy('LocationService#goTo');
-      let path = 'path';
+      const path = 'path';
       service.goToPath(path);
       assert(mockLocationService.goTo).to.haveBeenCalledWith(path);
     });

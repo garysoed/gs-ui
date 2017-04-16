@@ -166,14 +166,14 @@ describe('routing.Breadcrumb', () => {
 
   describe('onCreated', () => {
     it('should listen to the CHANGED event', () => {
-      spyOn(mockRouteService, 'on').and.callThrough();
+      spyOn(breadcrumb, 'listenTo');
 
       breadcrumb.onCreated(Mocks.object('element'));
 
-      assert(mockRouteService.on).to.haveBeenCalledWith(
+      assert(breadcrumb.listenTo).to.haveBeenCalledWith(
+          mockRouteService,
           RouteServiceEvents.CHANGED,
-          breadcrumb['onRouteChanged_'],
-          breadcrumb);
+          breadcrumb['onRouteChanged_']);
     });
   });
 

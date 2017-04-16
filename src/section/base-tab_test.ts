@@ -201,16 +201,16 @@ describe('section.BaseTab', () => {
 
       spyOn(tab, 'onTick_');
       spyOn(tab['mutationObserver_'], 'observe');
-      spyOn(tab['interval_'], 'on').and.returnValue(Mocks.disposable('Interval.on'));
       spyOn(tab['interval_'], 'start');
+      spyOn(tab, 'listenTo');
 
       tab.onCreated(element);
 
       assert(tab['mutationObserver_']['observe']).to.haveBeenCalledWith(element, {childList: true});
 
       assert(tab['interval_'].start).to.haveBeenCalledWith();
-      assert(tab['interval_'].on)
-          .to.haveBeenCalledWith(Interval.TICK_EVENT, tab['onTick_'], tab);
+      assert(tab.listenTo)
+          .to.haveBeenCalledWith(tab['interval_'], Interval.TICK_EVENT, tab['onTick_']);
 
       assert(tab['tabContainer_'].getEventTarget()).to.equal(tabContainer);
       assert(tab['highlightEl_']).to.equal(highlightEl);
@@ -224,16 +224,18 @@ describe('section.BaseTab', () => {
       tab['element_'] = mockElement;
 
       spyOn(tab, 'onAction_');
+      spyOn(tab, 'listenTo');
 
       tab.onInserted();
 
-      assert(mockElement.on).to.haveBeenCalledWith('gse-action', tab['onAction_'], tab);
+      assert(tab.listenTo).to.haveBeenCalledWith(mockElement, 'gse-action', tab['onAction_']);
     });
 
     it('should not throw error if there are no elements', () => {
       tab['element_'] = null;
 
       spyOn(tab, 'onAction_');
+      spyOn(tab, 'listenTo');
 
       assert(() => {
         tab.onInserted();
@@ -254,7 +256,7 @@ describe('section.BaseTab', () => {
 
       const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(selectedTab);
-      tab['element_'] = <ListenableDom<HTMLElement>> {getEventTarget: () => mockElement};
+      tab['element_'] = {getEventTarget: () => mockElement} as ListenableDom<HTMLElement>;
 
       spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
 
@@ -274,7 +276,7 @@ describe('section.BaseTab', () => {
       tab['highlightLength_'] = length;
 
       const element = Mocks.object('element');
-      tab['element_'] = <ListenableDom<HTMLElement>> {getEventTarget: () => element};
+      tab['element_'] = {getEventTarget: () => element} as ListenableDom<HTMLElement>;
 
       spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
 

@@ -98,7 +98,7 @@ export abstract class BaseInput<T> extends BaseActionElement {
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
     this.inputEl_ = element.shadowRoot.querySelector('input');
-    this.addDisposable(this.interval_.on(Interval.TICK_EVENT, this.onInputTick_, this));
+    this.listenTo(this.interval_, Interval.TICK_EVENT, this.onInputTick_);
   }
 
   /**

@@ -1,15 +1,17 @@
 import { Arrays, Maps } from 'external/gs_tools/src/collection';
 import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
+import { BaseListener } from 'external/gs_tools/src/event/base-listener';
 import { bind } from 'external/gs_tools/src/inject';
 import { SimpleIdGenerator } from 'external/gs_tools/src/random';
 
 
 @bind('gs.input.FileService')
-export class FileService {
+export class FileService extends BaseListener {
   private readonly bundles_: Map<string, File[]>;
   private readonly idGenerator_: SimpleIdGenerator;
 
   constructor() {
+    super();
     this.bundles_ = new Map<string, File[]>();
     this.idGenerator_ = new SimpleIdGenerator();
   }
@@ -30,7 +32,8 @@ export class FileService {
         reject: (error: any) => void) => {
       const fileReader = this.createFileReader_();
       const listenableFileReader = ListenableDom.of<FileReader>(fileReader);
-      listenableFileReader.on(
+      this.listenTo(
+          listenableFileReader,
           DomEvent.LOADEND,
           () => {
             listenableFileReader.dispose();
@@ -39,8 +42,7 @@ export class FileService {
             } else {
               reject(new Error(`Error loading file ${file.name}: ${fileReader.readyState}`));
             }
-          },
-          this);
+          });
       fileReader.readAsText(file);
     });
   }

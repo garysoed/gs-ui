@@ -99,10 +99,10 @@ export class ViewSlot extends BaseThemedElement {
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
     this.rootEl_ = <HTMLElement> element.shadowRoot.querySelector('#root');
-    this.addDisposable(this.locationService_.on(
+    this.listenTo(
+        this.locationService_,
         LocationServiceEvents.CHANGED,
-        this.onLocationChanged_,
-        this));
+        this.onLocationChanged_);
   }
 
   /**

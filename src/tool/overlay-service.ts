@@ -1,6 +1,6 @@
 import { Interval } from 'external/gs_tools/src/async';
-import { BaseDisposable } from 'external/gs_tools/src/dispose';
 import { ListenableDom } from 'external/gs_tools/src/event';
+import { BaseListener } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
 
 import { AnchorLocation } from '../tool/anchor-location';
@@ -9,7 +9,7 @@ import { OverlayContainer } from '../tool/overlay-container';
 
 
 @bind('gs.tool.OverlayService', [OverlayContainer])
-export class OverlayService extends BaseDisposable {
+export class OverlayService extends BaseListener {
   private static ANCHOR_TARGET_INTERVAL_: number = 500;
 
   private overlayContainerEl_: ListenableDom<HTMLElement> | null = null;
@@ -108,10 +108,10 @@ export class OverlayService extends BaseDisposable {
 
     let overlayContainerEl = this.getOverlayContainerEl_();
     let anchorTargetWatcher = Interval.newInstance(OverlayService.ANCHOR_TARGET_INTERVAL_);
-    anchorTargetWatcher.on(
+    this.listenTo(
+        anchorTargetWatcher,
         Interval.TICK_EVENT,
-        this.onTick_.bind(this, overlayContainerEl.getEventTarget(), anchorTarget, anchorElement),
-        this);
+        this.onTick_.bind(this, overlayContainerEl.getEventTarget(), anchorTarget, anchorElement));
     anchorTargetWatcher.start();
 
     overlayContainerEl.getEventTarget().appendChild(overlayContent);

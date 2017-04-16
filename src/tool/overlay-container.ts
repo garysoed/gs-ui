@@ -251,8 +251,8 @@ export class OverlayContainer extends BaseElement {
    */
   onInserted(element: HTMLElement): void {
     super.onInserted(element);
-    this.addDisposable(this.windowEl_.on(DomEvent.RESIZE, this.onWindowResize_, this));
-    this.addDisposable(this.backdropEl_.on(DomEvent.CLICK, this.onBackdropClick_, this));
+    this.listenTo(this.windowEl_, DomEvent.RESIZE, this.onWindowResize_);
+    this.listenTo(this.backdropEl_, DomEvent.CLICK, this.onBackdropClick_);
     this.updateContent_();
   }
 }

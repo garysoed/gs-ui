@@ -239,24 +239,19 @@ describe('input.CodeInput', () => {
 
       spyOn(input['editorValueBinder_'], 'setEditor');
 
-      const mockDeregisterFn = jasmine.createSpyObj('DeregisterFn', ['dispose']);
-      const mockInterval = jasmine.createSpyObj('Interval', ['dispose', 'on', 'start']);
-      mockInterval.on.and.returnValue(mockDeregisterFn);
+      const mockInterval = jasmine.createSpyObj('Interval', ['dispose', 'start']);
       spyOn(Interval, 'newInstance').and.returnValue(mockInterval);
 
       spyOn(input, 'addDisposable').and.callThrough();
 
-      const mockThemeDeregister = jasmine.createSpyObj('ThemeDeregistere', ['dispose']);
-      mockThemeService.on.and.returnValue(mockThemeDeregister);
-
       spyOn(input, 'onThemeChanged_');
+      spyOn(input, 'listenTo');
 
       input.onCreated(element);
 
       assert(input['onThemeChanged_']).to.haveBeenCalledWith();
-      assert(input.addDisposable).to.haveBeenCalledWith(mockThemeDeregister);
-      assert(mockThemeService.on).to.haveBeenCalledWith(
-          ThemeServiceEvents.THEME_CHANGED, input['onThemeChanged_'], input);
+      assert(input.listenTo).to.haveBeenCalledWith(
+          mockThemeService, ThemeServiceEvents.THEME_CHANGED, input['onThemeChanged_']);
       assert(mockShadowRoot.appendChild).to.haveBeenCalledWith(styleEl);
       assert(styleEl.innerHTML).to.equal(aceInnerHtml);
       assert(mockOwnerDocument.createElement).to.haveBeenCalledWith('style');
@@ -264,10 +259,10 @@ describe('input.CodeInput', () => {
       assert(input['editorValueBinder_'].setEditor).to.haveBeenCalledWith(mockEditor);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('#editor');
       assert(input['gsShowGutterHook_'].set).to.haveBeenCalledWith(true);
-      assert(mockInterval.on).to.haveBeenCalledWith(Interval.TICK_EVENT, input['onTick_'], input);
+      assert(input.listenTo).to.haveBeenCalledWith(
+          mockInterval, Interval.TICK_EVENT, input['onTick_']);
       assert(mockInterval.start).to.haveBeenCalledWith();
       assert(input.addDisposable).to.haveBeenCalledWith(mockInterval);
-      assert(input.addDisposable).to.haveBeenCalledWith(mockDeregisterFn);
     });
 
     it('should throw error if the ace editor CSS style cannot be found', () => {
