@@ -1,7 +1,7 @@
 import { DomEvent } from 'external/gs_tools/src/event';
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
-import { bind, customElement, DomHook, handle } from 'external/gs_tools/src/webc';
+import { customElement, DomHook, handle, hook } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
@@ -14,7 +14,7 @@ import { OverlayService } from '../tool/overlay-service';
   templateKey: 'src/tool/menu-item',
 })
 export class MenuItem extends BaseThemedElement {
-  @bind('#content').innerText()
+  @hook('#content').innerText()
   private readonly nameHook_: DomHook<string>;
 
   private readonly menuService_: OverlayService;

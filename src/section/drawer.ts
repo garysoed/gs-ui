@@ -1,10 +1,10 @@
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import {
-  bind,
   customElement,
   DomHook,
-  handle } from 'external/gs_tools/src/webc';
+  handle,
+  hook } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
@@ -15,19 +15,19 @@ import { ThemeService } from '../theming/theme-service';
   templateKey: 'src/section/drawer',
 })
 export class Drawer extends BaseThemedElement {
-  @bind('#root').classList()
+  @hook('#root').classList()
   readonly classListHook_: DomHook<Set<string>>;
 
-  @bind('#container').property('style')
+  @hook('#container').property('style')
   readonly containerStyleHook_: DomHook<CSSStyleDeclaration>;
 
-  @bind('#root').attribute('flex-justify', StringParser)
+  @hook('#root').attribute('flex-justify', StringParser)
   readonly flexJustifyHook_: DomHook<string>;
 
-  @bind('#item').property('style')
+  @hook('#item').property('style')
   readonly itemStyleHook_: DomHook<CSSStyleDeclaration>;
 
-  @bind('#root').property('style')
+  @hook('#root').property('style')
   readonly rootStyleHook_: DomHook<CSSStyleDeclaration>;
 
   constructor(

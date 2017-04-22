@@ -1,6 +1,6 @@
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
-import { bind, customElement, DomHook, handle } from 'external/gs_tools/src/webc';
+import { customElement, DomHook, handle, hook } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
@@ -14,7 +14,7 @@ import { ThemeService } from '../theming/theme-service';
   templateKey: 'src/tool/switch',
 })
 export class Switch extends BaseThemedElement {
-  @bind('#content').attribute('select', StringParser)
+  @hook('#content').attribute('select', StringParser)
   private readonly selectHook_: DomHook<string>;
 
   constructor(

@@ -11,10 +11,10 @@ import { Enums } from 'external/gs_tools/src/typescript';
 import { Reflect } from 'external/gs_tools/src/util';
 import { Validate } from 'external/gs_tools/src/valid';
 import {
-  bind,
   customElement,
   DomHook,
   handle,
+  hook,
   IDomBinder } from 'external/gs_tools/src/webc';
 
 import { ThemeServiceEvents } from '../const/theme-service-events';
@@ -85,16 +85,16 @@ export class EditorValueBinder implements IDomBinder<string> {
 })
 export class CodeInput extends BaseInput<string> {
 
-  @bind(null).attribute('gs-value', StringParser)
+  @hook(null).attribute('gs-value', StringParser)
   readonly boundGsValueHook_: DomHook<string>;
 
-  @bind('#customStyle').property('innerHTML')
+  @hook('#customStyle').property('innerHTML')
   readonly customStyleInnerHtmlHook_: DomHook<string>;
 
-  @bind(null).attribute('gs-show-gutter', BooleanParser)
+  @hook(null).attribute('gs-show-gutter', BooleanParser)
   readonly gsShowGutterHook_: DomHook<boolean>;
 
-  @bind('#editor').attribute('disabled', BooleanParser)
+  @hook('#editor').attribute('disabled', BooleanParser)
   readonly boundInputDisabledHook_: DomHook<boolean>;
 
   private readonly editorValueHook_: DomHook<string>;

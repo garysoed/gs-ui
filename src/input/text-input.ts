@@ -2,10 +2,10 @@
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import {
-  bind,
   customElement,
   DomHook,
-  handle } from 'external/gs_tools/src/webc';
+  handle,
+  hook } from 'external/gs_tools/src/webc';
 
 import { BaseInput } from '../input/base-input';
 import { ThemeService } from '../theming/theme-service';
@@ -16,13 +16,13 @@ import { ThemeService } from '../theming/theme-service';
   templateKey: 'src/input/text-input',
 })
 export class TextInput extends BaseInput<string> {
-  @bind(null).attribute('gs-value', StringParser)
+  @hook(null).attribute('gs-value', StringParser)
   private readonly boundGsValueHook_: DomHook<string>;
 
-  @bind('#input').attribute('disabled', BooleanParser)
+  @hook('#input').attribute('disabled', BooleanParser)
   private readonly boundInputDisabledHook_: DomHook<boolean>;
 
-  @bind('#input').property('value')
+  @hook('#input').property('value')
   private readonly boundInputValueHook_: DomHook<string>;
 
   constructor(@inject('theming.ThemeService') themeService: ThemeService) {

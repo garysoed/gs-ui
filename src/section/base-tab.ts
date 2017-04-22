@@ -3,9 +3,9 @@ import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
 import {
   Animation,
   AnimationEasing,
-  bind,
   DomHook,
-  handle } from 'external/gs_tools/src/webc';
+  handle,
+  hook } from 'external/gs_tools/src/webc';
 
 import { StringParser } from 'external/gs_tools/src/parse';
 import { BaseThemedElement } from '../common/base-themed-element';
@@ -16,7 +16,7 @@ import { ThemeService } from '../theming/theme-service';
 export abstract class BaseTab extends BaseThemedElement {
   static CHANGE_EVENT: string = 'gse-tab-change';
 
-  @bind(null).attribute('gs-selected-tab', StringParser)
+  @hook(null).attribute('gs-selected-tab', StringParser)
   readonly selectedTabHook_: DomHook<string>;
 
   private highlightContainerEl_: ListenableDom<HTMLElement>;

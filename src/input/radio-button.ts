@@ -1,10 +1,10 @@
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import {
-  bind,
   customElement,
   DomHook,
-  handle } from 'external/gs_tools/src/webc';
+  handle,
+  hook } from 'external/gs_tools/src/webc';
 
 import { BaseActionElement } from '../common/base-action-element';
 import { RadioButtonService } from '../input/radio-button-service';
@@ -21,7 +21,7 @@ import { ThemeService } from '../theming/theme-service';
   templateKey: 'src/input/radio-button',
 })
 export class RadioButton extends BaseActionElement {
-  @bind(null).attribute('gs-checked', BooleanParser)
+  @hook(null).attribute('gs-checked', BooleanParser)
   private gsCheckedHook_: DomHook<boolean>;
 
   protected radioButtonService_: RadioButtonService;

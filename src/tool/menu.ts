@@ -3,9 +3,9 @@ import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import {
   BaseElement,
-  bind,
   customElement,
-  DomHook } from 'external/gs_tools/src/webc';
+  DomHook,
+  hook } from 'external/gs_tools/src/webc';
 
 import { Event } from '../const/event';
 
@@ -26,7 +26,7 @@ import { OverlayService } from './overlay-service';
   templateKey: 'src/tool/menu',
 })
 export class Menu extends BaseElement {
-  @bind(null).attribute('gs-fit-parent-width', BooleanParser)
+  @hook(null).attribute('gs-fit-parent-width', BooleanParser)
   private readonly gsFitParentWidthHook_: DomHook<boolean>;
 
   private readonly overlayService_: OverlayService;

@@ -1,6 +1,6 @@
 import { Arrays } from 'external/gs_tools/src/collection';
 import { inject } from 'external/gs_tools/src/inject';
-import { bind, ChildElementDataHelper, customElement, DomHook } from 'external/gs_tools/src/webc';
+import { ChildElementDataHelper, customElement, DomHook, hook } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
@@ -62,7 +62,7 @@ export const CRUMB_DATA_HELPER: ChildElementDataHelper<CrumbData> = {
   templateKey: 'src/routing/breadcrumb',
 })
 export class Breadcrumb<T> extends BaseThemedElement {
-  @bind('#container').childrenElements<CrumbData>(CRUMB_DATA_HELPER)
+  @hook('#container').childrenElements<CrumbData>(CRUMB_DATA_HELPER)
   private readonly crumbHook_: DomHook<CrumbData[]>;
 
   private readonly routeService_: RouteService<T>;

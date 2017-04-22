@@ -3,10 +3,10 @@ import { DomEvent } from 'external/gs_tools/src/event';
 import { inject } from 'external/gs_tools/src/inject';
 import { ArrayParser, StringParser } from 'external/gs_tools/src/parse';
 import {
-  bind,
   customElement,
   DomHook,
-  handle } from 'external/gs_tools/src/webc';
+  handle,
+  hook } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
@@ -24,19 +24,19 @@ import { FileService } from '../input/file-service';
   templateKey: 'src/input/file-input',
 })
 export class FileInput extends BaseThemedElement {
-  @bind(null).attribute('gs-bundle-id', StringParser)
+  @hook(null).attribute('gs-bundle-id', StringParser)
   private readonly gsBundleIdHook_: DomHook<string>;
 
-  @bind(null).attribute('gs-mime-types', ArrayParser(StringParser))
+  @hook(null).attribute('gs-mime-types', ArrayParser(StringParser))
   private readonly gsMimeTypesHook_: DomHook<string[]>;
 
-  @bind('#initialMessage').innerText()
+  @hook('#initialMessage').innerText()
   private readonly initialMessageInnerTextHook_: DomHook<string>;
 
-  @bind('#droppedMessage').innerText()
+  @hook('#droppedMessage').innerText()
   private readonly droppedMessageInnerTextHook_: DomHook<string>;
 
-  @bind('#switch').attribute('gs-value', StringParser)
+  @hook('#switch').attribute('gs-value', StringParser)
   private readonly switchGsValueHook_: DomHook<string>;
 
   private readonly fileService_: FileService;
