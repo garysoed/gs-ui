@@ -2,7 +2,6 @@ import { Color, Colors, HslColor, RgbColor } from 'external/gs_tools/src/color';
 import { cache } from 'external/gs_tools/src/data/cache';
 import { Solve, Spec } from 'external/gs_tools/src/solver';
 import { Log } from 'external/gs_tools/src/util';
-import { Validate } from 'external/gs_tools/src/valid';
 
 
 const LOG: Log = new Log('theming.Theme');
@@ -248,8 +247,7 @@ export class Theme {
    * @return New instance of the theme.
    */
   static newInstance(baseColor: Color, accentColor: Color, contrast: number = 4.5): Theme {
-    let validationResult = Validate.any(baseColor).toNot.beEqualTo(accentColor);
-    if (!validationResult.isValid()) {
+    if (baseColor === accentColor) {
       Log.warn(LOG, 'base and accent colors are recommended to not be equal');
     }
 

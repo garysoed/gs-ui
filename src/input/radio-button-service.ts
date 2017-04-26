@@ -1,6 +1,5 @@
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
 import { bind, inject } from 'external/gs_tools/src/inject';
-import { Validate } from 'external/gs_tools/src/valid';
 
 
 /**
@@ -19,12 +18,14 @@ export class RadioButtonService extends BaseDisposable {
    * @param selected True iff the element should be selected.
    */
   setSelected(element: HTMLElement, selected: boolean): void {
-    Validate.htmlElement(element).to.beNamed('gs-radio-button').assertValid();
-    let groupName = element.getAttribute('gs-group');
+    if (element.nodeName.toLocaleLowerCase() !== 'gs-radio-button') {
+      throw new Error('element is expected to be named "gs-radio-button"');
+    }
+    const groupName = element.getAttribute('gs-group');
 
     // If checked, uncheck any checked group.
     if (selected) {
-      let button = this.document_
+      const button = this.document_
           .querySelector(`gs-radio-button[gs-group="${groupName}"][gs-checked="true"]`);
       if (button !== null && button !== element) {
         button['gsChecked'] = false;

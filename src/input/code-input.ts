@@ -9,7 +9,6 @@ import {
 import { Solve, Spec } from 'external/gs_tools/src/solver';
 import { Enums } from 'external/gs_tools/src/typescript';
 import { Reflect } from 'external/gs_tools/src/util';
-import { Validate } from 'external/gs_tools/src/valid';
 import {
   customElement,
   DomHook,
@@ -207,7 +206,7 @@ export class CodeInput extends BaseInput<string> {
 
     const aceCss = this.document_.getElementById('ace_editor.css');
     if (aceCss === null) {
-      throw Validate.fail('#ace_editor.css not found');
+      throw new Error('#ace_editor.css not found');
     }
     const styleEl = element.ownerDocument.createElement('style');
     styleEl.innerHTML = aceCss.innerHTML;

@@ -3,7 +3,6 @@ import { Color } from 'external/gs_tools/src/color';
 import { BaseListenable } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
-import { Validate } from 'external/gs_tools/src/valid';
 import { Templates } from 'external/gs_tools/src/webc';
 
 import { ThemeServiceEvents } from '../const/theme-service-events';
@@ -40,10 +39,10 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
   applyTheme(root: Element | Document): void {
     const targetEl: Element = root instanceof Document ? root.head : root;
     const cssTemplate = this.templates_.getTemplate('src/theming/common');
-    Validate.any(cssTemplate).to.exist()
-        .orThrows(`Template for src/theming/common not found`)
-        .assertValid();
-    const cssTemplateEl = this.parser_.parseFromString(cssTemplate!, 'text/html');
+    if (cssTemplate === null) {
+      throw new Error('Template for src/theming/common not found');
+    }
+    const cssTemplateEl = this.parser_.parseFromString(cssTemplate, 'text/html');
     targetEl.appendChild(cssTemplateEl.querySelector('style'));
   }
 
@@ -63,12 +62,11 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
     }
 
     const globalCssTemplate = this.templates_.getTemplate('src/theming/global');
-    Validate
-        .any(globalCssTemplate).to.exist()
-        .orThrows(`Template for src/theming/global not found`)
-        .assertValid();
+    if (globalCssTemplate === null) {
+      throw new Error('Template for src/theming/global not found');
+    }
 
-    const styleEl = this.parser_.parseFromString(globalCssTemplate!, 'text/html');
+    const styleEl = this.parser_.parseFromString(globalCssTemplate, 'text/html');
     const headEl = this.document_.querySelector('head');
     headEl.appendChild(styleEl.querySelector('style'));
     this.initialized_ = true;
