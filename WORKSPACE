@@ -21,7 +21,7 @@ new_local_repository(
 new_local_repository(
     name = "typescript",
     path = "./node_modules/typescript",
-    build_file = "node_modules/gs-tools/bazel/ts/typescript.BUILD",
+    build_file = "node_modules/gs-tools/bazel/typescript/typescript.BUILD",
 )
 
 # Web Animations Polyfill

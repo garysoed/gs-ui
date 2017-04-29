@@ -1,7 +1,7 @@
 package(default_visibility = ["//:internal"])
 
 load("//:defs.bzl", "gs_ui")
-load("@gs_tools//bazel/ts:defs.bzl", "ts_binary", "ts_library")
+load("@gs_tools//bazel/typescript:defs.bzl", "ts_binary", "ts_library")
 
 gs_ui(
     deps = [
