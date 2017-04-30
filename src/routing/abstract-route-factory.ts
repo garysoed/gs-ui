@@ -37,14 +37,14 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    * @return Matcher string for this route factory. This should exclude matchers for the parent
    *    factories.
    */
-  protected abstract getRelativeMatcher_(): string
+  protected abstract getRelativeMatcher_(): string;
 
   /**
    * @param params Params to create the path.
    * @return Path created using the given params. This path is not prefixed by the path created
    *    by the ancestors.
    */
-  protected abstract getRelativePath_(params: CP): string
+  protected abstract getRelativePath_(params: CP): string;
 
   /**
    * @return The full matcher for this factory.

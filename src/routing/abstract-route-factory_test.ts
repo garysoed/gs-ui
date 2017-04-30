@@ -26,7 +26,7 @@ class TestFactory extends AbstractRouteFactory<any, any, any, any> {
   }
 
   getName(params: any): Promise<string> {
-    return Promise.resolve();
+    return Promise.resolve('');
   }
 }
 

@@ -222,14 +222,15 @@ export class OverlayContainer extends BaseElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    this.backdropEl_ = ListenableDom.of(
-        <HTMLElement> element.shadowRoot.querySelector('.backdrop'));
-    this.containerEl_ = ListenableDom.of(
-        <HTMLElement> element.shadowRoot.querySelector('.container'));
-    this.contentEl_ = ListenableDom.of(
-        <HTMLElement> element.shadowRoot.querySelector('content'));
+    const shadowRoot = element.shadowRoot;
+    if (shadowRoot === null) {
+      throw new Error('Shadow root not found');
+    }
+    this.backdropEl_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('.backdrop'));
+    this.containerEl_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('.container'));
+    this.contentEl_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('content'));
     this.document_ = ListenableDom.of(element.ownerDocument);
-    this.rootEl_ = ListenableDom.of(<HTMLElement> element.shadowRoot.querySelector('.root'));
+    this.rootEl_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('.root'));
 
     this.addDisposable(
         this.backdropEl_,

@@ -216,6 +216,14 @@ describe('section.BaseTab', () => {
       assert(tab['highlightEl_']).to.equal(highlightEl);
       assert(tab['highlightContainerEl_'].getEventTarget()).to.equal(highlightContainer);
     });
+
+    it('should throw error if shadow root is null', () => {
+      const element = Mocks.object('element');
+      element.shadowRoot = null;
+      assert(() => {
+        tab.onCreated(element);
+      }).to.throwError(/root is null/);
+    });
   });
 
   describe('onInserted', () => {

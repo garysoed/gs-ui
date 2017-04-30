@@ -11,10 +11,10 @@ import { Enums } from 'external/gs_tools/src/typescript';
 import { Reflect } from 'external/gs_tools/src/util';
 import {
   customElement,
+  DomBinder,
   DomHook,
   handle,
-  hook,
-  IDomBinder } from 'external/gs_tools/src/webc';
+  hook } from 'external/gs_tools/src/webc';
 
 import { ThemeServiceEvents } from '../const/theme-service-events';
 import { BaseInput } from '../input/base-input';
@@ -34,7 +34,7 @@ export enum Languages {
 /**
  * Binder that passes the value to the Ace editor.
  */
-export class EditorValueBinder implements IDomBinder<string> {
+export class EditorValueBinder implements DomBinder<string> {
   private editor_: AceAjax.Editor | null = null;
 
   /**
@@ -96,6 +96,9 @@ export class CodeInput extends BaseInput<string> {
   @hook('#editor').attribute('disabled', BooleanParser)
   readonly boundInputDisabledHook_: DomHook<boolean>;
 
+  @hook('#editor').element(HTMLElement)
+  readonly editorElHook_: DomHook<HTMLElement>;
+
   private readonly editorValueHook_: DomHook<string>;
 
   private readonly ace_: AceAjax.Ace;
@@ -117,6 +120,7 @@ export class CodeInput extends BaseInput<string> {
     this.ace_ = ace;
     this.document_ = document;
     this.editor_ = null;
+    this.editorElHook_ = DomHook.of<HTMLElement>();
     this.boundGsValueHook_ = this.gsValueHook_;
     this.boundInputDisabledHook_ = this.inputDisabledHook_;
     this.customStyleInnerHtmlHook_ = DomHook.of<string>();
@@ -189,7 +193,12 @@ export class CodeInput extends BaseInput<string> {
     if (this.gsShowGutterHook_.get() === null) {
       this.gsShowGutterHook_.set(true);
     }
-    this.editor_ = this.ace_.edit(<HTMLElement> element.shadowRoot.querySelector('#editor'));
+
+    const shadowRoot = element.shadowRoot;
+    if (shadowRoot === null) {
+      throw new Error('No shadow roots were found');
+    }
+    this.editor_ = this.ace_.edit(<HTMLElement> shadowRoot.querySelector('#editor'));
     this.editorValueBinder_.setEditor(this.editor_);
 
     this.editor_.setHighlightActiveLine(true);
@@ -210,7 +219,7 @@ export class CodeInput extends BaseInput<string> {
     }
     const styleEl = element.ownerDocument.createElement('style');
     styleEl.innerHTML = aceCss.innerHTML;
-    element.shadowRoot.appendChild(styleEl);
+    shadowRoot.appendChild(styleEl);
 
     this.listenTo(this.themeService_, ThemeServiceEvents.THEME_CHANGED, this.onThemeChanged_);
     this.onThemeChanged_();
@@ -222,7 +231,7 @@ export class CodeInput extends BaseInput<string> {
   @handle(null).attributeChange('gs-value', StringParser)
   onGsValueChange_(newValue: string | null): void {
     super.onGsValueChange_(newValue || '');
-  };
+  }
 
   @handle(null).attributeChange('gs-language', EnumParser(Languages))
   onGsLanguageAttrChange_(newValue: Languages | null): void {
@@ -247,12 +256,11 @@ export class CodeInput extends BaseInput<string> {
       return;
     }
 
-    const listenableElement = this.getElement();
-    if (listenableElement === null) {
+    const editorEl = this.editorElHook_.get();
+    if (editorEl === null) {
       return;
     }
 
-    const editorEl = listenableElement.getEventTarget().shadowRoot.querySelector('#editor');
     const reverseMode = this.themeService_.isReversedMode(editorEl);
     if (reverseMode === null) {
       return;

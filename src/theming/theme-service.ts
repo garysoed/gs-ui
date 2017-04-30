@@ -30,20 +30,36 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
     this.window_ = windowRef;
   }
 
+  private getThemeStyleEl_(): Element {
+    const themeStyleEl = this.document_.querySelector('style#gs-theme');
+    if (themeStyleEl === null) {
+      const newEl = this.document_.createElement('style');
+      newEl.id = 'gs-theme';
+      this.document_.head.appendChild(newEl);
+      return newEl;
+    } else {
+      return themeStyleEl;
+    }
+  }
+
   /**
    * Applies the theme to the given element.
    *
    * @param root The root element to add the element to. If document, this method will append the
    *    style tag to the header element.
    */
-  applyTheme(root: Element | Document): void {
-    const targetEl: Element = root instanceof Document ? root.head : root;
+  applyTheme(root: Element | Document | ShadowRoot): void {
+    const targetEl: Element | ShadowRoot = root instanceof Document ? root.head : root;
     const cssTemplate = this.templates_.getTemplate('src/theming/common');
     if (cssTemplate === null) {
       throw new Error('Template for src/theming/common not found');
     }
     const cssTemplateEl = this.parser_.parseFromString(cssTemplate, 'text/html');
-    targetEl.appendChild(cssTemplateEl.querySelector('style'));
+    const styleEl = cssTemplateEl.querySelector('style');
+    if (styleEl === null) {
+      throw new Error('Expected style element not found');
+    }
+    targetEl.appendChild(styleEl);
   }
 
   /**
@@ -66,9 +82,12 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
       throw new Error('Template for src/theming/global not found');
     }
 
-    const styleEl = this.parser_.parseFromString(globalCssTemplate, 'text/html');
-    const headEl = this.document_.querySelector('head');
-    headEl.appendChild(styleEl.querySelector('style'));
+    const cssTemplateEl = this.parser_.parseFromString(globalCssTemplate, 'text/html');
+    const styleEl = cssTemplateEl.querySelector('style');
+    if (styleEl === null) {
+      throw new Error('Style element not found');
+    }
+    this.document_.head.appendChild(styleEl);
     this.initialized_ = true;
   }
 
@@ -78,14 +97,7 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
    * @param theme The theme to be installed.
    */
   install(theme: Theme): void {
-    let themeStyleEl = this.document_.querySelector('style#gs-theme');
-    if (!themeStyleEl) {
-      themeStyleEl = this.document_.createElement('style');
-      themeStyleEl.id = 'gs-theme';
-      const headEl = this.document_.querySelector('head');
-      headEl.appendChild(themeStyleEl);
-    }
-
+    const themeStyleEl = this.getThemeStyleEl_();
     const vars = Maps
         .fromRecord({
           'gsThemeAccent': theme.getAccent(),

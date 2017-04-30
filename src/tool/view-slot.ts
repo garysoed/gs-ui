@@ -3,7 +3,7 @@ import { Iterables } from 'external/gs_tools/src/collection';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import { Doms, LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
-import { customElement } from 'external/gs_tools/src/webc';
+import { customElement, DomHook, hook } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
@@ -20,7 +20,8 @@ export const __FULL_PATH = Symbol('fullPath');
 export class ViewSlot extends BaseThemedElement {
   private readonly locationService_: LocationService;
 
-  private rootEl_: HTMLElement | null;
+  @hook('#root').property('classList')
+  readonly rootElClassListHook_: DomHook<DOMTokenList>;
   private path_: string | null;
 
   /**
@@ -32,7 +33,7 @@ export class ViewSlot extends BaseThemedElement {
     super(themeService);
     this.locationService_ = locationService;
     this.path_ = null;
-    this.rootEl_ = null;
+    this.rootElClassListHook_ = DomHook.of<DOMTokenList>();
   }
 
   /**
@@ -68,9 +69,9 @@ export class ViewSlot extends BaseThemedElement {
    * @param visible True iff the root element should be visible.
    */
   private setRootElVisible_(visible: boolean): void {
-    if (this.rootEl_ !== null) {
-      // TODO: Use dom bridge for property
-      this.rootEl_.classList.toggle('hidden', !visible);
+    const classList = this.rootElClassListHook_.get();
+    if (classList !== null) {
+      classList.toggle('hidden', !visible);
     }
   }
 
@@ -98,7 +99,6 @@ export class ViewSlot extends BaseThemedElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    this.rootEl_ = <HTMLElement> element.shadowRoot.querySelector('#root');
     this.listenTo(
         this.locationService_,
         LocationServiceEvents.CHANGED,

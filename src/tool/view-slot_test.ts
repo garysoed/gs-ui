@@ -91,17 +91,24 @@ describe('tool.ViewSlot', () => {
 
   describe('setRootElVisible_', () => {
     it('should add the "hidden" classname when setting to not visible', () => {
-      let mockClassList = jasmine.createSpyObj('ClassList', ['toggle']);
-      viewSlot['rootEl_'] = <HTMLElement> {classList: mockClassList};
+      const mockClassList = jasmine.createSpyObj('ClassList', ['toggle']);
+      spyOn(viewSlot.rootElClassListHook_, 'get').and.returnValue(mockClassList);
       viewSlot['setRootElVisible_'](false);
       assert(mockClassList.toggle).to.haveBeenCalledWith('hidden', true);
     });
 
     it('should remove the "hidden" classname when setting to be visible', () => {
-      let mockClassList = jasmine.createSpyObj('ClassList', ['toggle']);
-      viewSlot['rootEl_'] = <HTMLElement> {classList: mockClassList};
+      const mockClassList = jasmine.createSpyObj('ClassList', ['toggle']);
+      spyOn(viewSlot.rootElClassListHook_, 'get').and.returnValue(mockClassList);
       viewSlot['setRootElVisible_'](true);
       assert(mockClassList.toggle).to.haveBeenCalledWith('hidden', false);
+    });
+
+    it('should do nothing if class list cannot be found', () => {
+      spyOn(viewSlot.rootElClassListHook_, 'get').and.returnValue(null);
+      assert(() => {
+        viewSlot['setRootElVisible_'](true);
+      }).toNot.throw();
     });
   });
 
@@ -185,8 +192,6 @@ describe('tool.ViewSlot', () => {
       spyOn(viewSlot, 'listenTo');
 
       viewSlot.onCreated(<HTMLElement> {shadowRoot: mockShadowRoot});
-      assert(viewSlot['rootEl_']).to.equal(rootEl);
-      assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('#root');
       assert(viewSlot.listenTo).to.haveBeenCalledWith(
           mockLocationService,
           LocationServiceEvents.CHANGED,

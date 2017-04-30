@@ -19,13 +19,21 @@ describe('common.BaseThemedElement', () => {
 
   describe('onCreated', () => {
     it('should apply the theme to the shadow root', () => {
-      let shadowRoot = Mocks.object('shadowRoot');
-      let element = Mocks.object('element');
+      const shadowRoot = Mocks.object('shadowRoot');
+      const element = Mocks.object('element');
       element.shadowRoot = shadowRoot;
 
       themedElement.onCreated(element);
 
       assert(mockThemeService.applyTheme).to.haveBeenCalledWith(element.shadowRoot);
+    });
+
+    it('should throw error if shadow root is null', () => {
+      const element = Mocks.object('element');
+      element.shadowRoot = null;
+      assert(() => {
+        themedElement.onCreated(element);
+      }).to.throwError(/root is null/);
     });
   });
 });

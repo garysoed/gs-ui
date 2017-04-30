@@ -42,14 +42,17 @@ export class Menu extends BaseElement {
    * Handler called when there is an action.
    */
   private onAction_(): void {
-    let element = this.getElement();
+    const element = this.getElement();
     if (element === null) {
       return;
     }
 
-    let elementTarget = element.getEventTarget();
-    let parentElement = elementTarget.parentElement;
-    let menuContent = <HTMLElement> elementTarget.querySelector('[gs-content]');
+    const elementTarget = element.getEventTarget();
+    const parentElement = elementTarget.parentElement;
+    if (parentElement === null) {
+      throw new Error('No parent element found');
+    }
+    const menuContent = <HTMLElement> elementTarget.querySelector('[gs-content]');
 
     if (!!this.gsFitParentWidthHook_.get()) {
       menuContent.style.width = `${parentElement.clientWidth}px`;
@@ -68,9 +71,19 @@ export class Menu extends BaseElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    this.menuRoot_ = <HTMLElement> element.shadowRoot.querySelector('.root');
+    const shadowRoot = element.shadowRoot;
+    const parentElement = element.parentElement;
 
-    let listenableParentElement = ListenableDom.of(element.parentElement);
+    if (shadowRoot === null) {
+      throw new Error('Shadow root not found');
+    }
+
+    if (parentElement === null) {
+      throw new Error('Parent element not found');
+    }
+    this.menuRoot_ = <HTMLElement> shadowRoot.querySelector('.root');
+
+    const listenableParentElement = ListenableDom.of(parentElement);
     this.addDisposable(listenableParentElement);
     this.listenTo(listenableParentElement, Event.ACTION, this.onAction_);
     if (element['gsAnchorTarget'] === null || element['gsAnchorTarget'] === undefined) {

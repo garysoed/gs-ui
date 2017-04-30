@@ -414,12 +414,7 @@ describe('input.CodeInput', () => {
       mockWindow.getComputedStyle.and.returnValue({backgroundColor: backgroundColorString});
 
       const editorEl = Mocks.object('editorEl');
-      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.returnValue(editorEl);
-
-      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
-      mockListenableElement.getEventTarget.and.returnValue({shadowRoot: mockShadowRoot});
-      spyOn(input, 'getElement').and.returnValue(mockListenableElement);
+      spyOn(input.editorElHook_, 'get').and.returnValue(editorEl);
 
       mockThemeService.isHighlightMode.and.returnValue(false);
       mockThemeService.isReversedMode.and.returnValue(false);
@@ -435,7 +430,6 @@ describe('input.CodeInput', () => {
       assert(mockWindow.getComputedStyle).to.haveBeenCalledWith(editorEl);
       assert(mockThemeService.isHighlightMode).to.haveBeenCalledWith(editorEl);
       assert(mockThemeService.isReversedMode).to.haveBeenCalledWith(editorEl);
-      assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('#editor');
     });
 
     it('should do nothing if background color cannot be determined', () => {
@@ -452,12 +446,7 @@ describe('input.CodeInput', () => {
       mockWindow.getComputedStyle.and.returnValue({backgroundColor: backgroundColorString});
 
       const editorEl = Mocks.object('editorEl');
-      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.returnValue(editorEl);
-
-      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
-      mockListenableElement.getEventTarget.and.returnValue({shadowRoot: mockShadowRoot});
-      spyOn(input, 'getElement').and.returnValue(mockListenableElement);
+      spyOn(input.editorElHook_, 'get').and.returnValue(editorEl);
 
       mockThemeService.isHighlightMode.and.returnValue(false);
       mockThemeService.isReversedMode.and.returnValue(false);
@@ -478,12 +467,7 @@ describe('input.CodeInput', () => {
       spyOn(Colors, 'fromCssColor').and.returnValue(null);
 
       const editorEl = Mocks.object('editorEl');
-      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.returnValue(editorEl);
-
-      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
-      mockListenableElement.getEventTarget.and.returnValue({shadowRoot: mockShadowRoot});
-      spyOn(input, 'getElement').and.returnValue(mockListenableElement);
+      spyOn(input.editorElHook_, 'get').and.returnValue(editorEl);
 
       mockThemeService.isHighlightMode.and.returnValue(null);
       mockThemeService.isReversedMode.and.returnValue(false);
@@ -504,12 +488,7 @@ describe('input.CodeInput', () => {
       spyOn(Colors, 'fromCssColor').and.returnValue(null);
 
       const editorEl = Mocks.object('editorEl');
-      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.returnValue(editorEl);
-
-      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
-      mockListenableElement.getEventTarget.and.returnValue({shadowRoot: mockShadowRoot});
-      spyOn(input, 'getElement').and.returnValue(mockListenableElement);
+      spyOn(input.editorElHook_, 'get').and.returnValue(editorEl);
 
       mockThemeService.isReversedMode.and.returnValue(null);
 
@@ -518,14 +497,14 @@ describe('input.CodeInput', () => {
       assert(input.customStyleInnerHtmlHook_.set).toNot.haveBeenCalled();
     });
 
-    it('should do nothing if listenableElement cannot be found', () => {
+    it('should do nothing if editorEl cannot be found', () => {
       spyOn(input.customStyleInnerHtmlHook_, 'set');
 
       const mockTheme = jasmine.createSpyObj('Theme', ['getBaseHue']);
       mockThemeService.getTheme.and.returnValue(mockTheme);
 
       spyOn(Colors, 'fromCssColor').and.returnValue(null);
-      spyOn(input, 'getElement').and.returnValue(null);
+      spyOn(input.editorElHook_, 'get').and.returnValue(null);
 
       mockThemeService.isReversedMode.and.returnValue(null);
 

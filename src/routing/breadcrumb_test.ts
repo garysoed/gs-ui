@@ -66,6 +66,13 @@ describe('CRUMB_DATA_HELPER', () => {
       assert(CRUMB_DATA_HELPER.get(mockElement)).to.beNull();
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
+
+    it('should return null if the link element cannot be found', () => {
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      mockElement.querySelector.and.returnValue(null);
+      assert(CRUMB_DATA_HELPER.get(mockElement)).to.equal(null);
+      assert(mockElement.querySelector).to.haveBeenCalledWith('a');
+    });
   });
 
   describe('set', () => {
@@ -81,6 +88,15 @@ describe('CRUMB_DATA_HELPER', () => {
       assert(linkEl.textContent).to.equal(name);
       assert(linkEl.href).to.equal(`#${url}`);
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
+    });
+
+    it('should throw error if the link element cannot be found', () => {
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      mockElement.querySelector.and.returnValue(null);
+
+      assert(() => {
+        CRUMB_DATA_HELPER.set({name: 'name', url: 'url'}, mockElement, Mocks.object('instance'));
+      }).to.throwError(/element not found/);
     });
   });
 });

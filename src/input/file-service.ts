@@ -27,8 +27,8 @@ export class FileService extends BaseListener {
    * @return Promise that will be resolved with the file content when done.
    */
   protected processFile_(file: File): Promise<string> {
-    return new Promise<string[]>((
-        resolve: (data: string[]) => void,
+    return new Promise<string>((
+        resolve: (data: string) => void,
         reject: (error: any) => void) => {
       const fileReader = this.createFileReader_();
       const listenableFileReader = ListenableDom.of<FileReader>(fileReader);

@@ -97,7 +97,11 @@ export abstract class BaseInput<T> extends BaseActionElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    this.inputEl_ = element.shadowRoot.querySelector('input');
+    const shadowRoot = element.shadowRoot;
+    if (shadowRoot === null) {
+      throw new Error('No shadow roots were found');
+    }
+    this.inputEl_ = shadowRoot.querySelector('input');
     this.listenTo(this.interval_, Interval.TICK_EVENT, this.onInputTick_);
   }
 

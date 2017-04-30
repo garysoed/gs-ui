@@ -125,6 +125,9 @@ export abstract class BaseTab extends BaseThemedElement {
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
     const shadowRoot = element.shadowRoot;
+    if (shadowRoot === null) {
+      throw new Error('Cannot find shadow root');
+    }
     this.highlightContainerEl_ = ListenableDom
         .of(<HTMLElement> shadowRoot.querySelector('.highlight-container'));
     this.highlightEl_ = <HTMLElement> shadowRoot.querySelector('.highlight');

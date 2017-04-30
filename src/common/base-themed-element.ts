@@ -19,6 +19,10 @@ export class BaseThemedElement extends BaseElement {
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    this.themeService_.applyTheme(element.shadowRoot);
+    const shadowRoot = element.shadowRoot;
+    if (shadowRoot === null) {
+      throw new Error('Shadow root is null');
+    }
+    this.themeService_.applyTheme(shadowRoot);
   }
 }

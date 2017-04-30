@@ -31,6 +31,10 @@ export const CRUMB_DATA_HELPER: ChildElementDataHelper<CrumbData> = {
 
   get(element: Element): CrumbData | null {
     const linkEl = element.querySelector('a');
+    if (linkEl === null) {
+      return null;
+    }
+
     const href = linkEl.href;
     if (!href.startsWith('#')) {
       return null;
@@ -49,6 +53,9 @@ export const CRUMB_DATA_HELPER: ChildElementDataHelper<CrumbData> = {
 
   set(data: CrumbData, element: Element): void {
     const linkEl = element.querySelector('a');
+    if (linkEl === null) {
+      throw new Error('Link element not found');
+    }
     linkEl.href = `#${data.url}`;
     linkEl.textContent = data.name;
   },
