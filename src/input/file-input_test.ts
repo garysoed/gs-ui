@@ -109,7 +109,7 @@ describe('input.FileInput', () => {
           spyOn(input['switchGsValueHook_'], 'set');
           spyOn(input, 'isValid_').and.returnValue(true);
 
-          input['onDragEnter_'](<any> {dataTransfer: dataTransfer});
+          input['onDragEnter_']({dataTransfer: dataTransfer} as any);
 
           assert(input['switchGsValueHook_'].set).to.haveBeenCalledWith('dragging');
           assert(input['isValid_']).to.haveBeenCalledWith(dataTransfer);
@@ -123,7 +123,7 @@ describe('input.FileInput', () => {
           spyOn(input['switchGsValueHook_'], 'set');
           spyOn(input, 'isValid_').and.returnValue(false);
 
-          input['onDragEnter_'](<any> {dataTransfer: dataTransfer});
+          input['onDragEnter_']({dataTransfer: dataTransfer} as any);
 
           assert(input['switchGsValueHook_'].set).to.haveBeenCalledWith('error');
           assert(input['isValid_']).to.haveBeenCalledWith(dataTransfer);
@@ -135,7 +135,7 @@ describe('input.FileInput', () => {
       spyOn(input['switchGsValueHook_'], 'set');
       spyOn(input, 'isValid_').and.returnValue(true);
 
-      input['onDragEnter_'](<any> {dataTransfer: Mocks.object('dataTransfer')});
+      input['onDragEnter_']({dataTransfer: Mocks.object('dataTransfer')} as any);
 
       assert(input['switchGsValueHook_'].set).toNot.haveBeenCalled();
       assert(input['dragDepth_']).to.equal(-1);

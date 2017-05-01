@@ -51,7 +51,7 @@ export abstract class BaseInput<T> extends BaseActionElement {
    * @param newValue The value it was changed to.
    */
   protected onGsValueChange_(newValue: T): void {
-    let parsedValue = this.valueParser_.parse(this.inputValueHook_.get());
+    const parsedValue = this.valueParser_.parse(this.inputValueHook_.get());
     if (this.isValueChanged_(parsedValue, newValue)) {
       this.inputValueHook_.set(this.valueParser_.stringify(newValue));
     }
@@ -71,8 +71,8 @@ export abstract class BaseInput<T> extends BaseActionElement {
    * Handler called when the input element fires a change event.
    */
   protected onInputTick_(): void {
-    let previousValue = this.gsValueHook_.get();
-    let parsedNewValue: T | null = this.valueParser_.parse(this.inputValueHook_.get());
+    const previousValue = this.gsValueHook_.get();
+    const parsedNewValue: T | null = this.valueParser_.parse(this.inputValueHook_.get());
     if (parsedNewValue === null) {
       return;
     }
@@ -82,7 +82,7 @@ export abstract class BaseInput<T> extends BaseActionElement {
     }
 
     this.gsValueHook_.set(parsedNewValue);
-    let element = this.getElement();
+    const element = this.getElement();
     if (element !== null) {
       element.dispatch(DomEvent.CHANGE);
     }

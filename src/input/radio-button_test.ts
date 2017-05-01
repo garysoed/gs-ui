@@ -26,7 +26,7 @@ describe('input.RadioButton', () => {
 
   describe('onClick_', () => {
     it('should set itself as selected if it is not disabled', () => {
-      let element = Mocks.object('element');
+      const element = Mocks.object('element');
       spyOn(button, 'isDisabled').and.returnValue(false);
       spyOn(button, 'getElement').and.returnValue({getEventTarget: () => element});
 
@@ -52,7 +52,7 @@ describe('input.RadioButton', () => {
 
   describe('onGsCheckedChanged_', () => {
     it('should update the service', () => {
-      let newValue = true;
+      const newValue = true;
       spyOn(button, 'updateService_');
       button['onGsCheckedChanged_'](newValue, false /* oldValue */);
       assert(button['updateService_']).to.haveBeenCalledWith(newValue);
@@ -67,7 +67,7 @@ describe('input.RadioButton', () => {
 
   describe('onGsGroupChanged_', () => {
     it('should update the service', () => {
-      let value = true;
+      const value = true;
       spyOn(button, 'updateService_');
       spyOn(button['gsCheckedHook_'], 'get').and.returnValue(value);
       button['onGsGroupChanged_']();
@@ -84,12 +84,12 @@ describe('input.RadioButton', () => {
 
   describe('updateService_', () => {
     it('should call the radio button service', () => {
-      let eventTarget = Mocks.object('eventTarget');
-      let mockElement = jasmine.createSpyObj('Element', ['getEventTarget']);
+      const eventTarget = Mocks.object('eventTarget');
+      const mockElement = jasmine.createSpyObj('Element', ['getEventTarget']);
       mockElement.getEventTarget.and.returnValue(eventTarget);
       spyOn(button, 'getElement').and.returnValue(mockElement);
 
-      let checked = true;
+      const checked = true;
       button['updateService_'](checked);
       assert(mockRadioButtonService.setSelected).to.haveBeenCalledWith(eventTarget, checked);
     });

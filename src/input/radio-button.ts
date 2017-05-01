@@ -39,7 +39,7 @@ export class RadioButton extends BaseActionElement {
    */
   protected onClick_(): void {
     super.onClick_();
-    let element = this.getElement();
+    const element = this.getElement();
     if (!this.isDisabled() && element !== null) {
       this.radioButtonService_.setSelected(element.getEventTarget(), true);
     }
@@ -72,7 +72,7 @@ export class RadioButton extends BaseActionElement {
    * @param isChecked True iff the element should be checked.
    */
   protected updateService_(isChecked: boolean): void {
-    let element = this.getElement();
+    const element = this.getElement();
     if (element !== null) {
       this.radioButtonService_.setSelected(element.getEventTarget(), isChecked);
     }

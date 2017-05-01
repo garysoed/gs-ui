@@ -84,10 +84,7 @@ export class FileService extends BaseListener {
     const promises = Arrays
         .of(files)
         .map((file: File) => {
-          return Promise.all(<[File, Promise<string>]> [
-            file,
-            this.processFile_(file),
-          ]);
+          return Promise.all([file, this.processFile_(file)]);
         })
         .asArray();
     const entries = await Promise.all(promises);

@@ -137,7 +137,7 @@ export class Main extends BaseDisposable {
     Injector.bindProvider(() => locationService, 'gs.LocationService');
 
     const injector = Injector.newInstance();
-    const themeService = <ThemeService> injector.getBoundValue('theming.ThemeService');
+    const themeService = injector.getBoundValue('theming.ThemeService') as ThemeService;
     themeService.initialize();
     return new Main(
         injector,

@@ -198,7 +198,7 @@ export class CodeInput extends BaseInput<string> {
     if (shadowRoot === null) {
       throw new Error('No shadow roots were found');
     }
-    this.editor_ = this.ace_.edit(<HTMLElement> shadowRoot.querySelector('#editor'));
+    this.editor_ = this.ace_.edit(shadowRoot.querySelector('#editor') as HTMLElement);
     this.editorValueBinder_.setEditor(this.editor_);
 
     this.editor_.setHighlightActiveLine(true);

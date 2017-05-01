@@ -28,7 +28,7 @@ export class OverlayService extends BaseListener {
         overlayContainerEl = this.document_.createElement('gs-overlay-container');
         this.document_.body.appendChild(overlayContainerEl);
       }
-      this.overlayContainerEl_ = ListenableDom.of(<HTMLElement> overlayContainerEl);
+      this.overlayContainerEl_ = ListenableDom.of(overlayContainerEl as HTMLElement);
       this.addDisposable(this.overlayContainerEl_);
     }
 
@@ -46,11 +46,11 @@ export class OverlayService extends BaseListener {
       overlayContainerEl: HTMLElement,
       anchorTarget: AnchorLocation,
       parentElement: HTMLElement): void {
-    let boundingRect = parentElement.getBoundingClientRect();
-    let parentScreenLeft = boundingRect.left;
-    let parentScreenTop = boundingRect.top;
+    const boundingRect = parentElement.getBoundingClientRect();
+    const parentScreenLeft = boundingRect.left;
+    const parentScreenTop = boundingRect.top;
 
-    let resolvedAnchorTarget = anchorTarget === AnchorLocation.AUTO ?
+    const resolvedAnchorTarget = anchorTarget === AnchorLocation.AUTO ?
         Anchors.resolveAutoLocation(
             parentScreenLeft + boundingRect.width / 2,
             parentScreenTop + boundingRect.height / 2,
@@ -106,8 +106,8 @@ export class OverlayService extends BaseListener {
       return Promise.resolve();
     }
 
-    let overlayContainerEl = this.getOverlayContainerEl_();
-    let anchorTargetWatcher = Interval.newInstance(OverlayService.ANCHOR_TARGET_INTERVAL_);
+    const overlayContainerEl = this.getOverlayContainerEl_();
+    const anchorTargetWatcher = Interval.newInstance(OverlayService.ANCHOR_TARGET_INTERVAL_);
     this.listenTo(
         anchorTargetWatcher,
         Interval.TICK_EVENT,

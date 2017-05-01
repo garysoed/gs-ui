@@ -10,8 +10,8 @@ export class Anchors {
    * @param windowEl The window element reference.
    */
   static resolveAutoLocation(x: number, y: number, windowEl: Window): AnchorLocation {
-    let normalizedX = x / windowEl.innerWidth;
-    let normalizedY = y / windowEl.innerHeight;
+    const normalizedX = x / windowEl.innerWidth;
+    const normalizedY = y / windowEl.innerHeight;
     if (normalizedX > 0.5) {
       if (normalizedY > 0.5) {
         return AnchorLocation.BOTTOM_RIGHT;

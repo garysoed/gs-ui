@@ -17,7 +17,7 @@ describe('tool.Switch', () => {
 
   describe('onGsValueChange_', () => {
     it('should set the select attribute correctly', () => {
-      let value = 'value';
+      const value = 'value';
       spyOn(switchEl['selectHook_'], 'set');
 
       switchEl['onGsValueChange_'](value);

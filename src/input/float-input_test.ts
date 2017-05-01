@@ -11,7 +11,7 @@ describe('input.FloatInput', () => {
   let input: FloatInput;
 
   beforeEach(() => {
-    let mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
+    const mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
     input = new FloatInput(mockThemeService);
     TestDispose.add(input);
   });

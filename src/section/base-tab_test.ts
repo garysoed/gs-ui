@@ -46,7 +46,7 @@ describe('section.BaseTab', () => {
 
       spyOn(tab.selectedTabHook_, 'set');
 
-      tab['onAction_'](<Event> {target: mockTarget});
+      tab['onAction_']({target: mockTarget} as Event);
 
       assert(tab.selectedTabHook_.set).to.haveBeenCalledWith(attribute);
       assert(mockTarget.getAttribute).to.haveBeenCalledWith('gs-tab-id');
@@ -300,7 +300,7 @@ describe('section.BaseTab', () => {
         await tab['updateHighlight_']();
         done.fail();
       } catch (e) {
-        assert(<string> e).to.match(/elements are found/);
+        assert(e as string).to.match(/elements are found/);
       }
     });
   });

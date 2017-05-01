@@ -138,7 +138,7 @@ describe('theming.ThemeService', () => {
       assert(mockParsedCss.querySelector).to.haveBeenCalledWith('style');
       assert(service['parser_'].parseFromString).to.haveBeenCalledWith(cssTemplate, 'text/html');
       assert(mockTemplates.getTemplate).to.haveBeenCalledWith('src/theming/global');
-      assert(<boolean> service['initialized_']).to.beTrue();
+      assert(service['initialized_'] as boolean).to.beTrue();
     });
 
     it('should not initialize again if called the second time', () => {

@@ -33,7 +33,7 @@ describe('routing.SimpleRouteFactory', () => {
 
   describe('getName', () => {
     it('should resolve with the correct name', async () => {
-      let name = await factory.getName();
+      const name = await factory.getName();
       assert(name).to.equal(NAME);
     });
   });

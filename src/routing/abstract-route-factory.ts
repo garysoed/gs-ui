@@ -66,9 +66,9 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
   private getMatchParams_(matches: {[key: string]: string}): CR {
     const currentMatchParams = this.getRelativeMatchParams_(matches);
     if (this.parent_ !== null) {
-      return <CR> Jsons.mixin(this.parent_.getMatchParams_(matches), currentMatchParams);
+      return Jsons.mixin(this.parent_.getMatchParams_(matches), currentMatchParams) as CR;
     } else {
-      return <CR> currentMatchParams;
+      return currentMatchParams as CR;
     }
   }
 

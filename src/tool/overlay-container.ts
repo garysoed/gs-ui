@@ -65,12 +65,12 @@ export class OverlayContainer extends BaseElement {
    * @return The anchor point based on the attribute set in the element.
    */
   private getAnchorPoint_(): AnchorLocation {
-    let element = this.getElement();
+    const element = this.getElement();
     if (element === null) {
       throw Error('No element found');
     }
-    let elementTarget = element.getEventTarget();
-    let anchorPoint = elementTarget['gsAnchorPoint'];
+    const elementTarget = element.getEventTarget();
+    const anchorPoint = elementTarget['gsAnchorPoint'];
     if (elementTarget['gsAnchorPoint'] !== AnchorLocation.AUTO) {
       return anchorPoint;
     } else {
@@ -85,8 +85,8 @@ export class OverlayContainer extends BaseElement {
    * Hides the menu container.
    */
   private hide_(): void {
-    let animate = OverlayContainer.HIDE_ANIMATION_.applyTo(this.containerEl_.getEventTarget());
-    let listenableAnimate = ListenableDom.of(animate);
+    const animate = OverlayContainer.HIDE_ANIMATION_.applyTo(this.containerEl_.getEventTarget());
+    const listenableAnimate = ListenableDom.of(animate);
     this.addDisposable(listenableAnimate);
 
     this.addDisposable(listenableAnimate.once(DomEvent.FINISH, this.onFinishAnimate_, this));
@@ -105,7 +105,7 @@ export class OverlayContainer extends BaseElement {
   private onFinishAnimate_(): void {
     this.rootEl_.getEventTarget().classList.remove(OverlayContainer.SHOW_CLASS_);
 
-    let element = this.getElement();
+    const element = this.getElement();
     if (element !== null) {
       element.dispatch(OverlayContainer.HIDE_EVENT, () => {});
     }
@@ -124,11 +124,11 @@ export class OverlayContainer extends BaseElement {
   private show_(): void {
     let contentHeight = 0;
     let contentWidth = 0;
-    let distributedNodes = this.contentEl_.getEventTarget().getDistributedNodes();
+    const distributedNodes = this.contentEl_.getEventTarget().getDistributedNodes();
     if (distributedNodes.length <= 0) {
       return;
     }
-    let distributedElement = distributedNodes[0];
+    const distributedElement = distributedNodes[0];
 
     // Temporarily displays the root element for measurement.
     Jsons.setTemporaryValue(
@@ -142,7 +142,7 @@ export class OverlayContainer extends BaseElement {
           contentWidth = distributedElement.clientWidth;
         });
 
-    let element = this.getElement();
+    const element = this.getElement();
     if (element !== null) {
       element.dispatch(
           OverlayContainer.SHOW_EVENT,
@@ -167,13 +167,13 @@ export class OverlayContainer extends BaseElement {
   @handle(null).attributeChange('gs-anchor-target-x', FloatParser)
   @handle(null).attributeChange('gs-anchor-target-y', FloatParser)
   private updateContent_(): void {
-    let element = this.getElement();
+    const element = this.getElement();
     if (element === null) {
       return;
     }
 
-    let anchorTargetX = element.getEventTarget()['gsAnchorTargetX'];
-    let anchorTargetY = element.getEventTarget()['gsAnchorTargetY'];
+    const anchorTargetX = element.getEventTarget()['gsAnchorTargetX'];
+    const anchorTargetY = element.getEventTarget()['gsAnchorTargetY'];
 
     if (anchorTargetX === null || anchorTargetY === null) {
       // Do nothing if the anchor target is not defined.
@@ -181,16 +181,16 @@ export class OverlayContainer extends BaseElement {
     }
 
     // Resets the location of the container.
-    let containerEl = this.containerEl_.getEventTarget();
+    const containerEl = this.containerEl_.getEventTarget();
     containerEl.style.top = '';
     containerEl.style.right = '';
     containerEl.style.bottom = '';
     containerEl.style.left = '';
 
-    let windowEl = this.windowEl_.getEventTarget();
-    let viewportHeight = windowEl.innerHeight;
-    let viewportWidth = windowEl.innerWidth;
-    let anchorPoint = this.getAnchorPoint_();
+    const windowEl = this.windowEl_.getEventTarget();
+    const viewportHeight = windowEl.innerHeight;
+    const viewportWidth = windowEl.innerWidth;
+    const anchorPoint = this.getAnchorPoint_();
 
     // Vertical offset
     switch (anchorPoint) {
@@ -226,11 +226,11 @@ export class OverlayContainer extends BaseElement {
     if (shadowRoot === null) {
       throw new Error('Shadow root not found');
     }
-    this.backdropEl_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('.backdrop'));
-    this.containerEl_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('.container'));
-    this.contentEl_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('content'));
+    this.backdropEl_ = ListenableDom.of(shadowRoot.querySelector('.backdrop') as HTMLElement);
+    this.containerEl_ = ListenableDom.of(shadowRoot.querySelector('.container') as HTMLElement);
+    this.contentEl_ = ListenableDom.of(shadowRoot.querySelector('content') as HTMLElement);
     this.document_ = ListenableDom.of(element.ownerDocument);
-    this.rootEl_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('.root'));
+    this.rootEl_ = ListenableDom.of(shadowRoot.querySelector('.root') as HTMLElement);
 
     this.addDisposable(
         this.backdropEl_,

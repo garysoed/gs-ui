@@ -135,7 +135,7 @@ describe('input.CodeInput', () => {
           .to.equal(shade);
       assert(HslColor.newInstance).to.haveBeenCalledWith(hue, saturation, distance);
       assert(Solve.findThreshold).to
-          .haveBeenCalledWith(Matchers.any(Spec), <any> Matchers.any(Function), true);
+          .haveBeenCalledWith(Matchers.any(Spec), Matchers.any(Function) as any, true);
 
       const spec = solveSpy.calls.argsFor(0)[0];
       assert(spec.getStart()).to.equal(0);
@@ -143,7 +143,7 @@ describe('input.CodeInput', () => {
       assert(spec.getEnd()).to.equal(1);
 
       spyOn(input, 'isHighContrast_').and.returnValue(true);
-      assert(<boolean> solveSpy.calls.argsFor(0)[1](testValue)).to.beTrue();
+      assert(solveSpy.calls.argsFor(0)[1](testValue) as boolean).to.beTrue();
       assert(input['isHighContrast_']).to
           .haveBeenCalledWith(testForeground, backgroundColor, idealContrast);
       assert(HslColor.newInstance).to.haveBeenCalledWith(hue, saturation, testValue);
@@ -173,7 +173,7 @@ describe('input.CodeInput', () => {
           .to.equal(shade);
       assert(HslColor.newInstance).to.haveBeenCalledWith(hue, saturation, distance);
       assert(Solve.findThreshold).to
-          .haveBeenCalledWith(Matchers.any(Spec), <any> Matchers.any(Function), false);
+          .haveBeenCalledWith(Matchers.any(Spec), Matchers.any(Function) as any, false);
     });
 
     it('should throw error if the shade cannot be computed', () => {

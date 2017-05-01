@@ -109,47 +109,47 @@ describe('section.Drawer', () => {
 
   describe('onIsExpandedChanged_', () => {
     it('should add the expanded class name if set to true', () => {
-      let existingClassName = 'existingClassName';
+      const existingClassName = 'existingClassName';
 
       spyOn(drawer['classListHook_'], 'get').and.returnValue(new Set([existingClassName]));
-      let bridgeSetSpy = spyOn(drawer['classListHook_'], 'set');
+      const bridgeSetSpy = spyOn(drawer['classListHook_'], 'set');
 
       drawer['onIsExpandedChanged_'](true);
 
       assert(drawer['classListHook_'].set).to.haveBeenCalledWith(Matchers.any(Set));
-      assert(<Set<string>> bridgeSetSpy.calls.argsFor(0)[0]).to
+      assert(bridgeSetSpy.calls.argsFor(0)[0] as Set<string>).to
           .haveElements([existingClassName, 'expanded']);
     });
 
     it('should remove the expanded class name if set to false', () => {
-      let existingClassName = 'existingClassName';
+      const existingClassName = 'existingClassName';
 
       spyOn(drawer['classListHook_'], 'get').and
           .returnValue(new Set([existingClassName, 'expanded']));
-      let bridgeSetSpy = spyOn(drawer['classListHook_'], 'set');
+      const bridgeSetSpy = spyOn(drawer['classListHook_'], 'set');
 
       drawer['onIsExpandedChanged_'](false);
 
       assert(drawer['classListHook_'].set).to.haveBeenCalledWith(Matchers.any(Set));
-      assert(<Set<string>> bridgeSetSpy.calls.argsFor(0)[0]).to .haveElements([existingClassName]);
+      assert(bridgeSetSpy.calls.argsFor(0)[0] as Set<string>).to.haveElements([existingClassName]);
     });
 
     it('should handle the case where there is no set of class lists', () => {
       spyOn(drawer['classListHook_'], 'get').and.returnValue(null);
-      let bridgeSetSpy = spyOn(drawer['classListHook_'], 'set');
+      const bridgeSetSpy = spyOn(drawer['classListHook_'], 'set');
 
       drawer['onIsExpandedChanged_'](true);
 
       assert(drawer['classListHook_'].set).to.haveBeenCalledWith(Matchers.any(Set));
-      assert(<Set<string>> bridgeSetSpy.calls.argsFor(0)[0]).to
+      assert(bridgeSetSpy.calls.argsFor(0)[0] as Set<string>).to
           .haveElements(['expanded']);
     });
   });
 
   describe('onMinWidthChanged_', () => {
     it('should set the collapsed width correctly', () => {
-      let width = 'width';
-      let mockStyle = jasmine.createSpyObj('Style', ['setProperty']);
+      const width = 'width';
+      const mockStyle = jasmine.createSpyObj('Style', ['setProperty']);
 
       spyOn(drawer['rootStyleHook_'], 'get').and.returnValue(mockStyle);
 
@@ -169,8 +169,8 @@ describe('section.Drawer', () => {
 
   describe('onMaxWidthChanged_', () => {
     it('should set the expanded width correctly', () => {
-      let width = 'width';
-      let mockStyle = jasmine.createSpyObj('Style', ['setProperty']);
+      const width = 'width';
+      const mockStyle = jasmine.createSpyObj('Style', ['setProperty']);
 
       spyOn(drawer['rootStyleHook_'], 'get').and.returnValue(mockStyle);
 

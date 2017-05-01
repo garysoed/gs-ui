@@ -48,10 +48,10 @@ export class ViewSlot extends BaseThemedElement {
    *    deactivate all elements.
    */
   setActiveElement_(targetEl: Element | null): void {
-    let listenableElement = this.getElement();
+    const listenableElement = this.getElement();
     if (listenableElement !== null) {
-      let element = listenableElement.getEventTarget();
-      let currentActive = element
+      const element = listenableElement.getEventTarget();
+      const currentActive = element
           .querySelector(`[gs-view-active="${BooleanParser.stringify(true)}"]`);
       if (currentActive !== null) {
         currentActive.setAttribute('gs-view-active', BooleanParser.stringify(false));
@@ -79,13 +79,13 @@ export class ViewSlot extends BaseThemedElement {
    * Updates the selector.
    */
   private updateActiveView_(): void {
-    let listenableElement = this.getElement();
+    const listenableElement = this.getElement();
     if (listenableElement !== null) {
-      let element = listenableElement.getEventTarget();
-      let targetEl = Arrays
+      const element = listenableElement.getEventTarget();
+      const targetEl = Arrays
           .fromItemList(element.children)
           .find((child: Element) => {
-            let path = child.getAttribute('gs-view-path');
+            const path = child.getAttribute('gs-view-path');
             return !!path && this.locationService_
                 .hasMatch(LocationService.appendParts([element[__FULL_PATH], path]));
           });

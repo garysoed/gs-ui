@@ -18,7 +18,7 @@ export const AnchorLocationParser: Parser<AnchorLocation> = {
     if (stringValue === null) {
       return null;
     }
-    let parsedValue = Enums.fromLowerCaseString<AnchorLocation>(stringValue!, AnchorLocation);
+    const parsedValue = Enums.fromLowerCaseString<AnchorLocation>(stringValue!, AnchorLocation);
     return parsedValue === undefined ? null : parsedValue;
   },
 

@@ -201,7 +201,7 @@ describe('tool.OverlayContainer', () => {
                 'style.display': 'block',
                 'style.visibility': 'hidden',
               },
-              <any> Matchers.any(Function));
+              Matchers.any(Function) as any);
         });
 
     it('should do nothing if the distributed element cannot be found', () => {

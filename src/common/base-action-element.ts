@@ -12,7 +12,7 @@ export class BaseActionElement extends BaseThemedElement {
    */
   @handle(null).event(DomEvent.CLICK)
   protected onClick_(): void {
-    let element = this.getElement();
+    const element = this.getElement();
     if (!this.isDisabled() && element !== null) {
       element.dispatch(Event.ACTION, () => {});
     }
@@ -22,7 +22,7 @@ export class BaseActionElement extends BaseThemedElement {
    * @return True iff the element is disabled.
    */
   isDisabled(): boolean {
-    let element = this.getElement();
+    const element = this.getElement();
     return element === null || element.getEventTarget().getAttribute('disabled') !== null;
   }
 }

@@ -35,7 +35,7 @@ export abstract class BaseTab extends BaseThemedElement {
   }
 
   private onAction_(event: Event): void {
-    const target = <HTMLElement> event.target;
+    const target = event.target as HTMLElement;
     this.selectedTabHook_.set(target.getAttribute('gs-tab-id') || '');
   }
 
@@ -129,9 +129,10 @@ export abstract class BaseTab extends BaseThemedElement {
       throw new Error('Cannot find shadow root');
     }
     this.highlightContainerEl_ = ListenableDom
-        .of(<HTMLElement> shadowRoot.querySelector('.highlight-container'));
-    this.highlightEl_ = <HTMLElement> shadowRoot.querySelector('.highlight');
-    this.tabContainer_ = ListenableDom.of(<HTMLElement> shadowRoot.querySelector('.tab-container'));
+        .of(shadowRoot.querySelector('.highlight-container') as HTMLElement);
+    this.highlightEl_ = shadowRoot.querySelector('.highlight') as HTMLElement;
+    this.tabContainer_ = ListenableDom
+        .of(shadowRoot.querySelector('.tab-container') as HTMLElement);
 
     this.listenTo(this.interval_, Interval.TICK_EVENT, this.onTick_);
     this.interval_.start();

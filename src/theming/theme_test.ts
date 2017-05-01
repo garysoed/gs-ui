@@ -727,7 +727,7 @@ describe('theming.Theme', () => {
       const createShadeSpy = spyOn(Theme, 'createShade_').and.returnValue(shade);
       assert(theme.getActionDarkest(true)).to.equal(shade);
       assert(Theme['createShade_']).to.haveBeenCalledWith(accent, Matchers.anyThing(), true);
-      assert(<number> createShadeSpy.calls.argsFor(0)[1]).to.beCloseTo(0.1, 0.01);
+      assert(createShadeSpy.calls.argsFor(0)[1] as number).to.beCloseTo(0.1, 0.01);
     });
   });
 
@@ -844,7 +844,7 @@ describe('theming.Theme', () => {
       assert(Colors.mix).to.haveBeenCalledWith(foreground, background, alpha);
       assert(Solve.findThreshold).to.haveBeenCalledWith(
           Matchers.any(Spec),
-          <any> Matchers.any(Function),
+          Matchers.any(Function) as any,
           false);
       assert(spySolve.calls.argsFor(0)[0].getStart()).to.equal(0);
       assert(spySolve.calls.argsFor(0)[0].getDelta()).to.equal(0.1);
@@ -852,7 +852,7 @@ describe('theming.Theme', () => {
 
       const testAlpha = 0.56;
       spyOn(Theme, 'isHighContrastForegroundAlpha_').and.returnValue(true);
-      assert(<boolean> spySolve.calls.argsFor(0)[1](testAlpha)).to.beTrue();
+      assert(spySolve.calls.argsFor(0)[1](testAlpha) as boolean).to.beTrue();
       assert(Theme['isHighContrastForegroundAlpha_']).to.haveBeenCalledWith(
           foreground,
           background,
@@ -909,7 +909,7 @@ describe('theming.Theme', () => {
 
       const testValue = 0.06;
       spyOn(Theme, 'isHighContrastAction_').and.returnValue(true);
-      assert(<boolean> spySolve.calls.argsFor(1)[1](testValue)).to.beTrue();
+      assert(spySolve.calls.argsFor(1)[1](testValue) as boolean).to.beTrue();
       assert(Theme['isHighContrastAction_']).to.haveBeenCalledWith(
           testValue,
           contrast,
@@ -925,7 +925,7 @@ describe('theming.Theme', () => {
       assert(spySolve.calls.argsFor(0)[0].getDelta()).to.equal(0.01);
       assert(spySolve.calls.argsFor(0)[0].getEnd()).to.equal(0.5);
 
-      assert(<boolean> spySolve.calls.argsFor(0)[1](testValue)).to.beTrue();
+      assert(spySolve.calls.argsFor(0)[1](testValue) as boolean).to.beTrue();
       assert(Theme['isHighContrastBase_']).to.haveBeenCalledWith(testValue, contrast, base);
     });
 

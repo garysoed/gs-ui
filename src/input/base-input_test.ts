@@ -41,7 +41,7 @@ describe('input.BaseInput', () => {
 
   describe('onGsValueChange_', () => {
     it('should update the input target value', () => {
-      let value = 'value';
+      const value = 'value';
       mockValueHook.get.and.returnValue(null);
 
       input['onGsValueChange_'](value);
@@ -50,7 +50,7 @@ describe('input.BaseInput', () => {
     });
 
     it('should not update the input value if it is the same', () => {
-      let value = 'value';
+      const value = 'value';
       mockValueHook.get.and.returnValue(value);
 
       input['onGsValueChange_'](value);
@@ -61,7 +61,7 @@ describe('input.BaseInput', () => {
 
   describe('onDisabledChange_', () => {
     it('should set the value to the input element', () => {
-      let value = true;
+      const value = true;
       spyOn(input['inputDisabledHook_'], 'set');
       input['onDisabledChange_'](value);
       assert(input['inputDisabledHook_'].set).to.haveBeenCalledWith(value);
@@ -70,13 +70,13 @@ describe('input.BaseInput', () => {
 
   describe('onInputTick_', () => {
     it('should set the new value and dispatch a CHANGE event', () => {
-      let oldValue = 'oldValue';
+      const oldValue = 'oldValue';
       mockGsValueHook.get.and.returnValue(oldValue);
 
-      let value = 'value';
+      const value = 'value';
       mockValueHook.get.and.returnValue(value);
 
-      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+      const mockElement = jasmine.createSpyObj('Element', ['dispatch']);
 
       spyOn(input, 'getElement').and.returnValue(mockElement);
 
@@ -87,11 +87,11 @@ describe('input.BaseInput', () => {
     });
 
     it('should not set the new value if the value does not change', () => {
-      let value = 'value';
+      const value = 'value';
       mockValueHook.get.and.returnValue(value);
       mockGsValueHook.get.and.returnValue(value);
 
-      let mockElement = jasmine.createSpyObj('Element', ['dispatch']);
+      const mockElement = jasmine.createSpyObj('Element', ['dispatch']);
 
       spyOn(input, 'getElement').and.returnValue(mockElement);
 
@@ -102,7 +102,7 @@ describe('input.BaseInput', () => {
     });
 
     it('should not dispatch event if there are no elements', () => {
-      let value = 'value';
+      const value = 'value';
       mockValueHook.get.and.returnValue(value);
       mockGsValueHook.get.and.returnValue('oldValue');
 

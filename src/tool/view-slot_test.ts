@@ -37,15 +37,15 @@ describe('tool.ViewSlot', () => {
 
   describe('setActiveElement_', () => {
     it('should deactivate the currently active element and activates the target element', () => {
-      let mockCurrentActiveEl = jasmine.createSpyObj('CurrentActiveEl', ['setAttribute']);
-      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      const mockCurrentActiveEl = jasmine.createSpyObj('CurrentActiveEl', ['setAttribute']);
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(mockCurrentActiveEl);
 
-      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
+      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
       mockListenableElement.getEventTarget.and.returnValue(mockElement);
       spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
 
-      let mockTargetElement = jasmine.createSpyObj('TargetElement', ['setAttribute']);
+      const mockTargetElement = jasmine.createSpyObj('TargetElement', ['setAttribute']);
 
       viewSlot['setActiveElement_'](mockTargetElement);
 
@@ -55,11 +55,11 @@ describe('tool.ViewSlot', () => {
     });
 
     it('should deactive the currently active element if target element is null', () => {
-      let mockCurrentActiveEl = jasmine.createSpyObj('CurrentActiveEl', ['setAttribute']);
-      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      const mockCurrentActiveEl = jasmine.createSpyObj('CurrentActiveEl', ['setAttribute']);
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(mockCurrentActiveEl);
 
-      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
+      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
       mockListenableElement.getEventTarget.and.returnValue(mockElement);
       spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
 
@@ -70,10 +70,10 @@ describe('tool.ViewSlot', () => {
     });
 
     it('should not throw error if there are no current active element', () => {
-      let mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+      const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(null);
 
-      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
+      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
       mockListenableElement.getEventTarget.and.returnValue(mockElement);
       spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
 
@@ -114,26 +114,26 @@ describe('tool.ViewSlot', () => {
 
   describe('updateActiveView_', () => {
     it('should set the correct target element to active', () => {
-      let fullPath = 'fullPath';
-      let children = Mocks.object('children');
-      let element = Mocks.object('element');
+      const fullPath = 'fullPath';
+      const children = Mocks.object('children');
+      const element = Mocks.object('element');
       element.children = children;
       element[__FULL_PATH] = fullPath;
 
-      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
+      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
       mockListenableElement.getEventTarget.and.returnValue(element);
       spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
 
-      let path = 'path';
-      let mockChildWithPath = jasmine.createSpyObj('ChildWithPath', ['getAttribute']);
+      const path = 'path';
+      const mockChildWithPath = jasmine.createSpyObj('ChildWithPath', ['getAttribute']);
       mockChildWithPath.getAttribute.and.returnValue(path);
 
-      let mockChildNoPath = jasmine.createSpyObj('ChildNoPath', ['getAttribute']);
+      const mockChildNoPath = jasmine.createSpyObj('ChildNoPath', ['getAttribute']);
       mockChildNoPath.getAttribute.and.returnValue(null);
       spyOn(Arrays, 'fromItemList').and
           .returnValue(Arrays.of([mockChildNoPath, mockChildWithPath]));
 
-      let appendedPath = 'appendedPath';
+      const appendedPath = 'appendedPath';
       spyOn(LocationService, 'appendParts').and.returnValue(appendedPath);
 
       mockLocationService.hasMatch = jasmine.createSpy('LocationService.hasMatch').and
@@ -155,14 +155,14 @@ describe('tool.ViewSlot', () => {
     });
 
     it('should set no elements to active if there are no active elements', () => {
-      let element = Mocks.object('element');
+      const element = Mocks.object('element');
       element.children = Mocks.object('children');
 
-      let mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
+      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
       mockListenableElement.getEventTarget.and.returnValue(element);
       spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
 
-      let mockChild = jasmine.createSpyObj('Child', ['getAttribute']);
+      const mockChild = jasmine.createSpyObj('Child', ['getAttribute']);
       mockChild.getAttribute.and.returnValue(null);
       spyOn(Arrays, 'fromItemList').and.returnValue(Arrays.of([mockChild]));
 
@@ -186,12 +186,12 @@ describe('tool.ViewSlot', () => {
 
   describe('onCreated', () => {
     it('should get the reference to the root element', () => {
-      let rootEl = Mocks.object('rootEl');
-      let mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
+      const rootEl = Mocks.object('rootEl');
+      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(rootEl);
       spyOn(viewSlot, 'listenTo');
 
-      viewSlot.onCreated(<HTMLElement> {shadowRoot: mockShadowRoot});
+      viewSlot.onCreated({shadowRoot: mockShadowRoot} as HTMLElement);
       assert(viewSlot.listenTo).to.haveBeenCalledWith(
           mockLocationService,
           LocationServiceEvents.CHANGED,
@@ -201,17 +201,17 @@ describe('tool.ViewSlot', () => {
 
   describe('onInserted', () => {
     it('should assign the full path correctly', () => {
-      let element = Mocks.object('element');
-      let rootPath = 'rootPath';
-      let rootElement = Mocks.object('rootElement');
+      const element = Mocks.object('element');
+      const rootPath = 'rootPath';
+      const rootElement = Mocks.object('rootElement');
       rootElement[__FULL_PATH] = rootPath;
       rootElement.nodeName = 'GS-VIEW-SLOT';
 
-      let currentPath = 'currentPath';
-      let mockPathElement = jasmine.createSpyObj('PathElement', ['getAttribute']);
+      const currentPath = 'currentPath';
+      const mockPathElement = jasmine.createSpyObj('PathElement', ['getAttribute']);
       mockPathElement.getAttribute.and.returnValue(currentPath);
 
-      let appendedPath = 'appendedPath';
+      const appendedPath = 'appendedPath';
       spyOn(LocationService, 'appendParts').and.returnValue(appendedPath);
 
       spyOn(Doms, 'parentIterable').and.returnValue([mockPathElement, rootElement]);
@@ -227,8 +227,8 @@ describe('tool.ViewSlot', () => {
     });
 
     it('should assign the path to "/" if there are no current path or root path', () => {
-      let element = Mocks.object('element');
-      let appendedPath = 'appendedPath';
+      const element = Mocks.object('element');
+      const appendedPath = 'appendedPath';
       spyOn(LocationService, 'appendParts').and.returnValue(appendedPath);
 
       spyOn(Doms, 'parentIterable').and.returnValue([]);

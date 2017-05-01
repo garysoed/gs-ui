@@ -52,7 +52,7 @@ export class Menu extends BaseElement {
     if (parentElement === null) {
       throw new Error('No parent element found');
     }
-    const menuContent = <HTMLElement> elementTarget.querySelector('[gs-content]');
+    const menuContent = elementTarget.querySelector('[gs-content]') as HTMLElement;
 
     if (!!this.gsFitParentWidthHook_.get()) {
       menuContent.style.width = `${parentElement.clientWidth}px`;
@@ -81,7 +81,7 @@ export class Menu extends BaseElement {
     if (parentElement === null) {
       throw new Error('Parent element not found');
     }
-    this.menuRoot_ = <HTMLElement> shadowRoot.querySelector('.root');
+    this.menuRoot_ = shadowRoot.querySelector('.root') as HTMLElement;
 
     const listenableParentElement = ListenableDom.of(parentElement);
     this.addDisposable(listenableParentElement);

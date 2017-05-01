@@ -53,14 +53,14 @@ describe('common.BaseActionElement', () => {
 
   describe('isDisabled', () => {
     it('should return true if the element is disabled', () => {
-      let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
+      const mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
       mockEventTarget.getAttribute.and.returnValue('');
       spyOn(actionElement, 'getElement').and.returnValue({getEventTarget: () => mockEventTarget});
       assert(actionElement.isDisabled()).to.beTrue();
     });
 
     it('should return false if the element is not disabled', () => {
-      let mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
+      const mockEventTarget = jasmine.createSpyObj('EventTarget', ['getAttribute']);
       mockEventTarget.getAttribute.and.returnValue(null);
       spyOn(actionElement, 'getElement').and.returnValue({getEventTarget: () => mockEventTarget});
       assert(actionElement.isDisabled()).to.beFalse();

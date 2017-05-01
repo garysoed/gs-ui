@@ -16,8 +16,8 @@ describe('section.HorizontalTab', () => {
 
   describe('getAnimationKeyframe', () => {
     it('should return the correct keyframe', () => {
-      let start = 123;
-      let length = 456;
+      const start = 123;
+      const length = 456;
       assert(tab.getAnimationKeyframe(start, length)).to
           .equal({top: `${start}px`, height: `${length}px`});
     });
@@ -25,8 +25,8 @@ describe('section.HorizontalTab', () => {
 
   describe('getLength', () => {
     it('should return the correct height', () => {
-      let height = 123;
-      let element = Mocks.object('element');
+      const height = 123;
+      const element = Mocks.object('element');
       element.clientHeight = height;
       assert(tab.getLength(element)).to.equal(height);
     });
@@ -34,8 +34,8 @@ describe('section.HorizontalTab', () => {
 
   describe('getStartPosition', () => {
     it('should return the offsetTop', () => {
-      let top = 123;
-      let element = Mocks.object('element');
+      const top = 123;
+      const element = Mocks.object('element');
       element.offsetTop = top;
       assert(tab.getStartPosition(element)).to.equal(top);
     });
@@ -43,9 +43,9 @@ describe('section.HorizontalTab', () => {
 
   describe('setHighlightEl', () => {
     it('should set the left and width correctly', () => {
-      let start = 123;
-      let length = 456;
-      let style = Mocks.object('style');
+      const start = 123;
+      const length = 456;
+      const style = Mocks.object('style');
       tab.setHighlightEl(start, length, {style});
       assert(style).to.equal({top: `${start}px`, height: `${length}px`});
     });

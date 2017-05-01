@@ -62,7 +62,7 @@ export class FileInput extends BaseThemedElement {
    * @return Files that have been attached, or null if there are none.
    */
   private getFiles_(): File[] | null {
-    let bundleId = this.gsBundleIdHook_.get();
+    const bundleId = this.gsBundleIdHook_.get();
     if (bundleId === null) {
       return null;
     }
@@ -75,12 +75,12 @@ export class FileInput extends BaseThemedElement {
    * @return True iff the given data transfer object is valid.
    */
   private isValid_(dataTransfer: DataTransfer): boolean {
-    let mimeTypesArray = this.gsMimeTypesHook_.get();
+    const mimeTypesArray = this.gsMimeTypesHook_.get();
     if (mimeTypesArray === null) {
       return true;
     }
 
-    let mimeTypesSet = new Set(mimeTypesArray);
+    const mimeTypesSet = new Set(mimeTypesArray);
     return Arrays
         .fromNumericIndexable(dataTransfer.items)
         .every((item: DataTransferItem) => {
@@ -112,7 +112,7 @@ export class FileInput extends BaseThemedElement {
   protected onDragLeave_(): void {
     this.dragDepth_--;
     if (this.dragDepth_ <= 0) {
-      let files = this.getFiles_();
+      const files = this.getFiles_();
       if (files === null || files.length <= 0) {
         this.switchGsValueHook_.set('initial');
       } else {
@@ -131,7 +131,7 @@ export class FileInput extends BaseThemedElement {
         this.deleteBundleFn_();
       }
 
-      let {id, deleteFn} =
+      const {id, deleteFn} =
           this.fileService_.addBundle(Arrays.fromItemList(event.dataTransfer.files).asArray());
       this.deleteBundleFn_ = deleteFn;
       this.gsBundleIdHook_.set(id);
@@ -146,7 +146,7 @@ export class FileInput extends BaseThemedElement {
       this.deleteBundleFn_();
     }
 
-    let files = this.getFiles_();
+    const files = this.getFiles_();
     if (files === null) {
       this.switchGsValueHook_.set('initial');
       return;
@@ -155,7 +155,7 @@ export class FileInput extends BaseThemedElement {
     this.switchGsValueHook_.set('dropped');
 
     // TODO: sort the file names.
-    let fileNames = Arrays
+    const fileNames = Arrays
         .of(files)
         .map((file: File) => {
           return file.name;
