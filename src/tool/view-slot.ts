@@ -18,10 +18,10 @@ export const __FULL_PATH = Symbol('fullPath');
   templateKey: 'src/tool/view-slot',
 })
 export class ViewSlot extends BaseThemedElement {
-  private readonly locationService_: LocationService;
-
   @hook('#root').property('classList')
   readonly rootElClassListHook_: DomHook<DOMTokenList>;
+
+  private readonly locationService_: LocationService;
   private path_: string | null;
 
   /**
@@ -41,26 +41,6 @@ export class ViewSlot extends BaseThemedElement {
    */
   private onLocationChanged_(): void {
     this.updateActiveView_();
-  }
-
-  /**
-   * @param targetEl The element to be set as the active element, if any. If null, this will
-   *    deactivate all elements.
-   */
-  setActiveElement_(targetEl: Element | null): void {
-    const listenableElement = this.getElement();
-    if (listenableElement !== null) {
-      const element = listenableElement.getEventTarget();
-      const currentActive = element
-          .querySelector(`[gs-view-active="${BooleanParser.stringify(true)}"]`);
-      if (currentActive !== null) {
-        currentActive.setAttribute('gs-view-active', BooleanParser.stringify(false));
-      }
-    }
-
-    if (targetEl !== null) {
-      targetEl.setAttribute('gs-view-active', BooleanParser.stringify(true));
-    }
   }
 
   /**
@@ -128,5 +108,25 @@ export class ViewSlot extends BaseThemedElement {
     element[__FULL_PATH] = LocationService.appendParts([rootPath, currentPath]);
 
     this.updateActiveView_();
+  }
+
+  /**
+   * @param targetEl The element to be set as the active element, if any. If null, this will
+   *    deactivate all elements.
+   */
+  setActiveElement_(targetEl: Element | null): void {
+    const listenableElement = this.getElement();
+    if (listenableElement !== null) {
+      const element = listenableElement.getEventTarget();
+      const currentActive = element
+          .querySelector(`[gs-view-active="${BooleanParser.stringify(true)}"]`);
+      if (currentActive !== null) {
+        currentActive.setAttribute('gs-view-active', BooleanParser.stringify(false));
+      }
+    }
+
+    if (targetEl !== null) {
+      targetEl.setAttribute('gs-view-active', BooleanParser.stringify(true));
+    }
   }
 }

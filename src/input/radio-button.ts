@@ -21,10 +21,10 @@ import { ThemeService } from '../theming/theme-service';
   templateKey: 'src/input/radio-button',
 })
 export class RadioButton extends BaseActionElement {
+  protected radioButtonService_: RadioButtonService;
+
   @hook(null).attribute('gs-checked', BooleanParser)
   private gsCheckedHook_: DomHook<boolean>;
-
-  protected radioButtonService_: RadioButtonService;
 
   constructor(
       @inject('input.RadioButtonService') radioButtonService: RadioButtonService,

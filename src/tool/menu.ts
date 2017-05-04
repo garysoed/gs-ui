@@ -29,8 +29,8 @@ export class Menu extends BaseElement {
   @hook(null).attribute('gs-fit-parent-width', BooleanParser)
   private readonly gsFitParentWidthHook_: DomHook<boolean>;
 
-  private readonly overlayService_: OverlayService;
   private menuRoot_: HTMLElement;
+  private readonly overlayService_: OverlayService;
 
   constructor(@inject('gs.tool.OverlayService') overlayService: OverlayService) {
     super();

@@ -24,6 +24,14 @@ import { FileService } from '../input/file-service';
   templateKey: 'src/input/file-input',
 })
 export class FileInput extends BaseThemedElement {
+  private deleteBundleFn_: (() => void) | null;
+  private dragDepth_: number;
+
+  @hook('#droppedMessage').innerText()
+  private readonly droppedMessageInnerTextHook_: DomHook<string>;
+
+  private readonly fileService_: FileService;
+
   @hook(null).attribute('gs-bundle-id', StringParser)
   private readonly gsBundleIdHook_: DomHook<string>;
 
@@ -33,16 +41,8 @@ export class FileInput extends BaseThemedElement {
   @hook('#initialMessage').innerText()
   private readonly initialMessageInnerTextHook_: DomHook<string>;
 
-  @hook('#droppedMessage').innerText()
-  private readonly droppedMessageInnerTextHook_: DomHook<string>;
-
   @hook('#switch').attribute('gs-value', StringParser)
   private readonly switchGsValueHook_: DomHook<string>;
-
-  private readonly fileService_: FileService;
-
-  private deleteBundleFn_: (() => void) | null;
-  private dragDepth_: number;
 
   constructor(
       @inject('gs.input.FileService') fileService: FileService,
@@ -88,14 +88,6 @@ export class FileInput extends BaseThemedElement {
         });
   }
 
-  @handle('#root').event(DomEvent.DRAGOVER)
-  protected onDragover_(event: DragEvent): void {
-    event.preventDefault();
-    if (this.isValid_(event.dataTransfer)) {
-      event.dataTransfer.dropEffect = 'copy';
-    }
-  }
-
   @handle('#root').event(DomEvent.DRAGENTER)
   protected onDragEnter_(event: DragEvent): void {
     this.dragDepth_++;
@@ -118,6 +110,14 @@ export class FileInput extends BaseThemedElement {
       } else {
         this.switchGsValueHook_.set('dropped');
       }
+    }
+  }
+
+  @handle('#root').event(DomEvent.DRAGOVER)
+  protected onDragover_(event: DragEvent): void {
+    event.preventDefault();
+    if (this.isValid_(event.dataTransfer)) {
+      event.dataTransfer.dropEffect = 'copy';
     }
   }
 

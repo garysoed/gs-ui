@@ -14,10 +14,10 @@ import { OverlayService } from '../tool/overlay-service';
   templateKey: 'src/tool/menu-item',
 })
 export class MenuItem extends BaseThemedElement {
+  private readonly menuService_: OverlayService;
+
   @hook('#content').innerText()
   private readonly nameHook_: DomHook<string>;
-
-  private readonly menuService_: OverlayService;
 
   constructor(
       @inject('theming.ThemeService') themeService: ThemeService,
@@ -27,13 +27,13 @@ export class MenuItem extends BaseThemedElement {
     this.nameHook_ = DomHook.of<string>();
   }
 
-  @handle(null).attributeChange('gs-content', StringParser)
-  protected onDataAttributeChange_(newContent: string): void {
-    this.nameHook_.set(newContent);
-  }
-
   @handle(null).event(DomEvent.CLICK)
   protected onClicked_(): void {
     this.menuService_.hideOverlay();
+  }
+
+  @handle(null).attributeChange('gs-content', StringParser)
+  protected onDataAttributeChange_(newContent: string): void {
+    this.nameHook_.set(newContent);
   }
 }

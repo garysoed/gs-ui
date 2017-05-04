@@ -14,8 +14,8 @@ import { Route } from '../routing/route';
  * @param <PR> Full parameters of the parent path. CR = CP & CR.
  */
 export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
-  protected readonly type_: T;
   protected readonly parent_: AbstractRouteFactory<T, any, PR, any> | null;
+  protected readonly type_: T;
 
   /**
    * @param type Type of the route factory.
@@ -26,25 +26,6 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
     this.type_ = type;
     this.parent_ = parent;
   }
-
-  /**
-   * @param matches The key value of matches from the path.
-   * @return Parsed object containing the matches that this factory can recognize.
-   */
-  protected abstract getRelativeMatchParams_(matches: {[key: string]: string}): CP;
-
-  /**
-   * @return Matcher string for this route factory. This should exclude matchers for the parent
-   *    factories.
-   */
-  protected abstract getRelativeMatcher_(): string;
-
-  /**
-   * @param params Params to create the path.
-   * @return Path created using the given params. This path is not prefixed by the path created
-   *    by the ancestors.
-   */
-  protected abstract getRelativePath_(params: CP): string;
 
   /**
    * @return The full matcher for this factory.
@@ -71,6 +52,25 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
       return currentMatchParams as CR;
     }
   }
+
+  /**
+   * @return Matcher string for this route factory. This should exclude matchers for the parent
+   *    factories.
+   */
+  protected abstract getRelativeMatcher_(): string;
+
+  /**
+   * @param matches The key value of matches from the path.
+   * @return Parsed object containing the matches that this factory can recognize.
+   */
+  protected abstract getRelativeMatchParams_(matches: {[key: string]: string}): CP;
+
+  /**
+   * @param params Params to create the path.
+   * @return Path created using the given params. This path is not prefixed by the path created
+   *    by the ancestors.
+   */
+  protected abstract getRelativePath_(params: CP): string;
 
   /**
    * @param params Params to create the path.

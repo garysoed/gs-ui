@@ -3,9 +3,8 @@ import { bind, inject } from 'external/gs_tools/src/inject';
 
 @bind('gs.tool.DownloadService')
 export class DownloadService {
-  private readonly window_: Window;
-
   private linkEl_: HTMLAnchorElement | null;
+  private readonly window_: Window;
 
   constructor(@inject('x.dom.window') window: Window) {
     this.linkEl_ = null;
@@ -20,6 +19,20 @@ export class DownloadService {
    */
   private createBlob_(parts: any[], options: BlobPropertyBag): Blob {
     return new Blob(parts, options);
+  }
+
+  /**
+   * @return The link element used for downloading.
+   */
+  private getLinkEl_(): HTMLAnchorElement {
+    if (this.linkEl_ !== null) {
+      return this.linkEl_;
+    }
+
+    const linkEl = this.window_.document.createElement('a');
+    linkEl.target = '_blank';
+    this.linkEl_ = linkEl;
+    return linkEl;
   }
 
   /**
@@ -46,19 +59,5 @@ export class DownloadService {
         [JSON.stringify(json, null)],
         {type: 'application/json'});
     this.download(blob, filename);
-  }
-
-  /**
-   * @return The link element used for downloading.
-   */
-  private getLinkEl_(): HTMLAnchorElement {
-    if (this.linkEl_ !== null) {
-      return this.linkEl_;
-    }
-
-    const linkEl = this.window_.document.createElement('a');
-    linkEl.target = '_blank';
-    this.linkEl_ = linkEl;
-    return linkEl;
   }
 }

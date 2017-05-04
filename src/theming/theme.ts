@@ -33,6 +33,88 @@ export class Theme {
     this.contrast_ = contrast;
   }
 
+  getAccent(): Color {
+    return this.accent_;
+  }
+
+  getAccentHue(): Color {
+    return this.accent_;
+  }
+
+  @cache()
+  getAction(): Color {
+    return Theme.createShade_(this.accent_, 0.5, true);
+  }
+
+  @cache()
+  getActionDark(reverseMode: boolean): Color {
+    return Theme.createShade_(this.accent_, 0.5 - this.actionDistance_, reverseMode);
+  }
+
+  @cache()
+  getActionDarkest(reverseMode: boolean): Color {
+    return Theme.createShade_(this.accent_, 0.5 - this.actionDistance_ * 2, reverseMode);
+  }
+
+  @cache()
+  getActionLight(reverseMode: boolean): Color {
+    return Theme.createShade_(this.accent_, 0.5 + this.actionDistance_, reverseMode);
+  }
+
+  @cache()
+  getActionLightest(reverseMode: boolean): Color {
+    return Theme.createShade_(this.accent_, 0.5 + this.actionDistance_ * 2, reverseMode);
+  }
+
+  @cache()
+  getBase(): Color {
+    return Theme.createShade_(this.base_, 0.5, true);
+  }
+
+  @cache()
+  getBaseDark(reverseMode: boolean): Color {
+    return Theme.createShade_(this.base_, 0.5 - this.baseDistance_, reverseMode);
+  }
+
+  @cache()
+  getBaseDarkest(reverseMode: boolean): Color {
+    return Theme.createShade_(this.base_, 0.5 - this.baseDistance_ * 2, reverseMode);
+  }
+
+  getBaseHue(): Color {
+    return this.base_;
+  }
+
+  @cache()
+  getBaseLight(reverseMode: boolean): Color {
+    return Theme.createShade_(this.base_, 0.5 + this.baseDistance_, reverseMode);
+  }
+
+  @cache()
+  getBaseLightest(reverseMode: boolean): Color {
+    return Theme.createShade_(this.base_, 0.5 + this.baseDistance_ * 2, reverseMode);
+  }
+
+  @cache()
+  getBlackFade(): Color {
+    return Theme.getForegroundFade_(BLACK, this.getBaseLight(true), this.contrast_ * 2 / 3);
+  }
+
+  @cache()
+  getBlackOnAccent(): Color {
+    const accent = this.getAccent();
+    return Colors.getContrast(BLACK, accent) > Colors.getContrast(WHITE, accent) ? BLACK : WHITE;
+  }
+
+  getContrast(): number {
+    return this.contrast_;
+  }
+
+  @cache()
+  getWhiteFade(): Color {
+    return Theme.getForegroundFade_(WHITE, this.getBaseDark(false), this.contrast_ * 2 / 3);
+  }
+
   /**
    * @param base Base color.
    * @param value Proportion of shade. 0 means totally dark, 1 means totally bright.
@@ -45,6 +127,27 @@ export class Theme {
         base.getHue(),
         (reverseMode ? cappedValue : 1 - cappedValue) * base.getSaturation(),
         cappedValue);
+  }
+
+  /**
+   * @param foreground
+   * @param background
+   * @param contrast Ideal contrast ratio.
+   * @return Foreground with the alpha applied such that its contrast ratio is just ideal.
+   */
+  private static getForegroundFade_(
+      foreground: Color, background: Color, contrast: number): Color {
+    const alpha = Solve.findThreshold(
+        Spec.newInstance(0, 0.1, 1),
+        (alpha: number) => {
+          return Theme.isHighContrastForegroundAlpha_(foreground, background, alpha, contrast);
+        },
+        false);
+    if (alpha === null) {
+      throw new Error('No alpha value can be computed');
+    }
+
+    return Colors.mix(foreground, background, alpha);
   }
 
   /**
@@ -134,109 +237,6 @@ export class Theme {
       alpha: number,
       contrast: number): boolean {
     return Colors.getContrast(Colors.mix(foreground, background, alpha), background) >= contrast;
-  }
-
-  getAccent(): Color {
-    return this.accent_;
-  }
-
-  getAccentHue(): Color {
-    return this.accent_;
-  }
-
-  @cache()
-  getAction(): Color {
-    return Theme.createShade_(this.accent_, 0.5, true);
-  }
-
-  @cache()
-  getActionDark(reverseMode: boolean): Color {
-    return Theme.createShade_(this.accent_, 0.5 - this.actionDistance_, reverseMode);
-  }
-
-  @cache()
-  getActionDarkest(reverseMode: boolean): Color {
-    return Theme.createShade_(this.accent_, 0.5 - this.actionDistance_ * 2, reverseMode);
-  }
-
-  @cache()
-  getActionLight(reverseMode: boolean): Color {
-    return Theme.createShade_(this.accent_, 0.5 + this.actionDistance_, reverseMode);
-  }
-
-  @cache()
-  getActionLightest(reverseMode: boolean): Color {
-    return Theme.createShade_(this.accent_, 0.5 + this.actionDistance_ * 2, reverseMode);
-  }
-
-  @cache()
-  getBase(): Color {
-    return Theme.createShade_(this.base_, 0.5, true);
-  }
-
-  @cache()
-  getBaseDark(reverseMode: boolean): Color {
-    return Theme.createShade_(this.base_, 0.5 - this.baseDistance_, reverseMode);
-  }
-
-  @cache()
-  getBaseDarkest(reverseMode: boolean): Color {
-    return Theme.createShade_(this.base_, 0.5 - this.baseDistance_ * 2, reverseMode);
-  }
-
-  getBaseHue(): Color {
-    return this.base_;
-  }
-
-  @cache()
-  getBaseLight(reverseMode: boolean): Color {
-    return Theme.createShade_(this.base_, 0.5 + this.baseDistance_, reverseMode);
-  }
-
-  @cache()
-  getBaseLightest(reverseMode: boolean): Color {
-    return Theme.createShade_(this.base_, 0.5 + this.baseDistance_ * 2, reverseMode);
-  }
-
-  @cache()
-  getBlackFade(): Color {
-    return Theme.getForegroundFade_(BLACK, this.getBaseLight(true), this.contrast_ * 2 / 3);
-  }
-
-  getContrast(): number {
-    return this.contrast_;
-  }
-
-  /**
-   * @param foreground
-   * @param background
-   * @param contrast Ideal contrast ratio.
-   * @return Foreground with the alpha applied such that its contrast ratio is just ideal.
-   */
-  private static getForegroundFade_(
-      foreground: Color, background: Color, contrast: number): Color {
-    const alpha = Solve.findThreshold(
-        Spec.newInstance(0, 0.1, 1),
-        (alpha: number) => {
-          return Theme.isHighContrastForegroundAlpha_(foreground, background, alpha, contrast);
-        },
-        false);
-    if (alpha === null) {
-      throw new Error('No alpha value can be computed');
-    }
-
-    return Colors.mix(foreground, background, alpha);
-  }
-
-  @cache()
-  getWhiteFade(): Color {
-    return Theme.getForegroundFade_(WHITE, this.getBaseDark(false), this.contrast_ * 2 / 3);
-  }
-
-  @cache()
-  getBlackOnAccent(): Color {
-    const accent = this.getAccent();
-    return Colors.getContrast(BLACK, accent) > Colors.getContrast(WHITE, accent) ? BLACK : WHITE;
   }
 
   /**

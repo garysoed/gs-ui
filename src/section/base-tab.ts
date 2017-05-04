@@ -21,8 +21,8 @@ export abstract class BaseTab extends BaseThemedElement {
 
   private highlightContainerEl_: ListenableDom<HTMLElement>;
   private highlightEl_: HTMLElement;
-  private highlightStart_: number = 0;
   private highlightLength_: number = 0;
+  private highlightStart_: number = 0;
   private interval_: Interval;
   private mutationObserver_: MutationObserver = new MutationObserver(this.onMutate_.bind(this));
   private tabContainer_: ListenableDom<HTMLElement>;
@@ -40,18 +40,6 @@ export abstract class BaseTab extends BaseThemedElement {
   }
 
   private onMutate_(): void {
-    this.updateHighlight_();
-  }
-
-  /**
-   * Handles event when the gs-selected-tab attribute was changed.
-   */
-  @handle(null).attributeChange('gs-selected-tab', StringParser)
-  protected onSelectedTabChanged_(): void {
-    const element = this.getElement();
-    if (element !== null) {
-      element.dispatch(BaseTab.CHANGE_EVENT, () => {});
-    }
     this.updateHighlight_();
   }
 
@@ -91,6 +79,29 @@ export abstract class BaseTab extends BaseThemedElement {
     });
   }
 
+  @atomic()
+  private updateHighlight_(): Promise<void> {
+    const selectedId = this.selectedTabHook_.get();
+    let destinationStart;
+    let destinationHeight;
+    const element = this.getElement();
+    if (element === null) {
+      return Promise.reject('No elements are found');
+    }
+
+    if (selectedId !== null) {
+      const selectedTab = element.getEventTarget()
+          .querySelector(`[gs-tab-id="${selectedId}"]`) as HTMLElement;
+      destinationStart = this.getStartPosition(selectedTab);
+      destinationHeight = this.getLength(selectedTab);
+    } else {
+      destinationStart = this.highlightStart_ + this.highlightLength_ / 2;
+      destinationHeight = this.highlightLength_;
+    }
+
+    return this.setHighlight_(destinationStart, destinationHeight);
+  }
+
   /**
    * @param start The start position of the element.
    * @param length The length of the element.
@@ -109,6 +120,18 @@ export abstract class BaseTab extends BaseThemedElement {
    * @return The start position of the given element.
    */
   protected abstract getStartPosition(element: HTMLElement): number;
+
+  /**
+   * Handles event when the gs-selected-tab attribute was changed.
+   */
+  @handle(null).attributeChange('gs-selected-tab', StringParser)
+  protected onSelectedTabChanged_(): void {
+    const element = this.getElement();
+    if (element !== null) {
+      element.dispatch(BaseTab.CHANGE_EVENT, () => {});
+    }
+    this.updateHighlight_();
+  }
 
   /**
    * Updates the given highlight element with the start position and length.
@@ -151,28 +174,5 @@ export abstract class BaseTab extends BaseThemedElement {
     if (element !== null) {
       this.listenTo(element, Event.ACTION, this.onAction_);
     }
-  }
-
-  @atomic()
-  private updateHighlight_(): Promise<void> {
-    const selectedId = this.selectedTabHook_.get();
-    let destinationStart;
-    let destinationHeight;
-    const element = this.getElement();
-    if (element === null) {
-      return Promise.reject('No elements are found');
-    }
-
-    if (selectedId !== null) {
-      const selectedTab = element.getEventTarget()
-          .querySelector(`[gs-tab-id="${selectedId}"]`) as HTMLElement;
-      destinationStart = this.getStartPosition(selectedTab);
-      destinationHeight = this.getLength(selectedTab);
-    } else {
-      destinationStart = this.highlightStart_ + this.highlightLength_ / 2;
-      destinationHeight = this.highlightLength_;
-    }
-
-    return this.setHighlight_(destinationStart, destinationHeight);
   }
 }

@@ -11,23 +11,15 @@ import { Theme } from '../theming/theme';
 
 @bind('theming.ThemeService')
 export class ThemeService extends BaseListenable<ThemeServiceEvents> {
-  private readonly document_: Document;
-  private readonly parser_: DOMParser;
-  private readonly templates_: Templates;
-  private readonly window_: Window;
   private initialized_: boolean = false;
-  private theme_: Theme | null;
+  private readonly parser_: DOMParser = new DOMParser();
+  private theme_: Theme | null = null;
 
   constructor(
-      @inject('x.gs_tools.templates') templates: Templates,
-      @inject('x.dom.window') windowRef: Window = window,
-      @inject('x.dom.document') document: Document = window.document) {
+      @inject('x.gs_tools.templates') private readonly templates_: Templates,
+      @inject('x.dom.window') private readonly window_: Window = window,
+      @inject('x.dom.document') private readonly document_: Document = window.document) {
     super();
-    this.document_ = document;
-    this.parser_ = new DOMParser();
-    this.templates_ = templates;
-    this.theme_ = null;
-    this.window_ = windowRef;
   }
 
   private getThemeStyleEl_(): Element {

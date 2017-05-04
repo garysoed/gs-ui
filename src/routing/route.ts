@@ -5,8 +5,8 @@
  * @param <P> Type of the params.
  */
 export class Route<T, P> {
-  private readonly path_: string;
   private readonly params_: P;
+  private readonly path_: string;
   private readonly type_: T;
 
   /**

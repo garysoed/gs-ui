@@ -40,6 +40,48 @@ export class Drawer extends BaseThemedElement {
     this.rootStyleHook_ = DomHook.of<CSSStyleDeclaration>();
   }
 
+  /**
+   * Handles when the gs-is-expanded attribute is changed.
+   *
+   * @param isExpanded True iff the drawer should be expanded.
+   */
+  @handle(null).attributeChange('gs-is-expanded', BooleanParser)
+  protected onIsExpandedChanged_(isExpanded: boolean): void {
+    const classListSet = this.classListHook_.get() || new Set();
+    if (isExpanded) {
+      classListSet.add('expanded');
+    } else {
+      classListSet.delete('expanded');
+    }
+    this.classListHook_.set(classListSet);
+  }
+
+  /**
+   * Handles when the gs-max-width attribute is changed.
+   *
+   * @param width The maximum width of the drawer to set.
+   */
+  @handle(null).attributeChange('gs-max-width', StringParser)
+  protected onMaxWidthChanged_(width: string): void {
+    const styleDeclaration = this.rootStyleHook_.get();
+    if (styleDeclaration !== null) {
+      styleDeclaration.setProperty('--gsDrawerExpandedWidth', width);
+    }
+  }
+
+  /**
+   * Handles when the gs-min-width attribute is changed.
+   *
+   * @param width The minimum width of the drawer to set.
+   */
+  @handle(null).attributeChange('gs-min-width', StringParser)
+  protected onMinWidthChanged_(width: string): void {
+    const styleDeclaration = this.rootStyleHook_.get();
+    if (styleDeclaration !== null) {
+      styleDeclaration.setProperty('--gsDrawerCollapsedWidth', width);
+    }
+  }
+
   @handle(null).attributeChange('gs-align-content', StringParser)
   onAlignContentChanged_(alignContent: string | null): void {
     const style = this.itemStyleHook_.get();
@@ -92,48 +134,6 @@ export class Drawer extends BaseThemedElement {
         break;
       default:
         throw Error(`Invalid anchor point ${anchorPoint}`);
-    }
-  }
-
-  /**
-   * Handles when the gs-is-expanded attribute is changed.
-   *
-   * @param isExpanded True iff the drawer should be expanded.
-   */
-  @handle(null).attributeChange('gs-is-expanded', BooleanParser)
-  protected onIsExpandedChanged_(isExpanded: boolean): void {
-    const classListSet = this.classListHook_.get() || new Set();
-    if (isExpanded) {
-      classListSet.add('expanded');
-    } else {
-      classListSet.delete('expanded');
-    }
-    this.classListHook_.set(classListSet);
-  }
-
-  /**
-   * Handles when the gs-min-width attribute is changed.
-   *
-   * @param width The minimum width of the drawer to set.
-   */
-  @handle(null).attributeChange('gs-min-width', StringParser)
-  protected onMinWidthChanged_(width: string): void {
-    const styleDeclaration = this.rootStyleHook_.get();
-    if (styleDeclaration !== null) {
-      styleDeclaration.setProperty('--gsDrawerCollapsedWidth', width);
-    }
-  }
-
-  /**
-   * Handles when the gs-max-width attribute is changed.
-   *
-   * @param width The maximum width of the drawer to set.
-   */
-  @handle(null).attributeChange('gs-max-width', StringParser)
-  protected onMaxWidthChanged_(width: string): void {
-    const styleDeclaration = this.rootStyleHook_.get();
-    if (styleDeclaration !== null) {
-      styleDeclaration.setProperty('--gsDrawerExpandedWidth', width);
     }
   }
 }

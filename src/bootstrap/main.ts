@@ -61,8 +61,8 @@ const DEPENDENCIES = [ThemeService];
  */
 export class Main extends BaseDisposable {
   private readonly injector_: Injector;
-  private readonly themeService_: ThemeService;
   private readonly registrar_: ElementRegistrar;
+  private readonly themeService_: ThemeService;
 
   constructor(
       injector: Injector,

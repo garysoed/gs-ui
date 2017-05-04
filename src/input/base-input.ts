@@ -11,13 +11,13 @@ import { ThemeService } from '../theming/theme-service';
 export abstract class BaseInput<T> extends BaseActionElement {
   private static INPUT_INTERVAL_: number = 500;
 
-  protected readonly valueParser_: Parser<T>;
   protected readonly gsValueHook_: DomHook<T>;
   protected readonly inputDisabledHook_: DomHook<boolean>;
   protected readonly inputValueHook_: DomHook<string>;
+  protected readonly valueParser_: Parser<T>;
 
-  private readonly interval_: Interval;
   private inputEl_: HTMLInputElement | null = null;
+  private readonly interval_: Interval;
 
   constructor(
       themeService: ThemeService,
@@ -33,6 +33,10 @@ export abstract class BaseInput<T> extends BaseActionElement {
     this.addDisposable(this.interval_);
   }
 
+  protected isValueChanged_(oldValue: T | null, newValue: T | null): boolean {
+    return oldValue !== newValue;
+  }
+
   /**
    * @override
    */
@@ -46,6 +50,16 @@ export abstract class BaseInput<T> extends BaseActionElement {
   }
 
   /**
+   * Handles event when the value of disabled attribute was changed.
+   *
+   * @param newValue The value of the disabled attribute..
+   */
+  @handle(null).attributeChange('disabled', BooleanParser)
+  protected onDisabledChange_(newValue: boolean): void {
+    this.inputDisabledHook_.set(newValue);
+  }
+
+  /**
    * Handles event when the value of gs-value attribute was changed.
    *
    * @param newValue The value it was changed to.
@@ -55,16 +69,6 @@ export abstract class BaseInput<T> extends BaseActionElement {
     if (this.isValueChanged_(parsedValue, newValue)) {
       this.inputValueHook_.set(this.valueParser_.stringify(newValue));
     }
-  }
-
-  /**
-   * Handles event when the value of disabled attribute was changed.
-   *
-   * @param newValue The value of the disabled attribute..
-   */
-  @handle(null).attributeChange('disabled', BooleanParser)
-  protected onDisabledChange_(newValue: boolean): void {
-    this.inputDisabledHook_.set(newValue);
   }
 
   /**
@@ -86,10 +90,6 @@ export abstract class BaseInput<T> extends BaseActionElement {
     if (element !== null) {
       element.dispatch(DomEvent.CHANGE);
     }
-  }
-
-  protected isValueChanged_(oldValue: T | null, newValue: T | null): boolean {
-    return oldValue !== newValue;
   }
 
   /**

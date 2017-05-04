@@ -17,8 +17,8 @@ import { RouteServiceEvents } from './route-service-events';
     ])
 export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> {
   private readonly locationService_: LocationService;
-  private readonly routeFactoryService_: IRouteFactoryService<T>;
   private readonly routeFactoryMap_: Map<T, AbstractRouteFactory<T, any, any, any>>;
+  private readonly routeFactoryService_: IRouteFactoryService<T>;
 
   constructor(
       @inject('gs.LocationService') locationService: LocationService,

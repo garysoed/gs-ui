@@ -51,7 +51,7 @@ export class FileService extends BaseListener {
    * @param files The bundle of files to add.
    * @return Object containing the bundle ID and a function to delete the bundle.
    */
-  addBundle(files: File[]): {id: string, deleteFn: () => void} {
+  addBundle(files: File[]): {deleteFn: () => void, id: string} {
     const id = this.idGenerator_.generate(Maps.of(this.bundles_).keys().asArray());
     this.bundles_.set(id, files);
     return {

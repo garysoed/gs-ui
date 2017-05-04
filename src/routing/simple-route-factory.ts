@@ -3,8 +3,8 @@ import { AbstractRouteFactory } from './abstract-route-factory';
 
 export class SimpleRouteFactory<T, PR>
     extends AbstractRouteFactory<T, {}, PR, PR> {
-  private readonly path_: string;
   private readonly name_: string;
+  private readonly path_: string;
 
   constructor(
       type: T,
@@ -19,15 +19,15 @@ export class SimpleRouteFactory<T, PR>
   /**
    * @override
    */
-  protected getRelativeMatchParams_(matches: {[key: string]: string}): {} {
-    return {};
+  protected getRelativeMatcher_(): string {
+    return this.getRelativePath_();
   }
 
   /**
    * @override
    */
-  protected getRelativeMatcher_(): string {
-    return this.getRelativePath_();
+  protected getRelativeMatchParams_(matches: {[key: string]: string}): {} {
+    return {};
   }
 
   /**

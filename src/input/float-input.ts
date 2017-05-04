@@ -37,16 +37,6 @@ export class FloatInput extends BaseInput<number> {
   }
 
   /**
-   * Handles event when the value of gs-value attribute was changed.
-   *
-   * @param newValue The value it was changed to.
-   */
-  @handle(null).attributeChange('gs-value', FloatParser)
-  protected onGsValueChange_(newValue: number): void {
-    super.onGsValueChange_(newValue);
-  }
-
-  /**
    * @override
    */
   protected isValueChanged_(oldValue: number | null, newValue: number | null): boolean {
@@ -57,5 +47,15 @@ export class FloatInput extends BaseInput<number> {
       return false;
     }
     return super.isValueChanged_(oldValue, newValue);
+  }
+
+  /**
+   * Handles event when the value of gs-value attribute was changed.
+   *
+   * @param newValue The value it was changed to.
+   */
+  @handle(null).attributeChange('gs-value', FloatParser)
+  protected onGsValueChange_(newValue: number): void {
+    super.onGsValueChange_(newValue);
   }
 }
