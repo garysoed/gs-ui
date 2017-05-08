@@ -120,12 +120,12 @@ describe('input.BaseInput', () => {
       const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
       mockShadowRoot.querySelector.and.returnValue(inputElement);
 
-      const mockElement = Mocks.element();
-      mockElement.shadowRoot = mockShadowRoot;
+      const element = Mocks.object('element');
+      element.shadowRoot = mockShadowRoot;
 
       spyOn(input, 'listenTo');
 
-      input.onCreated(mockElement);
+      input.onCreated(element);
 
       assert(input.listenTo).to
           .haveBeenCalledWith(input['interval_'], Interval.TICK_EVENT, input['onInputTick_']);

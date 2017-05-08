@@ -98,17 +98,17 @@ describe('tool.OverlayContainer', () => {
 
   describe('onFinishAnimate_', () => {
     it('should remove the SHOW class and dispatch the HIDE event', () => {
-      const mockRootElement = Mocks.element();
-      container['rootEl_'] = {getEventTarget: () => mockRootElement};
+      const mockClassList = jasmine.createSpyObj('ClassList', ['remove']);
+      const listenableElement = Mocks.object('listenableElement');
+      listenableElement.classList = mockClassList;
+      container['rootEl_'] = {getEventTarget: () => listenableElement};
 
       const mockElement = jasmine.createSpyObj('Element', ['dispatch']);
       spyOn(container, 'getElement').and.returnValue(mockElement);
 
-      spyOn(mockRootElement.classList, 'remove');
-
       container['onFinishAnimate_']();
 
-      assert(mockRootElement.classList.remove).to
+      assert(mockClassList.remove).to
           .haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
       assert(mockElement.dispatch).to.haveBeenCalledWith(
           OverlayContainer.HIDE_EVENT,
@@ -116,18 +116,18 @@ describe('tool.OverlayContainer', () => {
     });
 
     it('should not throw error if there are no elements', () => {
-      const mockRootElement = Mocks.element();
-      container['rootEl_'] = {getEventTarget: () => mockRootElement};
+      const mockClassList = jasmine.createSpyObj('ClassList', ['remove']);
+      const listenableElement = Mocks.object('listenableElement');
+      listenableElement.classList = mockClassList;
+      container['rootEl_'] = {getEventTarget: () => listenableElement};
 
       spyOn(container, 'getElement').and.returnValue(null);
-
-      spyOn(mockRootElement.classList, 'remove');
 
       assert(() => {
         container['onFinishAnimate_']();
       }).toNot.throw();
 
-      assert(mockRootElement.classList.remove).to
+      assert(mockClassList.remove).to
           .haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
     });
   });
