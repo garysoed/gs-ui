@@ -35,3 +35,4 @@ export const AnchorLocationParser: Parser<AnchorLocation> = {
     return Enums.toLowerCaseString(anchorLocation, AnchorLocation);
   },
 };
+// TODO: Mutable

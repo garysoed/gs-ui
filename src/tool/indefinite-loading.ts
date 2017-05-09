@@ -13,3 +13,4 @@ export class IndefiniteLoading extends BaseElement {
     element.classList.add('gs-action');
   }
 }
+// TODO: Mutable

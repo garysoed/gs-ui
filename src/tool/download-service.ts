@@ -61,3 +61,4 @@ export class DownloadService {
     this.download(blob, filename);
   }
 }
+// TODO: Mutable

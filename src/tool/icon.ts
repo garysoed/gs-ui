@@ -6,3 +6,4 @@ import { BaseElement, customElement } from 'external/gs_tools/src/webc';
   templateKey: 'src/tool/icon',
 })
 export class Icon extends BaseElement { }
+// TODO: Mutable

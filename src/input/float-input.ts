@@ -59,3 +59,4 @@ export class FloatInput extends BaseInput<number> {
     super.onGsValueChange_(newValue);
   }
 }
+// TODO: Mutable

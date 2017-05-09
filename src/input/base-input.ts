@@ -121,3 +121,4 @@ export abstract class BaseInput<T> extends BaseActionElement {
     this.interval_.stop();
   }
 }
+// TODO: Mutable

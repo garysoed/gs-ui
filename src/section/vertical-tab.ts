@@ -47,3 +47,4 @@ export class VerticalTab extends BaseTab {
     highlightEl.style.height = `${length}px`;
   }
 }
+// TODO: Mutable

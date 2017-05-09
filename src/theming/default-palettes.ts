@@ -68,3 +68,4 @@ export const DefaultPalettes = {
     return Arrays.fromIterable(COLOR_MAP.keys()).asArray();
   },
 };
+// TODO: Mutable

@@ -26,3 +26,4 @@ export class BaseActionElement extends BaseThemedElement {
     return element === null || element.getEventTarget().getAttribute('disabled') !== null;
   }
 }
+// TODO: Mutable

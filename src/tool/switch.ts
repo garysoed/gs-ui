@@ -32,3 +32,4 @@ export class Switch extends BaseThemedElement {
     }
   }
 }
+// TODO: Mutable

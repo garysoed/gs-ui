@@ -39,3 +39,4 @@ export class Route<T, P> {
     return this.type_;
   }
 }
+// TODO: Mutable

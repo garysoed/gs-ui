@@ -174,3 +174,4 @@ export class FileInput extends BaseThemedElement {
     this.initialMessageInnerTextHook_.set(label || 'Drop a file here to upload');
   }
 }
+// TODO: Mutable

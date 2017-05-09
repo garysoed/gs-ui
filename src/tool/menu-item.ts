@@ -37,3 +37,4 @@ export class MenuItem extends BaseThemedElement {
     this.nameHook_.set(newContent);
   }
 }
+// TODO: Mutable

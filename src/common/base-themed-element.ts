@@ -26,3 +26,4 @@ export class BaseThemedElement extends BaseElement {
     this.themeService_.applyTheme(shadowRoot);
   }
 }
+// TODO: Mutable

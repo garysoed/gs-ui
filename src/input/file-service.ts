@@ -91,3 +91,4 @@ export class FileService extends BaseListener {
     return new Map(entries);
   }
 }
+// TODO: Mutable

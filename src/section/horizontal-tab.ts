@@ -48,3 +48,4 @@ export class HorizontalTab extends BaseTab {
     highlightEl.style.width = `${length}px`;
   }
 }
+// TODO: Mutable

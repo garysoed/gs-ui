@@ -279,3 +279,4 @@ export class Theme {
     return new Theme(baseColor, accentColor, baseDistance, actionDistance, contrast);
   }
 }
+// TODO: Mutable

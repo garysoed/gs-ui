@@ -144,3 +144,4 @@ export class Breadcrumb<T> extends BaseThemedElement {
     this.onRouteChanged_();
   }
 }
+// TODO: Mutable

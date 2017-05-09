@@ -15,3 +15,4 @@ Jsons.setValue(window, 'gs.ui.DefaultPalettes', DefaultPalettes);
 Jsons.setValue(window, 'gs.ui.Main', Main);
 Jsons.setValue(window, 'gs.ui.SimpleRouteFactory', SimpleRouteFactory);
 Jsons.setValue(window, 'gs.ui.Theme', Theme);
+// TODO: Mutable

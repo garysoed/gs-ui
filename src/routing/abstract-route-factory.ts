@@ -151,3 +151,4 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
     return this.type_;
   }
 }
+// TODO: Mutable

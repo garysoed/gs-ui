@@ -152,3 +152,4 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
         computedStyle.getPropertyValue('--gsColorReverseMode').trim());
   }
 }
+// TODO: Mutable
