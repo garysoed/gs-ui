@@ -50,6 +50,19 @@ export abstract class BaseInput<T> extends BaseActionElement {
   }
 
   /**
+   * @override
+   */
+  onCreated(element: HTMLElement): void {
+    super.onCreated(element);
+    const shadowRoot = element.shadowRoot;
+    if (shadowRoot === null) {
+      throw new Error('No shadow roots were found');
+    }
+    this.inputEl_ = shadowRoot.querySelector('input');
+    this.listenTo(this.interval_, Interval.TICK_EVENT, this.onInputTick_);
+  }
+
+  /**
    * Handles event when the value of disabled attribute was changed.
    *
    * @param newValue The value of the disabled attribute..
@@ -90,19 +103,6 @@ export abstract class BaseInput<T> extends BaseActionElement {
     if (element !== null) {
       element.dispatch(DomEvent.CHANGE);
     }
-  }
-
-  /**
-   * @override
-   */
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    const shadowRoot = element.shadowRoot;
-    if (shadowRoot === null) {
-      throw new Error('No shadow roots were found');
-    }
-    this.inputEl_ = shadowRoot.querySelector('input');
-    this.listenTo(this.interval_, Interval.TICK_EVENT, this.onInputTick_);
   }
 
   /**

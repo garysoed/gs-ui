@@ -16,37 +16,6 @@ export class FileService extends BaseListener {
     this.idGenerator_ = new SimpleIdGenerator();
   }
 
-  private createFileReader_(): FileReader {
-    return new FileReader();
-  }
-
-  /**
-   * Processes the given file.
-   *
-   * @param file The file object to process.
-   * @return Promise that will be resolved with the file content when done.
-   */
-  protected processFile_(file: File): Promise<string> {
-    return new Promise<string>((
-        resolve: (data: string) => void,
-        reject: (error: any) => void) => {
-      const fileReader = this.createFileReader_();
-      const listenableFileReader = ListenableDom.of<FileReader>(fileReader);
-      this.listenTo(
-          listenableFileReader,
-          DomEvent.LOADEND,
-          () => {
-            listenableFileReader.dispose();
-            if (fileReader.readyState === 2) {
-              resolve(fileReader.result);
-            } else {
-              reject(new Error(`Error loading file ${file.name}: ${fileReader.readyState}`));
-            }
-          });
-      fileReader.readAsText(file);
-    });
-  }
-
   /**
    * @param files The bundle of files to add.
    * @return Object containing the bundle ID and a function to delete the bundle.
@@ -60,6 +29,10 @@ export class FileService extends BaseListener {
       }.bind(this),
       id: id,
     };
+  }
+
+  private createFileReader_(): FileReader {
+    return new FileReader();
   }
 
   /**
@@ -89,6 +62,33 @@ export class FileService extends BaseListener {
         .asArray();
     const entries = await Promise.all(promises);
     return new Map(entries);
+  }
+
+  /**
+   * Processes the given file.
+   *
+   * @param file The file object to process.
+   * @return Promise that will be resolved with the file content when done.
+   */
+  protected processFile_(file: File): Promise<string> {
+    return new Promise<string>((
+        resolve: (data: string) => void,
+        reject: (error: any) => void) => {
+      const fileReader = this.createFileReader_();
+      const listenableFileReader = ListenableDom.of<FileReader>(fileReader);
+      this.listenTo(
+          listenableFileReader,
+          DomEvent.LOADEND,
+          () => {
+            listenableFileReader.dispose();
+            if (fileReader.readyState === 2) {
+              resolve(fileReader.result);
+            } else {
+              reject(new Error(`Error loading file ${file.name}: ${fileReader.readyState}`));
+            }
+          });
+      fileReader.readAsText(file);
+    });
   }
 }
 // TODO: Mutable

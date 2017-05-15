@@ -1,4 +1,5 @@
 import { DomEvent } from 'external/gs_tools/src/event';
+import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
 import { customElement, DomHook, handle, hook } from 'external/gs_tools/src/webc';
@@ -9,7 +10,7 @@ import { OverlayService } from '../tool/overlay-service';
 
 
 @customElement({
-  dependencies: [OverlayService],
+  dependencies: ImmutableSet.of([OverlayService]),
   tag: 'gs-menu-item',
   templateKey: 'src/tool/menu-item',
 })

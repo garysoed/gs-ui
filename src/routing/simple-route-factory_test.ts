@@ -1,7 +1,9 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import { SimpleRouteFactory } from './simple-route-factory';
+import { ImmutableMap } from 'external/gs_tools/src/immutable';
+
+import { SimpleRouteFactory } from '../routing/simple-route-factory';
 
 
 describe('routing.SimpleRouteFactory', () => {
@@ -15,7 +17,7 @@ describe('routing.SimpleRouteFactory', () => {
 
   describe('getRelativeMatchParams_', () => {
     it('should return empty object', () => {
-      assert(factory['getRelativeMatchParams_']({})).to.equal({});
+      assert(factory['getRelativeMatchParams_'](ImmutableMap.of<string, string>([]))).to.equal({});
     });
   });
 

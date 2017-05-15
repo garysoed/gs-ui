@@ -2,6 +2,7 @@ import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Arrays } from 'external/gs_tools/src/collection';
+import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
@@ -147,7 +148,7 @@ describe('tool.ViewSlot', () => {
       assert(viewSlot['setRootElVisible_']).to.haveBeenCalledWith(true);
       assert(viewSlot['setActiveElement_']).to.haveBeenCalledWith(mockChildWithPath);
 
-      assert(LocationService.appendParts).to.haveBeenCalledWith([fullPath, path]);
+      assert(LocationService.appendParts).to.haveBeenCalledWith(ImmutableList.of([fullPath, path]));
       assert(mockLocationService.hasMatch).to.haveBeenCalledWith(appendedPath);
       assert(mockChildWithPath.getAttribute).to.haveBeenCalledWith('gs-view-path');
       assert(mockChildNoPath.getAttribute).to.haveBeenCalledWith('gs-view-path');
@@ -157,6 +158,7 @@ describe('tool.ViewSlot', () => {
     it('should set no elements to active if there are no active elements', () => {
       const element = Mocks.object('element');
       element.children = Mocks.object('children');
+      element[__FULL_PATH] = 'fullPath';
 
       const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
       mockListenableElement.getEventTarget.and.returnValue(element);
@@ -221,7 +223,8 @@ describe('tool.ViewSlot', () => {
 
       assert(viewSlot['updateActiveView_']).to.haveBeenCalledWith();
       assert(element[__FULL_PATH]).to.equal(appendedPath);
-      assert(LocationService.appendParts).to.haveBeenCalledWith([rootPath, currentPath]);
+      assert(LocationService.appendParts).to
+          .haveBeenCalledWith(ImmutableList.of([rootPath, currentPath]));
       assert(mockPathElement.getAttribute).to.haveBeenCalledWith('gs-view-path');
       assert(Doms.parentIterable).to.haveBeenCalledWith(element, true /* bustShadow */);
     });
@@ -237,7 +240,7 @@ describe('tool.ViewSlot', () => {
       viewSlot.onInserted(element);
 
       assert(element[__FULL_PATH]).to.equal(appendedPath);
-      assert(LocationService.appendParts).to.haveBeenCalledWith(['', '']);
+      assert(LocationService.appendParts).to.haveBeenCalledWith(ImmutableList.of(['', '']));
     });
   });
 });

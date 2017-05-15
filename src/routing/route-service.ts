@@ -30,13 +30,6 @@ export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> 
   }
 
   /**
-   * Handles event when the location has changed.
-   */
-  private onLocationChanged_(): void {
-    this.dispatch(RouteServiceEvents.CHANGED);
-  }
-
-  /**
    * Called during initialization.
    */
   [Reflect.__initialize](): void {
@@ -115,6 +108,13 @@ export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> 
    */
   goToPath(path: string): void {
     this.locationService_.goTo(path);
+  }
+
+  /**
+   * Handles event when the location has changed.
+   */
+  private onLocationChanged_(): void {
+    this.dispatch(RouteServiceEvents.CHANGED);
   }
 }
 // TODO: Mutable

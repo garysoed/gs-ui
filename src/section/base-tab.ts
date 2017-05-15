@@ -34,12 +34,77 @@ export abstract class BaseTab extends BaseThemedElement {
     this.addDisposable(this.interval_);
   }
 
+  /**
+   * @param start The start position of the element.
+   * @param length The length of the element.
+   * @return Animation keyframe object with the start and length of the animated element.
+   */
+  protected abstract getAnimationKeyframe(start: number, length: number): AnimationKeyframe;
+
+  /**
+   * @param element Element whose length should be returned.
+   * @return Length of the given element.
+   */
+  protected abstract getLength(element: HTMLElement): number;
+
+  /**
+   * @param element Element whose start position should be returned.
+   * @return The start position of the given element.
+   */
+  protected abstract getStartPosition(element: HTMLElement): number;
+
   private onAction_(event: Event): void {
     const target = event.target as HTMLElement;
     this.selectedTabHook_.set(target.getAttribute('gs-tab-id') || '');
   }
 
+  /**
+   * @override
+   */
+  onCreated(element: HTMLElement): void {
+    super.onCreated(element);
+    const shadowRoot = element.shadowRoot;
+    if (shadowRoot === null) {
+      throw new Error('Cannot find shadow root');
+    }
+    this.highlightContainerEl_ = ListenableDom
+        .of(shadowRoot.querySelector('.highlight-container') as HTMLElement);
+    this.highlightEl_ = shadowRoot.querySelector('.highlight') as HTMLElement;
+    this.tabContainer_ = ListenableDom
+        .of(shadowRoot.querySelector('.tab-container') as HTMLElement);
+
+    this.listenTo(this.interval_, Interval.TICK_EVENT, this.onTick_);
+    this.interval_.start();
+    this.mutationObserver_.observe(element, {childList: true});
+
+    this.addDisposable(
+        this.highlightContainerEl_,
+        this.tabContainer_);
+  }
+
+  /**
+   * @override
+   */
+  onInserted(): void {
+    const element = this.getElement();
+    if (element !== null) {
+      this.listenTo(element, Event.ACTION, this.onAction_);
+    }
+  }
+
   private onMutate_(): void {
+    this.updateHighlight_();
+  }
+
+  /**
+   * Handles event when the gs-selected-tab attribute was changed.
+   */
+  @handle(null).attributeChange('gs-selected-tab', StringParser)
+  protected onSelectedTabChanged_(): void {
+    const element = this.getElement();
+    if (element !== null) {
+      element.dispatch(BaseTab.CHANGE_EVENT, () => {});
+    }
     this.updateHighlight_();
   }
 
@@ -79,6 +144,15 @@ export abstract class BaseTab extends BaseThemedElement {
     });
   }
 
+  /**
+   * Updates the given highlight element with the start position and length.
+   *
+   * @param start Start position to set the highlight element to.
+   * @param length Length to set the highlight element to.
+   * @param highlightEl Element to update.
+   */
+  protected abstract setHighlightEl(start: number, length: number, highlightEl: HTMLElement): void;
+
   @atomic()
   private updateHighlight_(): Promise<void> {
     const selectedId = this.selectedTabHook_.get();
@@ -100,80 +174,6 @@ export abstract class BaseTab extends BaseThemedElement {
     }
 
     return this.setHighlight_(destinationStart, destinationHeight);
-  }
-
-  /**
-   * @param start The start position of the element.
-   * @param length The length of the element.
-   * @return Animation keyframe object with the start and length of the animated element.
-   */
-  protected abstract getAnimationKeyframe(start: number, length: number): AnimationKeyframe;
-
-  /**
-   * @param element Element whose length should be returned.
-   * @return Length of the given element.
-   */
-  protected abstract getLength(element: HTMLElement): number;
-
-  /**
-   * @param element Element whose start position should be returned.
-   * @return The start position of the given element.
-   */
-  protected abstract getStartPosition(element: HTMLElement): number;
-
-  /**
-   * Handles event when the gs-selected-tab attribute was changed.
-   */
-  @handle(null).attributeChange('gs-selected-tab', StringParser)
-  protected onSelectedTabChanged_(): void {
-    const element = this.getElement();
-    if (element !== null) {
-      element.dispatch(BaseTab.CHANGE_EVENT, () => {});
-    }
-    this.updateHighlight_();
-  }
-
-  /**
-   * Updates the given highlight element with the start position and length.
-   *
-   * @param start Start position to set the highlight element to.
-   * @param length Length to set the highlight element to.
-   * @param highlightEl Element to update.
-   */
-  protected abstract setHighlightEl(start: number, length: number, highlightEl: HTMLElement): void;
-
-  /**
-   * @override
-   */
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    const shadowRoot = element.shadowRoot;
-    if (shadowRoot === null) {
-      throw new Error('Cannot find shadow root');
-    }
-    this.highlightContainerEl_ = ListenableDom
-        .of(shadowRoot.querySelector('.highlight-container') as HTMLElement);
-    this.highlightEl_ = shadowRoot.querySelector('.highlight') as HTMLElement;
-    this.tabContainer_ = ListenableDom
-        .of(shadowRoot.querySelector('.tab-container') as HTMLElement);
-
-    this.listenTo(this.interval_, Interval.TICK_EVENT, this.onTick_);
-    this.interval_.start();
-    this.mutationObserver_.observe(element, {childList: true});
-
-    this.addDisposable(
-        this.highlightContainerEl_,
-        this.tabContainer_);
-  }
-
-  /**
-   * @override
-   */
-  onInserted(): void {
-    const element = this.getElement();
-    if (element !== null) {
-      this.listenTo(element, Event.ACTION, this.onAction_);
-    }
   }
 }
 // TODO: Mutable

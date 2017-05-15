@@ -35,6 +35,13 @@ export class OverlayService extends BaseListener {
     return this.overlayContainerEl_;
   }
 
+  /**
+   * Hides the overlay.
+   */
+  hideOverlay(): void {
+    this.getOverlayContainerEl_().getEventTarget()['hide']();
+  }
+
   private onTick_(
       overlayContainerEl: HTMLElement,
       anchorTarget: AnchorLocation,
@@ -78,13 +85,6 @@ export class OverlayService extends BaseListener {
         overlayContainerEl['gsAnchorTargetY'] = parentScreenTop;
         break;
     }
-  }
-
-  /**
-   * Hides the overlay.
-   */
-  hideOverlay(): void {
-    this.getOverlayContainerEl_().getEventTarget()['hide']();
   }
 
   /**

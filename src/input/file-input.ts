@@ -1,5 +1,6 @@
 import { Arrays } from 'external/gs_tools/src/collection';
 import { DomEvent } from 'external/gs_tools/src/event';
+import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { ArrayParser, StringParser } from 'external/gs_tools/src/parse';
 import {
@@ -9,17 +10,16 @@ import {
   hook } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
+import { FileService } from '../input/file-service';
 import { ThemeService } from '../theming/theme-service';
 import { Switch } from '../tool/switch';
-
-import { FileService } from '../input/file-service';
 
 
 /**
  * Component to attach files.
  */
 @customElement({
-  dependencies: [FileService, Switch],
+  dependencies: ImmutableSet.of([FileService, Switch]),
   tag: 'gs-file-input',
   templateKey: 'src/input/file-input',
 })

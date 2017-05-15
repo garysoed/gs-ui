@@ -100,6 +100,36 @@ export class OverlayContainer extends BaseElement {
   }
 
   /**
+   * @override
+   */
+  onCreated(element: HTMLElement): void {
+    super.onCreated(element);
+    const shadowRoot = element.shadowRoot;
+    if (shadowRoot === null) {
+      throw new Error('Shadow root not found');
+    }
+    this.backdropEl_ = ListenableDom.of(shadowRoot.querySelector('.backdrop') as HTMLElement);
+    this.containerEl_ = ListenableDom.of(shadowRoot.querySelector('.container') as HTMLElement);
+    this.contentEl_ = ListenableDom.of(shadowRoot.querySelector('content') as HTMLElement);
+    this.document_ = ListenableDom.of(element.ownerDocument);
+    this.rootEl_ = ListenableDom.of(shadowRoot.querySelector('.root') as HTMLElement);
+
+    this.addDisposable(
+        this.backdropEl_,
+        this.containerEl_,
+        this.contentEl_,
+        this.document_,
+        this.rootEl_);
+
+    element['hide'] = this.hide_.bind(this);
+    element['show'] = this.show_.bind(this);
+
+    if (element['gsAnchorPoint'] === null) {
+      element['gsAnchorPoint'] = AnchorLocation.AUTO;
+    }
+  }
+
+  /**
    * Handles the event when animate is done.
    */
   private onFinishAnimate_(): void {
@@ -109,6 +139,16 @@ export class OverlayContainer extends BaseElement {
     if (element !== null) {
       element.dispatch(OverlayContainer.HIDE_EVENT, () => {});
     }
+  }
+
+  /**
+   * @override
+   */
+  onInserted(element: HTMLElement): void {
+    super.onInserted(element);
+    this.listenTo(this.windowEl_, DomEvent.RESIZE, this.onWindowResize_);
+    this.listenTo(this.backdropEl_, DomEvent.CLICK, this.onBackdropClick_);
+    this.updateContent_();
   }
 
   /**
@@ -215,46 +255,6 @@ export class OverlayContainer extends BaseElement {
         containerEl.style.right = `${Math.max(viewportWidth - anchorTargetX, 0)}px`;
         break;
     }
-  }
-
-  /**
-   * @override
-   */
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    const shadowRoot = element.shadowRoot;
-    if (shadowRoot === null) {
-      throw new Error('Shadow root not found');
-    }
-    this.backdropEl_ = ListenableDom.of(shadowRoot.querySelector('.backdrop') as HTMLElement);
-    this.containerEl_ = ListenableDom.of(shadowRoot.querySelector('.container') as HTMLElement);
-    this.contentEl_ = ListenableDom.of(shadowRoot.querySelector('content') as HTMLElement);
-    this.document_ = ListenableDom.of(element.ownerDocument);
-    this.rootEl_ = ListenableDom.of(shadowRoot.querySelector('.root') as HTMLElement);
-
-    this.addDisposable(
-        this.backdropEl_,
-        this.containerEl_,
-        this.contentEl_,
-        this.document_,
-        this.rootEl_);
-
-    element['hide'] = this.hide_.bind(this);
-    element['show'] = this.show_.bind(this);
-
-    if (element['gsAnchorPoint'] === null) {
-      element['gsAnchorPoint'] = AnchorLocation.AUTO;
-    }
-  }
-
-  /**
-   * @override
-   */
-  onInserted(element: HTMLElement): void {
-    super.onInserted(element);
-    this.listenTo(this.windowEl_, DomEvent.RESIZE, this.onWindowResize_);
-    this.listenTo(this.backdropEl_, DomEvent.CLICK, this.onBackdropClick_);
-    this.updateContent_();
   }
 }
 // TODO: Mutable

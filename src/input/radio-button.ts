@@ -1,3 +1,4 @@
+import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import {
@@ -16,7 +17,7 @@ import { ThemeService } from '../theming/theme-service';
     'gsChecked': BooleanParser,
     'gsGroup': StringParser,
   },
-  dependencies: [RadioButtonService],
+  dependencies: ImmutableSet.of([RadioButtonService]),
   tag: 'gs-radio-button',
   templateKey: 'src/input/radio-button',
 })

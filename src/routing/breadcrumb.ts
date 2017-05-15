@@ -1,12 +1,12 @@
 import { Arrays } from 'external/gs_tools/src/collection';
+import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { ChildElementDataHelper, customElement, DomHook, hook } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
+import { RouteService } from '../routing/route-service';
+import { RouteServiceEvents } from '../routing/route-service-events';
 import { ThemeService } from '../theming/theme-service';
-import { RouteService } from './route-service';
-
-import { RouteServiceEvents } from './route-service-events';
 
 
 export const __FULL_PATH = Symbol('fullPath');
@@ -62,9 +62,9 @@ export const CRUMB_DATA_HELPER: ChildElementDataHelper<CrumbData> = {
 };
 
 @customElement({
-  dependencies: [
+  dependencies: ImmutableSet.of([
     RouteService,
-  ],
+  ]),
   tag: 'gs-breadcrumb',
   templateKey: 'src/routing/breadcrumb',
 })
@@ -84,6 +84,25 @@ export class Breadcrumb<T> extends BaseThemedElement {
     super(themeService);
     this.crumbHook_ = DomHook.of<CrumbData[]>();
     this.routeService_ = routeService;
+  }
+
+  /**
+   * @override
+   */
+  onCreated(element: HTMLElement): void {
+    super.onCreated(element);
+    this.listenTo(
+        this.routeService_,
+        RouteServiceEvents.CHANGED,
+        this.onRouteChanged_);
+  }
+
+  /**
+   * @override
+   */
+  onInserted(element: HTMLElement): void {
+    super.onInserted(element);
+    this.onRouteChanged_();
   }
 
   /**
@@ -123,25 +142,6 @@ export class Breadcrumb<T> extends BaseThemedElement {
         })
         .asArray();
     this.crumbHook_.set(crumbData);
-  }
-
-  /**
-   * @override
-   */
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    this.listenTo(
-        this.routeService_,
-        RouteServiceEvents.CHANGED,
-        this.onRouteChanged_);
-  }
-
-  /**
-   * @override
-   */
-  onInserted(element: HTMLElement): void {
-    super.onInserted(element);
-    this.onRouteChanged_();
   }
 }
 // TODO: Mutable

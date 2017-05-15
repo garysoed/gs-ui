@@ -22,18 +22,6 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
     super();
   }
 
-  private getThemeStyleEl_(): Element {
-    const themeStyleEl = this.document_.querySelector('style#gs-theme');
-    if (themeStyleEl === null) {
-      const newEl = this.document_.createElement('style');
-      newEl.id = 'gs-theme';
-      this.document_.head.appendChild(newEl);
-      return newEl;
-    } else {
-      return themeStyleEl;
-    }
-  }
-
   /**
    * Applies the theme to the given element.
    *
@@ -59,6 +47,18 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
    */
   getTheme(): Theme | null {
     return this.theme_;
+  }
+
+  private getThemeStyleEl_(): Element {
+    const themeStyleEl = this.document_.querySelector('style#gs-theme');
+    if (themeStyleEl === null) {
+      const newEl = this.document_.createElement('style');
+      newEl.id = 'gs-theme';
+      this.document_.head.appendChild(newEl);
+      return newEl;
+    } else {
+      return themeStyleEl;
+    }
   }
 
   /**

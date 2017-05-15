@@ -1,4 +1,5 @@
 import { ListenableDom } from 'external/gs_tools/src/event';
+import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import {
@@ -8,10 +9,9 @@ import {
   hook } from 'external/gs_tools/src/webc';
 
 import { Event } from '../const/event';
-
-import { AnchorLocation } from './anchor-location';
-import { AnchorLocationParser } from './anchor-location-parser';
-import { OverlayService } from './overlay-service';
+import { AnchorLocation } from '../tool/anchor-location';
+import { AnchorLocationParser } from '../tool/anchor-location-parser';
+import { OverlayService } from '../tool/overlay-service';
 
 
 @customElement({
@@ -19,9 +19,9 @@ import { OverlayService } from './overlay-service';
     'gsAnchorPoint': AnchorLocationParser,
     'gsAnchorTarget': AnchorLocationParser,
   },
-  dependencies: [
+  dependencies: ImmutableSet.of([
     OverlayService,
-  ],
+  ]),
   tag: 'gs-menu',
   templateKey: 'src/tool/menu',
 })

@@ -130,6 +130,23 @@ export class CodeInput extends BaseInput<string> {
   }
 
   /**
+   * Handles initialization.
+   */
+  [Reflect.__initialize](): void {
+    this.editorValueHook_.open(this.editorValueBinder_);
+  }
+
+  /**
+   * @override
+   */
+  disposeInternal(): void {
+    if (this.editor_ !== null) {
+      this.editor_.destroy();
+    }
+    super.disposeInternal();
+  }
+
+  /**
    * @param backgroundColor
    * @param hueColor The base color whose lightness should be modified.
    * @param idealContrast Target contrast ratio with the given background color.
@@ -165,6 +182,68 @@ export class CodeInput extends BaseInput<string> {
    */
   private isHighContrast_(foreground: Color, background: Color, idealContrast: number): boolean {
     return Colors.getContrast(foreground, background) >= idealContrast;
+  }
+
+  /**
+   * @override
+   */
+  onCreated(element: HTMLElement): void {
+    super.onCreated(element);
+    if (this.gsShowGutterHook_.get() === null) {
+      this.gsShowGutterHook_.set(true);
+    }
+
+    const shadowRoot = element.shadowRoot;
+    if (shadowRoot === null) {
+      throw new Error('No shadow roots were found');
+    }
+    this.editor_ = this.ace_.edit(shadowRoot.querySelector('#editor') as HTMLElement);
+    this.editorValueBinder_.setEditor(this.editor_);
+
+    this.editor_.setHighlightActiveLine(true);
+    this.editor_.setReadOnly(false);
+    this.editor_.setFontSize('14px');
+
+    this.editor_.session.setTabSize(2);
+    this.editor_.session.setUseSoftTabs(true);
+
+    const interval = Interval.newInstance(500);
+    this.addDisposable(interval);
+    this.listenTo(interval, Interval.TICK_EVENT, this.onTick_);
+    interval.start();
+
+    const aceCss = this.document_.getElementById('ace_editor.css');
+    if (aceCss === null) {
+      throw new Error('#ace_editor.css not found');
+    }
+    const styleEl = element.ownerDocument.createElement('style');
+    styleEl.innerHTML = aceCss.innerHTML;
+    shadowRoot.appendChild(styleEl);
+
+    this.listenTo(this.themeService_, ThemeServiceEvents.THEME_CHANGED, this.onThemeChanged_);
+    this.onThemeChanged_();
+  }
+
+  @handle(null).attributeChange('gs-language', EnumParser(Languages))
+  onGsLanguageAttrChange_(newValue: Languages | null): void {
+    if (this.editor_ !== null && newValue !== null) {
+      this.editor_.getSession().setMode(`ace/mode/${Enums.toLowerCaseString(newValue, Languages)}`);
+    }
+  }
+
+  @handle(null).attributeChange('gs-show-gutter', BooleanParser)
+  onGsShowGutterAttrChange_(newValue: boolean | null): void {
+    if (this.editor_ !== null) {
+      this.editor_.renderer.setShowGutter(newValue === null ? true : newValue);
+    }
+  }
+
+  /**
+   * @override
+   */
+  @handle(null).attributeChange('gs-value', StringParser)
+  onGsValueChange_(newValue: string | null): void {
+    super.onGsValueChange_(newValue || '');
   }
 
   /**
@@ -254,85 +333,6 @@ export class CodeInput extends BaseInput<string> {
     if (this.editor_ !== null) {
       this.editor_.resize();
     }
-  }
-
-  /**
-   * Handles initialization.
-   */
-  [Reflect.__initialize](): void {
-    this.editorValueHook_.open(this.editorValueBinder_);
-  }
-
-  /**
-   * @override
-   */
-  disposeInternal(): void {
-    if (this.editor_ !== null) {
-      this.editor_.destroy();
-    }
-    super.disposeInternal();
-  }
-
-  /**
-   * @override
-   */
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    if (this.gsShowGutterHook_.get() === null) {
-      this.gsShowGutterHook_.set(true);
-    }
-
-    const shadowRoot = element.shadowRoot;
-    if (shadowRoot === null) {
-      throw new Error('No shadow roots were found');
-    }
-    this.editor_ = this.ace_.edit(shadowRoot.querySelector('#editor') as HTMLElement);
-    this.editorValueBinder_.setEditor(this.editor_);
-
-    this.editor_.setHighlightActiveLine(true);
-    this.editor_.setReadOnly(false);
-    this.editor_.setFontSize('14px');
-
-    this.editor_.session.setTabSize(2);
-    this.editor_.session.setUseSoftTabs(true);
-
-    const interval = Interval.newInstance(500);
-    this.addDisposable(interval);
-    this.listenTo(interval, Interval.TICK_EVENT, this.onTick_);
-    interval.start();
-
-    const aceCss = this.document_.getElementById('ace_editor.css');
-    if (aceCss === null) {
-      throw new Error('#ace_editor.css not found');
-    }
-    const styleEl = element.ownerDocument.createElement('style');
-    styleEl.innerHTML = aceCss.innerHTML;
-    shadowRoot.appendChild(styleEl);
-
-    this.listenTo(this.themeService_, ThemeServiceEvents.THEME_CHANGED, this.onThemeChanged_);
-    this.onThemeChanged_();
-  }
-
-  @handle(null).attributeChange('gs-language', EnumParser(Languages))
-  onGsLanguageAttrChange_(newValue: Languages | null): void {
-    if (this.editor_ !== null && newValue !== null) {
-      this.editor_.getSession().setMode(`ace/mode/${Enums.toLowerCaseString(newValue, Languages)}`);
-    }
-  }
-
-  @handle(null).attributeChange('gs-show-gutter', BooleanParser)
-  onGsShowGutterAttrChange_(newValue: boolean | null): void {
-    if (this.editor_ !== null) {
-      this.editor_.renderer.setShowGutter(newValue === null ? true : newValue);
-    }
-  }
-
-  /**
-   * @override
-   */
-  @handle(null).attributeChange('gs-value', StringParser)
-  onGsValueChange_(newValue: string | null): void {
-    super.onGsValueChange_(newValue || '');
   }
 }
 // TODO: Mutable

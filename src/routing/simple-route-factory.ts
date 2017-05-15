@@ -1,4 +1,6 @@
-import { AbstractRouteFactory } from './abstract-route-factory';
+import { ImmutableMap } from 'external/gs_tools/src/immutable';
+
+import { AbstractRouteFactory } from '../routing/abstract-route-factory';
 
 
 export class SimpleRouteFactory<T, PR>
@@ -19,6 +21,13 @@ export class SimpleRouteFactory<T, PR>
   /**
    * @override
    */
+  getName(): Promise<string> {
+    return Promise.resolve(this.name_);
+  }
+
+  /**
+   * @override
+   */
   protected getRelativeMatcher_(): string {
     return this.getRelativePath_();
   }
@@ -26,7 +35,7 @@ export class SimpleRouteFactory<T, PR>
   /**
    * @override
    */
-  protected getRelativeMatchParams_(matches: {[key: string]: string}): {} {
+  protected getRelativeMatchParams_(matches: ImmutableMap<string, string>): {} {
     return {};
   }
 
@@ -36,12 +45,4 @@ export class SimpleRouteFactory<T, PR>
   protected getRelativePath_(): string {
     return this.path_;
   }
-
-  /**
-   * @override
-   */
-  getName(): Promise<string> {
-    return Promise.resolve(this.name_);
-  }
 }
-// TODO: Mutable

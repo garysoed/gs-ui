@@ -6,6 +6,15 @@ import { Event } from '../const/event';
 
 
 export class BaseActionElement extends BaseThemedElement {
+
+  /**
+   * @return True iff the element is disabled.
+   */
+  isDisabled(): boolean {
+    const element = this.getElement();
+    return element === null || element.getEventTarget().getAttribute('disabled') !== null;
+  }
+
   /**
    * Handler called when the element is clicked.
    * TODO: This makes no sense.
@@ -17,13 +26,4 @@ export class BaseActionElement extends BaseThemedElement {
       element.dispatch(Event.ACTION, () => {});
     }
   }
-
-  /**
-   * @return True iff the element is disabled.
-   */
-  isDisabled(): boolean {
-    const element = this.getElement();
-    return element === null || element.getEventTarget().getAttribute('disabled') !== null;
-  }
 }
-// TODO: Mutable

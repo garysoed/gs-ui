@@ -1,5 +1,6 @@
 import { Arrays } from 'external/gs_tools/src/collection';
 import { Jsons } from 'external/gs_tools/src/collection';
+import { ImmutableMap } from 'external/gs_tools/src/immutable';
 import { Locations } from 'external/gs_tools/src/ui';
 
 import { Route } from '../routing/route';
@@ -26,51 +27,6 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
     this.type_ = type;
     this.parent_ = parent;
   }
-
-  /**
-   * @return The full matcher for this factory.
-   */
-  private getMatcher_(): string {
-    const currentMatcher = this.getRelativeMatcher_();
-    if (this.parent_ === null) {
-      return currentMatcher;
-    } else {
-      return `${this.parent_.getMatcher_()}${currentMatcher}`;
-    }
-  }
-
-  /**
-   * @param matches The key value of matches from the path.
-   * @return Parsed object containing the matches that this factory and its ancestors can
-   *    recognize.
-   */
-  private getMatchParams_(matches: {[key: string]: string}): CR {
-    const currentMatchParams = this.getRelativeMatchParams_(matches);
-    if (this.parent_ !== null) {
-      return Jsons.mixin(this.parent_.getMatchParams_(matches), currentMatchParams) as CR;
-    } else {
-      return currentMatchParams as CR;
-    }
-  }
-
-  /**
-   * @return Matcher string for this route factory. This should exclude matchers for the parent
-   *    factories.
-   */
-  protected abstract getRelativeMatcher_(): string;
-
-  /**
-   * @param matches The key value of matches from the path.
-   * @return Parsed object containing the matches that this factory can recognize.
-   */
-  protected abstract getRelativeMatchParams_(matches: {[key: string]: string}): CP;
-
-  /**
-   * @param params Params to create the path.
-   * @return Path created using the given params. This path is not prefixed by the path created
-   *    by the ancestors.
-   */
-  protected abstract getRelativePath_(params: CP): string;
 
   /**
    * @param params Params to create the path.
@@ -126,6 +82,32 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
   }
 
   /**
+   * @return The full matcher for this factory.
+   */
+  private getMatcher_(): string {
+    const currentMatcher = this.getRelativeMatcher_();
+    if (this.parent_ === null) {
+      return currentMatcher;
+    } else {
+      return `${this.parent_.getMatcher_()}${currentMatcher}`;
+    }
+  }
+
+  /**
+   * @param matches The key value of matches from the path.
+   * @return Parsed object containing the matches that this factory and its ancestors can
+   *    recognize.
+   */
+  private getMatchParams_(matches: ImmutableMap<string, string>): CR {
+    const currentMatchParams = this.getRelativeMatchParams_(matches);
+    if (this.parent_ !== null) {
+      return Jsons.mixin(this.parent_.getMatchParams_(matches), currentMatchParams) as CR;
+    } else {
+      return currentMatchParams as CR;
+    }
+  }
+
+  /**
    * @param params Param to generate the name.
    * @return Promise that will be resolved with the name of the route produced by the factory.
    */
@@ -143,6 +125,25 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
       return `${this.parent_.getPath(params)}${currentPath}`;
     }
   }
+
+  /**
+   * @return Matcher string for this route factory. This should exclude matchers for the parent
+   *    factories.
+   */
+  protected abstract getRelativeMatcher_(): string;
+
+  /**
+   * @param matches The key value of matches from the path.
+   * @return Parsed object containing the matches that this factory can recognize.
+   */
+  protected abstract getRelativeMatchParams_(matches: ImmutableMap<string, string>): CP;
+
+  /**
+   * @param params Params to create the path.
+   * @return Path created using the given params. This path is not prefixed by the path created
+   *    by the ancestors.
+   */
+  protected abstract getRelativePath_(params: CP): string;
 
   /**
    * @return Type of the factory.

@@ -22,20 +22,6 @@ export class DownloadService {
   }
 
   /**
-   * @return The link element used for downloading.
-   */
-  private getLinkEl_(): HTMLAnchorElement {
-    if (this.linkEl_ !== null) {
-      return this.linkEl_;
-    }
-
-    const linkEl = this.window_.document.createElement('a');
-    linkEl.target = '_blank';
-    this.linkEl_ = linkEl;
-    return linkEl;
-  }
-
-  /**
    * Downloads the given blob.
    * @param blob Blob to download.
    * @param filename Name of file to download the blob as.
@@ -59,6 +45,20 @@ export class DownloadService {
         [JSON.stringify(json, null)],
         {type: 'application/json'});
     this.download(blob, filename);
+  }
+
+  /**
+   * @return The link element used for downloading.
+   */
+  private getLinkEl_(): HTMLAnchorElement {
+    if (this.linkEl_ !== null) {
+      return this.linkEl_;
+    }
+
+    const linkEl = this.window_.document.createElement('a');
+    linkEl.target = '_blank';
+    this.linkEl_ = linkEl;
+    return linkEl;
   }
 }
 // TODO: Mutable

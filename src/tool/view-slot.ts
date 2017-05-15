@@ -1,5 +1,6 @@
 import { Arrays } from 'external/gs_tools/src/collection';
 import { Iterables } from 'external/gs_tools/src/collection';
+import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import { Doms, LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
@@ -37,44 +38,6 @@ export class ViewSlot extends BaseThemedElement {
   }
 
   /**
-   * Handles event when the location was changed.
-   */
-  private onLocationChanged_(): void {
-    this.updateActiveView_();
-  }
-
-  /**
-   * Sets the root element to be visible.
-   *
-   * @param visible True iff the root element should be visible.
-   */
-  private setRootElVisible_(visible: boolean): void {
-    const classList = this.rootElClassListHook_.get();
-    if (classList !== null) {
-      classList.toggle('hidden', !visible);
-    }
-  }
-
-  /**
-   * Updates the selector.
-   */
-  private updateActiveView_(): void {
-    const listenableElement = this.getElement();
-    if (listenableElement !== null) {
-      const element = listenableElement.getEventTarget();
-      const targetEl = Arrays
-          .fromItemList(element.children)
-          .find((child: Element) => {
-            const path = child.getAttribute('gs-view-path');
-            return !!path && this.locationService_
-                .hasMatch(LocationService.appendParts([element[__FULL_PATH], path]));
-          });
-      this.setActiveElement_(targetEl);
-      this.setRootElVisible_(targetEl !== null);
-    }
-  }
-
-  /**
    * @override
    */
   onCreated(element: HTMLElement): void {
@@ -105,8 +68,15 @@ export class ViewSlot extends BaseThemedElement {
           }
         });
 
-    element[__FULL_PATH] = LocationService.appendParts([rootPath, currentPath]);
+    element[__FULL_PATH] = LocationService.appendParts(ImmutableList.of([rootPath, currentPath]));
 
+    this.updateActiveView_();
+  }
+
+  /**
+   * Handles event when the location was changed.
+   */
+  private onLocationChanged_(): void {
     this.updateActiveView_();
   }
 
@@ -127,6 +97,41 @@ export class ViewSlot extends BaseThemedElement {
 
     if (targetEl !== null) {
       targetEl.setAttribute('gs-view-active', BooleanParser.stringify(true));
+    }
+  }
+
+  /**
+   * Sets the root element to be visible.
+   *
+   * @param visible True iff the root element should be visible.
+   */
+  private setRootElVisible_(visible: boolean): void {
+    const classList = this.rootElClassListHook_.get();
+    if (classList !== null) {
+      classList.toggle('hidden', !visible);
+    }
+  }
+
+  /**
+   * Updates the selector.
+   */
+  private updateActiveView_(): void {
+    const listenableElement = this.getElement();
+    if (listenableElement !== null) {
+      const element = listenableElement.getEventTarget();
+      const targetEl = Arrays
+          .fromItemList(element.children)
+          .find((child: Element) => {
+            const path = child.getAttribute('gs-view-path');
+            if (!path) {
+              return false;
+            }
+            const joinedParts = LocationService.appendParts(
+                ImmutableList.of<string>([element[__FULL_PATH], path]));
+            return this.locationService_.hasMatch(joinedParts);
+          });
+      this.setActiveElement_(targetEl);
+      this.setRootElVisible_(targetEl !== null);
     }
   }
 }
