@@ -1,8 +1,12 @@
-import { Arrays } from 'external/gs_tools/src/collection';
 import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
+import {
+  ImmutableList,
+  ImmutableMap,
+  Iterables,
+  OrderedMap } from 'external/gs_tools/src/immutable';
 
 
-const COLORS: [string, Color][] = [
+const COLOR_MAP: OrderedMap<string, Color> = OrderedMap.of([
   ['red', HslColor.newInstance(0, 1, 0.5)],
   ['scarlet', HslColor.newInstance(7.5, 1, 0.5)],
   ['vermilion', HslColor.newInstance(15, 1, 0.5)],
@@ -28,9 +32,7 @@ const COLORS: [string, Color][] = [
   ['rose', HslColor.newInstance(330, 1, 0.5)],
   ['torchred', HslColor.newInstance(345, 1, 0.5)],
   ['grey', HslColor.newInstance(0, 0, 0.5)],
-];
-
-const COLOR_MAP: Map<string, Color> = new Map<string, Color>(COLORS);
+]);
 
 /**
  * Default built in palettes for gs-ui.
@@ -48,24 +50,28 @@ export const DefaultPalettes = {
   },
 
   getAt(index: number): Color {
-    const colorCount = COLORS.length - 1;
-    return COLORS[(colorCount - ((-1 * index) % colorCount)) % colorCount][1];
+    const colorCount = COLOR_MAP.size() - 1;
+    const entry = COLOR_MAP.getAt((colorCount - ((-1 * index) % colorCount)) % colorCount);
+    if (!entry) {
+      throw new Error(`No color found at position ${index}`);
+    }
+    return entry[1];
   },
 
   getClosestIndex(color: Color): number {
     type DistanceData = {distance: number, index: number};
-    const closestResult = Arrays
-        .of(COLORS)
-        .reduce((value: [string, Color], index: number, previousResult: DistanceData) => {
+    return COLOR_MAP
+        .entries()
+        .reduce((previousResult: DistanceData, value: [string, Color], index: number) => {
           const distance = Colors.getDistance(value[1], color);
           return distance < previousResult.distance ? {distance, index} : previousResult;
         },
-        {distance: Number.POSITIVE_INFINITY, index: -1});
-    return closestResult.index;
+        {distance: Number.POSITIVE_INFINITY, index: -1})
+        .index;
   },
 
   getNames(): string[] {
-    return Arrays.fromIterable(COLOR_MAP.keys()).asArray();
+    return Iterables.toArray(COLOR_MAP.keys());
   },
 };
 // TODO: Mutable

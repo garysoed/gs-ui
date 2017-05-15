@@ -223,7 +223,12 @@ describe('input.FileInput', () => {
     });
 
     it('should delete the previous bundle if valid and exist', () => {
-      const files = Mocks.object('files');
+      const files = {
+        item(): any {
+          return null;
+        },
+        length: 0,
+      };
       const dataTransfer = Mocks.object('dataTransfer');
       dataTransfer.files = files;
 

@@ -1,7 +1,6 @@
 import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
-import { Jsons } from 'external/gs_tools/src/collection';
 import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
@@ -170,11 +169,7 @@ describe('tool.OverlayContainer', () => {
 
           const mockClassList = jasmine.createSpyObj('ClassList', ['add']);
           rootEl.classList = mockClassList;
-
-          Fakes.build(spyOn(Jsons, 'setTemporaryValue'))
-              .call((json: any, substitutions: any, callback: any) => {
-                callback();
-              });
+          rootEl.style = {};
 
           const mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
           spyOn(OverlayContainer['BASE_SHOW_ANIMATION_'], 'appendKeyframe').and
@@ -194,14 +189,6 @@ describe('tool.OverlayContainer', () => {
                 height: `${height}px`,
                 width: `${width}px`,
               }));
-
-          assert(Jsons.setTemporaryValue).to.haveBeenCalledWith(
-              rootEl,
-              {
-                'style.display': 'block',
-                'style.visibility': 'hidden',
-              },
-              Matchers.any(Function) as any);
         });
 
     it('should do nothing if the distributed element cannot be found', () => {
@@ -217,15 +204,12 @@ describe('tool.OverlayContainer', () => {
     it('should not throw error if there are no elements', () => {
       container['element_'] = null;
 
+      spyOn(container['rootEl_'], 'getEventTarget').and.returnValue({style: {}});
+
       const distributedElement = Mocks.object('distributedElement');
       distributedElement.clientHeight = 123;
       distributedElement.clientWidth = 456;
       mockContentEl.getDistributedNodes.and.returnValue([distributedElement]);
-
-      Fakes.build(spyOn(Jsons, 'setTemporaryValue'))
-          .call((json: any, substitutions: any, callback: any) => {
-            callback();
-          });
 
       const mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
       spyOn(OverlayContainer['BASE_SHOW_ANIMATION_'], 'appendKeyframe').and

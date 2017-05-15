@@ -1,6 +1,5 @@
-import { Arrays } from 'external/gs_tools/src/collection';
 import { DomEvent } from 'external/gs_tools/src/event';
-import { ImmutableSet } from 'external/gs_tools/src/immutable';
+import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { ArrayParser, StringParser } from 'external/gs_tools/src/parse';
 import {
@@ -81,8 +80,8 @@ export class FileInput extends BaseThemedElement {
     }
 
     const mimeTypesSet = new Set(mimeTypesArray);
-    return Arrays
-        .fromNumericIndexable(dataTransfer.items)
+    return ImmutableList
+        .of(dataTransfer.items)
         .every((item: DataTransferItem) => {
           return mimeTypesSet.has(item.type);
         });
@@ -132,7 +131,7 @@ export class FileInput extends BaseThemedElement {
       }
 
       const {id, deleteFn} =
-          this.fileService_.addBundle(Arrays.fromItemList(event.dataTransfer.files).asArray());
+          this.fileService_.addBundle(ImmutableList.of(event.dataTransfer.files).toArray());
       this.deleteBundleFn_ = deleteFn;
       this.gsBundleIdHook_.set(id);
     }
@@ -155,12 +154,12 @@ export class FileInput extends BaseThemedElement {
     this.switchGsValueHook_.set('dropped');
 
     // TODO: sort the file names.
-    const fileNames = Arrays
+    const fileNames = ImmutableList
         .of(files)
         .map((file: File) => {
           return file.name;
         })
-        .asArray()
+        .toArray()
         .join(', ');
     // TODO: Differentiate between 1 attachment vs multiple.
     this.droppedMessageInnerTextHook_.set(`Added file(s): ${fileNames}`);

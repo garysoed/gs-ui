@@ -1,6 +1,6 @@
-import { Arrays } from 'external/gs_tools/src/collection';
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
 import { ListenableDom } from 'external/gs_tools/src/event';
+import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { Injector } from 'external/gs_tools/src/inject';
 import { LocationService } from 'external/gs_tools/src/ui';
 import { Reflect } from 'external/gs_tools/src/util';
@@ -91,12 +91,10 @@ export class Main extends BaseDisposable {
    * @param theme The theme to apply to the app.
    */
   bootstrap(theme: Theme = DEFAULT_THEME_, customElements: gs.ICtor<BaseElement>[] = []): void {
-    Arrays
-        .of(DEFAULT_ELEMENTS_)
-        .addAllArray(customElements)
-        .forEach((ctor: gs.ICtor<BaseElement>) => {
-          this.registrar_.register(ctor);
-        });
+    const ctors = ImmutableSet.of(DEFAULT_ELEMENTS_).addAll(ImmutableSet.of(customElements));
+    for (const ctor of ctors) {
+      this.registrar_.register(ctor);
+    }
 
     this.themeService_.install(theme);
   }

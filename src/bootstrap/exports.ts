@@ -1,5 +1,5 @@
-import { Jsons } from 'external/gs_tools/src/collection';
 import { HslColor } from 'external/gs_tools/src/color';
+import { Jsons } from 'external/gs_tools/src/data';
 import { Templates } from 'external/gs_tools/src/webc';
 
 import { SimpleRouteFactory } from '../routing/simple-route-factory';
@@ -15,4 +15,3 @@ Jsons.setValue(window, 'gs.ui.DefaultPalettes', DefaultPalettes);
 Jsons.setValue(window, 'gs.ui.Main', Main);
 Jsons.setValue(window, 'gs.ui.SimpleRouteFactory', SimpleRouteFactory);
 Jsons.setValue(window, 'gs.ui.Theme', Theme);
-// TODO: Mutable

@@ -1,4 +1,3 @@
-import { Jsons } from 'external/gs_tools/src/collection';
 import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
 import { inject } from 'external/gs_tools/src/inject';
 import { FloatParser } from 'external/gs_tools/src/parse';
@@ -9,9 +8,9 @@ import {
   customElement,
   handle } from 'external/gs_tools/src/webc';
 
-import { AnchorLocation } from './anchor-location';
-import { AnchorLocationParser } from './anchor-location-parser';
-import { Anchors } from './anchors';
+import { AnchorLocation } from '../tool/anchor-location';
+import { AnchorLocationParser } from '../tool/anchor-location-parser';
+import { Anchors } from '../tool/anchors';
 
 
 @customElement({
@@ -171,16 +170,16 @@ export class OverlayContainer extends BaseElement {
     const distributedElement = distributedNodes[0];
 
     // Temporarily displays the root element for measurement.
-    Jsons.setTemporaryValue(
-        this.rootEl_.getEventTarget(),
-        {
-          'style.display': 'block',
-          'style.visibility': 'hidden',
-        },
-        () => {
-          contentHeight = distributedElement.clientHeight;
-          contentWidth = distributedElement.clientWidth;
-        });
+
+    const eventTarget = this.rootEl_.getEventTarget();
+    const origDisplay = eventTarget.style.display;
+    const origVisibility = eventTarget.style.visibility;
+    eventTarget.style.display = 'block';
+    eventTarget.style.visibility = 'hidden';
+    contentHeight = distributedElement.clientHeight;
+    contentWidth = distributedElement.clientWidth;
+    eventTarget.style.display = origDisplay;
+    eventTarget.style.visibility = origVisibility;
 
     const element = this.getElement();
     if (element !== null) {

@@ -1,6 +1,6 @@
-import { Maps } from 'external/gs_tools/src/collection';
 import { Color } from 'external/gs_tools/src/color';
 import { BaseListenable } from 'external/gs_tools/src/event';
+import { ImmutableMap, Iterables } from 'external/gs_tools/src/immutable';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import { Templates } from 'external/gs_tools/src/webc';
@@ -90,8 +90,8 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
    */
   install(theme: Theme): void {
     const themeStyleEl = this.getThemeStyleEl_();
-    const vars = Maps
-        .fromRecord({
+    const mappedEntries = ImmutableMap
+        .of({
           'gsThemeAccent': theme.getAccent(),
           'gsThemeActionNormal': theme.getAction(),
           'gsThemeActionNormalDark': theme.getActionDark(false),
@@ -118,11 +118,10 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
           'gsThemeWhiteFade': theme.getWhiteFade(),
         })
         .entries()
-        .map(([name, color]: [string, Color]) => {
+        .mapItem(([name, color]: [string, Color]) => {
           return `--${name}:rgb(${color.getRed()},${color.getGreen()},${color.getBlue()});`;
-        })
-        .asArray()
-        .join('');
+        });
+    const vars = Iterables.toArray(mappedEntries).join('');
 
     this.dispatch(
         ThemeServiceEvents.THEME_CHANGED,

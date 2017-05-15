@@ -1,9 +1,9 @@
-import { Arrays } from 'external/gs_tools/src/collection';
 import { BaseListenableListener } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
 import { Reflect } from 'external/gs_tools/src/util';
 
+import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { AbstractRouteFactory } from './abstract-route-factory';
 import { IRouteFactoryService } from './i-route-factory-service';
 import { Route } from './route';
@@ -38,11 +38,9 @@ export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> 
         LocationServiceEvents.CHANGED,
         this.onLocationChanged_);
 
-    Arrays
-        .of(this.routeFactoryService_.getFactories())
-        .forEach((factory: AbstractRouteFactory<T, any, any, any>) => {
-          this.routeFactoryMap_.set(factory.getType(), factory);
-        });
+    for (const factory of this.routeFactoryService_.getFactories()) {
+      this.routeFactoryMap_.set(factory.getType(), factory);
+    }
   }
 
   /**
@@ -71,17 +69,12 @@ export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> 
   getRoute(): Route<T, any> | null {
     const path = this.getPath();
     let route: Route<T, any> | null = null;
-    Arrays
-        .of(this.routeFactoryService_.getFactories())
-        .forOf((
-            factory: AbstractRouteFactory<T, any, any, any>,
-            index: number,
-            breakFn: () => void) => {
-          route = factory.createFromPath(path);
-          if (route !== null) {
-            breakFn();
-          }
-        });
+    for (const factory of this.routeFactoryService_.getFactories()) {
+      route = factory.createFromPath(path);
+      if (route !== null) {
+        break;
+      }
+    }
     return route;
   }
 

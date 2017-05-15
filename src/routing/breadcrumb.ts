@@ -1,5 +1,4 @@
-import { Arrays } from 'external/gs_tools/src/collection';
-import { ImmutableSet } from 'external/gs_tools/src/immutable';
+import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { ChildElementDataHelper, customElement, DomHook, hook } from 'external/gs_tools/src/webc';
 
@@ -124,15 +123,14 @@ export class Breadcrumb<T> extends BaseThemedElement {
     const names = routeFactory.getCascadeNames(params);
     const paths = routeFactory.getCascadePaths(params);
 
-    const promises = Arrays
+    const promises = ImmutableList
         .of(names)
-        .zip(paths)
-        .mapElement((pair: [Promise<string>, string]) => {
-          return Promise.all(pair);
+        .map((promise: Promise<string>, index: number) => {
+          return Promise.all([promise, paths[index]]);
         })
-        .asArray();
+        .toArray();
     const data = await Promise.all(promises);
-    const crumbData = Arrays
+    const crumbData = ImmutableList
         .of(data)
         .map(([name, url]: [string, string]) => {
           return {
@@ -140,7 +138,7 @@ export class Breadcrumb<T> extends BaseThemedElement {
             url: url,
           };
         })
-        .asArray();
+        .toArray();
     this.crumbHook_.set(crumbData);
   }
 }

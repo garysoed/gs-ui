@@ -1,7 +1,6 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import { Arrays } from 'external/gs_tools/src/collection';
 import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
@@ -117,13 +116,6 @@ describe('tool.ViewSlot', () => {
     it('should set the correct target element to active', () => {
       const fullPath = 'fullPath';
       const children = Mocks.object('children');
-      const element = Mocks.object('element');
-      element.children = children;
-      element[__FULL_PATH] = fullPath;
-
-      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
-      mockListenableElement.getEventTarget.and.returnValue(element);
-      spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
 
       const path = 'path';
       const mockChildWithPath = jasmine.createSpyObj('ChildWithPath', ['getAttribute']);
@@ -131,8 +123,19 @@ describe('tool.ViewSlot', () => {
 
       const mockChildNoPath = jasmine.createSpyObj('ChildNoPath', ['getAttribute']);
       mockChildNoPath.getAttribute.and.returnValue(null);
-      spyOn(Arrays, 'fromItemList').and
-          .returnValue(Arrays.of([mockChildNoPath, mockChildWithPath]));
+
+      const element = Mocks.object('element');
+      element.children = {
+        item(index: number): any {
+          return (index === 0) ? mockChildNoPath : mockChildWithPath;
+        },
+        length: 2,
+      };
+      element[__FULL_PATH] = fullPath;
+
+      const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
+      mockListenableElement.getEventTarget.and.returnValue(element);
+      spyOn(viewSlot, 'getElement').and.returnValue(mockListenableElement);
 
       const appendedPath = 'appendedPath';
       spyOn(LocationService, 'appendParts').and.returnValue(appendedPath);
@@ -152,12 +155,16 @@ describe('tool.ViewSlot', () => {
       assert(mockLocationService.hasMatch).to.haveBeenCalledWith(appendedPath);
       assert(mockChildWithPath.getAttribute).to.haveBeenCalledWith('gs-view-path');
       assert(mockChildNoPath.getAttribute).to.haveBeenCalledWith('gs-view-path');
-      assert(Arrays.fromItemList).to.haveBeenCalledWith(children);
     });
 
     it('should set no elements to active if there are no active elements', () => {
       const element = Mocks.object('element');
-      element.children = Mocks.object('children');
+      element.children = {
+        item(): any {
+          return null;
+        },
+        length: 0,
+      };
       element[__FULL_PATH] = 'fullPath';
 
       const mockListenableElement = jasmine.createSpyObj('ListenableElement', ['getEventTarget']);
@@ -166,7 +173,6 @@ describe('tool.ViewSlot', () => {
 
       const mockChild = jasmine.createSpyObj('Child', ['getAttribute']);
       mockChild.getAttribute.and.returnValue(null);
-      spyOn(Arrays, 'fromItemList').and.returnValue(Arrays.of([mockChild]));
 
       spyOn(viewSlot, 'setRootElVisible_');
       spyOn(viewSlot, 'setActiveElement_');

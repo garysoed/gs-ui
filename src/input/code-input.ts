@@ -1,6 +1,6 @@
 import { Interval } from 'external/gs_tools/src/async';
-import { Maps } from 'external/gs_tools/src/collection';
 import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
+import { ImmutableMap, Iterables } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import {
   BooleanParser,
@@ -308,8 +308,8 @@ export class CodeInput extends BaseInput<string> {
         DefaultPalettes.getAt(index + 12),
         theme.getContrast(),
         reverseMode);
-    const cssContent = Maps
-        .fromRecord({
+    const mappedEntries = ImmutableMap
+        .of({
           gsCodeInputColorCharacter: characterColor,
           gsCodeInputColorLanguage: languageColor,
           gsCodeInputColorNumeric: numericColor,
@@ -318,11 +318,10 @@ export class CodeInput extends BaseInput<string> {
           gsCodeInputColorVariable: variableColor,
         })
         .entries()
-        .map(([name, color]: [string, Color]) => {
+        .mapItem(([name, color]: [string, Color]) => {
           return `--${name}:rgb(${color.getRed()},${color.getGreen()},${color.getBlue()});`;
-        })
-        .asArray()
-        .join('');
+        });
+    const cssContent = Iterables.toArray(mappedEntries).join('');
     this.customStyleInnerHtmlHook_.set(`#editor {${cssContent}}`);
   }
 

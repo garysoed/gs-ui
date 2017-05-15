@@ -1,5 +1,3 @@
-import { Arrays } from 'external/gs_tools/src/collection';
-import { Iterables } from 'external/gs_tools/src/collection';
 import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
@@ -57,16 +55,14 @@ export class ViewSlot extends BaseThemedElement {
     // Update the path.
     let rootPath: string = '';
     let currentPath: string = '';
-    Iterables
-        .of(Doms.parentIterable(element, true /* bustShadow */))
-        .iterate((currentElement: HTMLElement, breakFn: () => void) => {
-          if (currentElement !== element && currentElement.nodeName === 'GS-VIEW-SLOT') {
-            rootPath = currentElement[__FULL_PATH];
-            breakFn();
-          } else if (!!currentElement.getAttribute('gs-view-path')) {
-            currentPath = currentElement.getAttribute('gs-view-path') || '';
-          }
-        });
+    for (const currentElement of Doms.parentIterable(element, true /* bustShadow */)) {
+      if (currentElement !== element && currentElement.nodeName === 'GS-VIEW-SLOT') {
+        rootPath = currentElement[__FULL_PATH];
+        break;
+      } else if (!!currentElement.getAttribute('gs-view-path')) {
+        currentPath = currentElement.getAttribute('gs-view-path') || '';
+      }
+    }
 
     element[__FULL_PATH] = LocationService.appendParts(ImmutableList.of([rootPath, currentPath]));
 
@@ -119,8 +115,8 @@ export class ViewSlot extends BaseThemedElement {
     const listenableElement = this.getElement();
     if (listenableElement !== null) {
       const element = listenableElement.getEventTarget();
-      const targetEl = Arrays
-          .fromItemList(element.children)
+      const targetEl = ImmutableList
+          .of(element.children)
           .find((child: Element) => {
             const path = child.getAttribute('gs-view-path');
             if (!path) {

@@ -1,6 +1,5 @@
-import { Arrays } from 'external/gs_tools/src/collection';
-import { Jsons } from 'external/gs_tools/src/collection';
-import { ImmutableMap } from 'external/gs_tools/src/immutable';
+import { Jsons } from 'external/gs_tools/src/data';
+import { ImmutableList, ImmutableMap } from 'external/gs_tools/src/immutable';
 import { Locations } from 'external/gs_tools/src/ui';
 
 import { Route } from '../routing/route';
@@ -57,10 +56,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
       names.push(current.getName(params));
       current = current.parent_;
     }
-    return Arrays
-        .of(names)
-        .reverse()
-        .asArray();
+    return ImmutableList.of(names).reverse().toArray();
   }
 
   /**
@@ -75,10 +71,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
       paths.push(current.getPath(params));
       current = current.parent_;
     }
-    return Arrays
-        .of(paths)
-        .reverse()
-        .asArray();
+    return ImmutableList.of(paths).reverse().toArray();
   }
 
   /**
