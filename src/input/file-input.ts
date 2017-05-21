@@ -1,7 +1,7 @@
 import { DomEvent } from 'external/gs_tools/src/event';
 import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { ArrayParser, StringParser } from 'external/gs_tools/src/parse';
+import { ListParser, StringParser } from 'external/gs_tools/src/parse';
 import {
   customElement,
   DomHook,
@@ -34,8 +34,8 @@ export class FileInput extends BaseThemedElement {
   @hook(null).attribute('gs-bundle-id', StringParser)
   private readonly gsBundleIdHook_: DomHook<string>;
 
-  @hook(null).attribute('gs-mime-types', ArrayParser(StringParser))
-  private readonly gsMimeTypesHook_: DomHook<string[]>;
+  @hook(null).attribute('gs-mime-types', ListParser(StringParser))
+  private readonly gsMimeTypesHook_: DomHook<ImmutableList<string>>;
 
   @hook('#initialMessage').innerText()
   private readonly initialMessageInnerTextHook_: DomHook<string>;
@@ -52,7 +52,7 @@ export class FileInput extends BaseThemedElement {
     this.droppedMessageInnerTextHook_ = DomHook.of<string>();
     this.fileService_ = fileService;
     this.gsBundleIdHook_ = DomHook.of<string>();
-    this.gsMimeTypesHook_ = DomHook.of<string[]>();
+    this.gsMimeTypesHook_ = DomHook.of<ImmutableList<string>>();
     this.initialMessageInnerTextHook_ = DomHook.of<string>();
     this.switchGsValueHook_ = DomHook.of<string>();
   }
