@@ -34,16 +34,16 @@
   <body>
     <template id="template">
       <gs-basic-button>
-        <div gs-content>Normal Button</div>
+        <div>Normal Button</div>
       </gs-basic-button>
       <gs-basic-button disabled>
-        <div gs-content>Disabled Button</div>
+        <div>Disabled Button</div>
       </gs-basic-button>
       <gs-basic-button class="gs-primary">
-        <div gs-content>Primary Button</div>
+        <div>Primary Button</div>
       </gs-basic-button>
       <gs-basic-button class="gs-primary" disabled>
-        <div gs-content>Disabled Primary Button</div>
+        <div>Disabled Primary Button</div>
       </gs-basic-button>
     </template>
 
@@ -59,17 +59,17 @@
     </section>
 
     <gs-basic-button class="colorPicker gs-theme-normal gs-primary">
-      <div gs-content><gs-icon>color_lens</gs-icon></div>
+      <div><gs-icon>color_lens</gs-icon></div>
       <gs-menu>
-        <div class="menuRoot gs-theme-normal" gs-content selected-tab="base">
+        <div class="menuRoot gs-theme-normal" selected-tab="base">
           <div class="colorPickerMenu base"></div>
           <div class="colorPickerMenu accent"></div>
           <gs-horizontal-tab gs-selected-tab="base">
             <gs-basic-button gs-tab-id="base">
-              <div gs-content>Base</div>
+              <div>Base</div>
             </gs-basic-button>
             <gs-basic-button gs-tab-id="accent">
-              <div gs-content>Accent</div>
+              <div>Accent</div>
             </gs-basic-button>
           </gs-horizontal-tab>
         </div>
@@ -83,9 +83,9 @@
           gs-min-width="3.5rem"
           gs-max-width="9rem"
           id="contrastDrawer">
-        <div gs-content id="contrastContent" layout="row">
+        <div id="contrastContent" layout="row">
           <gs-basic-button class="gs-primary" id="contrastButton">
-            <gs-icon gs-content>accessibility</gs-icon>
+            <gs-icon>accessibility</gs-icon>
           </gs-basic-button>
           <gs-float-input flex gs-value="4.5" id="contrastInput"></gs-float-input>
         </div>
