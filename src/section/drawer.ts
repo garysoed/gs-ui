@@ -2,12 +2,21 @@ import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import {
   customElement,
+  dom,
   DomHook,
   handle,
-  hook } from 'external/gs_tools/src/webc';
+  hook,
+  onDom} from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
+
+
+const ALIGN_CONTENT_ATTRIBUTE = {name: 'gs-align-content', selector: null, parser: StringParser};
+const ANCHOR_POINT_ATTRIBUTE = {name: 'gs-anchor-point', selector: null, parser: StringParser};
+const IS_EXPANDED_ATTRIBUTE = {name: 'gs-is-expanded', selector: null, parser: BooleanParser};
+const MAX_WIDTH_ATTRIBUTE = {name: 'gs-max-width', selector: null, parser: StringParser};
+const MIN_WIDTH_ATTRIBUTE = {name: 'gs-min-width', selector: null, parser: StringParser};
 
 
 @customElement({
@@ -40,8 +49,9 @@ export class Drawer extends BaseThemedElement {
     this.rootStyleHook_ = DomHook.of<CSSStyleDeclaration>();
   }
 
-  @handle(null).attributeChange('gs-align-content', StringParser)
-  onAlignContentChanged_(alignContent: string | null): void {
+  @onDom.attributeChange(ALIGN_CONTENT_ATTRIBUTE)
+  onAlignContentChanged_(
+      @dom.attribute(ALIGN_CONTENT_ATTRIBUTE) alignContent: string | null): void {
     const style = this.itemStyleHook_.get();
     if (style === null) {
       return;
@@ -70,8 +80,9 @@ export class Drawer extends BaseThemedElement {
    *
    * @param anchorPoint The new value of the anchor point.
    */
-  @handle(null).attributeChange('gs-anchor-point', StringParser)
-  onAnchorPointChanged_(anchorPoint: string | null): void {
+  @onDom.attributeChange(ANCHOR_POINT_ATTRIBUTE)
+  onAnchorPointChanged_(
+      @dom.attribute(ANCHOR_POINT_ATTRIBUTE) anchorPoint: string | null): void {
     const style = this.containerStyleHook_.get();
     if (style === null) {
       return;
@@ -100,8 +111,9 @@ export class Drawer extends BaseThemedElement {
    *
    * @param isExpanded True iff the drawer should be expanded.
    */
-  @handle(null).attributeChange('gs-is-expanded', BooleanParser)
-  protected onIsExpandedChanged_(isExpanded: boolean): void {
+  @onDom.attributeChange(IS_EXPANDED_ATTRIBUTE)
+  protected onIsExpandedChanged_(
+      @dom.attribute(IS_EXPANDED_ATTRIBUTE) isExpanded: boolean): void {
     const classListSet = this.classListHook_.get() || new Set();
     if (isExpanded) {
       classListSet.add('expanded');
@@ -116,8 +128,9 @@ export class Drawer extends BaseThemedElement {
    *
    * @param width The maximum width of the drawer to set.
    */
-  @handle(null).attributeChange('gs-max-width', StringParser)
-  protected onMaxWidthChanged_(width: string): void {
+  @onDom.attributeChange(MAX_WIDTH_ATTRIBUTE)
+  protected onMaxWidthChanged_(
+      @dom.attribute(MAX_WIDTH_ATTRIBUTE) width: string): void {
     const styleDeclaration = this.rootStyleHook_.get();
     if (styleDeclaration !== null) {
       styleDeclaration.setProperty('--gsDrawerExpandedWidth', width);
@@ -129,8 +142,9 @@ export class Drawer extends BaseThemedElement {
    *
    * @param width The minimum width of the drawer to set.
    */
-  @handle(null).attributeChange('gs-min-width', StringParser)
-  protected onMinWidthChanged_(width: string): void {
+  @onDom.attributeChange(MIN_WIDTH_ATTRIBUTE)
+  protected onMinWidthChanged_(
+      @dom.attribute(MIN_WIDTH_ATTRIBUTE) width: string): void {
     const styleDeclaration = this.rootStyleHook_.get();
     if (styleDeclaration !== null) {
       styleDeclaration.setProperty('--gsDrawerCollapsedWidth', width);

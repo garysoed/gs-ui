@@ -3,12 +3,17 @@ import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import {
   customElement,
+  dom,
   DomHook,
   handle,
-  hook } from 'external/gs_tools/src/webc';
+  hook,
+  onDom} from 'external/gs_tools/src/webc';
 
 import { BaseInput } from '../input/base-input';
 import { ThemeService } from '../theming/theme-service';
+
+
+const VALUE_ATTRIBUTE = {name: 'gs-value', parser: StringParser, selector: null};
 
 
 @customElement({
@@ -41,8 +46,9 @@ export class TextInput extends BaseInput<string> {
    *
    * @param newValue The value it was changed to.
    */
-  @handle(null).attributeChange('gs-value', StringParser)
-  protected onGsValueChange_(newValue: string): void {
+  @onDom.attributeChange(VALUE_ATTRIBUTE)
+  protected onGsValueChange_(
+      @dom.attribute(VALUE_ATTRIBUTE) newValue: string): void {
     super.onGsValueChange_(newValue);
   }
 }

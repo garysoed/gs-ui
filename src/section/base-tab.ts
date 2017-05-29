@@ -99,7 +99,7 @@ export abstract class BaseTab extends BaseThemedElement {
   /**
    * Handles event when the gs-selected-tab attribute was changed.
    */
-  @handle(null).attributeChange('gs-selected-tab', StringParser)
+  @handle(null).attributeChange('gs-selected-tab')
   protected onSelectedTabChanged_(): void {
     const element = this.getElement();
     if (element !== null) {

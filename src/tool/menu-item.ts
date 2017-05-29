@@ -2,12 +2,14 @@ import { DomEvent } from 'external/gs_tools/src/event';
 import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
-import { customElement, DomHook, handle, hook } from 'external/gs_tools/src/webc';
+import { customElement, dom, DomHook, handle, hook, onDom } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
 import { OverlayService } from '../tool/overlay-service';
 
+
+const CONTENT_ATTRIBUTE = {name: 'gs-content', parser: StringParser, selector: null};
 
 @customElement({
   dependencies: ImmutableSet.of([OverlayService]),
@@ -33,9 +35,9 @@ export class MenuItem extends BaseThemedElement {
     this.menuService_.hideOverlay();
   }
 
-  @handle(null).attributeChange('gs-content', StringParser)
-  protected onDataAttributeChange_(newContent: string): void {
+  @onDom.attributeChange(CONTENT_ATTRIBUTE)
+  protected onDataAttributeChange_(
+      @dom.attribute(CONTENT_ATTRIBUTE) newContent: string): void {
     this.nameHook_.set(newContent);
   }
 }
-// TODO: Mutable

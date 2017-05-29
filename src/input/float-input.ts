@@ -3,12 +3,17 @@ import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, FloatParser } from 'external/gs_tools/src/parse';
 import {
   customElement,
+  dom,
   DomHook,
   handle,
-  hook } from 'external/gs_tools/src/webc';
+  hook,
+  onDom} from 'external/gs_tools/src/webc';
 
 import { BaseInput } from '../input/base-input';
 import { ThemeService } from '../theming/theme-service';
+
+
+const VALUE_ATTRIBUTE = {name: 'gs-value', parser: FloatParser, selector: null};
 
 
 @customElement({
@@ -54,8 +59,9 @@ export class FloatInput extends BaseInput<number> {
    *
    * @param newValue The value it was changed to.
    */
-  @handle(null).attributeChange('gs-value', FloatParser)
-  protected onGsValueChange_(newValue: number): void {
+  @onDom.attributeChange(VALUE_ATTRIBUTE)
+  protected onGsValueChange_(
+      @dom.attribute(VALUE_ATTRIBUTE) newValue: number): void {
     super.onGsValueChange_(newValue);
   }
 }

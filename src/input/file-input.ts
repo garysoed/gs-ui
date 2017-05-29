@@ -4,14 +4,20 @@ import { inject } from 'external/gs_tools/src/inject';
 import { ListParser, StringParser } from 'external/gs_tools/src/parse';
 import {
   customElement,
+  dom,
   DomHook,
   handle,
-  hook } from 'external/gs_tools/src/webc';
+  hook,
+  onDom} from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { FileService } from '../input/file-service';
 import { ThemeService } from '../theming/theme-service';
 import { Switch } from '../tool/switch';
+
+
+const BUNDLE_ID_ATTRIBUTE = {name: 'gs-bundle-id', parser: StringParser, selector: null};
+const LABEL_ATTRIBUTE = {name: 'gs-label', parser: StringParser, selector: null};
 
 
 /**
@@ -139,7 +145,7 @@ export class FileInput extends BaseThemedElement {
     return false;
   }
 
-  @handle(null).attributeChange('gs-bundle-id', StringParser)
+  @onDom.attributeChange(BUNDLE_ID_ATTRIBUTE)
   protected onGsBundleIdChanged_(newValue: string | null, oldValue: string | null): void {
     if (this.deleteBundleFn_ !== null && oldValue !== null) {
       this.deleteBundleFn_();
@@ -168,8 +174,9 @@ export class FileInput extends BaseThemedElement {
   /**
    * Updates the display elements.
    */
-  @handle(null).attributeChange('gs-label', StringParser)
-  protected onGsLabelChanged_(label: string | null): void {
+  @onDom.attributeChange(LABEL_ATTRIBUTE)
+  protected onGsLabelChanged_(
+      @dom.attribute(LABEL_ATTRIBUTE) label: string | null): void {
     this.initialMessageInnerTextHook_.set(label || 'Drop a file here to upload');
   }
 }

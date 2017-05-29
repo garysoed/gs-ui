@@ -202,9 +202,9 @@ export class OverlayContainer extends BaseElement {
   /**
    * Resets the location of the container element based on the anchor point and the anchor target.
    */
-  @handle(null).attributeChange('gs-anchor-point', AnchorLocationParser)
-  @handle(null).attributeChange('gs-anchor-target-x', FloatParser)
-  @handle(null).attributeChange('gs-anchor-target-y', FloatParser)
+  @handle(null).attributeChange('gs-anchor-point')
+  @handle(null).attributeChange('gs-anchor-target-x')
+  @handle(null).attributeChange('gs-anchor-target-y')
   private updateContent_(): void {
     const element = this.getElement();
     if (element === null) {

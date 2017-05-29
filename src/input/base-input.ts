@@ -2,10 +2,13 @@ import { Interval } from 'external/gs_tools/src/async';
 import { DomEvent } from 'external/gs_tools/src/event';
 import { Parser } from 'external/gs_tools/src/interfaces';
 import { BooleanParser } from 'external/gs_tools/src/parse';
-import { DomHook, handle } from 'external/gs_tools/src/webc';
+import { dom, DomHook, handle, onDom } from 'external/gs_tools/src/webc';
 
 import { BaseActionElement } from '../common/base-action-element';
 import { ThemeService } from '../theming/theme-service';
+
+
+const DISABLED_ATTRIBUTE = {name: 'disabled', parser: BooleanParser, selector: null};
 
 
 export abstract class BaseInput<T> extends BaseActionElement {
@@ -67,8 +70,9 @@ export abstract class BaseInput<T> extends BaseActionElement {
    *
    * @param newValue The value of the disabled attribute..
    */
-  @handle(null).attributeChange('disabled', BooleanParser)
-  protected onDisabledChange_(newValue: boolean): void {
+  @onDom.attributeChange(DISABLED_ATTRIBUTE)
+  protected onDisabledChange_(
+      @dom.attribute(DISABLED_ATTRIBUTE) newValue: boolean): void {
     this.inputDisabledHook_.set(newValue);
   }
 

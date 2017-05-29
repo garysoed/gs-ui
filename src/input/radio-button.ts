@@ -1,15 +1,22 @@
+import { event } from 'external/gs_tools/src/event';
 import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import {
   customElement,
+  dom,
   DomHook,
   handle,
-  hook } from 'external/gs_tools/src/webc';
+  hook,
+  onDom} from 'external/gs_tools/src/webc';
 
 import { BaseActionElement } from '../common/base-action-element';
 import { RadioButtonService } from '../input/radio-button-service';
 import { ThemeService } from '../theming/theme-service';
+
+
+const CHECKED_ATTRIBUTE = {name: 'gs-checked', parser: BooleanParser, selector: null};
+const GROUP_ATTRIBUTE = {name: 'gs-group', parser: StringParser, selector: null};
 
 
 @customElement({
@@ -52,8 +59,10 @@ export class RadioButton extends BaseActionElement {
    * @param newValue The new value of gs-checked.
    * @param oldValue The old value of gs-checked.
    */
-  @handle(null).attributeChange('gs-checked', BooleanParser)
-  protected onGsCheckedChanged_(newValue: boolean, oldValue: boolean): void {
+  @onDom.attributeChange(CHECKED_ATTRIBUTE)
+  protected onGsCheckedChanged_(
+      @dom.attribute(CHECKED_ATTRIBUTE) newValue: boolean,
+      @event() {oldValue}: {oldValue: boolean}): void {
     if (newValue !== oldValue) {
       this.updateService_(newValue);
     }
@@ -62,7 +71,7 @@ export class RadioButton extends BaseActionElement {
   /**
    * Handles event when gs-group attribute is changed.
    */
-  @handle(null).attributeChange('gs-group', StringParser)
+  @onDom.attributeChange(GROUP_ATTRIBUTE)
   protected onGsGroupChanged_(): void {
     this.updateService_(this.gsCheckedHook_.get() || false);
   }

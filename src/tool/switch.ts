@@ -1,10 +1,12 @@
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
-import { customElement, DomHook, handle, hook } from 'external/gs_tools/src/webc';
+import { customElement, dom, DomHook, handle, hook, onDom } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement } from '../common/base-themed-element';
 import { ThemeService } from '../theming/theme-service';
 
+
+const VALUE_ATTRIBUTE = {name: 'gs-value', parser: StringParser, selector: null};
 
 /**
  * Switches the content depending on the value.
@@ -23,8 +25,9 @@ export class Switch extends BaseThemedElement {
     this.selectHook_ = DomHook.of<string>(true);
   }
 
-  @handle(null).attributeChange('gs-value', StringParser)
-  protected onGsValueChange_(value: string | null): void {
+  @onDom.attributeChange(VALUE_ATTRIBUTE)
+  protected onGsValueChange_(
+      @dom.attribute(VALUE_ATTRIBUTE) value: string | null): void {
     if (value === null) {
       this.selectHook_.delete();
     } else {

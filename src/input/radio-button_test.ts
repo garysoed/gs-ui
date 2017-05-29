@@ -54,13 +54,13 @@ describe('input.RadioButton', () => {
     it('should update the service', () => {
       const newValue = true;
       spyOn(button, 'updateService_');
-      button['onGsCheckedChanged_'](newValue, false /* oldValue */);
+      button['onGsCheckedChanged_'](newValue, {oldValue: false});
       assert(button['updateService_']).to.haveBeenCalledWith(newValue);
     });
 
     it('should do nothing if the new and old values are the same', () => {
       spyOn(button, 'updateService_');
-      button['onGsCheckedChanged_'](false /* newValue */, false /* oldValue */);
+      button['onGsCheckedChanged_'](false /* newValue */, {oldValue: false});
       assert(button['updateService_']).toNot.haveBeenCalled();
     });
   });

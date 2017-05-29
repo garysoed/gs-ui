@@ -11,10 +11,12 @@ import { Enums } from 'external/gs_tools/src/typescript';
 import { Reflect } from 'external/gs_tools/src/util';
 import {
   customElement,
+  dom,
   DomBinder,
   DomHook,
   handle,
-  hook } from 'external/gs_tools/src/webc';
+  hook,
+  onDom} from 'external/gs_tools/src/webc';
 
 import { ThemeServiceEvents } from '../const/theme-service-events';
 import { BaseInput } from '../input/base-input';
@@ -29,6 +31,10 @@ export enum Languages {
   JAVASCRIPT,
   TYPESCRIPT,
 }
+
+const LANGUAGE_ATTRIBUTE = {name: 'gs-language', parser: EnumParser(Languages), selector: null};
+const SHOW_GUTTER_ATTRIBUTE = {name: 'gs-show-gutter', parser: BooleanParser, selector: null};
+const VALUE_ATTRIBUTE = {name: 'gs-value', parser: StringParser, selector: null};
 
 
 /**
@@ -224,15 +230,17 @@ export class CodeInput extends BaseInput<string> {
     this.onThemeChanged_();
   }
 
-  @handle(null).attributeChange('gs-language', EnumParser(Languages))
-  onGsLanguageAttrChange_(newValue: Languages | null): void {
+  @onDom.attributeChange(LANGUAGE_ATTRIBUTE)
+  onGsLanguageAttrChange_(
+      @dom.attribute(LANGUAGE_ATTRIBUTE) newValue: Languages | null): void {
     if (this.editor_ !== null && newValue !== null) {
       this.editor_.getSession().setMode(`ace/mode/${Enums.toLowerCaseString(newValue, Languages)}`);
     }
   }
 
-  @handle(null).attributeChange('gs-show-gutter', BooleanParser)
-  onGsShowGutterAttrChange_(newValue: boolean | null): void {
+  @onDom.attributeChange(SHOW_GUTTER_ATTRIBUTE)
+  onGsShowGutterAttrChange_(
+      @dom.attribute(SHOW_GUTTER_ATTRIBUTE) newValue: boolean | null): void {
     if (this.editor_ !== null) {
       this.editor_.renderer.setShowGutter(newValue === null ? true : newValue);
     }
@@ -241,8 +249,9 @@ export class CodeInput extends BaseInput<string> {
   /**
    * @override
    */
-  @handle(null).attributeChange('gs-value', StringParser)
-  onGsValueChange_(newValue: string | null): void {
+  @onDom.attributeChange(VALUE_ATTRIBUTE)
+  onGsValueChange_(
+      @dom.attribute(VALUE_ATTRIBUTE) newValue: string | null): void {
     super.onGsValueChange_(newValue || '');
   }
 
