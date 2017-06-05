@@ -10,9 +10,7 @@ import { ThemeService } from '../theming/theme-service';
   templateKey: 'src/button/basic-button',
 })
 export class BasicButton extends BaseActionElement {
-  constructor(
-      @inject('theming.ThemeService') themeService: ThemeService) {
+  constructor(@inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
   }
 }
-// TODO: Mutable

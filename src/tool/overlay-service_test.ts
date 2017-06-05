@@ -229,7 +229,7 @@ describe('gs.tool.OverlayService', () => {
 
       const mockMenuContainerEl = jasmine.createSpyObj(
           'MenuContainerEl',
-          ['appendChild', 'show']);
+          ['appendChild', 'setAttribute']);
       const mockListenableMenuContainer = jasmine.createSpyObj(
           'ListenableMenuContainer',
           ['getEventTarget', 'once']);
@@ -255,10 +255,10 @@ describe('gs.tool.OverlayService', () => {
           anchorElement,
           anchorTarget,
           anchorPoint);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('visible', 'true');
       assert(mockOverlayParent.appendChild).to.haveBeenCalledWith(menuContent);
       assert(mockAnchorTargetWatcher.dispose).to.haveBeenCalledWith();
 
-      assert(mockMenuContainerEl.show).to.haveBeenCalledWith();
       assert(mockListenableMenuContainer.once).to.haveBeenCalledWith(
           OverlayContainer.HIDE_EVENT,
           Matchers.any(Function),

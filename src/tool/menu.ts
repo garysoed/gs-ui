@@ -52,7 +52,7 @@ export class Menu extends BaseElement {
     if (parentElement === null) {
       throw new Error('No parent element found');
     }
-    const menuContent = elementTarget.querySelector('[gs-content]') as HTMLElement;
+    const menuContent = elementTarget.firstElementChild as HTMLElement;
 
     if (!!this.gsFitParentWidthHook_.get()) {
       menuContent.style.width = `${parentElement.clientWidth}px`;

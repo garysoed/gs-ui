@@ -36,7 +36,7 @@ describe('tool.Menu', () => {
       menuContent.style = menuContentStyle;
 
       const mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
-      mockEventTarget.querySelector.and.returnValue(menuContent);
+      mockEventTarget.firstElementChild = menuContent;
       mockEventTarget.parentElement = parentElement;
       mockEventTarget['gsAnchorPoint'] = anchorPoint;
       mockEventTarget['gsAnchorTarget'] = anchorTarget;
@@ -50,7 +50,6 @@ describe('tool.Menu', () => {
           parentElement,
           anchorTarget,
           anchorPoint);
-      assert(mockEventTarget.querySelector).to.haveBeenCalledWith('[gs-content]');
       assert(menuContentStyle.width).to.equal(`${parentWidth}px`);
     });
 

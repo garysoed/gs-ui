@@ -1,37 +1,47 @@
-import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
+import { DomEvent, ListenableDom, MonadSetter } from 'external/gs_tools/src/event';
+import { listener } from 'external/gs_tools/src/event/listener';
+import { on } from 'external/gs_tools/src/event/on';
+import { ImmutableMap } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { FloatParser } from 'external/gs_tools/src/parse';
+import { BooleanParser, FloatParser } from 'external/gs_tools/src/parse';
 import {
   Animation,
   AnimationEasing,
   BaseElement,
   customElement,
-  handle } from 'external/gs_tools/src/webc';
+  dom,
+  domOut,
+  handle,
+  onDom} from 'external/gs_tools/src/webc';
+import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
+import { WINDOW_BUS } from '../common/window-bus';
 import { AnchorLocation } from '../tool/anchor-location';
 import { AnchorLocationParser } from '../tool/anchor-location-parser';
 import { Anchors } from '../tool/anchors';
 
 
+const BACKDROP_CLICK_EVENT = {name: 'click', selector: '#backdrop'};
+const CONTAINER_EL = {selector: '#container'};
+const ROOT_EL = {selector: '#root'};
+const SLOT_EL = {selector: 'slot'};
+const VISIBLE_ATTR = {name: 'visible', parser: BooleanParser, selector: null};
+
+
 @customElement({
-  attributes: {
-    'gsAnchorPoint': AnchorLocationParser,
-    'gsAnchorTargetX': FloatParser,
-    'gsAnchorTargetY': FloatParser,
-  },
   tag: 'gs-overlay-container',
   templateKey: 'src/tool/overlay-container',
 })
 export class OverlayContainer extends BaseElement {
-  static HIDE_EVENT: string = 'gs-hide';
-  static SHOW_EVENT: string = 'gs-show';
+  static readonly HIDE_EVENT: string = 'gs-hide';
+  static readonly SHOW_EVENT: string = 'gs-show';
 
-  private static BASE_SHOW_ANIMATION_: Animation = Animation.newInstance(
+  private static readonly BASE_SHOW_ANIMATION_: Animation = Animation.newInstance(
       [
         {height: '0px', opacity: 0, width: '0px'},
       ],
       {duration: 300, easing: AnimationEasing.EASE_OUT_EXPO});
-  private static HIDE_ANIMATION_: Animation = Animation.newInstance(
+  private static readonly HIDE_ANIMATION_: Animation = Animation.newInstance(
       [
         {opacity: 1},
         {opacity: 0},
@@ -41,18 +51,8 @@ export class OverlayContainer extends BaseElement {
 
   private static SHOW_CLASS_: string = 'show';
 
-  private backdropEl_: ListenableDom<HTMLElement>;
-  private containerEl_: ListenableDom<HTMLElement>;
-  private contentEl_: ListenableDom<HTMLElement>;
-  private document_: ListenableDom<Document>;
-  private rootEl_: ListenableDom<HTMLElement>;
-  private windowEl_: ListenableDom<Window>;
-
-  constructor(
-      @inject('x.dom.window') windowEl: Window = window) {
+  constructor(@inject('x.dom.window') private windowEl_: Window = window) {
     super();
-    this.windowEl_ = ListenableDom.of(windowEl);
-    this.addDisposable(this.windowEl_);
   }
 
   /**
@@ -76,52 +76,47 @@ export class OverlayContainer extends BaseElement {
       return Anchors.resolveAutoLocation(
           elementTarget['gsAnchorTargetX'],
           elementTarget['gsAnchorTargetY'],
-          this.windowEl_.getEventTarget());
+          this.windowEl_);
     }
   }
 
   /**
    * Hides the menu container.
    */
-  private hide_(): void {
-    const animate = OverlayContainer.HIDE_ANIMATION_.applyTo(this.containerEl_.getEventTarget());
+  private hide_(containerEl: HTMLElement, rootEl: HTMLElement): void {
+    const animate = OverlayContainer.HIDE_ANIMATION_.applyTo(containerEl);
     const listenableAnimate = ListenableDom.of(animate);
     this.addDisposable(listenableAnimate);
 
-    this.addDisposable(listenableAnimate.once(DomEvent.FINISH, this.onFinishAnimate_, this));
+    this.addDisposable(listenableAnimate.once(
+        DomEvent.FINISH,
+        this.onFinishAnimate_.bind(this, rootEl),
+        this));
+  }
+
+  @handle(null).attributeChange('gs-anchor-point')
+  @handle(null).attributeChange('gs-anchor-target-x')
+  @handle(null).attributeChange('gs-anchor-target-y')
+  onAttributesChanged_(@dom.element(CONTAINER_EL) containerEl: HTMLElement): void {
+    this.updateContent_(containerEl);
   }
 
   /**
    * Handles the event when backdrop is clicked.
    */
-  private onBackdropClick_(): void {
-    this.hide_();
+  @onDom.event(BACKDROP_CLICK_EVENT)
+  onBackdropClick_(
+      @domOut.attribute(VISIBLE_ATTR) {id, value: isVisible}: MonadSetter<boolean>):
+      ImmutableMap<any, any> {
+    return ImmutableMap.of([[id, false]]);
   }
 
   /**
    * @override
+   * TODO: Use onLifecycle
    */
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
-    const shadowRoot = element.shadowRoot;
-    if (shadowRoot === null) {
-      throw new Error('Shadow root not found');
-    }
-    this.backdropEl_ = ListenableDom.of(shadowRoot.querySelector('.backdrop') as HTMLElement);
-    this.containerEl_ = ListenableDom.of(shadowRoot.querySelector('.container') as HTMLElement);
-    this.contentEl_ = ListenableDom.of(shadowRoot.querySelector('content') as HTMLElement);
-    this.document_ = ListenableDom.of(element.ownerDocument);
-    this.rootEl_ = ListenableDom.of(shadowRoot.querySelector('.root') as HTMLElement);
-
-    this.addDisposable(
-        this.backdropEl_,
-        this.containerEl_,
-        this.contentEl_,
-        this.document_,
-        this.rootEl_);
-
-    element['hide'] = this.hide_.bind(this);
-    element['show'] = this.show_.bind(this);
 
     if (element['gsAnchorPoint'] === null) {
       element['gsAnchorPoint'] = AnchorLocation.AUTO;
@@ -131,8 +126,8 @@ export class OverlayContainer extends BaseElement {
   /**
    * Handles the event when animate is done.
    */
-  private onFinishAnimate_(): void {
-    this.rootEl_.getEventTarget().classList.remove(OverlayContainer.SHOW_CLASS_);
+  private onFinishAnimate_(rootEl: HTMLElement): void {
+    rootEl.classList.remove(OverlayContainer.SHOW_CLASS_);
 
     const element = this.getElement();
     if (element !== null) {
@@ -143,43 +138,58 @@ export class OverlayContainer extends BaseElement {
   /**
    * @override
    */
-  onInserted(element: HTMLElement): void {
-    super.onInserted(element);
-    this.listenTo(this.windowEl_, DomEvent.RESIZE, this.onWindowResize_);
-    this.listenTo(this.backdropEl_, DomEvent.CLICK, this.onBackdropClick_);
-    this.updateContent_();
+  @onLifecycle('insert')
+  onInserted(@dom.element(CONTAINER_EL) containerEl: HTMLElement): void {
+    this.updateContent_(containerEl);
+  }
+
+  @onDom.attributeChange(VISIBLE_ATTR)
+  onVisibilityChange_(
+      @dom.attribute(VISIBLE_ATTR) isVisible: boolean | null,
+      @dom.element(CONTAINER_EL) containerEl: HTMLElement,
+      @dom.element(ROOT_EL) rootEl: HTMLElement,
+      @dom.element(SLOT_EL) slotEl: HTMLSlotElement): void {
+    if (isVisible === null) {
+      return;
+    }
+
+    if (isVisible) {
+      this.show_(containerEl, rootEl, slotEl);
+    } else {
+      this.hide_(containerEl, rootEl);
+    }
   }
 
   /**
    * Handler called when the window is resized.
    */
-  private onWindowResize_(): void {
-    this.updateContent_();
+  @on(WINDOW_BUS, 'resize')
+  private onWindowResize_(@dom.element(CONTAINER_EL) containerEl: HTMLElement): void {
+    this.updateContent_(containerEl);
   }
 
   /**
    * Shows the menu content.
    */
-  private show_(): void {
+  private show_(containerEl: HTMLElement, rootEl: HTMLElement, slotEl: HTMLSlotElement): void {
     let contentHeight = 0;
     let contentWidth = 0;
-    const distributedNodes = this.contentEl_.getEventTarget().getDistributedNodes();
+    const distributedNodes = slotEl.assignedNodes();
     if (distributedNodes.length <= 0) {
       return;
     }
-    const distributedElement = distributedNodes[0];
+    const distributedElement = distributedNodes[0] as HTMLElement;
 
     // Temporarily displays the root element for measurement.
 
-    const eventTarget = this.rootEl_.getEventTarget();
-    const origDisplay = eventTarget.style.display;
-    const origVisibility = eventTarget.style.visibility;
-    eventTarget.style.display = 'block';
-    eventTarget.style.visibility = 'hidden';
+    const origDisplay = rootEl.style.display;
+    const origVisibility = rootEl.style.visibility;
+    rootEl.style.display = 'block';
+    rootEl.style.visibility = 'hidden';
     contentHeight = distributedElement.clientHeight;
     contentWidth = distributedElement.clientWidth;
-    eventTarget.style.display = origDisplay;
-    eventTarget.style.visibility = origVisibility;
+    rootEl.style.display = origDisplay;
+    rootEl.style.visibility = origVisibility;
 
     const element = this.getElement();
     if (element !== null) {
@@ -192,9 +202,9 @@ export class OverlayContainer extends BaseElement {
                   opacity: 1,
                   width: `${contentWidth}px`,
                 })
-                .applyTo(this.containerEl_.getEventTarget());
+                .applyTo(containerEl);
 
-            this.rootEl_.getEventTarget().classList.add(OverlayContainer.SHOW_CLASS_);
+            rootEl.classList.add(OverlayContainer.SHOW_CLASS_);
           });
     }
   }
@@ -202,10 +212,7 @@ export class OverlayContainer extends BaseElement {
   /**
    * Resets the location of the container element based on the anchor point and the anchor target.
    */
-  @handle(null).attributeChange('gs-anchor-point')
-  @handle(null).attributeChange('gs-anchor-target-x')
-  @handle(null).attributeChange('gs-anchor-target-y')
-  private updateContent_(): void {
+  private updateContent_(containerEl: HTMLElement): void {
     const element = this.getElement();
     if (element === null) {
       return;
@@ -220,15 +227,13 @@ export class OverlayContainer extends BaseElement {
     }
 
     // Resets the location of the container.
-    const containerEl = this.containerEl_.getEventTarget();
     containerEl.style.top = '';
     containerEl.style.right = '';
     containerEl.style.bottom = '';
     containerEl.style.left = '';
 
-    const windowEl = this.windowEl_.getEventTarget();
-    const viewportHeight = windowEl.innerHeight;
-    const viewportWidth = windowEl.innerWidth;
+    const viewportHeight = this.windowEl_.innerHeight;
+    const viewportWidth = this.windowEl_.innerWidth;
     const anchorPoint = this.getAnchorPoint_();
 
     // Vertical offset

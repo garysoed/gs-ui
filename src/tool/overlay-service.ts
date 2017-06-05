@@ -1,7 +1,7 @@
 import { Interval } from 'external/gs_tools/src/async';
-import { ListenableDom } from 'external/gs_tools/src/event';
-import { BaseListener } from 'external/gs_tools/src/event';
+import { BaseListener, ListenableDom } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
+import { BooleanParser } from 'external/gs_tools/src/parse';
 
 import { AnchorLocation } from '../tool/anchor-location';
 import { Anchors } from '../tool/anchors';
@@ -114,9 +114,10 @@ export class OverlayService extends BaseListener {
         this.onTick_.bind(this, overlayContainerEl.getEventTarget(), anchorTarget, anchorElement));
     anchorTargetWatcher.start();
 
-    overlayContainerEl.getEventTarget().appendChild(overlayContent);
-    overlayContainerEl.getEventTarget()['gsAnchorPoint'] = anchorPoint;
-    this.setAnchorTarget_(overlayContainerEl.getEventTarget(), anchorTarget, anchorElement);
+    const overlayContainerElTarget = overlayContainerEl.getEventTarget();
+    overlayContainerElTarget.appendChild(overlayContent);
+    overlayContainerElTarget['gsAnchorPoint'] = anchorPoint;
+    this.setAnchorTarget_(overlayContainerElTarget, anchorTarget, anchorElement);
 
     return new Promise<void>((resolve: () => void, reject: () => void): void => {
       this.addDisposable(overlayContainerEl.once(
@@ -127,7 +128,7 @@ export class OverlayService extends BaseListener {
             resolve();
           },
           false));
-      overlayContainerEl.getEventTarget()['show']();
+      overlayContainerElTarget.setAttribute('visible', BooleanParser.stringify(true));
     });
   }
 }

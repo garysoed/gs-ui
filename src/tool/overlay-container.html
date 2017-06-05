@@ -1,5 +1,5 @@
 <style>
-  .root {
+  #root {
     display: none;
     position: fixed;
     top: 0;
@@ -9,11 +9,11 @@
     z-index: var(--gsZIndexMenuBackdrop);
   }
 
-  .root.show {
+  #root.show {
     display: block;
   }
 
-  .backdrop {
+  #backdrop {
     position: absolute;
     top: 0;
     right: 0;
@@ -21,16 +21,16 @@
     left: 0;
   }
 
-  .container {
+  #container {
     position: fixed;
     overflow: hidden;
     box-shadow: var(--gsBoxShadowAbove);
   }
 </style>
 
-<div class="root">
-  <div class="backdrop"></div>
-  <div class="container">
+<div id="root">
+  <div id="backdrop"></div>
+  <div id="container">
     <slot></slot>
   </div>
 </div>
