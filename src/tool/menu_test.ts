@@ -12,7 +12,7 @@ import { Menu } from './menu';
 
 
 describe('tool.Menu', () => {
-  let menu;
+  let menu: Menu;
   let mockMenuService;
 
   beforeEach(() => {
@@ -26,7 +26,6 @@ describe('tool.Menu', () => {
       const parentWidth = 123;
       const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = parentWidth;
-      spyOn(menu['gsFitParentWidthHook_'], 'get').and.returnValue(true);
 
       const anchorPoint = AnchorLocation.BOTTOM_LEFT;
       const anchorTarget = AnchorLocation.TOP_RIGHT;
@@ -35,17 +34,14 @@ describe('tool.Menu', () => {
       const menuContent = Mocks.object('menuContent');
       menuContent.style = menuContentStyle;
 
-      const mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
-      mockEventTarget.firstElementChild = menuContent;
-      mockEventTarget.parentElement = parentElement;
-      mockEventTarget['gsAnchorPoint'] = anchorPoint;
-      mockEventTarget['gsAnchorTarget'] = anchorTarget;
+      const element = Mocks.object('element');
+      element.firstElementChild = menuContent;
+      element.parentElement = parentElement;
 
-      menu['element_'] = {getEventTarget: () => mockEventTarget};
-      menu['onAction_']();
+      menu.onAction_(element, true, anchorTarget, anchorPoint);
 
       assert(mockMenuService.showOverlay).to.haveBeenCalledWith(
-          mockEventTarget,
+          element,
           menuContent,
           parentElement,
           anchorTarget,
@@ -56,122 +52,74 @@ describe('tool.Menu', () => {
     it('should not set the width to the parent element if fit-parent-width is not set', () => {
       const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = 123;
-      spyOn(menu['gsFitParentWidthHook_'], 'get').and.returnValue(false);
 
       const menuContentStyle = Mocks.object('menuContentStyle');
       const menuContent = Mocks.object('menuContent');
       menuContent.style = menuContentStyle;
 
-      const mockEventTarget = jasmine.createSpyObj('EventTarget', ['querySelector']);
-      mockEventTarget.querySelector.and.returnValue(menuContent);
-      mockEventTarget.parentElement = parentElement;
-      mockEventTarget['gsAnchorPoint'] = AnchorLocation.BOTTOM_LEFT;
-      mockEventTarget['gsAnchorTarget'] = AnchorLocation.TOP_RIGHT;
+      const element = Mocks.object('element');
+      element.firstElementChild = menuContent;
+      element.parentElement = parentElement;
 
-      menu['element_'] = {getEventTarget: () => mockEventTarget};
-      menu['onAction_']();
+      menu.onAction_(element, false, AnchorLocation.BOTTOM_LEFT, AnchorLocation.TOP_RIGHT);
 
       assert(menuContentStyle.width).toNot.beDefined();
     });
 
-    it('should not throw error if there are no elements', () => {
-      menu['element_'] = null;
+    it('should not throw error if there are no parent elements', () => {
+      const element = Mocks.object('element');
+      element.parentElement = null;
+      assert(() => {
+        menu.onAction_(element, false, AnchorLocation.BOTTOM_LEFT, AnchorLocation.TOP_RIGHT);
+      }).to.throwError(/No parent element/i);
+    });
+
+    it('should not throw error if there are no menu contents', () => {
+      const parentElement = Mocks.object('parentElement');
+      parentElement.clientWidth = 123;
+
+      const menuContentStyle = Mocks.object('menuContentStyle');
+      const menuContent = Mocks.object('menuContent');
+      menuContent.style = menuContentStyle;
+
+      const element = Mocks.object('element');
+      element.parentElement = parentElement;
 
       assert(() => {
-        menu['onAction_']();
+        menu.onAction_(element, true, AnchorLocation.BOTTOM_LEFT, AnchorLocation.TOP_RIGHT);
       }).toNot.throw();
     });
   });
 
   describe('onCreated', () => {
-    let element;
-
-    beforeEach(() => {
-      element = Mocks.object('element');
-    });
-
-    it('should initialize correctly', () => {
-      const anchorPoint = AnchorLocation.BOTTOM_LEFT;
-      const anchorTarget = AnchorLocation.TOP_RIGHT;
-      element['gsAnchorTarget'] = anchorTarget;
-      element['gsAnchorPoint'] = anchorPoint;
-
-      const mockListenableElement = Mocks.disposable('ListenableElement');
-
-      const parentElement = Mocks.object('parentElement');
-      element.parentElement = parentElement;
-      const mockListenableParentElement =
-          jasmine.createSpyObj('ListenableParentElement', ['dispose']);
-
-      Fakes.build(spyOn(ListenableDom, 'of'))
-          .when(element).return(mockListenableElement)
-          .when(parentElement).return(mockListenableParentElement);
-
-      const rootElement = Mocks.object('rootElement');
-      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.returnValue(rootElement);
-      element.shadowRoot = mockShadowRoot;
-
-      spyOn(menu, 'onAction_');
-      spyOn(menu, 'listenTo');
-
-      menu.onCreated(element);
-
-      assert(element['gsAnchorPoint']).to.equal(anchorPoint);
-      assert(element['gsAnchorTarget']).to.equal(anchorTarget);
-
-      assert(menu.listenTo)
-          .to.haveBeenCalledWith(mockListenableParentElement, Event.ACTION, menu['onAction_']);
-
-      assert(menu['menuRoot_']).to.equal(rootElement);
-      assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('.root');
-      assert(menu['element_']).to.equal(mockListenableElement);
-    });
-
     it('should default the anchor target to AUTO', () => {
-      const parentElement = Mocks.object('parentElement');
-      element.parentElement = parentElement;
-      const mockListenableParentElement =
-          jasmine.createSpyObj('ListenableParentElement', ['dispose', 'on']);
-      mockListenableParentElement.on.and
-          .returnValue(Mocks.disposable('ListenableParentElement.on'));
+      const anchorPointId = Mocks.object('anchorPointId');
+      const anchorTargetId = Mocks.object('anchorTargetId');
+      const anchorPoint = AnchorLocation.BOTTOM_LEFT;
 
-      Fakes.build(spyOn(ListenableDom, 'of'))
-          .when(element).return(Mocks.disposable('ListenableElement'))
-          .when(parentElement).return(mockListenableParentElement);
+      const value = menu.onCreated(
+          {id: anchorPointId, value: anchorPoint},
+          {id: anchorTargetId, value: null});
 
-      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.returnValue(Mocks.object('rootElement'));
-      element.shadowRoot = mockShadowRoot;
-
-      spyOn(menu, 'onAction_');
-
-      menu.onCreated(element);
-
-      assert(element['gsAnchorTarget']).to.equal(AnchorLocation.AUTO);
+      assert(value).to.haveElements([
+        [anchorPointId, anchorPoint],
+        [anchorTargetId, AnchorLocation.AUTO],
+      ]);
     });
 
     it('should default the anchor point to AUTO', () => {
-      const parentElement = Mocks.object('parentElement');
-      element.parentElement = parentElement;
-      const mockListenableParentElement =
-          jasmine.createSpyObj('ListenableParentElement', ['dispose', 'on']);
-      mockListenableParentElement.on.and
-          .returnValue(Mocks.disposable('ListenableParentElement.on'));
+      const anchorPointId = Mocks.object('anchorPointId');
+      const anchorTargetId = Mocks.object('anchorTargetId');
+      const anchorTarget = AnchorLocation.BOTTOM_LEFT;
 
-      Fakes.build(spyOn(ListenableDom, 'of'))
-          .when(element).return(Mocks.disposable('ListenableElement'))
-          .when(parentElement).return(mockListenableParentElement);
+      const value = menu.onCreated(
+          {id: anchorPointId, value: null},
+          {id: anchorTargetId, value: anchorTarget});
 
-      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.returnValue(Mocks.object('rootElement'));
-      element.shadowRoot = mockShadowRoot;
-
-      spyOn(menu, 'onAction_');
-
-      menu.onCreated(element);
-
-      assert(element['gsAnchorPoint']).to.equal(AnchorLocation.AUTO);
+      assert(value).to.haveElements([
+        [anchorPointId, AnchorLocation.AUTO],
+        [anchorTargetId, anchorTarget],
+      ]);
     });
   });
 });

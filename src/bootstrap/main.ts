@@ -29,7 +29,7 @@ import { OverlayContainer } from '../tool/overlay-container';
 import { ViewSlot } from '../tool/view-slot';
 
 
-const DEFAULT_ELEMENTS_: gs.ICtor<BaseElement>[] = [
+const DEFAULT_ELEMENTS_: gs.ICtor<BaseDisposable>[] = [
   BasicButton,
   Breadcrumb,
   CodeInput,

@@ -1,12 +1,17 @@
-import { ListenableDom } from 'external/gs_tools/src/event';
-import { ImmutableSet } from 'external/gs_tools/src/immutable';
+import { BaseDisposable } from 'external/gs_tools/src/dispose';
+import { ListenableDom, MonadSetter } from 'external/gs_tools/src/event';
+import { ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { BooleanParser } from 'external/gs_tools/src/parse';
+import { BooleanParser, EnumParser } from 'external/gs_tools/src/parse';
 import {
   BaseElement,
   customElement,
+  dom,
   DomHook,
-  hook } from 'external/gs_tools/src/webc';
+  domOut,
+  hook,
+  onDom} from 'external/gs_tools/src/webc';
+import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
 import { Event } from '../const/event';
 import { AnchorLocation } from '../tool/anchor-location';
@@ -14,84 +19,80 @@ import { AnchorLocationParser } from '../tool/anchor-location-parser';
 import { OverlayService } from '../tool/overlay-service';
 
 
+const ANCHOR_POINT_ATTR = {
+  name: 'gs-anchor-point',
+  parser: AnchorLocationParser,
+  selector: null,
+};
+const ANCHOR_TARGET_ATTR = {
+  name: 'gs-anchor-target',
+  parser: AnchorLocationParser,
+  selector: null,
+};
+const FIT_PARENT_WIDTH_ATTR = {name: 'gs-fit-parent-width', parser: BooleanParser, selector: null};
+const PARENT_EL = {name: Event.ACTION, selector: 'parent'};
+
+
 @customElement({
-  attributes: {
-    'gsAnchorPoint': AnchorLocationParser,
-    'gsAnchorTarget': AnchorLocationParser,
-  },
   dependencies: ImmutableSet.of([
     OverlayService,
   ]),
   tag: 'gs-menu',
   templateKey: 'src/tool/menu',
 })
-export class Menu extends BaseElement {
-  @hook(null).attribute('gs-fit-parent-width', BooleanParser)
-  private readonly gsFitParentWidthHook_: DomHook<boolean>;
-
-  private menuRoot_: HTMLElement;
-  private readonly overlayService_: OverlayService;
-
-  constructor(@inject('gs.tool.OverlayService') overlayService: OverlayService) {
+export class Menu extends BaseDisposable {
+  constructor(@inject('gs.tool.OverlayService') private overlayService_: OverlayService) {
     super();
-    this.overlayService_ = overlayService;
-    this.gsFitParentWidthHook_ = DomHook.of<boolean>();
   }
 
   /**
    * Handler called when there is an action.
    */
-  private onAction_(): void {
-    const element = this.getElement();
-    if (element === null) {
-      return;
-    }
-
-    const elementTarget = element.getEventTarget();
-    const parentElement = elementTarget.parentElement;
-    if (parentElement === null) {
+  @onDom.event(PARENT_EL)
+  onAction_(
+      @dom.element({selector: null}) element: HTMLElement,
+      @dom.attribute(FIT_PARENT_WIDTH_ATTR) fitParentWidth: boolean | null,
+      @dom.attribute(ANCHOR_TARGET_ATTR) anchorTarget: AnchorLocation | null,
+      @dom.attribute(ANCHOR_POINT_ATTR) anchorPoint: AnchorLocation | null): void {
+    const parentElement = element.parentElement;
+    if (!parentElement) {
       throw new Error('No parent element found');
     }
-    const menuContent = elementTarget.firstElementChild as HTMLElement;
+    const menuContent = element.firstElementChild as HTMLElement | null;
 
-    if (!!this.gsFitParentWidthHook_.get()) {
+    if (fitParentWidth && menuContent) {
       menuContent.style.width = `${parentElement.clientWidth}px`;
     }
 
     this.overlayService_.showOverlay(
-        elementTarget,
+        element,
         menuContent,
         parentElement,
-        elementTarget['gsAnchorTarget'],
-        elementTarget['gsAnchorPoint']);
+        anchorTarget || AnchorLocation.AUTO,
+        anchorPoint || AnchorLocation.AUTO);
   }
 
   /**
    * @override
    */
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    const shadowRoot = element.shadowRoot;
-    const parentElement = element.parentElement;
-
-    if (shadowRoot === null) {
-      throw new Error('Shadow root not found');
+  @onLifecycle('create')
+  onCreated(
+      @domOut.attribute(ANCHOR_POINT_ATTR)
+          {id: anchorPointId, value: anchorPoint}: MonadSetter<null | AnchorLocation>,
+      @domOut.attribute(ANCHOR_TARGET_ATTR)
+          {id: anchorTargetId, value: anchorTarget}: MonadSetter<null | AnchorLocation>):
+      ImmutableMap<any, any> {
+    if (anchorPoint === null) {
+      anchorPoint = AnchorLocation.AUTO;
     }
 
-    if (parentElement === null) {
-      throw new Error('Parent element not found');
+    if (anchorTarget === null) {
+      anchorTarget = AnchorLocation.AUTO;
     }
-    this.menuRoot_ = shadowRoot.querySelector('.root') as HTMLElement;
 
-    const listenableParentElement = ListenableDom.of(parentElement);
-    this.addDisposable(listenableParentElement);
-    this.listenTo(listenableParentElement, Event.ACTION, this.onAction_);
-    if (element['gsAnchorTarget'] === null || element['gsAnchorTarget'] === undefined) {
-      element['gsAnchorTarget'] = AnchorLocation.AUTO;
-    }
-    if (element['gsAnchorPoint'] === null || element['gsAnchorPoint'] === undefined) {
-      element['gsAnchorPoint'] = AnchorLocation.AUTO;
-    }
+    return ImmutableMap.of([
+      [anchorPointId, anchorPoint],
+      [anchorTargetId, anchorTarget],
+    ]);
   }
 }
-// TODO: Mutable
