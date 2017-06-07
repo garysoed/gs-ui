@@ -30,7 +30,6 @@ const ANCHOR_TARGET_ATTR = {
   selector: null,
 };
 const FIT_PARENT_WIDTH_ATTR = {name: 'gs-fit-parent-width', parser: BooleanParser, selector: null};
-const PARENT_EL = {name: Event.ACTION, selector: 'parent'};
 
 
 @customElement({
@@ -48,9 +47,9 @@ export class Menu extends BaseDisposable {
   /**
    * Handler called when there is an action.
    */
-  @onDom.event(PARENT_EL)
+  @onDom.event('parent', Event.ACTION)
   onAction_(
-      @dom.element({selector: null}) element: HTMLElement,
+      @dom.element(null) element: HTMLElement,
       @dom.attribute(FIT_PARENT_WIDTH_ATTR) fitParentWidth: boolean | null,
       @dom.attribute(ANCHOR_TARGET_ATTR) anchorTarget: AnchorLocation | null,
       @dom.attribute(ANCHOR_POINT_ATTR) anchorPoint: AnchorLocation | null): void {

@@ -21,10 +21,10 @@ import { AnchorLocationParser } from '../tool/anchor-location-parser';
 import { Anchors } from '../tool/anchors';
 
 
-const BACKDROP_CLICK_EVENT = {name: 'click', selector: '#backdrop'};
-const CONTAINER_EL = {selector: '#container'};
-const ROOT_EL = {selector: '#root'};
-const SLOT_EL = {selector: 'slot'};
+const BACKDROP_EL = '#backdrop';
+const CONTAINER_EL = '#container';
+const ROOT_EL = '#root';
+const SLOT_EL = 'slot';
 const VISIBLE_ATTR = {name: 'visible', parser: BooleanParser, selector: null};
 
 
@@ -104,7 +104,7 @@ export class OverlayContainer extends BaseElement {
   /**
    * Handles the event when backdrop is clicked.
    */
-  @onDom.event(BACKDROP_CLICK_EVENT)
+  @onDom.event(BACKDROP_EL, 'click')
   onBackdropClick_(
       @domOut.attribute(VISIBLE_ATTR) {id, value: isVisible}: MonadSetter<boolean>):
       ImmutableMap<any, any> {
