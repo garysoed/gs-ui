@@ -13,6 +13,7 @@ import {
   onDom} from 'external/gs_tools/src/webc';
 import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
+import { BaseThemedElement } from '../common/base-themed-element';
 import { Event } from '../const/event';
 import { AnchorLocation } from '../tool/anchor-location';
 import { AnchorLocationParser } from '../tool/anchor-location-parser';

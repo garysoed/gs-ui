@@ -1,7 +1,10 @@
-import { BaseElement } from 'external/gs_tools/src/webc';
+import { deprecated } from 'external/gs_tools/src/typescript/deprecated';
+import { Log } from 'external/gs_tools/src/util';
+import { BaseElement, dom, onLifecycle } from 'external/gs_tools/src/webc';
 
 import { ThemeService } from '../theming/theme-service';
 
+const LOG = Log.of('gs-ui.common.BaseThemedElement');
 
 export class BaseThemedElement extends BaseElement {
   protected readonly themeService_: ThemeService;
@@ -17,6 +20,7 @@ export class BaseThemedElement extends BaseElement {
   /**
    * @override
    */
+  @deprecated(LOG, 'Use BaseThemedElement2 instead')
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
     const shadowRoot = element.shadowRoot;
@@ -26,4 +30,3 @@ export class BaseThemedElement extends BaseElement {
     this.themeService_.applyTheme(shadowRoot);
   }
 }
-// TODO: Mutable

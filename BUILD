@@ -36,6 +36,7 @@ karma_run(
     name = "test",
     srcs = [
         "//src/bootstrap:test_src",
+        "//src/button:test_src",
         "//src/common:test_src",
         "//src/input:test_src",
         "//src/routing:test_src",

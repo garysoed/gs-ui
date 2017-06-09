@@ -29,17 +29,17 @@
   }
 
   /* Primary button */
-  :host(.gs-primary) {
+  :host([primary]) {
     --gsButtonFG: var(--gsColorActionPrimaryFG);
     --gsButtonBG: var(--gsColorActionPrimaryBG);
   }
 
-  :host(.gs-primary[disabled]) {
+  :host([primary][disabled]) {
     --gsButtonFG: var(--gsColorActionPrimaryDisabledFG);
     --gsButtonBG: var(--gsColorActionPrimaryDisabledBG);
   }
 
-  :host(.gs-primary:not([disabled]):hover) {
+  :host([primary]:not([disabled]):hover) {
     --gsButtonFG: var(--gsColorActionPrimaryFocusFG);
     --gsButtonBG: var(--gsColorActionPrimaryFocusBG);
   }

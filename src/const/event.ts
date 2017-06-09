@@ -1,3 +1,3 @@
 export const Event = {
-  ACTION: 'gse-action',
+  ACTION: 'gs-action',
 };

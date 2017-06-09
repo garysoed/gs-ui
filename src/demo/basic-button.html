@@ -39,10 +39,10 @@
       <gs-basic-button disabled>
         <div>Disabled Button</div>
       </gs-basic-button>
-      <gs-basic-button class="gs-primary">
+      <gs-basic-button primary>
         <div>Primary Button</div>
       </gs-basic-button>
-      <gs-basic-button class="gs-primary" disabled>
+      <gs-basic-button disabled primary>
         <div>Disabled Primary Button</div>
       </gs-basic-button>
     </template>
@@ -58,7 +58,7 @@
       </section>
     </section>
 
-    <gs-basic-button class="colorPicker gs-theme-normal gs-primary">
+    <gs-basic-button class="colorPicker gs-theme-normal" primary>
       <div><gs-icon>color_lens</gs-icon></div>
       <gs-menu>
         <div class="menuRoot gs-theme-normal" selected-tab="base">
@@ -84,7 +84,7 @@
           gs-max-width="9rem"
           id="contrastDrawer">
         <div id="contrastContent" layout="row">
-          <gs-basic-button class="gs-primary" id="contrastButton">
+          <gs-basic-button id="contrastButton" primary>
             <gs-icon>accessibility</gs-icon>
           </gs-basic-button>
           <gs-float-input flex gs-value="4.5" id="contrastInput"></gs-float-input>
