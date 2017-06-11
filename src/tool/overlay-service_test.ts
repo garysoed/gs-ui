@@ -13,9 +13,9 @@ import { OverlayService } from './overlay-service';
 
 
 describe('gs.tool.OverlayService', () => {
-  let mockDocument;
+  let mockDocument: any;
   let service: OverlayService;
-  let window;
+  let window: any;
 
   beforeEach(() => {
     mockDocument = jasmine.createSpyObj('Document', ['createElement', 'querySelector']);
@@ -86,7 +86,7 @@ describe('gs.tool.OverlayService', () => {
   });
 
   describe('setAnchorTarget_', () => {
-    let mockParentElement;
+    let mockParentElement: any;
 
     beforeEach(() => {
       mockParentElement = jasmine.createSpyObj('ParentElement', ['getBoundingClientRect']);
@@ -214,7 +214,7 @@ describe('gs.tool.OverlayService', () => {
   });
 
   describe('showOverlay', () => {
-    let anchorElement;
+    let anchorElement: any;
 
     beforeEach(() => {
       anchorElement = Mocks.object('anchorElement');
@@ -235,7 +235,7 @@ describe('gs.tool.OverlayService', () => {
           ['getEventTarget', 'once']);
       mockListenableMenuContainer.getEventTarget.and.returnValue(mockMenuContainerEl);
       Fakes.build(mockListenableMenuContainer.once)
-          .call((eventType: any, handler: () => void, useCapture: any) => {
+          .call((_eventType: any, handler: () => void, _useCapture: any) => {
             handler();
             return Mocks.disposable('ListenableMenuContainer.once');
           });

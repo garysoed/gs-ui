@@ -13,8 +13,8 @@ import { BaseInput } from '../input/base-input';
 class Input extends BaseInput<string> { }
 
 describe('input.BaseInput', () => {
-  let mockGsValueHook;
-  let mockValueHook;
+  let mockGsValueHook: any;
+  let mockValueHook: any;
   let input: Input;
 
   beforeEach(() => {

@@ -8,7 +8,7 @@ import { FileInput } from './file-input';
 
 
 describe('input.FileInput', () => {
-  let mockFileService;
+  let mockFileService: any;
   let input: FileInput;
 
   beforeEach(() => {

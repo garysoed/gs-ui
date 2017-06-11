@@ -12,8 +12,8 @@ import { RouteServiceEvents } from './route-service-events';
 
 
 describe('routing.RouteService', () => {
-  let mockRouteFactoryService;
-  let mockLocationService;
+  let mockRouteFactoryService: any;
+  let mockLocationService: any;
   let service: RouteService<any>;
 
   beforeEach(() => {

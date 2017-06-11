@@ -7,7 +7,7 @@ import { IndefiniteLoading } from './indefinite-loading';
 
 
 describe('tool.IndefiniteLoading', () => {
-  let loading;
+  let loading: IndefiniteLoading;
 
   beforeEach(() => {
     loading = new IndefiniteLoading();
@@ -17,7 +17,7 @@ describe('tool.IndefiniteLoading', () => {
   describe('onCreated', () => {
     it('should add the gs-action class', () => {
       const mockClassList = jasmine.createSpyObj('ClassList', ['add']);
-      loading.onCreated({classList: mockClassList});
+      loading.onCreated({classList: mockClassList} as HTMLElement);
       assert(mockClassList.add).to.haveBeenCalledWith('gs-action');
     });
   });

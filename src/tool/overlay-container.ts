@@ -1,9 +1,8 @@
 import { DomEvent, ListenableDom, MonadSetter } from 'external/gs_tools/src/event';
-import { listener } from 'external/gs_tools/src/event/listener';
 import { on } from 'external/gs_tools/src/event/on';
 import { ImmutableMap } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { BooleanParser, FloatParser } from 'external/gs_tools/src/parse';
+import { BooleanParser } from 'external/gs_tools/src/parse';
 import {
   Animation,
   AnimationEasing,
@@ -17,7 +16,6 @@ import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
 import { WINDOW_BUS } from '../common/window-bus';
 import { AnchorLocation } from '../tool/anchor-location';
-import { AnchorLocationParser } from '../tool/anchor-location-parser';
 import { Anchors } from '../tool/anchors';
 
 
@@ -106,7 +104,7 @@ export class OverlayContainer extends BaseElement {
    */
   @onDom.event(BACKDROP_EL, 'click')
   onBackdropClick_(
-      @domOut.attribute(VISIBLE_ATTR) {id, value: isVisible}: MonadSetter<boolean>):
+      @domOut.attribute(VISIBLE_ATTR) {id}: MonadSetter<boolean>):
       ImmutableMap<any, any> {
     return ImmutableMap.of([[id, false]]);
   }
@@ -164,7 +162,7 @@ export class OverlayContainer extends BaseElement {
    * Handler called when the window is resized.
    */
   @on(WINDOW_BUS, 'resize')
-  private onWindowResize_(@dom.element(CONTAINER_EL) containerEl: HTMLElement): void {
+  onWindowResize_(@dom.element(CONTAINER_EL) containerEl: HTMLElement): void {
     this.updateContent_(containerEl);
   }
 

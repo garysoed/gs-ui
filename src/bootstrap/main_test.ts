@@ -11,9 +11,9 @@ import { Main } from './main';
 
 
 describe('bootstrap.Main', () => {
-  let mockThemeService;
-  let mockRegistrar;
-  let main;
+  let mockThemeService: any;
+  let mockRegistrar: any;
+  let main: Main;
 
   beforeEach(() => {
     const injector = Mocks.object('injector');

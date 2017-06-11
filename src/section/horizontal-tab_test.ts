@@ -7,7 +7,7 @@ import { HorizontalTab } from './horizontal-tab';
 
 
 describe('section.HorizontalTab', () => {
-  let tab;
+  let tab: HorizontalTab;
 
   beforeEach(() => {
     tab = new HorizontalTab(Mocks.object('ThemeService'));
@@ -46,7 +46,7 @@ describe('section.HorizontalTab', () => {
       const start = 123;
       const length = 456;
       const style = Mocks.object('style');
-      tab.setHighlightEl(start, length, {style});
+      tab.setHighlightEl(start, length, {style} as HTMLElement);
       assert(style).to.equal({left: `${start}px`, width: `${length}px`});
     });
   });

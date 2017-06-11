@@ -15,19 +15,19 @@ class TestTab extends BaseTab {
     super(themeService);
   }
 
-  protected getAnimationKeyframe(start: number, length: number): AnimationKeyframe {
+  protected getAnimationKeyframe(): AnimationKeyframe {
     return {};
   }
 
-  protected getLength(element: HTMLElement): number {
+  protected getLength(): number {
     return -1;
   }
 
-  protected getStartPosition(element: HTMLElement): number {
+  protected getStartPosition(): number {
     return -1;
   }
 
-  protected setHighlightEl(start: number, length: number, highlightEl: HTMLElement): void { }
+  protected setHighlightEl(): void { }
 }
 
 describe('section.BaseTab', () => {
@@ -236,7 +236,7 @@ describe('section.BaseTab', () => {
 
       tab.onInserted();
 
-      assert(tab.listenTo).to.haveBeenCalledWith(mockElement, 'gse-action', tab['onAction_']);
+      assert(tab.listenTo).to.haveBeenCalledWith(mockElement, 'gs-action', tab['onAction_']);
     });
 
     it('should not throw error if there are no elements', () => {

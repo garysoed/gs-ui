@@ -1,19 +1,16 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import { ListenableDom } from 'external/gs_tools/src/event';
-import { Fakes, Mocks } from 'external/gs_tools/src/mock';
+import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { Event } from '../const/event';
-
-import { AnchorLocation } from './anchor-location';
-import { Menu } from './menu';
+import { AnchorLocation } from '../tool/anchor-location';
+import { Menu } from '../tool/menu';
 
 
 describe('tool.Menu', () => {
   let menu: Menu;
-  let mockMenuService;
+  let mockMenuService: any;
 
   beforeEach(() => {
     mockMenuService = jasmine.createSpyObj('MenuService', ['showOverlay']);

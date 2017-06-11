@@ -8,7 +8,7 @@ import { BaseThemedElement2 } from '../common/base-themed-element2';
 
 
 describe('common.BaseThemedElement2', () => {
-  let mockThemeService;
+  let mockThemeService: any;
   let element: BaseThemedElement2;
 
   beforeEach(() => {

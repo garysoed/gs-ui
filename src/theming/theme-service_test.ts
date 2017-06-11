@@ -10,9 +10,9 @@ import { ThemeService } from '../theming/theme-service';
 
 
 describe('theming.ThemeService', () => {
-  let mockDocument;
-  let mockTemplates;
-  let mockWindow;
+  let mockDocument: any;
+  let mockTemplates: any;
+  let mockWindow: any;
   let service: ThemeService;
 
   beforeEach(() => {

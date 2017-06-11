@@ -18,7 +18,7 @@ describe('common.BaseActionElement', () => {
   });
 
   describe('onClick_', () => {
-    let mockListenableElement;
+    let mockListenableElement: any;
 
     beforeEach(() => {
       mockListenableElement = jasmine.createSpyObj(

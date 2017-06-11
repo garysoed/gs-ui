@@ -13,8 +13,8 @@ describe('theming.Theme', () => {
   const ACTION_DISTANCE = 0.2;
   const BASE_DISTANCE = 0.1;
   const CONTRAST = 12;
-  let accent;
-  let base;
+  let accent: any;
+  let base: any;
   let theme: Theme;
 
   beforeEach(() => {

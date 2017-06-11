@@ -4,7 +4,6 @@ import {
   customElement,
   dom,
   DomHook,
-  handle,
   hook,
   onDom} from 'external/gs_tools/src/webc';
 

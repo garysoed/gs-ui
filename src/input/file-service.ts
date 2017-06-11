@@ -24,7 +24,7 @@ export class FileService extends BaseListener {
     const id = this.idGenerator_.generate(Iterables.toArray(ImmutableMap.of(this.bundles_).keys()));
     this.bundles_.set(id, files);
     return {
-      deleteFn: function(): void {
+      deleteFn: function(this: FileService): void {
         this.bundles_.delete(id);
       }.bind(this),
       id: id,

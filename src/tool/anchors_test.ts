@@ -9,7 +9,7 @@ import { Anchors } from './anchors';
 
 describe('tool.Anchors', () => {
   describe('resolveAutoLocation', () => {
-    let window;
+    let window: any;
 
     beforeEach(() => {
       window = Mocks.object('window');

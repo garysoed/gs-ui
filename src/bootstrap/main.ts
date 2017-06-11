@@ -55,6 +55,7 @@ const DEFAULT_THEME_: Theme = Theme.newInstance(
 // Needed so ThemeService is loaded and bound.
 // tslint:disable-next-line:no-unused-variable
 const DEPENDENCIES = [ThemeService];
+DEPENDENCIES.push();
 
 /**
  * Main entry class to the app.

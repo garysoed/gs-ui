@@ -3,7 +3,6 @@ import { bind, inject } from 'external/gs_tools/src/inject';
 import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
 import { Reflect } from 'external/gs_tools/src/util';
 
-import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { AbstractRouteFactory } from './abstract-route-factory';
 import { IRouteFactoryService } from './i-route-factory-service';
 import { Route } from './route';

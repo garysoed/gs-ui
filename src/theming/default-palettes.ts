@@ -1,9 +1,5 @@
 import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
-import {
-  ImmutableList,
-  ImmutableMap,
-  Iterables,
-  OrderedMap } from 'external/gs_tools/src/immutable';
+import { Iterables, OrderedMap } from 'external/gs_tools/src/immutable';
 
 
 const COLOR_MAP: OrderedMap<string, Color> = OrderedMap.of([

@@ -146,7 +146,7 @@ export class FileInput extends BaseThemedElement {
   }
 
   @onDom.attributeChange(BUNDLE_ID_ATTRIBUTE)
-  protected onGsBundleIdChanged_(newValue: string | null, oldValue: string | null): void {
+  protected onGsBundleIdChanged_(_: string | null, oldValue: string | null): void {
     if (this.deleteBundleFn_ !== null && oldValue !== null) {
       this.deleteBundleFn_();
     }

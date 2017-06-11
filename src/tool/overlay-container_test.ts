@@ -2,7 +2,7 @@ import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
 import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
-import { Fakes, Mocks } from 'external/gs_tools/src/mock';
+import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { AnchorLocation } from './anchor-location';
@@ -11,7 +11,7 @@ import { OverlayContainer } from './overlay-container';
 
 
 describe('tool.OverlayContainer', () => {
-  let window;
+  let window: any;
   let container: OverlayContainer;
 
   beforeEach(() => {
@@ -181,10 +181,10 @@ describe('tool.OverlayContainer', () => {
   });
 
   describe('show_', () => {
-    let containerEl;
-    let mockSlotEl;
-    let mockListenableElement;
-    let rootEl;
+    let containerEl: any;
+    let mockSlotEl: any;
+    let mockListenableElement: any;
+    let rootEl: any;
 
     beforeEach(() => {
       containerEl = Mocks.object('containerEl');
@@ -260,8 +260,8 @@ describe('tool.OverlayContainer', () => {
   });
 
   describe('updateContent_', () => {
-    let containerEl;
-    let element;
+    let containerEl: any;
+    let element: any;
 
     beforeEach(() => {
       containerEl = Mocks.object('containerEl');

@@ -9,7 +9,7 @@ import { BaseThemedElement } from './base-themed-element';
 
 describe('common.BaseThemedElement', () => {
   let themedElement: BaseThemedElement;
-  let mockThemeService;
+  let mockThemeService: any;
 
   beforeEach(() => {
     mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);

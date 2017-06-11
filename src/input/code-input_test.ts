@@ -14,7 +14,7 @@ import { CodeInput, EditorValueBinder, Languages } from './code-input';
 
 
 describe('input.EditorValueBinder', () => {
-  let binder;
+  let binder: EditorValueBinder;
 
   beforeEach(() => {
     binder = new EditorValueBinder();
@@ -66,10 +66,10 @@ describe('input.EditorValueBinder', () => {
 });
 
 describe('input.CodeInput', () => {
-  let mockAce;
-  let mockDocument;
-  let mockThemeService;
-  let mockWindow;
+  let mockAce: any;
+  let mockDocument: any;
+  let mockThemeService: any;
+  let mockWindow: any;
   let input: CodeInput;
 
   beforeEach(() => {

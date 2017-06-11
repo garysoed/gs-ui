@@ -1,6 +1,6 @@
 import { deprecated } from 'external/gs_tools/src/typescript/deprecated';
 import { Log } from 'external/gs_tools/src/util';
-import { BaseElement, dom, onLifecycle } from 'external/gs_tools/src/webc';
+import { BaseElement } from 'external/gs_tools/src/webc';
 
 import { ThemeService } from '../theming/theme-service';
 

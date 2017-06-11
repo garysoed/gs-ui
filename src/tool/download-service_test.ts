@@ -7,7 +7,7 @@ import { DownloadService } from '../tool/download-service';
 
 
 describe('tool.DownloadService', () => {
-  let window;
+  let window: any;
   let service: DownloadService;
 
   beforeEach(() => {

@@ -10,7 +10,7 @@ import { RadioButton } from './radio-button';
 
 
 describe('input.RadioButton', () => {
-  let mockRadioButtonService;
+  let mockRadioButtonService: any;
   let button: RadioButton;
 
   beforeEach(() => {

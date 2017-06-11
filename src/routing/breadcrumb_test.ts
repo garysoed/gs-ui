@@ -104,7 +104,7 @@ describe('CRUMB_DATA_HELPER', () => {
 
 describe('routing.Breadcrumb', () => {
   let breadcrumb: Breadcrumb<any>;
-  let mockRouteService;
+  let mockRouteService: any;
 
   beforeEach(() => {
     mockRouteService = Mocks.listenable('RouteService');

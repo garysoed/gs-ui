@@ -2,7 +2,7 @@ import { Interval } from 'external/gs_tools/src/async';
 import { DomEvent } from 'external/gs_tools/src/event';
 import { Parser } from 'external/gs_tools/src/interfaces';
 import { BooleanParser } from 'external/gs_tools/src/parse';
-import { dom, DomHook, handle, onDom } from 'external/gs_tools/src/webc';
+import { dom, DomHook, onDom } from 'external/gs_tools/src/webc';
 
 import { BaseActionElement } from '../common/base-action-element';
 import { ThemeService } from '../theming/theme-service';

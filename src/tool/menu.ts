@@ -1,19 +1,11 @@
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
-import { ListenableDom, MonadSetter } from 'external/gs_tools/src/event';
+import { MonadSetter } from 'external/gs_tools/src/event';
 import { ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { BooleanParser, EnumParser } from 'external/gs_tools/src/parse';
-import {
-  BaseElement,
-  customElement,
-  dom,
-  DomHook,
-  domOut,
-  hook,
-  onDom} from 'external/gs_tools/src/webc';
+import { BooleanParser } from 'external/gs_tools/src/parse';
+import { customElement, dom, domOut, onDom} from 'external/gs_tools/src/webc';
 import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
-import { BaseThemedElement } from '../common/base-themed-element';
 import { Event } from '../const/event';
 import { AnchorLocation } from '../tool/anchor-location';
 import { AnchorLocationParser } from '../tool/anchor-location-parser';

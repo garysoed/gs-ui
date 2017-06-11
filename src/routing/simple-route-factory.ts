@@ -2,7 +2,6 @@ import { ImmutableMap } from 'external/gs_tools/src/immutable';
 
 import { AbstractRouteFactory } from '../routing/abstract-route-factory';
 
-
 export class SimpleRouteFactory<T, PR>
     extends AbstractRouteFactory<T, {}, PR, PR> {
   private readonly name_: string;
@@ -35,7 +34,7 @@ export class SimpleRouteFactory<T, PR>
   /**
    * @override
    */
-  protected getRelativeMatchParams_(matches: ImmutableMap<string, string>): {} {
+  protected getRelativeMatchParams_(_: ImmutableMap<string, string>): {} {
     return {};
   }
 

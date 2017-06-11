@@ -12,7 +12,7 @@ import { __FULL_PATH, ViewSlot } from './view-slot';
 
 describe('tool.ViewSlot', () => {
   let viewSlot: ViewSlot;
-  let mockLocationService;
+  let mockLocationService: any;
 
   beforeEach(() => {
     mockLocationService = Mocks.listenable('LocationService');
@@ -115,7 +115,6 @@ describe('tool.ViewSlot', () => {
   describe('updateActiveView_', () => {
     it('should set the correct target element to active', () => {
       const fullPath = 'fullPath';
-      const children = Mocks.object('children');
 
       const path = 'path';
       const mockChildWithPath = jasmine.createSpyObj('ChildWithPath', ['getAttribute']);

@@ -119,7 +119,7 @@ export class OverlayService extends BaseListener {
     overlayContainerElTarget['gsAnchorPoint'] = anchorPoint;
     this.setAnchorTarget_(overlayContainerElTarget, anchorTarget, anchorElement);
 
-    return new Promise<void>((resolve: () => void, reject: () => void): void => {
+    return new Promise<void>((resolve: () => void): void => {
       this.addDisposable(overlayContainerEl.once(
           OverlayContainer.HIDE_EVENT,
           () => {

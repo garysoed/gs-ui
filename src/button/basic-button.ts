@@ -16,7 +16,6 @@ import { DispatchFn } from 'external/gs_tools/src/interfaces';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import { customElement, dom, onDom } from 'external/gs_tools/src/webc';
 
-import { BaseActionElement } from '../common/base-action-element';
 import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
 

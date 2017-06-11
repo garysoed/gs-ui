@@ -13,7 +13,7 @@ class TestFactory extends AbstractRouteFactory<any, any, any, any> {
     super(TYPE, parent);
   }
 
-  getName(params: any): Promise<string> {
+  getName(_: any): Promise<string> {
     return Promise.resolve('');
   }
 
@@ -21,11 +21,11 @@ class TestFactory extends AbstractRouteFactory<any, any, any, any> {
     return null;
   }
 
-  getRelativeMatchParams_(matches: any): any {
+  getRelativeMatchParams_(_: any): any {
     return null;
   }
 
-  getRelativePath_(params: any): any {
+  getRelativePath_(_: any): any {
     return null;
   }
 }

@@ -8,8 +8,8 @@ import { RadioButtonService } from './radio-button-service';
 
 
 describe('input.RadioButtonService', () => {
-  let mockDocument;
-  let service;
+  let mockDocument: any;
+  let service: RadioButtonService;
 
   beforeEach(() => {
     mockDocument = jasmine.createSpyObj('Document', ['querySelector']);
@@ -18,7 +18,7 @@ describe('input.RadioButtonService', () => {
   });
 
   describe('setSelected', () => {
-    let mockButtonEl;
+    let mockButtonEl: any;
 
     beforeEach(() => {
       mockButtonEl = jasmine.createSpyObj('ButtonEl', ['getAttribute']);
