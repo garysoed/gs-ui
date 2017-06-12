@@ -140,7 +140,8 @@ describe('section.BaseTab', () => {
       assert(mockAnimation.applyTo).to.haveBeenCalledWith(highlightEl);
       assert(Animation.newInstance).to.haveBeenCalledWith(
           [keyframe1, keyframe2],
-          Matchers.any(Object));
+          Matchers.any(Object),
+          Matchers.anyThing());
       assert(tab['getAnimationKeyframe']).to.haveBeenCalledWith(currentStart, currentLength);
       assert(tab['getAnimationKeyframe']).to.haveBeenCalledWith(targetStart, targetLength);
     });

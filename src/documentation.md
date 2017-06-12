@@ -53,7 +53,7 @@ combination of CSS types, this should never be used. Instead, multiple variables
 
 Slots are slots used for shadow dom. If a `@slot` has no name, and there is only one `@slot` entry,
 that slot is considered to be the default slot. This means that any components with multiple slots
-must have all of its slots named.
+must have all of its slots named. If a slot has no name, `_` is used for the name.
 
 ## Event
 

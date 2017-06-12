@@ -121,7 +121,7 @@ export class OverlayService extends BaseListener {
 
     return new Promise<void>((resolve: () => void): void => {
       this.addDisposable(overlayContainerEl.once(
-          OverlayContainer.HIDE_EVENT,
+          'gs-hide',
           () => {
             anchorTargetWatcher.dispose();
             overlayParent.appendChild(overlayContent);

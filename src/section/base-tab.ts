@@ -131,7 +131,8 @@ export abstract class BaseTab extends BaseThemedElement {
           this.getAnimationKeyframe(this.highlightStart_, this.highlightLength_),
           this.getAnimationKeyframe(start, length),
         ],
-        {duration: 300, easing: AnimationEasing.EASE_OUT_EXPO});
+        {duration: 300, easing: AnimationEasing.EASE_OUT_EXPO},
+        Symbol('move'));
     const animate = ListenableDom.of(animation.applyTo(this.highlightEl_));
     this.addDisposable(animate);
     return new Promise<void>((resolve: () => void) => {

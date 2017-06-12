@@ -6,10 +6,9 @@ import { ListenableDom } from 'external/gs_tools/src/event';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { AnchorLocation } from './anchor-location';
-import { Anchors } from './anchors';
-import { OverlayContainer } from './overlay-container';
-import { OverlayService } from './overlay-service';
+import { AnchorLocation } from '../tool/anchor-location';
+import { Anchors } from '../tool/anchors';
+import { OverlayService } from '../tool/overlay-service';
 
 
 describe('gs.tool.OverlayService', () => {
@@ -260,7 +259,7 @@ describe('gs.tool.OverlayService', () => {
       assert(mockAnchorTargetWatcher.dispose).to.haveBeenCalledWith();
 
       assert(mockListenableMenuContainer.once).to.haveBeenCalledWith(
-          OverlayContainer.HIDE_EVENT,
+          'gs-hide',
           Matchers.any(Function),
           false);
 
