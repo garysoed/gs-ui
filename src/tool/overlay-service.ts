@@ -1,7 +1,8 @@
 import { Interval } from 'external/gs_tools/src/async';
+import { cache } from 'external/gs_tools/src/data/cache';
 import { BaseListener, ListenableDom } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
-import { BooleanParser } from 'external/gs_tools/src/parse';
+import { BooleanParser, EnumParser, FloatParser } from 'external/gs_tools/src/parse';
 
 import { AnchorLocation } from '../tool/anchor-location';
 import { Anchors } from '../tool/anchors';
@@ -12,34 +13,36 @@ import { OverlayContainer } from '../tool/overlay-container';
 export class OverlayService extends BaseListener {
   private static ANCHOR_TARGET_INTERVAL_: number = 500;
 
-  private overlayContainerEl_: ListenableDom<HTMLElement> | null = null;
-
   constructor(
       @inject('x.dom.document') private document_: Document,
       @inject('x.dom.window') private window_: Window) {
     super();
   }
 
+  @cache()
   private getOverlayContainerEl_(): ListenableDom<HTMLElement> {
     // Checks if there is a gs-overlay-container element.
-    if (this.overlayContainerEl_ === null) {
-      let overlayContainerEl = this.document_.querySelector('gs-overlay-container');
-      if (overlayContainerEl === null) {
-        overlayContainerEl = this.document_.createElement('gs-overlay-container');
-        this.document_.body.appendChild(overlayContainerEl);
-      }
-      this.overlayContainerEl_ = ListenableDom.of(overlayContainerEl as HTMLElement);
-      this.addDisposable(this.overlayContainerEl_);
-    }
+    const overlayContainerEl = this.document_.querySelector('gs-overlay-container');
+    if (overlayContainerEl === null) {
+      const newOverlayContainerEl = this.document_.createElement('gs-overlay-container');
+      const listenableNewOverlayContainer = ListenableDom.of(newOverlayContainerEl);
+      this.addDisposable(listenableNewOverlayContainer);
+      this.document_.body.appendChild(newOverlayContainerEl);
 
-    return this.overlayContainerEl_;
+      return listenableNewOverlayContainer;
+    } else {
+      const listenableOverlayContainerEl = ListenableDom.of(overlayContainerEl as HTMLElement);
+      this.addDisposable(listenableOverlayContainerEl);
+      return listenableOverlayContainerEl;
+    }
   }
 
   /**
    * Hides the overlay.
    */
   hideOverlay(): void {
-    this.getOverlayContainerEl_().getEventTarget()['hide']();
+    this.getOverlayContainerEl_().getEventTarget()
+        .setAttribute('visible', BooleanParser.stringify(false));
   }
 
   private onTick_(
@@ -67,22 +70,26 @@ export class OverlayService extends BaseListener {
     switch (resolvedAnchorTarget) {
       case AnchorLocation.BOTTOM_LEFT:
       case AnchorLocation.TOP_LEFT:
-        overlayContainerEl['gsAnchorTargetX'] = parentScreenLeft;
+        overlayContainerEl.setAttribute(
+            'gs-anchor-target-x', FloatParser.stringify(parentScreenLeft));
         break;
       case AnchorLocation.BOTTOM_RIGHT:
       case AnchorLocation.TOP_RIGHT:
-        overlayContainerEl['gsAnchorTargetX'] = parentScreenLeft + boundingRect.width;
+        overlayContainerEl.setAttribute(
+            'gs-anchor-target-x', FloatParser.stringify(parentScreenLeft + boundingRect.width));
         break;
     }
 
     switch (resolvedAnchorTarget) {
       case AnchorLocation.BOTTOM_LEFT:
       case AnchorLocation.BOTTOM_RIGHT:
-        overlayContainerEl['gsAnchorTargetY'] = parentScreenTop + boundingRect.height;
+        overlayContainerEl.setAttribute(
+            'gs-anchor-target-y', FloatParser.stringify(parentScreenTop + boundingRect.height));
         break;
       case AnchorLocation.TOP_LEFT:
       case AnchorLocation.TOP_RIGHT:
-        overlayContainerEl['gsAnchorTargetY'] = parentScreenTop;
+        overlayContainerEl.setAttribute(
+            'gs-anchor-target-y', FloatParser.stringify(parentScreenTop));
         break;
     }
   }
@@ -116,7 +123,8 @@ export class OverlayService extends BaseListener {
 
     const overlayContainerElTarget = overlayContainerEl.getEventTarget();
     overlayContainerElTarget.appendChild(overlayContent);
-    overlayContainerElTarget['gsAnchorPoint'] = anchorPoint;
+    overlayContainerElTarget.setAttribute(
+        'gs-anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
     this.setAnchorTarget_(overlayContainerElTarget, anchorTarget, anchorElement);
 
     return new Promise<void>((resolve: () => void): void => {
@@ -132,4 +140,3 @@ export class OverlayService extends BaseListener {
     });
   }
 }
-// TODO: Mutable

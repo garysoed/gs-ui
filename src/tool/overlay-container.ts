@@ -48,12 +48,12 @@ const ANCHOR_POINT_ATTR = {
   selector: null,
 };
 const ANCHOR_TARGET_X_ATTR = {
-  name: 'gs-anchor-target-left',
+  name: 'gs-anchor-target-x',
   parser: FloatParser,
   selector: null,
 };
 const ANCHOR_TARGET_Y_ATTR = {
-  name: 'gs-anchor-target-top',
+  name: 'gs-anchor-target-y',
   parser: FloatParser,
   selector: null,
 };

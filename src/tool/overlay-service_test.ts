@@ -4,6 +4,7 @@ TestBase.setup();
 import { Interval } from 'external/gs_tools/src/async';
 import { ListenableDom } from 'external/gs_tools/src/event';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
+import { EnumParser } from 'external/gs_tools/src/parse';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { AnchorLocation } from '../tool/anchor-location';
@@ -58,14 +59,15 @@ describe('gs.tool.OverlayService', () => {
       assert(mockDocument.createElement).toNot.haveBeenCalled();
       assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-overlay-container');
     });
+  });
 
-    it('should return the existing menu container element', () => {
-      const listenableContainer = Mocks.disposable('listenableContainer');
-      TestDispose.add(listenableContainer);
-      service['overlayContainerEl_'] = listenableContainer;
-
-      assert(service['getOverlayContainerEl_']()).to.equal(listenableContainer);
-      assert(mockDocument.querySelector).toNot.haveBeenCalled();
+  describe('hideOverlay', () => {
+    it('should hide the menu container', () => {
+      const mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['setAttribute']);
+      spyOn(service, 'getOverlayContainerEl_').and
+          .returnValue({getEventTarget: () => mockMenuContainer});
+      service.hideOverlay();
+      assert(mockMenuContainer.setAttribute).to.haveBeenCalledWith('visible', 'false');
     });
   });
 
@@ -92,7 +94,7 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should set the correct X and Y for TOP_LEFT', () => {
-      const menuContainerEl = Mocks.object('menuContainerEl');
+      const mockMenuContainerEl = jasmine.createSpyObj('MenuContainerEl', ['setAttribute']);
       const left = 12;
       const top = 34;
 
@@ -102,16 +104,18 @@ describe('gs.tool.OverlayService', () => {
       });
 
       service['setAnchorTarget_'](
-          menuContainerEl,
+          mockMenuContainerEl,
           AnchorLocation.TOP_LEFT,
           mockParentElement);
 
-      assert(menuContainerEl['gsAnchorTargetX']).to.equal(left);
-      assert(menuContainerEl['gsAnchorTargetY']).to.equal(top);
+      assert(mockMenuContainerEl.setAttribute).to
+          .haveBeenCalledWith('gs-anchor-target-x', `${left}`);
+      assert(mockMenuContainerEl.setAttribute).to
+          .haveBeenCalledWith('gs-anchor-target-y', `${top}`);
     });
 
     it('should set the correct X and Y for TOP_RIGHT', () => {
-      const menuContainerEl = Mocks.object('menuContainerEl');
+      const mockMenuContainerEl = jasmine.createSpyObj('MenuContainerEl', ['setAttribute']);
       const left = 12;
       const top = 34;
       const width = 56;
@@ -123,16 +127,17 @@ describe('gs.tool.OverlayService', () => {
       });
 
       service['setAnchorTarget_'](
-          menuContainerEl,
+          mockMenuContainerEl,
           AnchorLocation.TOP_RIGHT,
           mockParentElement);
 
-      assert(menuContainerEl['gsAnchorTargetX']).to.equal(68);
-      assert(menuContainerEl['gsAnchorTargetY']).to.equal(top);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('gs-anchor-target-x', `68`);
+      assert(mockMenuContainerEl.setAttribute).to
+          .haveBeenCalledWith('gs-anchor-target-y', `${top}`);
     });
 
     it('should set the correct X and Y for BOTTOM_RIGHT', () => {
-      const menuContainerEl = Mocks.object('menuContainerEl');
+      const mockMenuContainerEl = jasmine.createSpyObj('MenuContainerEl', ['setAttribute']);
       const left = 12;
       const top = 34;
       const width = 56;
@@ -146,16 +151,16 @@ describe('gs.tool.OverlayService', () => {
       });
 
       service['setAnchorTarget_'](
-          menuContainerEl,
+          mockMenuContainerEl,
           AnchorLocation.BOTTOM_RIGHT,
           mockParentElement);
 
-      assert(menuContainerEl['gsAnchorTargetX']).to.equal(68);
-      assert(menuContainerEl['gsAnchorTargetY']).to.equal(112);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('gs-anchor-target-x', `68`);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('gs-anchor-target-y', `112`);
     });
 
     it('should set the correct X and T for BOTTOM_LEFT', () => {
-      const menuContainerEl = Mocks.object('menuContainerEl');
+      const mockMenuContainerEl = jasmine.createSpyObj('MenuContainerEl', ['setAttribute']);
       const left = 12;
       const top = 34;
       const height = 78;
@@ -167,16 +172,17 @@ describe('gs.tool.OverlayService', () => {
       });
 
       service['setAnchorTarget_'](
-          menuContainerEl,
+          mockMenuContainerEl,
           AnchorLocation.BOTTOM_LEFT,
           mockParentElement);
 
-      assert(menuContainerEl['gsAnchorTargetX']).to.equal(left);
-      assert(menuContainerEl['gsAnchorTargetY']).to.equal(112);
+      assert(mockMenuContainerEl.setAttribute).to
+          .haveBeenCalledWith('gs-anchor-target-x', `${left}`);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('gs-anchor-target-y', `112`);
     });
 
     it('should resolve auto location if the anchor target is AUTO', () => {
-      const menuContainerEl = Mocks.object('menuContainerEl');
+      const mockMenuContainerEl = jasmine.createSpyObj('MenuContainerEl', ['setAttribute']);
       const left = 12;
       const top = 34;
       const width = 56;
@@ -192,23 +198,15 @@ describe('gs.tool.OverlayService', () => {
       spyOn(Anchors, 'resolveAutoLocation').and.returnValue(AnchorLocation.TOP_LEFT);
 
       service['setAnchorTarget_'](
-          menuContainerEl,
+          mockMenuContainerEl,
           AnchorLocation.AUTO,
           mockParentElement);
 
-      assert(menuContainerEl['gsAnchorTargetX']).to.equal(left);
-      assert(menuContainerEl['gsAnchorTargetY']).to.equal(top);
+      assert(mockMenuContainerEl.setAttribute).to
+          .haveBeenCalledWith('gs-anchor-target-x', `${left}`);
+      assert(mockMenuContainerEl.setAttribute).to
+          .haveBeenCalledWith('gs-anchor-target-y', `${top}`);
       assert(Anchors.resolveAutoLocation).to.haveBeenCalledWith(40, 73, window);
-    });
-  });
-
-  describe('hideOverlay', () => {
-    it('should hide the menu container', () => {
-      const mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['hide']);
-      spyOn(service, 'getOverlayContainerEl_').and
-          .returnValue({getEventTarget: () => mockMenuContainer});
-      service.hideOverlay();
-      assert(mockMenuContainer.hide).to.haveBeenCalledWith();
     });
   });
 
@@ -265,7 +263,8 @@ describe('gs.tool.OverlayService', () => {
 
       assert(service['setAnchorTarget_'])
           .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
-      assert(mockMenuContainerEl['gsAnchorPoint']).to.equal(anchorPoint);
+      assert(mockMenuContainerEl.setAttribute).to
+          .haveBeenCalledWith('gs-anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
       assert(mockMenuContainerEl.appendChild).to.haveBeenCalledWith(menuContent);
 
       assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();
