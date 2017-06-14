@@ -87,7 +87,7 @@ describe('input.CodeInput', () => {
     it('should open the editor value bridge', () => {
       spyOn(input['editorValueHook_'], 'open');
 
-      input[Reflect.__initialize]();
+      input[Reflect.__initialize](input);
 
       assert(input['editorValueHook_'].open).to.haveBeenCalledWith(input['editorValueBinder_']);
     });
