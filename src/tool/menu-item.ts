@@ -32,7 +32,7 @@ export class MenuItem extends BaseThemedElement {
 
   @handle(null).event(DomEvent.CLICK)
   protected onClicked_(): void {
-    this.menuService_.hideOverlay();
+    this.menuService_.hideOverlay(Symbol('id'));
   }
 
   @onDom.attributeChange(CONTENT_ATTRIBUTE)

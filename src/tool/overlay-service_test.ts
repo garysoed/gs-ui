@@ -9,7 +9,8 @@ import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { AnchorLocation } from '../tool/anchor-location';
 import { Anchors } from '../tool/anchors';
-import { OverlayService } from '../tool/overlay-service';
+import { OverlayBus } from '../tool/overlay-bus';
+import { __shownId, OverlayService } from '../tool/overlay-service';
 
 
 describe('gs.tool.OverlayService', () => {
@@ -61,13 +62,45 @@ describe('gs.tool.OverlayService', () => {
     });
   });
 
+  describe('getShownId_', () => {
+    it(`should return the ID in the container element`, () => {
+      const shownId = Symbol('shownId');
+      const containerEl = Mocks.object('containerEl');
+      containerEl[__shownId] = shownId;
+      spyOn(service, 'getOverlayContainerEl_').and.returnValue(containerEl);
+      assert(service['getShownId_']()).to.equal(shownId);
+    });
+
+    it(`should return null if there are no shown IDs`, () => {
+      const containerEl = Mocks.object('containerEl');
+      spyOn(service, 'getOverlayContainerEl_').and.returnValue(containerEl);
+      assert(service['getShownId_']()).to.beNull();
+    });
+  });
+
   describe('hideOverlay', () => {
     it('should hide the menu container', () => {
+      const id = Symbol('id');
       const mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['setAttribute']);
       spyOn(service, 'getOverlayContainerEl_').and
           .returnValue({getEventTarget: () => mockMenuContainer});
-      service.hideOverlay();
+      spyOn(service, 'getShownId_').and.returnValue(id);
+      Fakes.build(spyOn(OverlayBus, 'dispatch')).call((_: any, fn: () => void) => fn());
+      service.hideOverlay(id);
       assert(mockMenuContainer.setAttribute).to.haveBeenCalledWith('visible', 'false');
+      assert(OverlayBus.dispatch).to
+          .haveBeenCalledWith({id, type: 'hide'}, Matchers.any(Function) as any);
+    });
+
+    it(`should do nothing if the ID does not match`, () => {
+      const mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['setAttribute']);
+      spyOn(service, 'getOverlayContainerEl_').and
+          .returnValue({getEventTarget: () => mockMenuContainer});
+      spyOn(service, 'getShownId_').and.returnValue(Symbol('otherId'));
+      Fakes.build(spyOn(OverlayBus, 'dispatch')).call((_: any, fn: () => void) => fn());
+      service.hideOverlay(Symbol('id'));
+      assert(mockMenuContainer.setAttribute).toNot.haveBeenCalled();
+      assert(OverlayBus.dispatch).toNot.haveBeenCalled();
     });
   });
 
@@ -218,6 +251,7 @@ describe('gs.tool.OverlayService', () => {
     });
 
     it('should open the menu container correctly', async () => {
+      const id = Symbol('id');
       const mockOverlayParent = jasmine.createSpyObj('OverlayParent', ['appendChild']);
       const menuContent = Mocks.object('menuContent');
 
@@ -246,12 +280,18 @@ describe('gs.tool.OverlayService', () => {
       spyOn(service, 'setAnchorTarget_');
       const listenToSpy = spyOn(service, 'listenTo');
 
+      spyOn(service, 'getShownId_').and.returnValue(null);
+      Fakes.build(spyOn(OverlayBus, 'dispatch')).call((_: any, fn: () => void) => fn());
+
       await service.showOverlay(
+          id,
           mockOverlayParent,
           menuContent,
           anchorElement,
           anchorTarget,
           anchorPoint);
+      assert(OverlayBus.dispatch).to
+          .haveBeenCalledWith({id, type: 'show'}, Matchers.any(Function) as any);
       assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('visible', 'true');
       assert(mockOverlayParent.appendChild).to.haveBeenCalledWith(menuContent);
       assert(mockAnchorTargetWatcher.dispose).to.haveBeenCalledWith();
@@ -278,6 +318,121 @@ describe('gs.tool.OverlayService', () => {
 
       assert(Interval.newInstance)
           .to.haveBeenCalledWith(OverlayService['ANCHOR_TARGET_INTERVAL_']);
+    });
+
+    it(`should hide the previous overlay if one is already shown`, async () => {
+      const otherId = Symbol('otherId');
+      spyOn(service, 'getShownId_').and.returnValue(otherId);
+
+      const id = Symbol('id');
+      const mockOverlayParent = jasmine.createSpyObj('OverlayParent', ['appendChild']);
+      const menuContent = Mocks.object('menuContent');
+
+      const anchorTarget = AnchorLocation.TOP_LEFT;
+      const anchorPoint = AnchorLocation.BOTTOM_RIGHT;
+
+      const mockMenuContainerEl = jasmine.createSpyObj(
+          'MenuContainerEl',
+          ['appendChild', 'setAttribute']);
+      const mockListenableMenuContainer = jasmine.createSpyObj(
+          'ListenableMenuContainer',
+          ['getEventTarget', 'once']);
+      mockListenableMenuContainer.getEventTarget.and.returnValue(mockMenuContainerEl);
+      Fakes.build(mockListenableMenuContainer.once)
+          .call((_eventType: any, handler: () => void, _useCapture: any) => {
+            handler();
+            return Mocks.disposable('ListenableMenuContainer.once');
+          });
+      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockListenableMenuContainer);
+
+      const mockAnchorTargetWatcher = jasmine
+          .createSpyObj('AnchorTargetWatcher', ['dispose', 'start']);
+      spyOn(Interval, 'newInstance').and.returnValue(mockAnchorTargetWatcher);
+
+      spyOn(service, 'onTick_');
+      spyOn(service, 'setAnchorTarget_');
+      spyOn(service, 'hideOverlay');
+      const listenToSpy = spyOn(service, 'listenTo');
+
+      Fakes.build(spyOn(OverlayBus, 'dispatch')).call((_: any, fn: () => void) => fn());
+
+      await service.showOverlay(
+          id,
+          mockOverlayParent,
+          menuContent,
+          anchorElement,
+          anchorTarget,
+          anchorPoint);
+      assert(OverlayBus.dispatch).to
+          .haveBeenCalledWith({id, type: 'show'}, Matchers.any(Function) as any);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('visible', 'true');
+      assert(mockOverlayParent.appendChild).to.haveBeenCalledWith(menuContent);
+      assert(mockAnchorTargetWatcher.dispose).to.haveBeenCalledWith();
+
+      assert(mockListenableMenuContainer.once).to.haveBeenCalledWith(
+          'gs-hide',
+          Matchers.any(Function),
+          false);
+
+      assert(service['setAnchorTarget_'])
+          .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
+      assert(mockMenuContainerEl.setAttribute).to
+          .haveBeenCalledWith('gs-anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
+      assert(mockMenuContainerEl.appendChild).to.haveBeenCalledWith(menuContent);
+
+      assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();
+      assert(service.listenTo).to.haveBeenCalledWith(
+          mockAnchorTargetWatcher,
+          Interval.TICK_EVENT,
+          Matchers.any(Function) as any);
+      listenToSpy.calls.argsFor(0)[2]();
+
+      assert(Interval.newInstance)
+          .to.haveBeenCalledWith(OverlayService['ANCHOR_TARGET_INTERVAL_']);
+      assert(service.hideOverlay).to.haveBeenCalledWith(otherId);
+    });
+
+    it(`should do nothing if the overlay corresponding to the ID is already shown`, async () => {
+      const id = Symbol('id');
+      const mockOverlayParent = jasmine.createSpyObj('OverlayParent', ['appendChild']);
+      const menuContent = Mocks.object('menuContent');
+
+      const anchorTarget = AnchorLocation.TOP_LEFT;
+      const anchorPoint = AnchorLocation.BOTTOM_RIGHT;
+
+      const mockMenuContainerEl = jasmine.createSpyObj(
+          'MenuContainerEl',
+          ['appendChild', 'setAttribute']);
+      const mockListenableMenuContainer = jasmine.createSpyObj(
+          'ListenableMenuContainer',
+          ['getEventTarget', 'once']);
+      mockListenableMenuContainer.getEventTarget.and.returnValue(mockMenuContainerEl);
+      Fakes.build(mockListenableMenuContainer.once)
+          .call((_eventType: any, handler: () => void, _useCapture: any) => {
+            handler();
+            return Mocks.disposable('ListenableMenuContainer.once');
+          });
+      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockListenableMenuContainer);
+
+      const mockAnchorTargetWatcher = jasmine
+          .createSpyObj('AnchorTargetWatcher', ['dispose', 'start']);
+      spyOn(Interval, 'newInstance').and.returnValue(mockAnchorTargetWatcher);
+
+      spyOn(service, 'setAnchorTarget_');
+
+      spyOn(service, 'getShownId_').and.returnValue(id);
+      spyOn(OverlayBus, 'dispatch');
+
+      await service.showOverlay(
+          id,
+          mockOverlayParent,
+          menuContent,
+          anchorElement,
+          anchorTarget,
+          anchorPoint);
+
+      assert(OverlayBus.dispatch).toNot.haveBeenCalled();
+      assert(mockMenuContainerEl.setAttribute).toNot.haveBeenCalled();
     });
   });
 });

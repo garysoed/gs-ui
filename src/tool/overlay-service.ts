@@ -6,8 +6,10 @@ import { BooleanParser, EnumParser, FloatParser } from 'external/gs_tools/src/pa
 
 import { AnchorLocation } from '../tool/anchor-location';
 import { Anchors } from '../tool/anchors';
+import { OverlayBus } from '../tool/overlay-bus';
 import { OverlayContainer } from '../tool/overlay-container';
 
+export const __shownId = Symbol('shownId');
 
 @bind('gs.tool.OverlayService', [OverlayContainer])
 export class OverlayService extends BaseListener {
@@ -37,12 +39,22 @@ export class OverlayService extends BaseListener {
     }
   }
 
+  private getShownId_(): symbol | null {
+    return this.getOverlayContainerEl_()[__shownId] || null;
+  }
+
   /**
    * Hides the overlay.
    */
-  hideOverlay(): void {
-    this.getOverlayContainerEl_().getEventTarget()
-        .setAttribute('visible', BooleanParser.stringify(false));
+  hideOverlay(id: symbol): void {
+    if (this.getShownId_() !== id) {
+      return;
+    }
+    const overlayContainerEl = this.getOverlayContainerEl_();
+    OverlayBus.dispatch({id, type: 'hide'}, () => {
+      overlayContainerEl.getEventTarget().setAttribute('visible', BooleanParser.stringify(false));
+      overlayContainerEl[__shownId] = null;
+    });
   }
 
   private onTick_(
@@ -104,11 +116,22 @@ export class OverlayService extends BaseListener {
    * @return Promise that will be resolved when the overlay is hidden.
    */
   showOverlay(
+      id: symbol,
       overlayParent: Element,
       overlayContent: Element | null,
       anchorElement: HTMLElement,
       anchorTarget: AnchorLocation,
       anchorPoint: AnchorLocation): Promise<void> {
+    const shownId = this.getShownId_();
+    if (shownId === id) {
+      // The overlay is already shown.
+      return Promise.resolve();
+    }
+
+    if (shownId) {
+      this.hideOverlay(shownId);
+    }
+
     if (overlayContent === null) {
       return Promise.resolve();
     }
@@ -133,10 +156,14 @@ export class OverlayService extends BaseListener {
           () => {
             anchorTargetWatcher.dispose();
             overlayParent.appendChild(overlayContent);
+            this.hideOverlay(id);
             resolve();
           },
           false));
-      overlayContainerElTarget.setAttribute('visible', BooleanParser.stringify(true));
+      OverlayBus.dispatch({id, type: 'show'}, () => {
+        overlayContainerElTarget.setAttribute('visible', BooleanParser.stringify(true));
+        overlayContainerEl[__shownId] = id;
+      });
     });
   }
 }
