@@ -1,4 +1,4 @@
-import { event } from 'external/gs_tools/src/event';
+import { eventDetails } from 'external/gs_tools/src/event';
 import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
@@ -61,7 +61,7 @@ export class RadioButton extends BaseActionElement {
   @onDom.attributeChange(CHECKED_ATTRIBUTE)
   protected onGsCheckedChanged_(
       @dom.attribute(CHECKED_ATTRIBUTE) newValue: boolean,
-      @event() {oldValue}: {oldValue: boolean}): void {
+      @eventDetails() {oldValue}: {oldValue: boolean}): void {
     if (newValue !== oldValue) {
       this.updateService_(newValue);
     }

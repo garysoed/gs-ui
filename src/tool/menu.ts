@@ -13,7 +13,7 @@
  * @attr {boolean} visible True iff the menu is shown.
  */
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
-import { event, MonadSetter, on } from 'external/gs_tools/src/event';
+import { eventDetails, MonadSetter, on } from 'external/gs_tools/src/event';
 import { ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
@@ -84,7 +84,7 @@ export class Menu extends BaseDisposable {
   @on(OverlayBus, 'show')
   @on(OverlayBus, 'hide')
   onOverlayVisibilityChange_(
-      @event() {id, type}: {id: symbol, type: OverlayEventType},
+      @eventDetails() {id, type}: {id: symbol, type: OverlayEventType},
       @domOut.attribute(VISIBLE_ATTR) {id: visibleId}: MonadSetter<boolean | null>):
       ImmutableMap<string, any> {
     if (id !== this.id_) {

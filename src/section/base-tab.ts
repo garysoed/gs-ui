@@ -1,5 +1,5 @@
 import { Interval } from 'external/gs_tools/src/async';
-import { event, on } from 'external/gs_tools/src/event';
+import { eventDetails, on } from 'external/gs_tools/src/event';
 import { DispatchFn } from 'external/gs_tools/src/interfaces';
 import { StringParser } from 'external/gs_tools/src/parse';
 import {
@@ -49,7 +49,7 @@ export abstract class BaseTab extends BaseThemedElement2 {
 
   @onDom.animate(HIGHLIGHT_EL, 'finish', HIGHLIGHT_MOVE_ANIMATION)
   onAnimationFinish_(
-      @event() {keyframes}: {keyframes: AnimationKeyframe[]},
+      @eventDetails() {keyframes}: {keyframes: AnimationKeyframe[]},
       @dom.element(HIGHLIGHT_EL) highlightEl: HTMLElement): void {
     const {start, length} = this.parseAnimationKeyframe(keyframes[keyframes.length - 1]);
     this.setHighlightEl(start, length, highlightEl);
