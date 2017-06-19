@@ -25,7 +25,9 @@ class TestTab extends BaseTab {
     return -1;
   }
 
-  protected parseAnimationKeyframe() { return {length: 0, start: 0}; }
+  protected parseAnimationKeyframe(): {length: number, start: number} {
+    return {length: 0, start: 0};
+  }
 
   protected setHighlightEl(): void { }
 }
