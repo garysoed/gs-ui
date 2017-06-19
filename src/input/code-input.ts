@@ -214,7 +214,7 @@ export class CodeInput extends BaseInput<string> {
 
     const interval = Interval.newInstance(500);
     this.addDisposable(interval);
-    this.listenTo(interval, Interval.TICK_EVENT, this.onTick_);
+    this.addDisposable(interval.on('tick', this.onTick_, this));
     interval.start();
 
     const aceCss = this.document_.getElementById('ace_editor.css');

@@ -239,7 +239,8 @@ describe('input.CodeInput', () => {
 
       spyOn(input['editorValueBinder_'], 'setEditor');
 
-      const mockInterval = jasmine.createSpyObj('Interval', ['dispose', 'start']);
+      const mockInterval = jasmine.createSpyObj('Interval', ['dispose', 'on', 'start']);
+      mockInterval.on.and.returnValue(jasmine.createSpyObj('DisposableFn', ['dispose']));
       spyOn(Interval, 'newInstance').and.returnValue(mockInterval);
 
       spyOn(input, 'addDisposable').and.callThrough();
@@ -259,8 +260,7 @@ describe('input.CodeInput', () => {
       assert(input['editorValueBinder_'].setEditor).to.haveBeenCalledWith(mockEditor);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('#editor');
       assert(input['gsShowGutterHook_'].set).to.haveBeenCalledWith(true);
-      assert(input.listenTo).to.haveBeenCalledWith(
-          mockInterval, Interval.TICK_EVENT, input['onTick_']);
+      assert(mockInterval.on).to.haveBeenCalledWith('tick', input['onTick_'], input);
       assert(mockInterval.start).to.haveBeenCalledWith();
       assert(input.addDisposable).to.haveBeenCalledWith(mockInterval);
     });

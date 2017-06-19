@@ -273,13 +273,12 @@ describe('gs.tool.OverlayService', () => {
       spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockListenableMenuContainer);
 
       const mockAnchorTargetWatcher = jasmine
-          .createSpyObj('AnchorTargetWatcher', ['dispose', 'start']);
+          .createSpyObj('AnchorTargetWatcher', ['dispose', 'on', 'start']);
+      mockAnchorTargetWatcher.on.and.returnValue(jasmine.createSpyObj('DisposableFn', ['dispose']));
       spyOn(Interval, 'newInstance').and.returnValue(mockAnchorTargetWatcher);
 
       spyOn(service, 'onTick_');
       spyOn(service, 'setAnchorTarget_');
-      const listenToSpy = spyOn(service, 'listenTo');
-
       spyOn(service, 'getShownId_').and.returnValue(null);
       Fakes.build(spyOn(OverlayBus, 'dispatch')).call((_: any, fn: () => void) => fn());
 
@@ -308,11 +307,11 @@ describe('gs.tool.OverlayService', () => {
       assert(mockMenuContainerEl.appendChild).to.haveBeenCalledWith(menuContent);
 
       assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();
-      assert(service.listenTo).to.haveBeenCalledWith(
-          mockAnchorTargetWatcher,
-          Interval.TICK_EVENT,
-          Matchers.any(Function) as any);
-      listenToSpy.calls.argsFor(0)[2]();
+      assert(mockAnchorTargetWatcher.on).to.haveBeenCalledWith(
+          'tick',
+          Matchers.any(Function) as any,
+          service);
+      mockAnchorTargetWatcher.on.calls.argsFor(0)[1]();
       assert(service['onTick_'])
           .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
 
@@ -346,13 +345,13 @@ describe('gs.tool.OverlayService', () => {
       spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockListenableMenuContainer);
 
       const mockAnchorTargetWatcher = jasmine
-          .createSpyObj('AnchorTargetWatcher', ['dispose', 'start']);
+          .createSpyObj('AnchorTargetWatcher', ['dispose', 'on', 'start']);
+      mockAnchorTargetWatcher.on.and.returnValue(jasmine.createSpyObj('DisposableFn', ['dispose']));
       spyOn(Interval, 'newInstance').and.returnValue(mockAnchorTargetWatcher);
 
       spyOn(service, 'onTick_');
       spyOn(service, 'setAnchorTarget_');
       spyOn(service, 'hideOverlay');
-      const listenToSpy = spyOn(service, 'listenTo');
 
       Fakes.build(spyOn(OverlayBus, 'dispatch')).call((_: any, fn: () => void) => fn());
 
@@ -381,11 +380,11 @@ describe('gs.tool.OverlayService', () => {
       assert(mockMenuContainerEl.appendChild).to.haveBeenCalledWith(menuContent);
 
       assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();
-      assert(service.listenTo).to.haveBeenCalledWith(
-          mockAnchorTargetWatcher,
-          Interval.TICK_EVENT,
-          Matchers.any(Function) as any);
-      listenToSpy.calls.argsFor(0)[2]();
+      assert(mockAnchorTargetWatcher.on).to.haveBeenCalledWith(
+          'tick',
+          Matchers.any(Function) as any,
+          service);
+      mockAnchorTargetWatcher.on.calls.argsFor(0)[1]();
 
       assert(Interval.newInstance)
           .to.haveBeenCalledWith(OverlayService['ANCHOR_TARGET_INTERVAL_']);

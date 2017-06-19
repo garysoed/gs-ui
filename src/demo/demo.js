@@ -51,8 +51,26 @@ function onClickAccent(name) {
 }
 
 function setupPalettePicker() {
+  var colorPickerButton = document.querySelector('gs-basic-button.colorPicker');
   var basePickerMenu = document.querySelector('.colorPickerMenu.base');
   var accentPickerMenu = document.querySelector('.colorPickerMenu.accent');
+
+  var colorPickerMenu = document.querySelector('#colorPickerMenu');
+  colorPickerButton.addEventListener('gs-action', function() {
+    colorPickerMenu.setAttribute('visible', 'true');
+  });
+
+  var colorPickerBaseTab = document.querySelector('#colorPickerBaseTab');
+  var colorPickerAccentTab = document.querySelector('#colorPickerAccentTab');
+  var colorPickerTab = document.querySelector('#colorPickerTab');
+
+  colorPickerBaseTab.addEventListener('gs-action', function() {
+    colorPickerTab.setAttribute('gs-selected-tab', colorPickerBaseTab.getAttribute('gs-tab-id'));
+  });
+
+  colorPickerAccentTab.addEventListener('gs-action', function() {
+    colorPickerTab.setAttribute('gs-selected-tab', colorPickerAccentTab.getAttribute('gs-tab-id'));
+  });
 
   // Create the base color picker.
   for (var r = 0; r < 5; r++) {
@@ -116,7 +134,7 @@ function setupPalettePicker() {
   // Add logic to the tab.
   var menuRoot = document.querySelector('.menuRoot');
   var tab = document.querySelector('.colorPicker gs-horizontal-tab');
-  tab.addEventListener('gse-tab-change', function() {
+  tab.addEventListener('gs-tab-change', function() {
     menuRoot.setAttribute('selected-tab', tab.getAttribute('gs-selected-tab'));
   });
 

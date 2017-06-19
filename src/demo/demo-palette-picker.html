@@ -1,14 +1,14 @@
 <gs-basic-button class="colorPicker gs-theme-normal" primary>
   <div><gs-icon>color_lens</gs-icon></div>
-  <gs-menu>
+  <gs-menu id="colorPickerMenu">
     <div class="menuRoot gs-theme-normal" selected-tab="base">
       <div class="colorPickerMenu base"></div>
       <div class="colorPickerMenu accent"></div>
-      <gs-horizontal-tab gs-selected-tab="base">
-        <gs-basic-button gs-tab-id="base">
+      <gs-horizontal-tab gs-selected-tab="base" id="colorPickerTab">
+        <gs-basic-button gs-tab-id="base" id="colorPickerBaseTab">
           <div>Base</div>
         </gs-basic-button>
-        <gs-basic-button gs-tab-id="accent">
+        <gs-basic-button gs-tab-id="accent" id="colorPickerAccentTab">
           <div>Accent</div>
         </gs-basic-button>
       </gs-horizontal-tab>

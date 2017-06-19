@@ -62,7 +62,7 @@ export abstract class BaseInput<T> extends BaseActionElement {
       throw new Error('No shadow roots were found');
     }
     this.inputEl_ = shadowRoot.querySelector('input');
-    this.listenTo(this.interval_, Interval.TICK_EVENT, this.onInputTick_);
+    this.addDisposable(this.interval_.on('tick', this.onInputTick_, this));
   }
 
   /**

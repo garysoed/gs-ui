@@ -1,10 +1,20 @@
+/**
+ * @webcomponent gs-vertical-tab
+ * A vertical tab.
+ *
+ * Every child of this tab represents a single tab. They should have an attribute called `gs-tab-id`
+ * so `gs-vertical-tab` can select it.
+ *
+ * @attr {string} gs-selected-tab The currently selected tab. Defaults to the first tab.
+ *
+ * @event {{}} gs-tab-change Dispatched when the tab is changed.
+ */
 import { inject } from 'external/gs_tools/src/inject';
-import { StringParser } from 'external/gs_tools/src/parse';
+import { SizeParser, StringParser } from 'external/gs_tools/src/parse';
 import { customElement } from 'external/gs_tools/src/webc';
 
 import { BaseTab } from '../section/base-tab';
 import { ThemeService } from '../theming/theme-service';
-
 
 @customElement({
   attributes: {
@@ -14,7 +24,7 @@ import { ThemeService } from '../theming/theme-service';
   templateKey: 'src/section/vertical-tab',
 })
 export class VerticalTab extends BaseTab {
-  constructor(@inject('theming.ThemeService') themeService: ThemeService) {
+  constructor( @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
   }
 
@@ -22,7 +32,10 @@ export class VerticalTab extends BaseTab {
    * @override
    */
   getAnimationKeyframe(start: number, length: number): AnimationKeyframe {
-    return {top: `${start}px`, height: `${length}px`};
+    return {
+      height: SizeParser.stringify({value: length, unit: 'px'}),
+      top: SizeParser.stringify({value: start, unit: 'px'}),
+    };
   }
 
   /**
@@ -39,12 +52,28 @@ export class VerticalTab extends BaseTab {
     return element.offsetTop;
   }
 
+  protected parseAnimationKeyframe(keyframe: AnimationKeyframe): {length: number; start: number} {
+    const {top, height} = keyframe;
+    if (top === undefined || height === undefined) {
+      throw new Error(`Invalid keyframe. One of [top, height] does not exist: ${top}, ${height}`);
+    }
+
+    const length = SizeParser.parse(height);
+    const start = SizeParser.parse(top);
+    if (length === null || start === null) {
+      throw new Error(`Invalid keyframe value: ${top}, ${height}`);
+    }
+    return {
+      length: length.value,
+      start: start.value,
+    };
+  }
+
   /**
    * @override
    */
   setHighlightEl(start: number, length: number, highlightEl: HTMLElement): void {
-    highlightEl.style.top = `${start}px`;
-    highlightEl.style.height = `${length}px`;
+    highlightEl.style.top = SizeParser.stringify({value: start, unit: 'px'});
+    highlightEl.style.height = SizeParser.stringify({value: length, unit: 'px'});
   }
 }
-// TODO: Mutable

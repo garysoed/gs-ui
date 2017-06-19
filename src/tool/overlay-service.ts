@@ -138,10 +138,10 @@ export class OverlayService extends BaseListener {
 
     const overlayContainerEl = this.getOverlayContainerEl_();
     const anchorTargetWatcher = Interval.newInstance(OverlayService.ANCHOR_TARGET_INTERVAL_);
-    this.listenTo(
-        anchorTargetWatcher,
-        Interval.TICK_EVENT,
-        this.onTick_.bind(this, overlayContainerEl.getEventTarget(), anchorTarget, anchorElement));
+    this.addDisposable(anchorTargetWatcher.on(
+        'tick',
+        this.onTick_.bind(this, overlayContainerEl.getEventTarget(), anchorTarget, anchorElement),
+        this));
     anchorTargetWatcher.start();
 
     const overlayContainerElTarget = overlayContainerEl.getEventTarget();

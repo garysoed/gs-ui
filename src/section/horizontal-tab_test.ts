@@ -41,6 +41,39 @@ describe('section.HorizontalTab', () => {
     });
   });
 
+  describe('parseAnimationKeyframe', () => {
+    it(`should return the correct object`, () => {
+      const left = 12;
+      const width = 34;
+      assert(tab['parseAnimationKeyframe']({left: `${left}px`, width: `${width}px`}))
+          .to.equal({length: width, start: left});
+    });
+
+    it(`should throw error if length is invalid`, () => {
+      assert(() => {
+        tab['parseAnimationKeyframe']({left: `12px`, width: `abcd`});
+      }).to.throwError(/Invalid keyframe value/);
+    });
+
+    it(`should throw error if start is invalid`, () => {
+      assert(() => {
+        tab['parseAnimationKeyframe']({left: `abc`, width: `34px`});
+      }).to.throwError(/Invalid keyframe value/);
+    });
+
+    it(`should throw error if left does not exist`, () => {
+      assert(() => {
+        tab['parseAnimationKeyframe']({width: `34px`});
+      }).to.throwError(/Invalid keyframe/);
+    });
+
+    it(`should throw error if width does not exist`, () => {
+      assert(() => {
+        tab['parseAnimationKeyframe']({left: `34px`});
+      }).to.throwError(/Invalid keyframe/);
+    });
+  });
+
   describe('setHighlightEl', () => {
     it('should set the left and width correctly', () => {
       const start = 123;

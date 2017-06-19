@@ -1,7 +1,6 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import { Interval } from 'external/gs_tools/src/async';
 import { DomEvent } from 'external/gs_tools/src/event';
 import { Mocks } from 'external/gs_tools/src/mock';
 import { StringParser } from 'external/gs_tools/src/parse';
@@ -124,11 +123,12 @@ describe('input.BaseInput', () => {
       element.shadowRoot = mockShadowRoot;
 
       spyOn(input, 'listenTo');
+      spyOn(input['interval_'], 'on').and
+          .returnValue(jasmine.createSpyObj('DisposableFn', ['dispose']));
 
       input.onCreated(element);
 
-      assert(input.listenTo).to
-          .haveBeenCalledWith(input['interval_'], Interval.TICK_EVENT, input['onInputTick_']);
+      assert(input['interval_'].on).to.haveBeenCalledWith('tick', input['onInputTick_'], input);
       assert(input['inputEl_']).to.equal(inputElement);
       assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('input');
     });
