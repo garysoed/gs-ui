@@ -65,11 +65,11 @@ function setupPalettePicker() {
   var colorPickerTab = document.querySelector('#colorPickerTab');
 
   colorPickerBaseTab.addEventListener('gs-action', function() {
-    colorPickerTab.setAttribute('gs-selected-tab', colorPickerBaseTab.getAttribute('gs-tab-id'));
+    colorPickerTab.setAttribute('selected-tab', colorPickerBaseTab.getAttribute('tab-id'));
   });
 
   colorPickerAccentTab.addEventListener('gs-action', function() {
-    colorPickerTab.setAttribute('gs-selected-tab', colorPickerAccentTab.getAttribute('gs-tab-id'));
+    colorPickerTab.setAttribute('selected-tab', colorPickerAccentTab.getAttribute('tab-id'));
   });
 
   // Create the base color picker.
@@ -135,7 +135,7 @@ function setupPalettePicker() {
   var menuRoot = document.querySelector('.menuRoot');
   var tab = document.querySelector('.colorPicker gs-horizontal-tab');
   tab.addEventListener('gs-tab-change', function() {
-    menuRoot.setAttribute('selected-tab', tab.getAttribute('gs-selected-tab'));
+    menuRoot.setAttribute('selected-tab', tab.getAttribute('selected-tab'));
   });
 
   updateCells();

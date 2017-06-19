@@ -142,9 +142,9 @@ describe('gs.tool.OverlayService', () => {
           mockParentElement);
 
       assert(mockMenuContainerEl.setAttribute).to
-          .haveBeenCalledWith('gs-anchor-target-x', `${left}`);
+          .haveBeenCalledWith('anchor-target-x', `${left}`);
       assert(mockMenuContainerEl.setAttribute).to
-          .haveBeenCalledWith('gs-anchor-target-y', `${top}`);
+          .haveBeenCalledWith('anchor-target-y', `${top}`);
     });
 
     it('should set the correct X and Y for TOP_RIGHT', () => {
@@ -164,9 +164,9 @@ describe('gs.tool.OverlayService', () => {
           AnchorLocation.TOP_RIGHT,
           mockParentElement);
 
-      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('gs-anchor-target-x', `68`);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('anchor-target-x', `68`);
       assert(mockMenuContainerEl.setAttribute).to
-          .haveBeenCalledWith('gs-anchor-target-y', `${top}`);
+          .haveBeenCalledWith('anchor-target-y', `${top}`);
     });
 
     it('should set the correct X and Y for BOTTOM_RIGHT', () => {
@@ -188,8 +188,8 @@ describe('gs.tool.OverlayService', () => {
           AnchorLocation.BOTTOM_RIGHT,
           mockParentElement);
 
-      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('gs-anchor-target-x', `68`);
-      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('gs-anchor-target-y', `112`);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('anchor-target-x', `68`);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('anchor-target-y', `112`);
     });
 
     it('should set the correct X and T for BOTTOM_LEFT', () => {
@@ -210,8 +210,8 @@ describe('gs.tool.OverlayService', () => {
           mockParentElement);
 
       assert(mockMenuContainerEl.setAttribute).to
-          .haveBeenCalledWith('gs-anchor-target-x', `${left}`);
-      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('gs-anchor-target-y', `112`);
+          .haveBeenCalledWith('anchor-target-x', `${left}`);
+      assert(mockMenuContainerEl.setAttribute).to.haveBeenCalledWith('anchor-target-y', `112`);
     });
 
     it('should resolve auto location if the anchor target is AUTO', () => {
@@ -236,9 +236,9 @@ describe('gs.tool.OverlayService', () => {
           mockParentElement);
 
       assert(mockMenuContainerEl.setAttribute).to
-          .haveBeenCalledWith('gs-anchor-target-x', `${left}`);
+          .haveBeenCalledWith('anchor-target-x', `${left}`);
       assert(mockMenuContainerEl.setAttribute).to
-          .haveBeenCalledWith('gs-anchor-target-y', `${top}`);
+          .haveBeenCalledWith('anchor-target-y', `${top}`);
       assert(Anchors.resolveAutoLocation).to.haveBeenCalledWith(40, 73, window);
     });
   });
@@ -303,7 +303,7 @@ describe('gs.tool.OverlayService', () => {
       assert(service['setAnchorTarget_'])
           .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
       assert(mockMenuContainerEl.setAttribute).to
-          .haveBeenCalledWith('gs-anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
+          .haveBeenCalledWith('anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
       assert(mockMenuContainerEl.appendChild).to.haveBeenCalledWith(menuContent);
 
       assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();
@@ -376,7 +376,7 @@ describe('gs.tool.OverlayService', () => {
       assert(service['setAnchorTarget_'])
           .to.haveBeenCalledWith(mockMenuContainerEl, anchorTarget, anchorElement);
       assert(mockMenuContainerEl.setAttribute).to
-          .haveBeenCalledWith('gs-anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
+          .haveBeenCalledWith('anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
       assert(mockMenuContainerEl.appendChild).to.haveBeenCalledWith(menuContent);
 
       assert(mockAnchorTargetWatcher.start).to.haveBeenCalledWith();

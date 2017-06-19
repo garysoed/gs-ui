@@ -83,12 +83,12 @@ export class OverlayService extends BaseListener {
       case AnchorLocation.BOTTOM_LEFT:
       case AnchorLocation.TOP_LEFT:
         overlayContainerEl.setAttribute(
-            'gs-anchor-target-x', FloatParser.stringify(parentScreenLeft));
+            'anchor-target-x', FloatParser.stringify(parentScreenLeft));
         break;
       case AnchorLocation.BOTTOM_RIGHT:
       case AnchorLocation.TOP_RIGHT:
         overlayContainerEl.setAttribute(
-            'gs-anchor-target-x', FloatParser.stringify(parentScreenLeft + boundingRect.width));
+            'anchor-target-x', FloatParser.stringify(parentScreenLeft + boundingRect.width));
         break;
     }
 
@@ -96,12 +96,12 @@ export class OverlayService extends BaseListener {
       case AnchorLocation.BOTTOM_LEFT:
       case AnchorLocation.BOTTOM_RIGHT:
         overlayContainerEl.setAttribute(
-            'gs-anchor-target-y', FloatParser.stringify(parentScreenTop + boundingRect.height));
+            'anchor-target-y', FloatParser.stringify(parentScreenTop + boundingRect.height));
         break;
       case AnchorLocation.TOP_LEFT:
       case AnchorLocation.TOP_RIGHT:
         overlayContainerEl.setAttribute(
-            'gs-anchor-target-y', FloatParser.stringify(parentScreenTop));
+            'anchor-target-y', FloatParser.stringify(parentScreenTop));
         break;
     }
   }
@@ -147,7 +147,7 @@ export class OverlayService extends BaseListener {
     const overlayContainerElTarget = overlayContainerEl.getEventTarget();
     overlayContainerElTarget.appendChild(overlayContent);
     overlayContainerElTarget.setAttribute(
-        'gs-anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
+        'anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
     this.setAnchorTarget_(overlayContainerElTarget, anchorTarget, anchorElement);
 
     return new Promise<void>((resolve: () => void): void => {

@@ -15,7 +15,7 @@ import { ThemeService } from '../theming/theme-service';
 const HIGHLIGHT_MOVE_ANIMATION = Symbol('move');
 
 export const HIGHLIGHT_EL = '#highlight';
-const SELECTED_TAB_ATTR = {name: 'gs-selected-tab', parser: StringParser, selector: null};
+const SELECTED_TAB_ATTR = {name: 'selected-tab', parser: StringParser, selector: null};
 
 export abstract class BaseTab extends BaseThemedElement2 {
   static CHANGE_EVENT: string = 'gs-tab-change';
@@ -119,7 +119,7 @@ export abstract class BaseTab extends BaseThemedElement2 {
 
     if (selectedId !== null) {
       const selectedTab =
-          element.querySelector(`[gs-tab-id="${selectedId}"]`) as HTMLElement | null;
+          element.querySelector(`[tab-id="${selectedId}"]`) as HTMLElement | null;
       if (!selectedTab) {
         return;
       }

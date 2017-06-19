@@ -2,10 +2,10 @@
  * @webcomponent gs-vertical-tab
  * A vertical tab.
  *
- * Every child of this tab represents a single tab. They should have an attribute called `gs-tab-id`
- * so `gs-vertical-tab` can select it.
+ * Every child of this tab represents a single tab. They should have an attribute called `tab-id`
+ * so `vertical-tab` can select it.
  *
- * @attr {string} gs-selected-tab The currently selected tab. Defaults to the first tab.
+ * @attr {string} selected-tab The currently selected tab. Defaults to the first tab.
  *
  * @event {{}} gs-tab-change Dispatched when the tab is changed.
  */

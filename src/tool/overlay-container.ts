@@ -4,11 +4,11 @@
  *
  * Do not use this directly. Instead, use tool.OverlayService or tool.Menu.
  *
- * @attr {enum<AnchorLocation>} gs-anchor-point Location to anchor the overlay content to. This
+ * @attr {enum<AnchorLocation>} anchor-point Location to anchor the overlay content to. This
  *    affects the expanding animation. For example, if this is left to BOTTOM_RIGHT, the content
  *    will expand towards the top left.
- * @attr {float} gs-anchor-target-x X coordinate of the left edge of the content, in px.
- * @attr {float} gs-anchor-target-y Y coordinate of the top edge of the content, in px.
+ * @attr {float} anchor-target-x X coordinate of the left edge of the content, in px.
+ * @attr {float} anchor-target-y Y coordinate of the top edge of the content, in px.
  * @attr {boolean} visible True iff the container should be visible.
  *
  * @slot _ Content of the overlay.
@@ -43,17 +43,17 @@ const ROOT_EL = '#root';
 const SLOT_EL = 'slot';
 
 const ANCHOR_POINT_ATTR = {
-  name: 'gs-anchor-point',
+  name: 'anchor-point',
   parser: EnumParser(AnchorLocation),
   selector: null,
 };
 const ANCHOR_TARGET_X_ATTR = {
-  name: 'gs-anchor-target-x',
+  name: 'anchor-target-x',
   parser: FloatParser,
   selector: null,
 };
 const ANCHOR_TARGET_Y_ATTR = {
-  name: 'gs-anchor-target-y',
+  name: 'anchor-target-y',
   parser: FloatParser,
   selector: null,
 };
