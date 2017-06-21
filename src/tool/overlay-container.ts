@@ -159,7 +159,7 @@ export class OverlayContainer extends BaseDisposable {
   /**
    * Handles the event when animate is done.
    */
-  @onDom.event(CONTAINER_EL, 'gs-animationend')
+  @onDom.event(CONTAINER_EL, 'gs-animationfinish')
   onFinishAnimate_(
       @eventDetails() {detail}: {detail: AnimationEventDetail},
       @dom.element(ROOT_EL) rootEl: HTMLElement,

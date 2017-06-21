@@ -48,7 +48,7 @@ export abstract class BaseTab extends BaseThemedElement2 {
    */
   protected abstract getStartPosition(element: HTMLElement): number;
 
-  @onDom.event(HIGHLIGHT_EL, 'gs-animationend')
+  @onDom.event(HIGHLIGHT_EL, 'gs-animationfinish')
   onAnimationFinish_(
       @eventDetails() {detail}: {detail: AnimationEventDetail},
       @dom.element(HIGHLIGHT_EL) highlightEl: HTMLElement): void {
