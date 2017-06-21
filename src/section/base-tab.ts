@@ -5,6 +5,7 @@ import { StringParser } from 'external/gs_tools/src/parse';
 import {
   Animation,
   AnimationEasing,
+  AnimationEventDetail,
   dom,
   onDom,
   onLifecycle} from 'external/gs_tools/src/webc';
@@ -12,7 +13,7 @@ import {
 import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
 
-const HIGHLIGHT_MOVE_ANIMATION = Symbol('move');
+export const HIGHLIGHT_MOVE_ANIMATION = Symbol('move');
 
 export const HIGHLIGHT_EL = '#highlight';
 const SELECTED_TAB_ATTR = {name: 'selected-tab', parser: StringParser, selector: null};
@@ -47,10 +48,14 @@ export abstract class BaseTab extends BaseThemedElement2 {
    */
   protected abstract getStartPosition(element: HTMLElement): number;
 
-  @onDom.animate(HIGHLIGHT_EL, 'finish', HIGHLIGHT_MOVE_ANIMATION)
+  @onDom.event(HIGHLIGHT_EL, 'gs-animationend')
   onAnimationFinish_(
-      @eventDetails() {keyframes}: {keyframes: AnimationKeyframe[]},
+      @eventDetails() {detail}: {detail: AnimationEventDetail},
       @dom.element(HIGHLIGHT_EL) highlightEl: HTMLElement): void {
+    const {id, keyframes} = detail;
+    if (id !== HIGHLIGHT_MOVE_ANIMATION) {
+      return;
+    }
     const {start, length} = this.parseAnimationKeyframe(keyframes[keyframes.length - 1]);
     this.setHighlightEl(start, length, highlightEl);
   }

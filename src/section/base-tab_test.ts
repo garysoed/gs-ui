@@ -5,7 +5,7 @@ import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 import { Animation } from 'external/gs_tools/src/webc';
 
-import { BaseTab, HIGHLIGHT_EL } from '../section/base-tab';
+import { BaseTab, HIGHLIGHT_EL, HIGHLIGHT_MOVE_ANIMATION } from '../section/base-tab';
 
 
 class TestTab extends BaseTab {
@@ -41,7 +41,34 @@ describe('section.BaseTab', () => {
   });
 
   describe('onAnimationFinish_', () => {
-    fit(`should parse the keyframe and update the highlight element`);
+    it(`should parse the keyframe and update the highlight element`, () => {
+      const keyframe = Mocks.object('keyframe');
+      const keyframes = [Mocks.object('otherKeyframe'), keyframe];
+      const detail = {id: HIGHLIGHT_MOVE_ANIMATION, keyframes};
+      const highlightEl = Mocks.object('highlightEl');
+
+      const start = 12;
+      const length = 34;
+      spyOn(tab, 'parseAnimationKeyframe').and.returnValue({start, length});
+      spyOn(tab, 'setHighlightEl');
+
+      tab.onAnimationFinish_({detail}, highlightEl);
+      assert(tab['parseAnimationKeyframe']).to.haveBeenCalledWith(keyframe);
+      assert(tab['setHighlightEl']).to.haveBeenCalledWith(start, length, highlightEl);
+    });
+
+    it(`should do nothing if the ID is incorrect`, () => {
+      const keyframes = Mocks.object('keyframes');
+      const detail = {id: Symbol('otherId'), keyframes};
+      const highlightEl = Mocks.object('highlightEl');
+
+      spyOn(tab, 'parseAnimationKeyframe');
+      spyOn(tab, 'setHighlightEl');
+
+      tab.onAnimationFinish_({detail}, highlightEl);
+      assert(tab['parseAnimationKeyframe']).toNot.haveBeenCalled();
+      assert(tab['setHighlightEl']).toNot.haveBeenCalled();
+    });
   });
 
   describe('onCreated', () => {
@@ -57,7 +84,7 @@ describe('section.BaseTab', () => {
       const mockDispatcher = jasmine.createSpy('Dispatcher');
       tab.onSelectedTabChanged_(mockDispatcher);
 
-      assert(mockDispatcher).to.haveBeenCalledWith(BaseTab.CHANGE_EVENT);
+      assert(mockDispatcher).to.haveBeenCalledWith(BaseTab.CHANGE_EVENT, {});
     });
   });
 
@@ -70,7 +97,7 @@ describe('section.BaseTab', () => {
 
       const animate = Mocks.object('animate');
       const mockAnimation = jasmine.createSpyObj('Animation', ['start']);
-      mockAnimation.applyTo.and.returnValue(animate);
+      mockAnimation.start.and.returnValue(animate);
       spyOn(Animation, 'newInstance').and.returnValue(mockAnimation);
 
       const keyframe1 = Mocks.object('keyframe1');
@@ -96,8 +123,8 @@ describe('section.BaseTab', () => {
       const targetStart = 56;
       const targetLength = 78;
 
-      const mockAnimation = jasmine.createSpyObj('Animation', ['applyTo']);
-      mockAnimation.applyTo.and.returnValue(Mocks.object('animate'));
+      const mockAnimation = jasmine.createSpyObj('Animation', ['start']);
+      mockAnimation.start.and.returnValue(Mocks.object('animate'));
       spyOn(Animation, 'newInstance').and.returnValue(mockAnimation);
 
       spyOn(tab, 'setHighlightEl');
@@ -147,7 +174,7 @@ describe('section.BaseTab', () => {
           targetLength,
           currentStart,
           currentLength);
-      assert(mockElement.querySelector).to.haveBeenCalledWith(`[gs-tab-id="${selectedId}"]`);
+      assert(mockElement.querySelector).to.haveBeenCalledWith(`[tab-id="${selectedId}"]`);
       assert(tab['getStartPosition']).to.haveBeenCalledWith(selectedTab);
       assert(tab['getLength']).to.haveBeenCalledWith(selectedTab);
       assert(tab['getStartPosition']).to.haveBeenCalledWith(highlightElement);
@@ -160,6 +187,9 @@ describe('section.BaseTab', () => {
 
       const element = Mocks.object('element');
       const highlightElement = Mocks.object('highlightElement');
+
+      spyOn(tab, 'getStartPosition').and.returnValue(currentStart);
+      spyOn(tab, 'getLength').and.returnValue(currentLength);
 
       spyOn(tab, 'setHighlight_').and.returnValue(Promise.resolve());
 

@@ -3,10 +3,11 @@ TestBase.setup();
 
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
+import { AnimationEventDetail } from 'external/gs_tools/src/webc';
 
-import { AnchorLocation } from './anchor-location';
-import { Anchors } from './anchors';
-import { OverlayContainer } from './overlay-container';
+import { AnchorLocation } from '../tool/anchor-location';
+import { Anchors } from '../tool/anchors';
+import { HIDE_ANIM, OverlayContainer } from '../tool/overlay-container';
 
 
 describe('tool.OverlayContainer', () => {
@@ -93,12 +94,27 @@ describe('tool.OverlayContainer', () => {
       rootEl.classList = mockClassList;
 
       const mockDispatcher = jasmine.createSpy('Dispatcher');
+      const detail = {id: HIDE_ANIM} as AnimationEventDetail;
 
-      container.onFinishAnimate_(rootEl, mockDispatcher);
+      container.onFinishAnimate_({detail}, rootEl, mockDispatcher);
 
       assert(mockClassList.remove).to
           .haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
       assert(mockDispatcher).to.haveBeenCalledWith('gs-hide', {});
+    });
+
+    it(`should do nothing if the ID is incorrect`, () => {
+      const mockClassList = jasmine.createSpyObj('ClassList', ['remove']);
+      const rootEl = Mocks.object('rootEl');
+      rootEl.classList = mockClassList;
+
+      const mockDispatcher = jasmine.createSpy('Dispatcher');
+      const detail = {id: Symbol('otherId')} as AnimationEventDetail;
+
+      container.onFinishAnimate_({detail}, rootEl, mockDispatcher);
+
+      assert(mockClassList.remove).toNot.haveBeenCalled();
+      assert(mockDispatcher).toNot.haveBeenCalled();
     });
   });
 

@@ -17,7 +17,7 @@
  * @event {} gs-show The overlay is shown.
  */
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
-import { MonadSetter } from 'external/gs_tools/src/event';
+import { eventDetails, MonadSetter } from 'external/gs_tools/src/event';
 import { on } from 'external/gs_tools/src/event/on';
 import { ImmutableMap } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
@@ -26,6 +26,7 @@ import { BooleanParser, EnumParser, FloatParser } from 'external/gs_tools/src/pa
 import {
   Animation,
   AnimationEasing,
+  AnimationEventDetail,
   customElement,
   dom,
   domOut,
@@ -63,7 +64,7 @@ const HIDE_EVENT: string = 'gs-hide';
 const SHOW_EVENT: string = 'gs-show';
 
 const SHOW_ANIM = Symbol('show');
-const HIDE_ANIM = Symbol('hide');
+export const HIDE_ANIM = Symbol('hide');
 
 @customElement({
   tag: 'gs-overlay-container',
@@ -158,10 +159,14 @@ export class OverlayContainer extends BaseDisposable {
   /**
    * Handles the event when animate is done.
    */
-  @onDom.animate(CONTAINER_EL, 'finish', HIDE_ANIM)
+  @onDom.event(CONTAINER_EL, 'gs-animationend')
   onFinishAnimate_(
+      @eventDetails() {detail}: {detail: AnimationEventDetail},
       @dom.element(ROOT_EL) rootEl: HTMLElement,
       @dom.eventDispatcher() dispatcher: DispatchFn<{}>): void {
+    if (detail.id !== HIDE_ANIM) {
+      return;
+    }
     rootEl.classList.remove(OverlayContainer.SHOW_CLASS_);
     dispatcher(HIDE_EVENT, {});
   }
