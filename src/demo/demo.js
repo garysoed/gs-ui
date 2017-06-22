@@ -24,14 +24,14 @@ function updateTheme() {
 
 function updateCells() {
   // Update the base cells.
-  var cells = document.querySelectorAll('.base .colorPickerCell');
+  var cells = document.querySelectorAll('#colorPickerBase .colorPickerCell');
   for (var i = 0; i < cells.length; i++) {
     var cellEl = cells.item(i);
     cellEl.setAttribute('data-selected', cellEl.getAttribute('data-name') === base);
   }
 
   // Update the accent cells.
-  var cells = document.querySelectorAll('.accent .colorPickerCell');
+  var cells = document.querySelectorAll('#colorPickerAccent .colorPickerCell');
   for (var i = 0; i < cells.length; i++) {
     var cellEl = cells.item(i);
     cellEl.setAttribute('data-selected', cellEl.getAttribute('data-name') === accent);
@@ -52,8 +52,8 @@ function onClickAccent(name) {
 
 function setupPalettePicker() {
   var colorPickerButton = document.querySelector('gs-basic-button.colorPicker');
-  var basePickerMenu = document.querySelector('.colorPickerMenu.base');
-  var accentPickerMenu = document.querySelector('.colorPickerMenu.accent');
+  var basePickerMenu = document.querySelector('#colorPickerBase');
+  var accentPickerMenu = document.querySelector('#colorPickerAccent');
 
   var colorPickerMenu = document.querySelector('#colorPickerMenu');
   colorPickerButton.addEventListener('gs-action', function() {
@@ -132,10 +132,10 @@ function setupPalettePicker() {
   }
 
   // Add logic to the tab.
-  var menuRoot = document.querySelector('.menuRoot');
+  var menuSwitch = document.querySelector('#menuSwitch');
   var tab = document.querySelector('.colorPicker gs-horizontal-tab');
   tab.addEventListener('gs-tab-change', function() {
-    menuRoot.setAttribute('selected-tab', tab.getAttribute('selected-tab'));
+    menuSwitch.setAttribute('value', tab.getAttribute('selected-tab'));
   });
 
   updateCells();

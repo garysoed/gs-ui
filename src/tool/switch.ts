@@ -1,12 +1,34 @@
+/**
+ * @webcomponent gs-switch
+ * Switches between different views depending on the value.
+ *
+ * To use this, add views this component switches between as children. Add `slot` attribute with the
+ * expected value.
+ *
+ * @attr {string} value Current value of the switch.
+ */
+
+import { eventDetails, monad } from 'external/gs_tools/src/event';
+import { ImmutableList, Vector2d } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
-import { customElement, dom, DomHook, hook, onDom } from 'external/gs_tools/src/webc';
+import {
+  Animation,
+  AnimationEasing,
+  AnimationEventDetail,
+  customElement,
+  dom,
+  onDom} from 'external/gs_tools/src/webc';
 
-import { BaseThemedElement } from '../common/base-themed-element';
+import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
+import { Action, ActionTracker } from '../tool/action-tracker';
 
+const ROOT_EL = '#root';
+const VALUE_ATTRIBUTE = {name: 'value', parser: StringParser, selector: null};
 
-const VALUE_ATTRIBUTE = {name: 'gs-value', parser: StringParser, selector: null};
+export const ANIMATE_SLOT_ID = Symbol('animateSlot');
+export const ANIMATE_CONTAINER_ID = Symbol('animateContainer');
 
 /**
  * Switches the content depending on the value.
@@ -15,24 +37,155 @@ const VALUE_ATTRIBUTE = {name: 'gs-value', parser: StringParser, selector: null}
   tag: 'gs-switch',
   templateKey: 'src/tool/switch',
 })
-export class Switch extends BaseThemedElement {
-  @hook('#content').attribute('select', StringParser)
-  private readonly selectHook_: DomHook<string>;
-
+export class Switch extends BaseThemedElement2 {
   constructor(
-      @inject('theming.ThemeService') themeService: ThemeService) {
+      @inject('theming.ThemeService') themeService: ThemeService,
+      @inject('x.dom.document') private readonly document_: Document,
+      @inject('x.dom.window') private readonly window_: Window) {
     super(themeService);
-    this.selectHook_ = DomHook.of<string>(true);
+  }
+
+  private applyKeyframe_(element: HTMLElement, keyframe: AnimationKeyframe): void {
+    for (const key in keyframe) {
+      element.style[key] = keyframe[key];
+    }
+  }
+
+  private computeAnimations_(
+      targetClientRect: ClientRect,
+      circleCenter: Vector2d): {container: Animation, slot: Animation} {
+    const corners = [
+      Vector2d.of(targetClientRect.left, targetClientRect.top),
+      Vector2d.of(targetClientRect.left, targetClientRect.top + targetClientRect.height),
+      Vector2d.of(targetClientRect.left + targetClientRect.width, targetClientRect.top),
+      Vector2d.of(
+          targetClientRect.left + targetClientRect.width,
+          targetClientRect.top + targetClientRect.height),
+    ];
+    const distances = corners
+        .map((corner: Vector2d) => {
+          return corner.add(circleCenter.mult(-1)).getLengthSquared();
+        });
+    const relativeCenter = circleCenter
+        .add(Vector2d.of(targetClientRect.left, targetClientRect.top).mult(-1));
+    const maxLength = Math.sqrt(Math.max(...distances));
+    const minLength = Math.sqrt(Math.min(...distances));
+
+    const containerAnimation = Animation.newInstance(
+        [
+          {
+            height: `${2 * minLength}px`,
+            left: `${relativeCenter.x - minLength}px`,
+            top: `${relativeCenter.y - minLength}px`,
+            width: `${2 * minLength}px`,
+          },
+          {
+            height: `${2 * maxLength}px`,
+            left: `${relativeCenter.x - maxLength}px`,
+            top: `${relativeCenter.y - maxLength}px`,
+            width: `${2 * maxLength}px`,
+          },
+        ],
+        {duration: 600, easing: AnimationEasing.EASE_OUT_EXPO},
+        ANIMATE_CONTAINER_ID);
+
+    const slotAnimation = Animation.newInstance(
+        [
+          {
+            left: `${minLength - relativeCenter.x}px`,
+            top: `${minLength - relativeCenter.y}px`,
+          },
+          {
+            left: `${maxLength - relativeCenter.x}px`,
+            top: `${maxLength - relativeCenter.y}px`,
+          },
+        ],
+        {duration: 600, easing: AnimationEasing.EASE_OUT_EXPO},
+        ANIMATE_SLOT_ID);
+    return {container: containerAnimation, slot: slotAnimation};
+  }
+
+  private getAnimationCircleCenter_(_: Action | null): Vector2d {
+    // TODO: Handle click actions
+    // TODO: Make sure that the action is recent
+    return Vector2d.of(this.window_.innerWidth / 2, 0);
+  }
+
+  @onDom.event(ROOT_EL, 'gs-animationfinish')
+  onAnimateContainerFinish_(@eventDetails() eventDetails: CustomEvent): void {
+    const targetEl = eventDetails.target;
+    if (!(targetEl instanceof HTMLElement)) {
+      throw new Error(`${targetEl} is not an HTMLElement`);
+    }
+
+    const {id, keyframes} = eventDetails.detail as AnimationEventDetail;
+    if (id !== ANIMATE_CONTAINER_ID) {
+      return;
+    }
+
+    function *previousSiblings(element: Element): IterableIterator<Element> {
+      let currentElement = element.previousElementSibling;
+      while (currentElement) {
+        yield currentElement;
+        currentElement = element.previousElementSibling;
+      }
+    }
+
+    for (const toRemove of previousSiblings(targetEl)) {
+      toRemove.remove();
+    }
+    this.applyKeyframe_(targetEl, keyframes[keyframes.length - 1]);
+  }
+
+  @onDom.event(ROOT_EL, 'gs-animationfinish')
+  onAnimateSlotFinish_(@eventDetails() eventDetails: CustomEvent): void {
+    const targetEl = eventDetails.target;
+    if (!(targetEl instanceof HTMLElement)) {
+      throw new Error(`${targetEl} is not an HTMLElement`);
+    }
+
+    const {id, keyframes} = eventDetails.detail as AnimationEventDetail;
+    if (id !== ANIMATE_SLOT_ID) {
+      return;
+    }
+
+    this.applyKeyframe_(targetEl, keyframes[keyframes.length - 1]);
   }
 
   @onDom.attributeChange(VALUE_ATTRIBUTE)
-  protected onGsValueChange_(
-      @dom.attribute(VALUE_ATTRIBUTE) value: string | null): void {
-    if (value === null) {
-      this.selectHook_.delete();
-    } else {
-      this.selectHook_.set(`[gs-when="${value}"]`);
+  onValueChange_(
+      @dom.attribute(VALUE_ATTRIBUTE) value: string | null,
+      @dom.element(ROOT_EL) rootEl: HTMLElement,
+      @monad(ActionTracker) lastAction: Action): void {
+    // TODO: Handle null value.
+    // Delete any animation with the same value.
+    for (const oldEl of ImmutableList.of(rootEl.querySelectorAll(`div#${value}`))) {
+      oldEl.remove();
     }
+    const center = this.getAnimationCircleCenter_(lastAction);
+
+    // TODO: Handle resize
+    const boundingRect = rootEl.getBoundingClientRect();
+    const {container: containerAnimation, slot: slotAnimation} =
+        this.computeAnimations_(boundingRect, center);
+
+    const id = value || '';
+    const slotEl = this.document_.createElement('slot');
+    slotEl.setAttribute('name', StringParser.stringify(value));
+
+    const slotContainerEl = this.document_.createElement('div');
+    slotContainerEl.style.height = `${boundingRect.height}px`;
+    slotContainerEl.style.width = `${boundingRect.width}px`;
+    slotContainerEl.classList.add('slotContainer');
+    slotContainerEl.appendChild(slotEl);
+
+    const containerEl = this.document_.createElement('div');
+    containerEl.id = id;
+    containerEl.classList.add('container');
+    containerEl.appendChild(slotContainerEl);
+    rootEl.appendChild(containerEl);
+
+    containerAnimation.start(this, `#${id}`);
+    slotAnimation.start(this, `#${id} > *`);
   }
 }
-// TODO: Mutable

@@ -8,4 +8,5 @@ gs_ui(
       "//src/common",
       "//src/const",
       "//src/theming",
+      "//src/tool",
     ])

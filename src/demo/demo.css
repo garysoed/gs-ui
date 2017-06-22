@@ -40,7 +40,6 @@
 
 .colorPickerMenu {
   background-color: white;
-  display: none;
   flex-direction: column;
   overflow: hidden;
 }
@@ -50,11 +49,13 @@
   flex-direction: row;
 }
 
-.menuRoot {
-  background-color: white;
+#colorPickerSwitchContainer {
+  height: 240px;
+  overflow: hidden;
+  position: relative;
+  width: 240px;
 }
 
-.menuRoot[selected-tab="base"] > .colorPickerMenu.base,
-.menuRoot[selected-tab="accent"] > .colorPickerMenu.accent {
-  display: flex;
+.menuRoot {
+  background-color: white;
 }

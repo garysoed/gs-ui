@@ -1,9 +1,13 @@
 <gs-basic-button class="colorPicker gs-theme-normal" primary>
   <div><gs-icon>color_lens</gs-icon></div>
   <gs-menu id="colorPickerMenu">
-    <div class="menuRoot gs-theme-normal" selected-tab="base">
-      <div class="colorPickerMenu base"></div>
-      <div class="colorPickerMenu accent"></div>
+    <div class="menuRoot gs-theme-normal">
+      <div id="colorPickerSwitchContainer">
+        <gs-switch id="menuSwitch" value="base">
+          <div class="colorPickerMenu" id="colorPickerBase" slot="base"></div>
+          <div class="colorPickerMenu" id="colorPickerAccent" slot="accent"></div>
+        </gs-switch>
+      </div>
       <gs-horizontal-tab selected-tab="base" id="colorPickerTab">
         <gs-basic-button tab-id="base" id="colorPickerBaseTab">
           <div>Base</div>
