@@ -5,9 +5,7 @@ import { Vector2d } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { Action } from '../tool/action-tracker';
-import { ANIMATE_CONTAINER_ID, ANIMATE_SLOT_ID, Switch } from '../tool/switch';
-
+import { ANIMATE_CONTAINER_ID, ANIMATE_SLOT_ID, NULL_ID, Switch } from '../tool/switch';
 
 describe('tool.Switch', () => {
   let mockDocument: any;
@@ -72,9 +70,17 @@ describe('tool.Switch', () => {
   });
 
   describe('getAnimationCircleCenter_', () => {
-    it(`should return the correct coordinate`, () => {
+    it(`should return the correct coordinate for click actions`, () => {
+      const x = 12;
+      const y = 34;
+      const action = {type: 'click' as 'click', x: 12, y: 34};
+      assert(switchEl['getAnimationCircleCenter_'](action)).to
+          .equal(Matchers.objectContaining({x, y}));
+    });
+
+    it(`should return the correct coordinate for no actions`, () => {
       window.innerWidth = 12;
-      assert(switchEl['getAnimationCircleCenter_']({} as Action)).to
+      assert(switchEl['getAnimationCircleCenter_'](null)).to
           .equal(Matchers.objectContaining({x: 6, y: 0}));
     });
   });
@@ -205,6 +211,42 @@ describe('tool.Switch', () => {
     });
   });
 
+  describe('onRootDimensionChange_', () => {
+    it(`should delete all the root children and add a single slot element`, () => {
+      const rootEl = document.createElement('div');
+      const child1 = document.createElement('child-1');
+      rootEl.appendChild(child1);
+      const child2 = document.createElement('child-2');
+      rootEl.appendChild(child2);
+      const child3 = document.createElement('child-3');
+      rootEl.appendChild(child3);
+
+      const value = 'value';
+      const slotEl = document.createElement('slot');
+
+      mockDocument.createElement.and.returnValue(slotEl);
+
+      switchEl.onRootDimensionChange_(rootEl, value);
+      assert(rootEl).to.haveChildren([slotEl]);
+      assert(slotEl.getAttribute('name')).to.equal(value);
+      assert(mockDocument.createElement).to.haveBeenCalledWith('slot');
+    });
+
+    it(`should do nothing if the value is null`, () => {
+      const rootEl = document.createElement('div');
+      const child1 = document.createElement('child-1');
+      rootEl.appendChild(child1);
+      const child2 = document.createElement('child-2');
+      rootEl.appendChild(child2);
+      const child3 = document.createElement('child-3');
+      rootEl.appendChild(child3);
+
+      switchEl.onRootDimensionChange_(rootEl, null);
+      assert(rootEl).to.haveChildren([child1, child2, child3]);
+      assert(mockDocument.createElement).toNot.haveBeenCalled();
+    });
+  });
+
   describe('onValueChange_', () => {
     it(`should delete old duplicate animations and create the animations correctly`, () => {
       const value = 'value';
@@ -255,6 +297,59 @@ describe('tool.Switch', () => {
           .equal(Matchers.objectContaining({height: `${height}px`, width: `${width}px`}));
 
       assert(slotEl.getAttribute('name')).to.equal(value);
+
+      assert(switchEl['computeAnimations_']).to.haveBeenCalledWith(clientRect, center);
+      assert(switchEl['getAnimationCircleCenter_']).to.haveBeenCalledWith(lastAction);
+    });
+
+    it(`should handle null values correctly`, () => {
+      const height = 12;
+      const width = 34;
+      const clientRect = {height, width} as any;
+      const center = Vector2d.of(56, 78);
+      const rootEl = document.createElement('div');
+      spyOn(rootEl, 'getBoundingClientRect').and.returnValue(clientRect);
+      const otherEl = document.createElement('div');
+      otherEl.id = NULL_ID;
+      rootEl.appendChild(otherEl);
+
+      const containerEl = document.createElement('div');
+      const slotContainerEl = document.createElement('div');
+      const slotEl = document.createElement('slot');
+      let callCount = 0;
+      Fakes.build(mockDocument.createElement)
+          .when('div').call(() => {
+            const toReturn = callCount === 0 ? slotContainerEl : containerEl;
+            callCount++;
+            return toReturn;
+          })
+          .when('slot').return(slotEl);
+
+      const lastAction = Mocks.object('lastAction');
+      const mockContainerAnimation = jasmine.createSpyObj('ContainerAnimation', ['start']);
+      const mockSlotAnimation = jasmine.createSpyObj('SlotAnimation', ['start']);
+
+      spyOn(switchEl, 'computeAnimations_').and.returnValue({
+        container: mockContainerAnimation,
+        slot: mockSlotAnimation,
+      });
+      spyOn(switchEl, 'getAnimationCircleCenter_').and.returnValue(center);
+
+      switchEl.onValueChange_(null, rootEl, lastAction);
+      assert(mockSlotAnimation.start).to.haveBeenCalledWith(switchEl, `#${NULL_ID} > *`);
+      assert(mockContainerAnimation.start).to.haveBeenCalledWith(switchEl, `#${NULL_ID}`);
+      assert(rootEl).to.haveChildren([containerEl]);
+
+      assert(containerEl).to.haveChildren([slotContainerEl]);
+      assert(containerEl).to.haveClasses(['container']);
+      assert(containerEl.id).to.equal(NULL_ID);
+
+      assert(slotContainerEl).to.haveChildren([slotEl]);
+      assert(slotContainerEl).to.haveClasses(['slotContainer']);
+      assert(slotContainerEl.style).to
+          .equal(Matchers.objectContaining({height: `${height}px`, width: `${width}px`}));
+
+      assert(slotEl.getAttribute('name')).to.equal(NULL_ID);
 
       assert(switchEl['computeAnimations_']).to.haveBeenCalledWith(clientRect, center);
       assert(switchEl['getAnimationCircleCenter_']).to.haveBeenCalledWith(lastAction);

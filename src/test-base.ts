@@ -7,6 +7,7 @@ import {
 import { Log } from 'external/gs_tools/src/util';
 import { LogLevel } from 'external/gs_tools/src/util/log';
 export { assert, assertColor, Matchers } from 'external/gs_tools/src/jasmine';
+export { Mocks } from 'external/gs_tools/src/mock';
 
 const TEST_SETUP = new TestSetup([
   TestAsync,

@@ -12,6 +12,7 @@ import { eventDetails, monad } from 'external/gs_tools/src/event';
 import { ImmutableList, Vector2d } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
+import { assertUnreachable } from 'external/gs_tools/src/typescript';
 import {
   Animation,
   AnimationEasing,
@@ -24,6 +25,7 @@ import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
 import { Action, ActionTracker } from '../tool/action-tracker';
 
+export const NULL_ID = '_gs-null';
 const ROOT_EL = '#root';
 const VALUE_ATTRIBUTE = {name: 'value', parser: StringParser, selector: null};
 
@@ -105,10 +107,19 @@ export class Switch extends BaseThemedElement2 {
     return {container: containerAnimation, slot: slotAnimation};
   }
 
-  private getAnimationCircleCenter_(_: Action | null): Vector2d {
-    // TODO: Handle click actions
-    // TODO: Make sure that the action is recent
-    return Vector2d.of(this.window_.innerWidth / 2, 0);
+  private getAnimationCircleCenter_(recentAction: Action | null): Vector2d {
+    if (!recentAction) {
+      return Vector2d.of(this.window_.innerWidth / 2, 0);
+    }
+
+    const actionType = recentAction.type;
+
+    switch (actionType) {
+      case 'click':
+        return Vector2d.of(recentAction.x, recentAction.y);
+      default:
+        throw assertUnreachable(actionType);
+    }
   }
 
   @onDom.event(ROOT_EL, 'gs-animationfinish')
@@ -152,26 +163,43 @@ export class Switch extends BaseThemedElement2 {
     this.applyKeyframe_(targetEl, keyframes[keyframes.length - 1]);
   }
 
+  @onDom.dimensionChange(ROOT_EL)
+  onRootDimensionChange_(
+      @dom.element(ROOT_EL) rootEl: HTMLElement,
+      @dom.attribute(VALUE_ATTRIBUTE) value: string | null): void {
+    if (value === null) {
+      return;
+    }
+
+    // Cancel all the animations.
+    for (const childEl of ImmutableList.of(rootEl.children)) {
+      childEl.remove();
+    }
+
+    const slotEl = this.document_.createElement('slot');
+    slotEl.setAttribute('name', StringParser.stringify(value));
+    rootEl.appendChild(slotEl);
+  }
+
   @onDom.attributeChange(VALUE_ATTRIBUTE)
   onValueChange_(
       @dom.attribute(VALUE_ATTRIBUTE) value: string | null,
       @dom.element(ROOT_EL) rootEl: HTMLElement,
       @monad(ActionTracker) lastAction: Action): void {
-    // TODO: Handle null value.
+    const id = value || NULL_ID;
+
     // Delete any animation with the same value.
-    for (const oldEl of ImmutableList.of(rootEl.querySelectorAll(`div#${value}`))) {
+    for (const oldEl of ImmutableList.of(rootEl.querySelectorAll(`div#${id}`))) {
       oldEl.remove();
     }
     const center = this.getAnimationCircleCenter_(lastAction);
 
-    // TODO: Handle resize
     const boundingRect = rootEl.getBoundingClientRect();
     const {container: containerAnimation, slot: slotAnimation} =
         this.computeAnimations_(boundingRect, center);
 
-    const id = value || '';
     const slotEl = this.document_.createElement('slot');
-    slotEl.setAttribute('name', StringParser.stringify(value));
+    slotEl.setAttribute('name', StringParser.stringify(id));
 
     const slotContainerEl = this.document_.createElement('div');
     slotContainerEl.style.height = `${boundingRect.height}px`;
