@@ -141,13 +141,44 @@ function setupPalettePicker() {
   updateCells();
 }
 
+function setupContrastPicker() {
+  var contrastButton = document.querySelector('#contrastButton');
+  var contrastDrawer = document.querySelector('#contrastDrawer');
+  contrastButton.addEventListener('click', function() {
+    var value = contrastDrawer.getAttribute('gs-is-expanded') === 'true';
+    contrastDrawer.setAttribute('gs-is-expanded', !value);
+  });
+
+  var contrastInput = document.querySelector('#contrastInput');
+  contrastInput.setAttribute('gs-value', contrast);
+  var mutationObserver = new MutationObserver(function(records) {
+    records.forEach(function() {
+      var newContrast = Number.parseFloat(contrastInput.getAttribute('gs-value'));
+      if (!Number.isNaN(newContrast)) {
+        contrast = newContrast;
+        updateTheme();
+      }
+    });
+  });
+  mutationObserver.observe(contrastInput, {attributes: true, attributeFilter: ['gs-value']});
+}
+
 fetch('demo-palette-picker.html', {method: 'GET'})
     .then(function(response) {
-      return response.text()
+      return response.text();
     })
     .then(function(textResponse) {
       document.body.innerHTML += textResponse;
       setupPalettePicker();
+    });
+
+fetch('demo-contrast-picker.html', {method: 'GET'})
+    .then(function(response) {
+      return response.text();
+    })
+    .then(function(textResponse) {
+      document.body.innerHTML += textResponse;
+      setupContrastPicker();
     });
 
 // Set the templates.
@@ -156,26 +187,6 @@ document.querySelectorAll('section.cell').forEach(function(el) {
   el.innerHTML = templateEl.innerHTML;
 });
 
-// Setup the contrast button.
-var contrastButton = document.querySelector('#contrastButton');
-var contrastDrawer = document.querySelector('#contrastDrawer');
-contrastButton.addEventListener('click', function() {
-  var value = contrastDrawer.getAttribute('gs-is-expanded') === 'true';
-  contrastDrawer.setAttribute('gs-is-expanded', !value);
-});
-
-var contrastInput = document.querySelector('#contrastInput');
-contrastInput.setAttribute('gs-value', contrast);
-var mutationObserver = new MutationObserver(function(records) {
-  records.forEach(function() {
-    var newContrast = Number.parseFloat(contrastInput.getAttribute('gs-value'));
-    if (!Number.isNaN(newContrast)) {
-      contrast = newContrast;
-      updateTheme();
-    }
-  });
-});
-mutationObserver.observe(contrastInput, {attributes: true, attributeFilter: ['gs-value']});
 
 
 var theme = gs.ui.Theme.newInstance(
