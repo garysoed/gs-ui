@@ -1,76 +1,65 @@
+/**
+ * @webcomponent gs-drawer
+ * An expandable side drawer.
+ *
+ * To use this, put the content of the drawer as the child element.
+ *
+ * @attr {'left'|'right'} align-content The content alignment.
+ * @attr {'left'|'right'} anchor-point The side to anchor the content to.
+ * @attr {boolean} expanded True iff the drawer should be expanded.
+ * @attr {Size} max-width The max width of the drawer when expanded, in px.
+ * @attr {Size} min-width The min width of the drawer when collapsed, in px.
+ */
 import { inject } from 'external/gs_tools/src/inject';
-import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
-import {
-  customElement,
-  dom,
-  DomHook,
-  hook,
-  onDom} from 'external/gs_tools/src/webc';
+import { BooleanParser, SizeParser, StringSetParser } from 'external/gs_tools/src/parse';
+import { assertUnreachable } from 'external/gs_tools/src/typescript';
+import { customElement, dom, onDom } from 'external/gs_tools/src/webc';
 
-import { BaseThemedElement } from '../common/base-themed-element';
+import { Size } from 'external/gs_tools/src/interfaces';
+import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
 
+type Sides = 'left' | 'right';
+const SidesParser = StringSetParser<Sides>(['left', 'right']);
 
-const ALIGN_CONTENT_ATTRIBUTE = {name: 'gs-align-content', selector: null, parser: StringParser};
-const ANCHOR_POINT_ATTRIBUTE = {name: 'gs-anchor-point', selector: null, parser: StringParser};
-const IS_EXPANDED_ATTRIBUTE = {name: 'gs-is-expanded', selector: null, parser: BooleanParser};
-const MAX_WIDTH_ATTRIBUTE = {name: 'gs-max-width', selector: null, parser: StringParser};
-const MIN_WIDTH_ATTRIBUTE = {name: 'gs-min-width', selector: null, parser: StringParser};
+const ALIGN_CONTENT_ATTR = {name: 'align-content', selector: null, parser: SidesParser};
+const ANCHOR_POINT_ATTR = {name: 'anchor-point', selector: null, parser: SidesParser};
+const IS_EXPANDED_ATTR = {name: 'expanded', selector: null, parser: BooleanParser};
+const MAX_WIDTH_ATTR = {name: 'max-width', selector: null, parser: SizeParser};
+const MIN_WIDTH_ATTR = {name: 'min-width', selector: null, parser: SizeParser};
 
+const CONTAINER_EL = '#container';
+const ITEM_EL = '#item';
+const ROOT_EL = '#root';
 
 @customElement({
   tag: 'gs-drawer',
   templateKey: 'src/section/drawer',
 })
-export class Drawer extends BaseThemedElement {
-  @hook('#root').classList()
-  readonly classListHook_: DomHook<Set<string>>;
-
-  @hook('#container').property('style')
-  readonly containerStyleHook_: DomHook<CSSStyleDeclaration>;
-
-  @hook('#root').attribute('flex-justify', StringParser)
-  readonly flexJustifyHook_: DomHook<string>;
-
-  @hook('#item').property('style')
-  readonly itemStyleHook_: DomHook<CSSStyleDeclaration>;
-
-  @hook('#root').property('style')
-  readonly rootStyleHook_: DomHook<CSSStyleDeclaration>;
-
-  constructor(
-      @inject('theming.ThemeService') themeService: ThemeService) {
+export class Drawer extends BaseThemedElement2 {
+  constructor(@inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-    this.classListHook_ = DomHook.of<Set<string>>();
-    this.containerStyleHook_ = DomHook.of<CSSStyleDeclaration>();
-    this.flexJustifyHook_ = DomHook.of<string>();
-    this.itemStyleHook_ = DomHook.of<CSSStyleDeclaration>();
-    this.rootStyleHook_ = DomHook.of<CSSStyleDeclaration>();
   }
 
-  @onDom.attributeChange(ALIGN_CONTENT_ATTRIBUTE)
+  @onDom.attributeChange(ALIGN_CONTENT_ATTR)
   onAlignContentChanged_(
-      @dom.attribute(ALIGN_CONTENT_ATTRIBUTE) alignContent: string | null): void {
-    const style = this.itemStyleHook_.get();
-    if (style === null) {
-      return;
-    }
-
+      @dom.attribute(ALIGN_CONTENT_ATTR) alignContent: Sides | null,
+      @dom.element(ITEM_EL) itemEl: HTMLElement): void {
     if (alignContent === null) {
       return;
     }
 
-    switch (alignContent.toLowerCase()) {
+    switch (alignContent) {
       case 'left':
-        style.left = '0';
-        style.right = null;
+        itemEl.style.left = '0';
+        itemEl.style.right = null;
         break;
       case 'right':
-        style.left = null;
-        style.right = '0';
+        itemEl.style.left = null;
+        itemEl.style.right = '0';
         break;
       default:
-        throw Error(`Invalid align point ${alignContent}`);
+        throw assertUnreachable(alignContent);
     }
   }
 
@@ -79,29 +68,25 @@ export class Drawer extends BaseThemedElement {
    *
    * @param anchorPoint The new value of the anchor point.
    */
-  @onDom.attributeChange(ANCHOR_POINT_ATTRIBUTE)
+  @onDom.attributeChange(ANCHOR_POINT_ATTR)
   onAnchorPointChanged_(
-      @dom.attribute(ANCHOR_POINT_ATTRIBUTE) anchorPoint: string | null): void {
-    const style = this.containerStyleHook_.get();
-    if (style === null) {
-      return;
-    }
-
+      @dom.attribute(ANCHOR_POINT_ATTR) anchorPoint: Sides | null,
+      @dom.element(CONTAINER_EL) containerEl: HTMLElement): void {
     if (anchorPoint === null) {
       return;
     }
 
-    switch (anchorPoint.toLowerCase()) {
+    switch (anchorPoint) {
       case 'left':
-        style.left = '0';
-        style.right = null;
+        containerEl.style.left = '0';
+        containerEl.style.right = null;
         break;
       case 'right':
-        style.left = null;
-        style.right = '0';
+        containerEl.style.left = null;
+        containerEl.style.right = '0';
         break;
       default:
-        throw Error(`Invalid anchor point ${anchorPoint}`);
+        throw assertUnreachable(anchorPoint);
     }
   }
 
@@ -110,16 +95,15 @@ export class Drawer extends BaseThemedElement {
    *
    * @param isExpanded True iff the drawer should be expanded.
    */
-  @onDom.attributeChange(IS_EXPANDED_ATTRIBUTE)
-  protected onIsExpandedChanged_(
-      @dom.attribute(IS_EXPANDED_ATTRIBUTE) isExpanded: boolean): void {
-    const classListSet = this.classListHook_.get() || new Set();
+  @onDom.attributeChange(IS_EXPANDED_ATTR)
+  onExpandedChanged_(
+      @dom.element(ROOT_EL) rootEl: HTMLElement,
+      @dom.attribute(IS_EXPANDED_ATTR) isExpanded: boolean): void {
     if (isExpanded) {
-      classListSet.add('expanded');
+      rootEl.classList.add('expanded');
     } else {
-      classListSet.delete('expanded');
+      rootEl.classList.remove('expanded');
     }
-    this.classListHook_.set(classListSet);
   }
 
   /**
@@ -127,13 +111,11 @@ export class Drawer extends BaseThemedElement {
    *
    * @param width The maximum width of the drawer to set.
    */
-  @onDom.attributeChange(MAX_WIDTH_ATTRIBUTE)
-  protected onMaxWidthChanged_(
-      @dom.attribute(MAX_WIDTH_ATTRIBUTE) width: string): void {
-    const styleDeclaration = this.rootStyleHook_.get();
-    if (styleDeclaration !== null) {
-      styleDeclaration.setProperty('--gsDrawerExpandedWidth', width);
-    }
+  @onDom.attributeChange(MAX_WIDTH_ATTR)
+  onMaxWidthChanged_(
+      @dom.attribute(MAX_WIDTH_ATTR) width: Size | null,
+      @dom.element(ROOT_EL) rootEl: HTMLElement): void {
+    rootEl.style.setProperty('--gsDrawerExpandedWidth', SizeParser.stringify(width));
   }
 
   /**
@@ -141,13 +123,10 @@ export class Drawer extends BaseThemedElement {
    *
    * @param width The minimum width of the drawer to set.
    */
-  @onDom.attributeChange(MIN_WIDTH_ATTRIBUTE)
-  protected onMinWidthChanged_(
-      @dom.attribute(MIN_WIDTH_ATTRIBUTE) width: string): void {
-    const styleDeclaration = this.rootStyleHook_.get();
-    if (styleDeclaration !== null) {
-      styleDeclaration.setProperty('--gsDrawerCollapsedWidth', width);
-    }
+  @onDom.attributeChange(MIN_WIDTH_ATTR)
+  onMinWidthChanged_(
+      @dom.attribute(MIN_WIDTH_ATTR) width: Size | null,
+      @dom.element(ROOT_EL) rootEl: HTMLElement): void {
+    rootEl.style.setProperty('--gsDrawerCollapsedWidth', SizeParser.stringify(width));
   }
 }
-// TODO: Mutable

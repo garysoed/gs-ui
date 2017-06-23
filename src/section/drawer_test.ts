@@ -1,4 +1,4 @@
-import { assert, Matchers, TestBase } from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Mocks } from 'external/gs_tools/src/mock';
@@ -18,9 +18,10 @@ describe('section.Drawer', () => {
   describe('onAlignContentChanged_', () => {
     it('should set the style correctly if the anchor point is "left"', () => {
       const style = Mocks.object('style');
-      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(style);
+      const itemEl = Mocks.object('itemEl');
+      itemEl.style = style;
 
-      drawer.onAlignContentChanged_('left');
+      drawer.onAlignContentChanged_('left', itemEl);
 
       assert(style.left).to.equal('0');
       assert(style.right).to.beNull();
@@ -28,35 +29,22 @@ describe('section.Drawer', () => {
 
     it('should set the style correctly if the anchor point is "right"', () => {
       const style = Mocks.object('style');
-      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(style);
+      const itemEl = Mocks.object('itemEl');
+      itemEl.style = style;
 
-      drawer.onAlignContentChanged_('right');
+      drawer.onAlignContentChanged_('right', itemEl);
 
       assert(style.left).to.beNull();
       assert(style.right).to.equal('0');
     });
 
-    it('should throw error if the value is invalid', () => {
-      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(Mocks.object('style'));
-      assert(() => {
-        drawer.onAlignContentChanged_('unknown');
-      }).to.throwError(/Invalid align point/);
-    });
-
     it('should not throw error if alignContent is null', () => {
       const style = Mocks.object('style');
-      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(style);
+      const itemEl = Mocks.object('itemEl');
+      itemEl.style = style;
 
       assert(() => {
-        drawer.onAlignContentChanged_(null);
-      }).toNot.throw();
-    });
-
-    it('should not throw error if style is null', () => {
-      spyOn(drawer.itemStyleHook_, 'get').and.returnValue(null);
-
-      assert(() => {
-        drawer.onAlignContentChanged_('left');
+        drawer.onAlignContentChanged_(null, itemEl);
       }).toNot.throw();
     });
   });
@@ -64,9 +52,10 @@ describe('section.Drawer', () => {
   describe('onAnchorPointChanged_', () => {
     it('should set the style correctly if the anchor point is "left"', () => {
       const style = Mocks.object('style');
-      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(style);
+      const itemEl = Mocks.object('itemEl');
+      itemEl.style = style;
 
-      drawer.onAnchorPointChanged_('left');
+      drawer.onAnchorPointChanged_('left', itemEl);
 
       assert(style.left).to.equal('0');
       assert(style.right).to.beNull();
@@ -74,117 +63,68 @@ describe('section.Drawer', () => {
 
     it('should set the style correctly if the anchor point is "right"', () => {
       const style = Mocks.object('style');
-      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(style);
+      const itemEl = Mocks.object('itemEl');
+      itemEl.style = style;
 
-      drawer.onAnchorPointChanged_('right');
+      drawer.onAnchorPointChanged_('right', itemEl);
 
       assert(style.left).to.beNull();
       assert(style.right).to.equal('0');
     });
 
-    it('should throw error if the value is invalid', () => {
-      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(Mocks.object('style'));
-      assert(() => {
-        drawer.onAnchorPointChanged_('unknown');
-      }).to.throwError(/Invalid anchor point/);
-    });
-
     it('should not throw error if anchorPoint is null', () => {
       const style = Mocks.object('style');
-      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(style);
+      const itemEl = Mocks.object('itemEl');
+      itemEl.style = style;
 
       assert(() => {
-        drawer.onAnchorPointChanged_(null);
-      }).toNot.throw();
-    });
-
-    it('should not throw error if style is null', () => {
-      spyOn(drawer.containerStyleHook_, 'get').and.returnValue(null);
-
-      assert(() => {
-        drawer.onAnchorPointChanged_('left');
+        drawer.onAnchorPointChanged_(null, itemEl);
       }).toNot.throw();
     });
   });
 
-  describe('onIsExpandedChanged_', () => {
+  describe('onExpandedChanged_', () => {
     it('should add the expanded class name if set to true', () => {
       const existingClassName = 'existingClassName';
+      const rootEl = document.createElement('div');
+      rootEl.classList.add(existingClassName);
 
-      spyOn(drawer['classListHook_'], 'get').and.returnValue(new Set([existingClassName]));
-      const bridgeSetSpy = spyOn(drawer['classListHook_'], 'set');
+      drawer.onExpandedChanged_(rootEl, true);
 
-      drawer['onIsExpandedChanged_'](true);
-
-      assert(drawer['classListHook_'].set).to.haveBeenCalledWith(Matchers.any(Set));
-      assert(bridgeSetSpy.calls.argsFor(0)[0] as Set<string>).to
-          .haveElements([existingClassName, 'expanded']);
+      assert(rootEl).to.haveClasses([existingClassName, 'expanded']);
     });
 
     it('should remove the expanded class name if set to false', () => {
       const existingClassName = 'existingClassName';
+      const rootEl = document.createElement('div');
+      rootEl.classList.add(existingClassName);
+      rootEl.classList.add('expanded');
 
-      spyOn(drawer['classListHook_'], 'get').and
-          .returnValue(new Set([existingClassName, 'expanded']));
-      const bridgeSetSpy = spyOn(drawer['classListHook_'], 'set');
+      drawer.onExpandedChanged_(rootEl, false);
 
-      drawer['onIsExpandedChanged_'](false);
-
-      assert(drawer['classListHook_'].set).to.haveBeenCalledWith(Matchers.any(Set));
-      assert(bridgeSetSpy.calls.argsFor(0)[0] as Set<string>).to.haveElements([existingClassName]);
-    });
-
-    it('should handle the case where there is no set of class lists', () => {
-      spyOn(drawer['classListHook_'], 'get').and.returnValue(null);
-      const bridgeSetSpy = spyOn(drawer['classListHook_'], 'set');
-
-      drawer['onIsExpandedChanged_'](true);
-
-      assert(drawer['classListHook_'].set).to.haveBeenCalledWith(Matchers.any(Set));
-      assert(bridgeSetSpy.calls.argsFor(0)[0] as Set<string>).to
-          .haveElements(['expanded']);
-    });
-  });
-
-  describe('onMinWidthChanged_', () => {
-    it('should set the collapsed width correctly', () => {
-      const width = 'width';
-      const mockStyle = jasmine.createSpyObj('Style', ['setProperty']);
-
-      spyOn(drawer['rootStyleHook_'], 'get').and.returnValue(mockStyle);
-
-      drawer['onMinWidthChanged_'](width);
-
-      assert(mockStyle.setProperty).to.haveBeenCalledWith('--gsDrawerCollapsedWidth', width);
-    });
-
-    it('should not set the style if there is no style property', () => {
-      spyOn(drawer['rootStyleHook_'], 'get').and.returnValue(null);
-
-      assert(() => {
-        drawer['onMinWidthChanged_']('width');
-      }).toNot.throw();
+      assert(rootEl).to.haveClasses([existingClassName]);
     });
   });
 
   describe('onMaxWidthChanged_', () => {
     it('should set the expanded width correctly', () => {
-      const width = 'width';
-      const mockStyle = jasmine.createSpyObj('Style', ['setProperty']);
+      const width = {unit: 'rem' as 'rem', value: 123};
+      const rootEl = document.createElement('div');
 
-      spyOn(drawer['rootStyleHook_'], 'get').and.returnValue(mockStyle);
+      drawer.onMaxWidthChanged_(width, rootEl);
 
-      drawer['onMaxWidthChanged_'](width);
-
-      assert(mockStyle.setProperty).to.haveBeenCalledWith('--gsDrawerExpandedWidth', width);
+      assert(rootEl.style.getPropertyValue('--gsDrawerExpandedWidth')).to.equal(`123rem`);
     });
+  });
 
-    it('should not set the style if there is no style property', () => {
-      spyOn(drawer['rootStyleHook_'], 'get').and.returnValue(null);
+  describe('onMinWidthChanged_', () => {
+    it('should set the collapsed width correctly', () => {
+      const width = {unit: 'rem' as 'rem', value: 123};
+      const rootEl = document.createElement('div');
 
-      assert(() => {
-        drawer['onMaxWidthChanged_']('width');
-      }).toNot.throw();
+      drawer.onMinWidthChanged_(width, rootEl);
+
+      assert(rootEl.style.getPropertyValue('--gsDrawerCollapsedWidth')).to.equal(`123rem`);
     });
   });
 });

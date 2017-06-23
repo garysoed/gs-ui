@@ -47,7 +47,7 @@ describe('tool.DownloadService', () => {
       service.downloadJson(json, filename);
       assert(service.download).to.haveBeenCalledWith(blob, filename);
       assert(service['createBlob_']).to.haveBeenCalledWith(
-          [JSON.stringify(json, null, 2)],
+          [JSON.stringify(json, null)],
           {type: 'application/json'});
     });
   });

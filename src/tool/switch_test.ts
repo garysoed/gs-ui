@@ -28,7 +28,7 @@ describe('tool.Switch', () => {
       element.style = style;
 
       switchEl['applyKeyframe_'](element, {left, right});
-      assert(element.style).to.equal({left, right});
+      assert(element.style).to.equal(Matchers.objectContaining({left, right}));
     });
   });
 

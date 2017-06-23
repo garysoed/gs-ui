@@ -144,40 +144,39 @@ function setupPalettePicker() {
 function setupContrastPicker() {
   var contrastButton = document.querySelector('#contrastButton');
   var contrastDrawer = document.querySelector('#contrastDrawer');
-  contrastButton.addEventListener('click', function() {
-    var value = contrastDrawer.getAttribute('gs-is-expanded') === 'true';
-    contrastDrawer.setAttribute('gs-is-expanded', !value);
+  contrastButton.addEventListener('gs-action', function() {
+    var value = contrastDrawer.getAttribute('expanded') === 'true';
+    contrastDrawer.setAttribute('expanded', !value);
   });
 
   var contrastInput = document.querySelector('#contrastInput');
-  contrastInput.setAttribute('gs-value', contrast);
+  contrastInput.setAttribute('value', contrast);
   var mutationObserver = new MutationObserver(function(records) {
     records.forEach(function() {
-      var newContrast = Number.parseFloat(contrastInput.getAttribute('gs-value'));
+      var newContrast = Number.parseFloat(contrastInput.getAttribute('value'));
       if (!Number.isNaN(newContrast)) {
         contrast = newContrast;
         updateTheme();
       }
     });
   });
-  mutationObserver.observe(contrastInput, {attributes: true, attributeFilter: ['gs-value']});
+  mutationObserver.observe(contrastInput, {attributes: true, attributeFilter: ['value']});
 }
 
-fetch('demo-palette-picker.html', {method: 'GET'})
-    .then(function(response) {
-      return response.text();
+Promise
+    .all([
+      fetch('demo-palette-picker.html', {method: 'GET'}),
+      fetch('demo-contrast-picker.html', {method: 'GET'})
+    ])
+    .then(function(responses) {
+      return Promise.all([
+        responses[0].text(),
+        responses[1].text(),
+      ])
     })
-    .then(function(textResponse) {
-      document.body.innerHTML += textResponse;
+    .then(function(textResponses) {
+      document.body.innerHTML += textResponses[0] + textResponses[1];
       setupPalettePicker();
-    });
-
-fetch('demo-contrast-picker.html', {method: 'GET'})
-    .then(function(response) {
-      return response.text();
-    })
-    .then(function(textResponse) {
-      document.body.innerHTML += textResponse;
       setupContrastPicker();
     });
 
@@ -186,8 +185,6 @@ var templateEl = document.querySelector('#template');
 document.querySelectorAll('section.cell').forEach(function(el) {
   el.innerHTML = templateEl.innerHTML;
 });
-
-
 
 var theme = gs.ui.Theme.newInstance(
     gs.ui.DefaultPalettes.get(base),

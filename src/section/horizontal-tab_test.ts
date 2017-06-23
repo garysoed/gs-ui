@@ -1,4 +1,4 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
@@ -80,7 +80,7 @@ describe('section.HorizontalTab', () => {
       const length = 456;
       const style = Mocks.object('style');
       tab.setHighlightEl(start, length, {style} as HTMLElement);
-      assert(style).to.equal({left: `${start}px`, width: `${length}px`});
+      assert(style).to.equal(Matchers.objectContaining({left: `${start}px`, width: `${length}px`}));
     });
   });
 });

@@ -333,7 +333,7 @@ describe('theming.Theme', () => {
           .when(baseNormalDarkest, baseReversedLightest).return(20);
 
       assert(Theme['isHighContrastBase_'](0.25, 12, baseColor)).to.beTrue();
-      assert(Colors.getContrast).to.haveBeenCalledWith(baseNormalDarkest, WHITE);
+      assert(Colors.getContrast).to.haveBeenCalledWith(baseNormalDark, WHITE);
       assert(Colors.getContrast).to.haveBeenCalledWith(BLACK, baseNormalLightest);
       assert(Colors.getContrast).to.haveBeenCalledWith(baseReversedLightest, baseNormalDark);
       assert(Colors.getContrast).to.haveBeenCalledWith(WHITE, baseNormalDark);
