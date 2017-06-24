@@ -1,7 +1,8 @@
-import { assert, Mocks, TestBase } from '../test-base';
+import { assert, Matchers, Mocks, TestBase } from '../test-base';
 TestBase.setup();
 
-import { ElementSelector } from 'external/gs_tools/src/interfaces';
+import { MonadUtil } from 'external/gs_tools/src/event';
+import { Disposable, ElementSelector } from 'external/gs_tools/src/interfaces';
 import { StringParser } from 'external/gs_tools/src/parse';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
@@ -22,6 +23,10 @@ class TestInput extends BaseInput2<string> {
 
   isValueChanged_(): boolean {
     throw new Error(`Unimplemented`);
+  }
+
+  protected listenToValueChanges_(): Disposable {
+    throw new Error('Method not implemented.');
   }
 
   protected setInputElDisabled_(): void {
@@ -170,6 +175,30 @@ describe('input.BaseInput', () => {
       assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, elValue);
       assert(input['getInputEl_']).to.haveBeenCalledWith(element);
       assert(input['getInputElValue_']).to.haveBeenCalledWith(inputEl);
+    });
+  });
+
+  describe('onInserted_', () => {
+    it(`should listen to the value changes correctly`, () => {
+      const element = Mocks.object('element');
+      const mockDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
+      const listenSpy = spyOn(input, 'listenToValueChanges_').and.returnValue(mockDisposable);
+
+      const inputEl = Mocks.object('inputEl');
+      spyOn(input, 'getInputEl_').and.returnValue(inputEl);
+      spyOn(input, 'addDisposable').and.callThrough();
+
+      spyOn(MonadUtil, 'callFunction');
+
+      input.onInserted_(element);
+      assert(input.addDisposable).to.haveBeenCalledWith(mockDisposable);
+      assert(input['listenToValueChanges_']).to
+          .haveBeenCalledWith(inputEl, Matchers.any(Function) as any);
+
+      const eventObject = Mocks.object('eventObject');
+      listenSpy.calls.argsFor(0)[1](eventObject);
+      assert(MonadUtil.callFunction).to.haveBeenCalledWith(eventObject, input, 'onInputChange_');
+      assert(input['getInputEl_']).to.haveBeenCalledWith(element);
     });
   });
 });

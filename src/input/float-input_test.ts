@@ -1,9 +1,10 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Mocks, TestBase } from '../test-base';
 TestBase.setup();
 
+import { ListenableDom } from 'external/gs_tools/src/event';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { FloatInput } from './float-input';
+import { FloatInput } from '../input/float-input';
 
 
 describe('input.FloatInput', () => {
@@ -35,6 +36,24 @@ describe('input.FloatInput', () => {
 
     it(`should return false if the old and new values are NaN and non null`, () => {
       assert(input['isValueChanged_'](NaN, NaN)).to.beFalse();
+    });
+  });
+
+  describe('listenToValueChanges_', () => {
+    it(`should listen to the value changes correctly`, () => {
+      const element = Mocks.object('element');
+      const callback = Mocks.object('callback');
+      const disposable = Mocks.object('disposable');
+      const mockListenableDom = jasmine.createSpyObj('ListenableDom', ['dispose', 'on']);
+      mockListenableDom.on.and.returnValue(disposable);
+      spyOn(ListenableDom, 'of').and.returnValue(mockListenableDom);
+
+      spyOn(input, 'addDisposable').and.callThrough();
+
+      assert(input['listenToValueChanges_'](element, callback)).to.equal(disposable);
+      assert(input.addDisposable).to.haveBeenCalledWith(mockListenableDom);
+      assert(mockListenableDom.on).to.haveBeenCalledWith('change', callback, input);
+      assert(ListenableDom.of).to.haveBeenCalledWith(element);
     });
   });
 

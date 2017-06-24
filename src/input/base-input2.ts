@@ -1,13 +1,17 @@
-import { MonadSetter } from 'external/gs_tools/src/event';
-import { DispatchFn, ElementSelector, Parser } from 'external/gs_tools/src/interfaces';
-import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
-import { dom, domOut, onDom, Util } from 'external/gs_tools/src/webc';
-
+import { MonadSetter, MonadUtil } from 'external/gs_tools/src/event';
 import { ImmutableMap } from 'external/gs_tools/src/immutable';
+import {
+  DispatchFn,
+  Disposable,
+  ElementSelector,
+  Event,
+  Parser } from 'external/gs_tools/src/interfaces';
+import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
+import { dom, domOut, onDom, onLifecycle, Util } from 'external/gs_tools/src/webc';
+
 import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
 
-const INPUT_EL = 'input';
 const DISABLED_ATTR = {name: 'disabled', parser: BooleanParser, selector: null};
 const VALUE_ATTR = {name: 'value', selector: null, parser: StringParser};
 const CHANGE_EVENT = 'change';
@@ -29,6 +33,10 @@ export abstract class BaseInput2<T, E extends HTMLElement = HTMLInputElement>
   protected abstract getInputElValue_(inputEl: E): string;
 
   protected abstract isValueChanged_(oldValue: T | null, newValue: T | null): boolean;
+
+  protected abstract listenToValueChanges_(
+      element: E,
+      callback: (event: Event<any>) => void): Disposable;
 
   /**
    * @override
@@ -81,7 +89,6 @@ export abstract class BaseInput2<T, E extends HTMLElement = HTMLInputElement>
   /**
    * Handler called when the input element fires a change event.
    */
-  @onDom.event(INPUT_EL, 'change')
   onInputChange_(
       @domOut.attribute(VALUE_ATTR) {id: elValueId, value: elValue}: MonadSetter<string | null>,
       @dom.element(null) element: HTMLElement,
@@ -95,6 +102,14 @@ export abstract class BaseInput2<T, E extends HTMLElement = HTMLInputElement>
 
     dispatcher(CHANGE_EVENT, {});
     return ImmutableMap.of([[elValueId, inputValue]]);
+  }
+
+  @onLifecycle('insert')
+  onInserted_(@dom.element(null) element: HTMLElement): void {
+    const inputEl = this.getInputEl_(element);
+    this.addDisposable(this.listenToValueChanges_(inputEl, (event: Event<any>) => {
+      MonadUtil.callFunction(event, this, 'onInputChange_');
+    }));
   }
 
   protected abstract setInputElDisabled_(inputEl: E, disabled: boolean): void;
