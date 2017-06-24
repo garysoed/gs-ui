@@ -1,4 +1,3 @@
-import { Jsons } from 'external/gs_tools/src/data';
 import { ImmutableList, ImmutableMap } from 'external/gs_tools/src/immutable';
 import { Locations } from 'external/gs_tools/src/ui';
 
@@ -92,9 +91,10 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    *    recognize.
    */
   private getMatchParams_(matches: ImmutableMap<string, string>): CR {
-    const currentMatchParams = this.getRelativeMatchParams_(matches);
+    const currentMatchParams = this.getRelativeMatchParams_(matches) as Object;
     if (this.parent_ !== null) {
-      return Jsons.mixin(this.parent_.getMatchParams_(matches), currentMatchParams) as CR;
+      const matchParams = this.parent_.getMatchParams_(matches) as Object;
+      return {...matchParams, ...currentMatchParams} as CR;
     } else {
       return currentMatchParams as CR;
     }

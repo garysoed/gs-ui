@@ -1,20 +1,23 @@
-import { BaseListenableListener } from 'external/gs_tools/src/event';
+import { Bus } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
-import { Reflect } from 'external/gs_tools/src/util';
+import { Log, Reflect } from 'external/gs_tools/src/util';
 
-import { AbstractRouteFactory } from './abstract-route-factory';
-import { IRouteFactoryService } from './i-route-factory-service';
-import { Route } from './route';
-import { RouteServiceEvents } from './route-service-events';
+import { AbstractRouteFactory } from '../routing/abstract-route-factory';
+import { IRouteFactoryService } from '../routing/i-route-factory-service';
+import { Route } from '../routing/route';
+import { RouteServiceEvents } from '../routing/route-service-events';
 
+type RouteServiceEvent = {type: RouteServiceEvents};
+
+const LOGGER = Log.of('gs-ui.routing.RouteService');
 
 @bind(
     'gs.routing.RouteService',
     [
       LocationService,
     ])
-export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> {
+export class RouteService<T> extends Bus<RouteServiceEvents, RouteServiceEvent> {
   private readonly locationService_: LocationService;
   private readonly routeFactoryMap_: Map<T, AbstractRouteFactory<T, any, any, any>>;
   private readonly routeFactoryService_: IRouteFactoryService<T>;
@@ -22,7 +25,7 @@ export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> 
   constructor(
       @inject('gs.LocationService') locationService: LocationService,
       @inject('x.gs_ui.routeFactoryService') routeFactoryService: IRouteFactoryService<T>) {
-    super();
+    super(LOGGER);
     this.locationService_ = locationService;
     this.routeFactoryService_ = routeFactoryService;
     this.routeFactoryMap_ = new Map();
@@ -32,10 +35,8 @@ export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> 
    * Called during initialization.
    */
   [Reflect.__initialize](): void {
-    this.listenTo(
-        this.locationService_,
-        LocationServiceEvents.CHANGED,
-        this.onLocationChanged_);
+    this.addDisposable(
+        this.locationService_.on(LocationServiceEvents.CHANGED, this.onLocationChanged_, this));
 
     for (const factory of this.routeFactoryService_.getFactories()) {
       this.routeFactoryMap_.set(factory.getType(), factory);
@@ -106,7 +107,7 @@ export class RouteService<T> extends BaseListenableListener<RouteServiceEvents> 
    * Handles event when the location has changed.
    */
   private onLocationChanged_(): void {
-    this.dispatch(RouteServiceEvents.CHANGED);
+    this.dispatch({type: RouteServiceEvents.CHANGED});
   }
 }
 // TODO: Mutable

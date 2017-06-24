@@ -18,35 +18,17 @@ describe('routing.RouteService', () => {
 
   beforeEach(() => {
     mockRouteFactoryService = jasmine.createSpyObj('RouteFactoryService', ['getFactories']);
-    mockLocationService = Mocks.listenable('LocationService');
-    mockLocationService.getPath = jasmine.createSpy('LocationService.getPath');
+    mockLocationService = jasmine.createSpyObj('LocationService', ['dispose', 'getPath', 'on']);
     service = new RouteService(mockLocationService, mockRouteFactoryService);
-    TestDispose.add(mockLocationService, service);
-  });
-
-  describe('onLocationChanged_', () => {
-    it('should dispatch the CHANGED event', () => {
-      spyOn(service, 'dispatch');
-      service['onLocationChanged_']();
-      assert(service.dispatch).to.haveBeenCalledWith(RouteServiceEvents.CHANGED);
-    });
+    TestDispose.add(service);
   });
 
   describe('[Reflect.__initialize]', () => {
     it('should listen to the CHANGED event on the location service', () => {
-      spyOn(service, 'listenTo');
+      const mockDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
+      mockLocationService.on.and.returnValue(mockDisposable);
+      spyOn(service, 'addDisposable').and.callThrough();
 
-      mockRouteFactoryService.getFactories.and.returnValue([]);
-
-      service[Reflect.__initialize]();
-
-      assert(service.listenTo).to.haveBeenCalledWith(
-          mockLocationService,
-          LocationServiceEvents.CHANGED,
-          service['onLocationChanged_']);
-    });
-
-    it('should initialize the route factory map', () => {
       const type1 = Mocks.object('type1');
       const mockFactory1 = jasmine.createSpyObj('Factory1', ['getType']);
       mockFactory1.getType.and.returnValue(type1);
@@ -59,10 +41,24 @@ describe('routing.RouteService', () => {
 
       service[Reflect.__initialize]();
 
+      assert(mockLocationService.on).to.haveBeenCalledWith(
+          LocationServiceEvents.CHANGED,
+          service['onLocationChanged_'],
+          service);
+      assert(service.addDisposable).to.haveBeenCalledWith(mockDisposable);
+
       assert(service['routeFactoryMap_']).to.haveEntries([
         [type1, mockFactory1],
         [type2, mockFactory2],
       ]);
+    });
+  });
+
+  describe('onLocationChanged_', () => {
+    it('should dispatch the CHANGED event', () => {
+      spyOn(service, 'dispatch');
+      service['onLocationChanged_']();
+      assert(service.dispatch).to.haveBeenCalledWith({type: RouteServiceEvents.CHANGED});
     });
   });
 

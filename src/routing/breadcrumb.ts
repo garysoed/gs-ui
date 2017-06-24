@@ -1,63 +1,74 @@
-import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
+/**
+ * @webcomponent gs-breadcrumb
+ * Displays breadcrumb for the current path.
+ *
+ * This component works closely with the gs-ui.routing.RouteService to come up with the segments
+ * for the current path, as well as the name and link for each segment.
+ */
+import { MonadSetter, on } from 'external/gs_tools/src/event';
+import { ImmutableList, ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { ChildElementDataHelper, customElement, DomHook, hook } from 'external/gs_tools/src/webc';
+import { customElement, domOut, onLifecycle } from 'external/gs_tools/src/webc';
 
-import { BaseThemedElement } from '../common/base-themed-element';
+import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { RouteService } from '../routing/route-service';
 import { RouteServiceEvents } from '../routing/route-service-events';
 import { ThemeService } from '../theming/theme-service';
 
-
 export const __FULL_PATH = Symbol('fullPath');
 
-type CrumbData = {name: string, url: string};
+export type CrumbData = {name: string, url: string};
 
+const CONTAINER_EL = '#container';
+export const CRUMB_CHILDREN_CONFIG = {
+  bridge: {
+    create(document: Document): Element {
+      const rootCrumb = document.createElement('div');
+      rootCrumb.classList.add('crumb');
+      rootCrumb.setAttribute('layout', 'row');
+      rootCrumb.setAttribute('flex-align', 'center');
 
-export const CRUMB_DATA_HELPER: ChildElementDataHelper<CrumbData> = {
-  create(document: Document): Element {
-    const rootCrumb = document.createElement('div');
-    rootCrumb.classList.add('crumb');
-    rootCrumb.setAttribute('layout', 'row');
-    rootCrumb.setAttribute('flex-align', 'center');
+      const link = document.createElement('a');
+      const arrow = document.createElement('gs-icon');
+      arrow.textContent = 'keyboard_arrow_right';
+      rootCrumb.appendChild(link);
+      rootCrumb.appendChild(arrow);
+      return rootCrumb;
+    },
 
-    const link = document.createElement('a');
-    const arrow = document.createElement('gs-icon');
-    arrow.textContent = 'keyboard_arrow_right';
-    rootCrumb.appendChild(link);
-    rootCrumb.appendChild(arrow);
-    return rootCrumb;
+    get(element: Element): CrumbData | null {
+      const linkEl = element.querySelector('a');
+      if (linkEl === null) {
+        return null;
+      }
+
+      const href = linkEl.href;
+      if (!href.startsWith('#')) {
+        return null;
+      }
+
+      const name = linkEl.textContent;
+      if (name === null) {
+        return null;
+      }
+
+      return {
+        name,
+        url: href.substr(1),
+      };
+    },
+
+    set(data: CrumbData, element: Element): void {
+      const linkEl = element.querySelector('a');
+      if (linkEl === null) {
+        throw new Error('Link element not found');
+      }
+      linkEl.href = `#${data.url}`;
+      linkEl.textContent = data.name;
+    },
   },
 
-  get(element: Element): CrumbData | null {
-    const linkEl = element.querySelector('a');
-    if (linkEl === null) {
-      return null;
-    }
-
-    const href = linkEl.href;
-    if (!href.startsWith('#')) {
-      return null;
-    }
-
-    const name = linkEl.textContent;
-    if (name === null) {
-      return null;
-    }
-
-    return {
-      name,
-      url: href.substr(1),
-    };
-  },
-
-  set(data: CrumbData, element: Element): void {
-    const linkEl = element.querySelector('a');
-    if (linkEl === null) {
-      throw new Error('Link element not found');
-    }
-    linkEl.href = `#${data.url}`;
-    linkEl.textContent = data.name;
-  },
+  selector: CONTAINER_EL,
 };
 
 @customElement({
@@ -67,10 +78,7 @@ export const CRUMB_DATA_HELPER: ChildElementDataHelper<CrumbData> = {
   tag: 'gs-breadcrumb',
   templateKey: 'src/routing/breadcrumb',
 })
-export class Breadcrumb<T> extends BaseThemedElement {
-  @hook('#container').childrenElements<CrumbData>(CRUMB_DATA_HELPER)
-  private readonly crumbHook_: DomHook<CrumbData[]>;
-
+export class Breadcrumb<T> extends BaseThemedElement2 {
   private readonly routeService_: RouteService<T>;
 
   /**
@@ -81,43 +89,37 @@ export class Breadcrumb<T> extends BaseThemedElement {
       @inject('gs.routing.RouteService') routeService: RouteService<T>,
       @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-    this.crumbHook_ = DomHook.of<CrumbData[]>();
     this.routeService_ = routeService;
   }
 
   /**
    * @override
    */
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    this.listenTo(
-        this.routeService_,
-        RouteServiceEvents.CHANGED,
-        this.onRouteChanged_);
-  }
-
-  /**
-   * @override
-   */
-  onInserted(element: HTMLElement): void {
-    super.onInserted(element);
-    this.onRouteChanged_();
+  @onLifecycle('insert')
+  onInserted(
+      @domOut.childElements(CRUMB_CHILDREN_CONFIG)
+          monadSetter: MonadSetter<ImmutableList<CrumbData>>): Promise<ImmutableMap<string, any>> {
+    return this.onRouteChanged_(monadSetter);
   }
 
   /**
    * Handles event when the route is changed.
    */
-  private async onRouteChanged_(): Promise<void> {
+  @on((instance: Breadcrumb<any>) => instance.routeService_, RouteServiceEvents.CHANGED)
+  async onRouteChanged_(
+      @domOut.childElements(CRUMB_CHILDREN_CONFIG)
+          {id: crumbId}: MonadSetter<ImmutableList<CrumbData>>):
+      Promise<ImmutableMap<string, any>> {
     const route = this.routeService_.getRoute();
     if (route === null) {
-      return Promise.resolve();
+      return Promise.resolve(ImmutableMap.of<string, any>([]));
     }
 
     const params = route.getParams();
     const routeFactory = this.routeService_.getRouteFactory(route.getType());
 
     if (!routeFactory) {
-      return Promise.resolve();
+      return Promise.resolve(ImmutableMap.of<string, any>([]));
     }
 
     const names = routeFactory.getCascadeNames(params);
@@ -137,9 +139,7 @@ export class Breadcrumb<T> extends BaseThemedElement {
             name: name,
             url: url,
           };
-        })
-        .toArray();
-    this.crumbHook_.set(crumbData);
+        });
+    return ImmutableMap.of([[crumbId, crumbData]]);
   }
 }
-// TODO: Mutable

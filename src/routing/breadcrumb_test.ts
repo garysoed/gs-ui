@@ -1,12 +1,11 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
+import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { Breadcrumb, CRUMB_DATA_HELPER } from './breadcrumb';
-import { RouteServiceEvents } from './route-service-events';
-
+import { Breadcrumb, CRUMB_CHILDREN_CONFIG, CrumbData } from '../routing/breadcrumb';
 
 describe('CRUMB_DATA_HELPER', () => {
   describe('create', () => {
@@ -23,7 +22,8 @@ describe('CRUMB_DATA_HELPER', () => {
           .when('a').return(linkEl)
           .when('gs-icon').return(arrowEl);
 
-      assert(CRUMB_DATA_HELPER.create(mockDocument, Mocks.object('instance'))).to.equal(mockRootEl);
+      assert(CRUMB_CHILDREN_CONFIG.bridge.create(mockDocument))
+          .to.equal(mockRootEl);
       assert(mockRootEl.appendChild).to.haveBeenCalledWith(arrowEl);
       assert(mockRootEl.appendChild).to.haveBeenCalledWith(linkEl);
       assert(arrowEl.textContent).to.equal('keyboard_arrow_right');
@@ -42,7 +42,7 @@ describe('CRUMB_DATA_HELPER', () => {
       linkEl.textContent = name;
       const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(linkEl);
-      assert(CRUMB_DATA_HELPER.get(mockElement)).to.equal({name, url});
+      assert(CRUMB_CHILDREN_CONFIG.bridge.get(mockElement)).to.equal({name, url});
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
 
@@ -53,7 +53,7 @@ describe('CRUMB_DATA_HELPER', () => {
       linkEl.textContent = null;
       const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(linkEl);
-      assert(CRUMB_DATA_HELPER.get(mockElement)).to.beNull();
+      assert(CRUMB_CHILDREN_CONFIG.bridge.get(mockElement)).to.beNull();
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
 
@@ -63,14 +63,14 @@ describe('CRUMB_DATA_HELPER', () => {
       linkEl.textContent = null;
       const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(linkEl);
-      assert(CRUMB_DATA_HELPER.get(mockElement)).to.beNull();
+      assert(CRUMB_CHILDREN_CONFIG.bridge.get(mockElement)).to.beNull();
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
 
     it('should return null if the link element cannot be found', () => {
       const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
       mockElement.querySelector.and.returnValue(null);
-      assert(CRUMB_DATA_HELPER.get(mockElement)).to.equal(null);
+      assert(CRUMB_CHILDREN_CONFIG.bridge.get(mockElement)).to.equal(null);
       assert(mockElement.querySelector).to.haveBeenCalledWith('a');
     });
   });
@@ -83,7 +83,7 @@ describe('CRUMB_DATA_HELPER', () => {
 
       const url = 'url';
       const name = 'name';
-      CRUMB_DATA_HELPER.set({name: name, url: url}, mockElement, Mocks.object('instance'));
+      CRUMB_CHILDREN_CONFIG.bridge.set({name: name, url: url}, mockElement);
 
       assert(linkEl.textContent).to.equal(name);
       assert(linkEl.href).to.equal(`#${url}`);
@@ -95,7 +95,7 @@ describe('CRUMB_DATA_HELPER', () => {
       mockElement.querySelector.and.returnValue(null);
 
       assert(() => {
-        CRUMB_DATA_HELPER.set({name: 'name', url: 'url'}, mockElement, Mocks.object('instance'));
+        CRUMB_CHILDREN_CONFIG.bridge.set({name: 'name', url: 'url'}, mockElement);
       }).to.throwError(/element not found/);
     });
   });
@@ -112,6 +112,17 @@ describe('routing.Breadcrumb', () => {
     const mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
     breadcrumb = new Breadcrumb<any>(mockRouteService, mockThemeService);
     TestDispose.add(breadcrumb);
+  });
+
+  describe('onInserted', () => {
+    it('should call route changed method', () => {
+      const monadSetter = Mocks.object('monadSetter');
+      spyOn(breadcrumb, 'onRouteChanged_');
+
+      breadcrumb.onInserted(monadSetter);
+
+      assert(breadcrumb.onRouteChanged_).to.haveBeenCalledWith(monadSetter);
+    });
   });
 
   describe('onRouteChanged_', () => {
@@ -139,10 +150,10 @@ describe('routing.Breadcrumb', () => {
       mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
           .and.returnValue(mockRoute);
 
-      spyOn(breadcrumb['crumbHook_'], 'set');
-
-      await breadcrumb['onRouteChanged_']();
-      assert(breadcrumb['crumbHook_'].set).to.haveBeenCalledWith([
+      const crumbId = 'crumbId';
+      const map = await breadcrumb.onRouteChanged_({id: crumbId} as any);
+      assert(map).to.haveElements([[crumbId, Matchers.any(ImmutableList)]]);
+      assert(map.get(crumbId) as ImmutableList<CrumbData>).to.haveElements([
         {name: name1, url: url1},
         {name: name2, url: url2},
       ]);
@@ -163,43 +174,15 @@ describe('routing.Breadcrumb', () => {
       mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
           .and.returnValue(mockRoute);
 
-      spyOn(breadcrumb['crumbHook_'], 'set');
 
-      await breadcrumb['onRouteChanged_']();
-      assert(breadcrumb['crumbHook_'].set).toNot.haveBeenCalled();
+      assert(await breadcrumb.onRouteChanged_({id: 'crumbId'} as any)).to.haveElements([]);
     });
 
     it('should not update the bridge if there are no routes', async () => {
       mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
           .and.returnValue(null);
 
-      spyOn(breadcrumb['crumbHook_'], 'set');
-
-      await breadcrumb['onRouteChanged_']();
-      assert(breadcrumb['crumbHook_'].set).toNot.haveBeenCalled();
-    });
-  });
-
-  describe('onCreated', () => {
-    it('should listen to the CHANGED event', () => {
-      spyOn(breadcrumb, 'listenTo');
-
-      breadcrumb.onCreated(Mocks.object('element'));
-
-      assert(breadcrumb.listenTo).to.haveBeenCalledWith(
-          mockRouteService,
-          RouteServiceEvents.CHANGED,
-          breadcrumb['onRouteChanged_']);
-    });
-  });
-
-  describe('onInserted', () => {
-    it('should call route changed method', () => {
-      spyOn(breadcrumb, 'onRouteChanged_');
-
-      breadcrumb.onInserted(Mocks.object('element'));
-
-      assert(breadcrumb['onRouteChanged_']).to.haveBeenCalledWith();
+      assert(await breadcrumb.onRouteChanged_({id: 'crumbId'} as any)).to.haveElements([]);
     });
   });
 });
