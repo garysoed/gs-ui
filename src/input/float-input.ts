@@ -8,19 +8,30 @@
  * @event {{}} change Dispatched when the value has changed.
  */
 import { inject } from 'external/gs_tools/src/inject';
+import { ElementSelector } from 'external/gs_tools/src/interfaces';
 import { FloatParser } from 'external/gs_tools/src/parse';
 import { customElement } from 'external/gs_tools/src/webc';
 
 import { BaseInput2 } from '../input/base-input2';
 import { ThemeService } from '../theming/theme-service';
 
+const INPUT_EL = 'input';
+
 @customElement({
   tag: 'gs-float-input',
   templateKey: 'src/input/float-input',
 })
 export class FloatInput extends BaseInput2<number> {
-  constructor(@inject('theming.ThemeService') themeService: ThemeService) {
+  constructor( @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService, FloatParser);
+  }
+
+  protected getInputElSelector_(): ElementSelector {
+    return INPUT_EL;
+  }
+
+  protected getInputElValue_(inputEl: HTMLInputElement): string {
+    return inputEl.value;
   }
 
   /**
@@ -34,5 +45,17 @@ export class FloatInput extends BaseInput2<number> {
       return false;
     }
     return oldValue !== newValue;
+  }
+
+  protected setInputElDisabled_(inputEl: HTMLInputElement, disabled: boolean): void {
+    if (disabled) {
+      inputEl.setAttribute('disabled', '');
+    } else {
+      inputEl.removeAttribute('disabled');
+    }
+  }
+
+  protected setInputElValue_(inputEl: HTMLInputElement, newValue: string): void {
+    inputEl.value = newValue;
   }
 }

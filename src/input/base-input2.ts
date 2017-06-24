@@ -1,7 +1,7 @@
 import { MonadSetter } from 'external/gs_tools/src/event';
-import { DispatchFn, Parser } from 'external/gs_tools/src/interfaces';
+import { DispatchFn, ElementSelector, Parser } from 'external/gs_tools/src/interfaces';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
-import { dom, domOut, onDom } from 'external/gs_tools/src/webc';
+import { dom, domOut, onDom, Util } from 'external/gs_tools/src/webc';
 
 import { ImmutableMap } from 'external/gs_tools/src/immutable';
 import { BaseThemedElement2 } from '../common/base-themed-element2';
@@ -9,16 +9,24 @@ import { ThemeService } from '../theming/theme-service';
 
 const INPUT_EL = 'input';
 const DISABLED_ATTR = {name: 'disabled', parser: BooleanParser, selector: null};
-const INPUT_DISABLED_ATTR = {name: 'disabled', selector: INPUT_EL, parser: BooleanParser};
 const VALUE_ATTR = {name: 'value', selector: null, parser: StringParser};
 const CHANGE_EVENT = 'change';
 
-export abstract class BaseInput2<T> extends BaseThemedElement2 {
+export abstract class BaseInput2<T, E extends HTMLElement = HTMLInputElement>
+    extends BaseThemedElement2 {
   constructor(
       themeService: ThemeService,
       private readonly valueParser_: Parser<T>) {
     super(themeService);
   }
+
+  private getInputEl_(element: HTMLElement): E {
+    return Util.requireSelector(this.getInputElSelector_(), element) as E;
+  }
+
+  protected abstract getInputElSelector_(): ElementSelector;
+
+  protected abstract getInputElValue_(inputEl: E): string;
 
   protected abstract isValueChanged_(oldValue: T | null, newValue: T | null): boolean;
 
@@ -28,11 +36,12 @@ export abstract class BaseInput2<T> extends BaseThemedElement2 {
   @onDom.event(null, 'click')
   onClick_(
       @dom.attribute(DISABLED_ATTR) disabled: boolean,
-      @dom.element(INPUT_EL) inputEl: HTMLElement): void {
+      @dom.element(null) rootEl: HTMLElement): void {
     if (disabled) {
       return;
     }
 
+    const inputEl = this.getInputEl_(rootEl);
     inputEl.click();
     inputEl.focus();
   }
@@ -44,10 +53,9 @@ export abstract class BaseInput2<T> extends BaseThemedElement2 {
    */
   @onDom.attributeChange(DISABLED_ATTR)
   onDisabledChange_(
-      @dom.attribute(DISABLED_ATTR) newValue: boolean,
-      @domOut.attribute(INPUT_DISABLED_ATTR) {id: inputDisabledId}: MonadSetter<boolean>):
-      ImmutableMap<string, any> {
-    return ImmutableMap.of([[inputDisabledId, newValue]]);
+      @dom.element(null) element: HTMLElement,
+      @dom.attribute(DISABLED_ATTR) newValue: boolean): void {
+    this.setInputElDisabled_(this.getInputEl_(element), newValue);
   }
 
   /**
@@ -58,15 +66,16 @@ export abstract class BaseInput2<T> extends BaseThemedElement2 {
   @onDom.attributeChange(VALUE_ATTR)
   onElValueChange_(
       @dom.attribute(VALUE_ATTR) elValue: string | null,
-      @dom.element(INPUT_EL) inputEl: HTMLInputElement): void {
-    const inputValue = inputEl.value;
+      @dom.element(null) element: HTMLElement): void {
+    const inputEl = this.getInputEl_(element);
+    const inputValue = this.getInputElValue_(inputEl);
     const parsedInputValue = this.valueParser_.parse(inputValue);
     const parsedElValue = this.valueParser_.parse(elValue);
     if (!this.isValueChanged_(parsedInputValue, parsedElValue)) {
       return;
     }
 
-    inputEl.value = elValue || '';
+    this.setInputElValue_(inputEl, elValue || '');
   }
 
   /**
@@ -75,9 +84,9 @@ export abstract class BaseInput2<T> extends BaseThemedElement2 {
   @onDom.event(INPUT_EL, 'change')
   onInputChange_(
       @domOut.attribute(VALUE_ATTR) {id: elValueId, value: elValue}: MonadSetter<string | null>,
-      @dom.element(INPUT_EL) inputEl: HTMLInputElement,
+      @dom.element(null) element: HTMLElement,
       @dom.eventDispatcher() dispatcher: DispatchFn<{}>): ImmutableMap<string, any> {
-    const inputValue = inputEl.value;
+    const inputValue = this.getInputElValue_(this.getInputEl_(element));
     const parsedInputValue = this.valueParser_.parse(inputValue);
     const parsedElValue = this.valueParser_.parse(elValue);
     if (!this.isValueChanged_(parsedInputValue, parsedElValue)) {
@@ -87,4 +96,8 @@ export abstract class BaseInput2<T> extends BaseThemedElement2 {
     dispatcher(CHANGE_EVENT, {});
     return ImmutableMap.of([[elValueId, inputValue]]);
   }
+
+  protected abstract setInputElDisabled_(inputEl: E, disabled: boolean): void;
+
+  protected abstract setInputElValue_(inputEl: E, newValue: string): void;
 }
