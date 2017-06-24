@@ -1,16 +1,20 @@
 import { Color } from 'external/gs_tools/src/color';
-import { BaseListenable } from 'external/gs_tools/src/event';
+import { Bus } from 'external/gs_tools/src/event';
 import { ImmutableMap, Iterables } from 'external/gs_tools/src/immutable';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
+import { Log } from 'external/gs_tools/src/util';
 import { Templates } from 'external/gs_tools/src/webc';
 
 import { ThemeServiceEvents } from '../const/theme-service-events';
 import { Theme } from '../theming/theme';
 
+type ThemeServiceEvent = {type: ThemeServiceEvents};
+
+const LOGGER = Log.of('gs-ui.theming.ThemeService');
 
 @bind('theming.ThemeService')
-export class ThemeService extends BaseListenable<ThemeServiceEvents> {
+export class ThemeService extends Bus<ThemeServiceEvents, ThemeServiceEvent> {
   private initialized_: boolean = false;
   private readonly parser_: DOMParser = new DOMParser();
   private theme_: Theme | null = null;
@@ -19,7 +23,7 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
       @inject('x.gs_tools.templates') private readonly templates_: Templates,
       @inject('x.dom.window') private readonly window_: Window = window,
       @inject('x.dom.document') private readonly document_: Document = window.document) {
-    super();
+    super(LOGGER);
   }
 
   /**
@@ -124,7 +128,7 @@ export class ThemeService extends BaseListenable<ThemeServiceEvents> {
     const vars = Iterables.toArray(mappedEntries).join('');
 
     this.dispatch(
-        ThemeServiceEvents.THEME_CHANGED,
+        {type: ThemeServiceEvents.THEME_CHANGED},
         () => {
           themeStyleEl.innerHTML = `body{${vars}}`;
           this.theme_ = theme;

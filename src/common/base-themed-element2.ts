@@ -4,7 +4,7 @@ import { dom, onLifecycle } from 'external/gs_tools/src/webc';
 import { ThemeService } from '../theming/theme-service';
 
 export class BaseThemedElement2 extends BaseDisposable {
-  constructor(private readonly themeService_: ThemeService) {
+  constructor(protected readonly themeService_: ThemeService) {
     super();
   }
 

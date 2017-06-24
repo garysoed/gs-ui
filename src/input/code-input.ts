@@ -1,27 +1,28 @@
 import { Interval } from 'external/gs_tools/src/async';
 import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
+import { cache } from 'external/gs_tools/src/data/cache';
+import { MonadSetter, on } from 'external/gs_tools/src/event';
 import { ImmutableMap, Iterables } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
+import { Disposable, ElementSelector, Event } from 'external/gs_tools/src/interfaces';
 import {
   BooleanParser,
   EnumParser,
   StringParser } from 'external/gs_tools/src/parse';
 import { Solve, Spec } from 'external/gs_tools/src/solver';
 import { Enums } from 'external/gs_tools/src/typescript';
-import { Reflect } from 'external/gs_tools/src/util';
 import {
   customElement,
   dom,
-  DomBinder,
-  DomHook,
-  hook,
-  onDom} from 'external/gs_tools/src/webc';
+  domOut,
+  onDom,
+  onLifecycle} from 'external/gs_tools/src/webc';
 
+import { DisposableFunction } from 'external/gs_tools/src/dispose';
 import { ThemeServiceEvents } from '../const/theme-service-events';
-import { BaseInput } from '../input/base-input';
+import { BaseInput2 } from '../input/base-input2';
 import { DefaultPalettes } from '../theming/default-palettes';
 import { ThemeService } from '../theming/theme-service';
-
 
 export enum Languages {
   CSS,
@@ -31,54 +32,12 @@ export enum Languages {
   TYPESCRIPT,
 }
 
-const LANGUAGE_ATTRIBUTE = {name: 'gs-language', parser: EnumParser(Languages), selector: null};
-const SHOW_GUTTER_ATTRIBUTE = {name: 'gs-show-gutter', parser: BooleanParser, selector: null};
-const VALUE_ATTRIBUTE = {name: 'gs-value', parser: StringParser, selector: null};
+const CUSTOM_STYLE_EL = '#customStyle';
+const EDITOR_EL_ID = 'editor';
+const EDITOR_EL = `#${EDITOR_EL_ID}`;
 
-
-/**
- * Binder that passes the value to the Ace editor.
- */
-export class EditorValueBinder implements DomBinder<string> {
-  private editor_: AceAjax.Editor | null = null;
-
-  /**
-   * @override
-   */
-  delete(): void {
-    this.set('');
-  }
-
-  /**
-   * @override
-   */
-  get(): string | null {
-    if (this.editor_ === null) {
-      return null;
-    }
-
-    return this.editor_.getValue();
-  }
-
-  /**
-   * @override
-   */
-  set(value: string): void {
-    if (this.editor_ === null) {
-      return;
-    }
-
-    this.editor_.setValue(value, this.editor_.getCursorPositionScreen());
-  }
-
-  /**
-   * @param editor The editor to set.
-   */
-  setEditor(editor: AceAjax.Editor): void {
-    this.editor_ = editor;
-  }
-}
-
+const LANGUAGE_ATTRIBUTE = {name: 'language', parser: EnumParser(Languages), selector: null};
+const SHOW_GUTTER_ATTRIBUTE = {name: 'show-gutter', parser: BooleanParser, selector: null};
 
 /**
  * Element to input code.
@@ -87,28 +46,9 @@ export class EditorValueBinder implements DomBinder<string> {
   tag: 'gs-code-input',
   templateKey: 'src/input/code-input',
 })
-export class CodeInput extends BaseInput<string> {
-
-  @hook(null).attribute('gs-value', StringParser)
-  readonly boundGsValueHook_: DomHook<string>;
-
-  @hook('#editor').attribute('disabled', BooleanParser)
-  readonly boundInputDisabledHook_: DomHook<boolean>;
-
-  @hook('#customStyle').property('innerHTML')
-  readonly customStyleInnerHtmlHook_: DomHook<string>;
-
-  @hook('#editor').element(HTMLElement)
-  readonly editorElHook_: DomHook<HTMLElement>;
-
-  @hook(null).attribute('gs-show-gutter', BooleanParser)
-  readonly gsShowGutterHook_: DomHook<boolean>;
-
+export class CodeInput extends BaseInput2<string, HTMLDivElement> {
   private readonly ace_: AceAjax.Ace;
   private readonly document_: Document;
-  private editor_: AceAjax.Editor | null;
-  private readonly editorValueBinder_: EditorValueBinder;
-  private readonly editorValueHook_: DomHook<string>;
   private readonly window_: Window;
 
   constructor(
@@ -116,39 +56,10 @@ export class CodeInput extends BaseInput<string> {
       @inject('x.ace') ace: AceAjax.Ace,
       @inject('x.dom.document') document: Document,
       @inject('x.dom.window') window: Window) {
-    super(
-        themeService,
-        DomHook.of<string>(),
-        DomHook.of<string>(),
-        StringParser);
+    super(themeService, StringParser);
     this.ace_ = ace;
     this.document_ = document;
-    this.editor_ = null;
-    this.editorElHook_ = DomHook.of<HTMLElement>();
-    this.boundGsValueHook_ = this.gsValueHook_;
-    this.boundInputDisabledHook_ = this.inputDisabledHook_;
-    this.customStyleInnerHtmlHook_ = DomHook.of<string>();
-    this.editorValueBinder_ = new EditorValueBinder();
-    this.editorValueHook_ = this.inputValueHook_;
-    this.gsShowGutterHook_ = DomHook.of<boolean>();
     this.window_ = window;
-  }
-
-  /**
-   * Handles initialization.
-   */
-  [Reflect.__initialize](): void {
-    this.editorValueHook_.open(this.editorValueBinder_);
-  }
-
-  /**
-   * @override
-   */
-  disposeInternal(): void {
-    if (this.editor_ !== null) {
-      this.editor_.destroy();
-    }
-    super.disposeInternal();
   }
 
   /**
@@ -178,6 +89,45 @@ export class CodeInput extends BaseInput<string> {
     return HslColor.newInstance(hueColor.getHue(), hueColor.getSaturation(), distance);
   }
 
+  @cache()
+  private getEditor_(containerEl: HTMLElement): AceAjax.Editor {
+    const editor = this.ace_.edit(containerEl);
+
+    editor.setHighlightActiveLine(true);
+    editor.setReadOnly(false);
+    editor.setFontSize('14px');
+
+    editor.session.setTabSize(2);
+    editor.session.setUseSoftTabs(true);
+
+    this.addDisposable(DisposableFunction.of(() => {
+      editor.destroy();
+    }));
+
+    const aceCss = this.document_.getElementById('ace_editor.css');
+    if (aceCss === null) {
+      throw new Error('#ace_editor.css not found');
+    }
+
+    const shadowRoot = containerEl.parentNode;
+    if (shadowRoot === null) {
+      throw new Error('No shadow roots were found');
+    }
+    const styleEl = this.document_.createElement('style');
+    styleEl.innerHTML = aceCss.innerHTML;
+    shadowRoot.appendChild(styleEl);
+
+    return editor;
+  }
+
+  protected getInputElSelector_(): ElementSelector {
+    return EDITOR_EL;
+  }
+
+  protected getInputElValue_(containerEl: HTMLDivElement): string {
+    return this.getEditor_(containerEl).getValue();
+  }
+
   /**
    * @param foreground
    * @param background
@@ -189,82 +139,76 @@ export class CodeInput extends BaseInput<string> {
     return Colors.getContrast(foreground, background) >= idealContrast;
   }
 
+  protected isValueChanged_(oldValue: string | null, newValue: string | null): boolean {
+    return oldValue !== newValue;
+  }
+
+  protected listenToValueChanges_(
+      containerEl: HTMLDivElement,
+      callback: (event: Event<any>) => void): Disposable {
+    let isListening = true;
+    const editor = this.getEditor_(containerEl);
+    editor.getSession().on('change', () => {
+      if (isListening) {
+        callback({type: 'change'});
+      }
+    });
+    return DisposableFunction.of(() => {
+      isListening = false;
+    });
+  }
+
   /**
    * @override
    */
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    if (this.gsShowGutterHook_.get() === null) {
-      this.gsShowGutterHook_.set(true);
+  @onLifecycle('create')
+  onCreated(
+      @domOut.attribute(SHOW_GUTTER_ATTRIBUTE)
+          {id: showGutterId, value: showGutter}: MonadSetter<boolean | null>,
+      @dom.element(CUSTOM_STYLE_EL) customStyleEl: HTMLStyleElement,
+      @dom.element(EDITOR_EL) editorEl: HTMLElement):
+      ImmutableMap<string, any> {
+    const changes = new Map<string, any>();
+    if (showGutter === null) {
+      changes.set(showGutterId, true);
     }
-
-    const shadowRoot = element.shadowRoot;
-    if (shadowRoot === null) {
-      throw new Error('No shadow roots were found');
-    }
-    this.editor_ = this.ace_.edit(shadowRoot.querySelector('#editor') as HTMLElement);
-    this.editorValueBinder_.setEditor(this.editor_);
-
-    this.editor_.setHighlightActiveLine(true);
-    this.editor_.setReadOnly(false);
-    this.editor_.setFontSize('14px');
-
-    this.editor_.session.setTabSize(2);
-    this.editor_.session.setUseSoftTabs(true);
 
     const interval = Interval.newInstance(500);
     this.addDisposable(interval);
-    this.addDisposable(interval.on('tick', this.onTick_, this));
+    this.addDisposable(interval.on('tick', this.onTick_.bind(this, editorEl), this));
     interval.start();
 
-    const aceCss = this.document_.getElementById('ace_editor.css');
-    if (aceCss === null) {
-      throw new Error('#ace_editor.css not found');
-    }
-    const styleEl = element.ownerDocument.createElement('style');
-    styleEl.innerHTML = aceCss.innerHTML;
-    shadowRoot.appendChild(styleEl);
-
-    this.listenTo(this.themeService_, ThemeServiceEvents.THEME_CHANGED, this.onThemeChanged_);
-    this.onThemeChanged_();
+    this.onThemeChanged_(customStyleEl, editorEl);
+    return ImmutableMap.of(changes);
   }
 
   @onDom.attributeChange(LANGUAGE_ATTRIBUTE)
-  onGsLanguageAttrChange_(
+  onLanguageAttrChange_(
+      @dom.element(EDITOR_EL) editorEl: HTMLDivElement,
       @dom.attribute(LANGUAGE_ATTRIBUTE) newValue: Languages | null): void {
-    if (this.editor_ !== null && newValue !== null) {
-      this.editor_.getSession().setMode(`ace/mode/${Enums.toLowerCaseString(newValue, Languages)}`);
+    if (newValue !== null) {
+      this.getEditor_(editorEl)
+          .getSession()
+          .setMode(`ace/mode/${Enums.toLowerCaseString(newValue, Languages)}`);
     }
   }
 
   @onDom.attributeChange(SHOW_GUTTER_ATTRIBUTE)
-  onGsShowGutterAttrChange_(
+  onShowGutterAttrChange_(
+      @dom.element(EDITOR_EL) editorEl: HTMLDivElement,
       @dom.attribute(SHOW_GUTTER_ATTRIBUTE) newValue: boolean | null): void {
-    if (this.editor_ !== null) {
-      this.editor_.renderer.setShowGutter(newValue === null ? true : newValue);
-    }
-  }
-
-  /**
-   * @override
-   */
-  @onDom.attributeChange(VALUE_ATTRIBUTE)
-  onGsValueChange_(
-      @dom.attribute(VALUE_ATTRIBUTE) newValue: string | null): void {
-    super.onGsValueChange_(newValue || '');
+    this.getEditor_(editorEl).renderer.setShowGutter(newValue === null ? true : newValue);
   }
 
   /**
    * Handles when the theme is changed.
    */
-  private onThemeChanged_(): void {
+  @on((instance: CodeInput) => instance.themeService_, ThemeServiceEvents.THEME_CHANGED)
+  onThemeChanged_(
+      @dom.element(CUSTOM_STYLE_EL) customStyleEl: HTMLStyleElement,
+      @dom.element(EDITOR_EL) editorEl: HTMLElement): void {
     const theme = this.themeService_.getTheme();
     if (theme === null) {
-      return;
-    }
-
-    const editorEl = this.editorElHook_.get();
-    if (editorEl === null) {
       return;
     }
 
@@ -330,16 +274,22 @@ export class CodeInput extends BaseInput<string> {
           return `--${name}:rgb(${color.getRed()},${color.getGreen()},${color.getBlue()});`;
         });
     const cssContent = Iterables.toArray(mappedEntries).join('');
-    this.customStyleInnerHtmlHook_.set(`#editor {${cssContent}}`);
+    customStyleEl.innerHTML = `#editor {${cssContent}}`;
   }
 
   /**
    * Called when the interval ticks.
    */
-  private onTick_(): void {
-    if (this.editor_ !== null) {
-      this.editor_.resize();
-    }
+  private onTick_(editorEl: HTMLElement): void {
+    this.getEditor_(editorEl).resize();
+  }
+
+  protected setInputElDisabled_(containerEl: HTMLDivElement, disabled: boolean): void {
+    this.getEditor_(containerEl).setReadOnly(disabled);
+  }
+
+  protected setInputElValue_(containerEl: HTMLDivElement, newValue: string): void {
+    const editor = this.getEditor_(containerEl);
+    editor.setValue(newValue, editor.getCursorPositionScreen());
   }
 }
-// TODO: Mutable

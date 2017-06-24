@@ -24,7 +24,7 @@ export abstract class BaseInput2<T, E extends HTMLElement = HTMLInputElement>
     super(themeService);
   }
 
-  private getInputEl_(element: HTMLElement): E {
+  protected getInputEl_(element: HTMLElement): E {
     return Util.requireSelector(this.getInputElSelector_(), element) as E;
   }
 
