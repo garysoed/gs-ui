@@ -2,6 +2,8 @@ import { Interval } from 'external/gs_tools/src/async';
 import { DomEvent } from 'external/gs_tools/src/event';
 import { Parser } from 'external/gs_tools/src/interfaces';
 import { BooleanParser } from 'external/gs_tools/src/parse';
+import { deprecated } from 'external/gs_tools/src/typescript';
+import { Log } from 'external/gs_tools/src/util';
 import { dom, DomHook, onDom } from 'external/gs_tools/src/webc';
 
 import { BaseActionElement } from '../common/base-action-element';
@@ -9,7 +11,7 @@ import { ThemeService } from '../theming/theme-service';
 
 
 const DISABLED_ATTRIBUTE = {name: 'disabled', parser: BooleanParser, selector: null};
-
+const LOGGER = Log.of('gs-ui.input.BaseInput');
 
 export abstract class BaseInput<T> extends BaseActionElement {
   private static INPUT_INTERVAL_: number = 500;
@@ -55,6 +57,7 @@ export abstract class BaseInput<T> extends BaseActionElement {
   /**
    * @override
    */
+  @deprecated(LOGGER, 'Use BaseInput2 instead')
   onCreated(element: HTMLElement): void {
     super.onCreated(element);
     const shadowRoot = element.shadowRoot;

@@ -1,43 +1,26 @@
-
+/**
+ * @webcomponent gs-float-input
+ * Element for inputting float.
+ *
+ * @attr {boolean} disabled True iff the input should be disabled.
+ * @attr {float} value Value of the input.
+ *
+ * @event {{}} change Dispatched when the value has changed.
+ */
 import { inject } from 'external/gs_tools/src/inject';
-import { BooleanParser, FloatParser } from 'external/gs_tools/src/parse';
-import {
-  customElement,
-  dom,
-  DomHook,
-  hook,
-  onDom} from 'external/gs_tools/src/webc';
+import { FloatParser } from 'external/gs_tools/src/parse';
+import { customElement } from 'external/gs_tools/src/webc';
 
-import { BaseInput } from '../input/base-input';
+import { BaseInput2 } from '../input/base-input2';
 import { ThemeService } from '../theming/theme-service';
-
-
-const VALUE_ATTRIBUTE = {name: 'gs-value', parser: FloatParser, selector: null};
-
 
 @customElement({
   tag: 'gs-float-input',
   templateKey: 'src/input/float-input',
 })
-export class FloatInput extends BaseInput<number> {
-  @hook(null).attribute('gs-value', FloatParser)
-  private readonly boundGsValueHook_: DomHook<number>;
-
-  @hook('#input').attribute('disabled', BooleanParser)
-  private readonly boundInputDisabledHook_: DomHook<boolean>;
-
-  @hook('#input').property('value')
-  private readonly boundInputValueHook_: DomHook<string>;
-
+export class FloatInput extends BaseInput2<number> {
   constructor(@inject('theming.ThemeService') themeService: ThemeService) {
-    super(
-        themeService,
-        DomHook.of<number>(),
-        DomHook.of<string>(),
-        FloatParser);
-    this.boundGsValueHook_ = this.gsValueHook_;
-    this.boundInputDisabledHook_ = this.inputDisabledHook_;
-    this.boundInputValueHook_ = this.inputValueHook_;
+    super(themeService, FloatParser);
   }
 
   /**
@@ -50,18 +33,6 @@ export class FloatInput extends BaseInput<number> {
         && Number.isNaN(newValue)) {
       return false;
     }
-    return super.isValueChanged_(oldValue, newValue);
-  }
-
-  /**
-   * Handles event when the value of gs-value attribute was changed.
-   *
-   * @param newValue The value it was changed to.
-   */
-  @onDom.attributeChange(VALUE_ATTRIBUTE)
-  protected onGsValueChange_(
-      @dom.attribute(VALUE_ATTRIBUTE) newValue: number): void {
-    super.onGsValueChange_(newValue);
+    return oldValue !== newValue;
   }
 }
-// TODO: Mutable
