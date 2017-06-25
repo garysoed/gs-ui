@@ -8,23 +8,51 @@
     --gsIconFontSize: 4rem;
 	  perspective: 1000px;
   }
+
+  #switch > div {
+    background-color: var(--gsColorPassiveBG);
+  }
 </style>
 
 <div fill-parent id="root" flex-align="center" flex-justify="center" layout="column">
-  <gs-switch id="switch">
-    <div flex-align="center" gs-when="initial" id="initial" layout="column">
+  <gs-switch id="switch" value="initial">
+    <div
+        flex-align="center"
+        flex-justify="center"
+        fill-parent
+        id="initial"
+        layout="column"
+        slot="initial">
       <gs-icon>file_upload</gs-icon>
       <div id="initialMessage"></div>
     </div>
-    <div flex-align="center" gs-when="dragging" id="drop" layout="column">
+    <div
+        flex-align="center"
+        flex-justify="center"
+        fill-parent
+        id="drop"
+        layout="column"
+        slot="dragging">
       <gs-icon>file_download</gs-icon>
       <div>Drop the file here</div>
     </div>
-    <div flex-align="center" gs-when="dropped" id="main" layout="column">
+    <div
+        flex-align="center"
+        flex-justify="center"
+        fill-parent
+        id="main"
+        layout="column"
+        slot="dropped">
       <gs-icon>insert_drive_file</gs-icon>
       <div id="droppedMessage"></div>
     </div>
-    <div flex-align="center" gs-when="error" id="error" layout="column">
+    <div
+        flex-align="center"
+        flex-justify="center"
+        fill-parent
+        id="error"
+        layout="column"
+        slot="error">
       <gs-icon>error</gs-icon>
       <div>Invalid file type</div>
     </div>
