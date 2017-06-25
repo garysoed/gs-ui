@@ -39,18 +39,18 @@
   </head>
   <body>
     <template id="template">
-      <gs-vertical-tab gs-selected-tab="tab2">
-        <gs-basic-button gs-tab-id="tab1">
-          <div gs-content>Tab 1</div>
+      <gs-vertical-tab selected-tab="tab2">
+        <gs-basic-button tab-id="tab1">
+          <div>Tab 1</div>
         </gs-basic-button>
-        <gs-basic-button gs-tab-id="tab2">
-          <div gs-content>Tab 2</div>
+        <gs-basic-button tab-id="tab2">
+          <div>Tab 2</div>
         </gs-basic-button>
-        <gs-basic-button gs-tab-id="tab3">
-          <div gs-content>Tab 3</div>
+        <gs-basic-button tab-id="tab3">
+          <div>Tab 3</div>
         </gs-basic-button>
-        <gs-basic-button gs-tab-id="tab3" disabled>
-          <div gs-content>Disabled tab</div>
+        <gs-basic-button tab-id="tab3" disabled>
+          <div>Disabled tab</div>
         </gs-basic-button>
       </gs-vertical-tab>
     </template>
@@ -62,40 +62,17 @@
       <section class="cell gs-theme-invert-hilite"></section>
     </section>
 
-    <gs-basic-button class="colorPicker gs-theme-normal gs-primary">
-      <div gs-content><gs-icon>color_lens</gs-icon></div>
-      <gs-menu>
-        <div class="menuRoot gs-theme-normal" gs-content selected-tab="base">
-          <div class="colorPickerMenu base"></div>
-          <div class="colorPickerMenu accent"></div>
-          <gs-horizontal-tab gs-selected-tab="base">
-            <gs-basic-button gs-tab-id="base">
-              <div gs-content>Base</div>
-            </gs-basic-button>
-            <gs-basic-button gs-tab-id="accent">
-              <div gs-content>Accent</div>
-            </gs-basic-button>
-          </gs-horizontal-tab>
-        </div>
-      </gs-menu>
-    </gs-basic-button>
-
-    <div class="gs-theme-normal" id="contrastContainer">
-      <gs-drawer
-          gs-align-content="left"
-          gs-anchor-point="right"
-          gs-min-width="3.5rem"
-          gs-max-width="9rem"
-          id="contrastDrawer">
-        <div gs-content id="contrastContent" layout="row">
-          <gs-basic-button class="gs-primary" id="contrastButton">
-            <gs-icon slot="content">accessibility</gs-icon>
-          </gs-basic-button>
-          <gs-float-input flex gs-value="4.5" id="contrastInput"></gs-float-input>
-        </div>
-      </gs-drawer>
-    </div>
-
     <script src="demo.js"></script>
+    <script>
+      var verticalTabs = document.querySelectorAll('gs-vertical-tab');
+      verticalTabs.forEach(function(tab) {
+        var buttons = tab.querySelectorAll('gs-basic-button');
+        buttons.forEach(function(button) {
+          button.addEventListener('gs-action', function() {
+            tab.setAttribute('selected-tab', button.getAttribute('tab-id'));
+          });
+        });
+      });
+    </script>
   </body>
 </html>

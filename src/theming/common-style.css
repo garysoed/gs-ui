@@ -183,8 +183,8 @@ td {
 
 .gs-theme-normal-hilite {
   --gsColorPassiveBG: var(--gsThemeBaseNormalDark);
-  --gsColorPassiveFG: var(--gsThemeBaseReversedLightest);
-  --gsColorHeaderFG: var(--gsThemeWhite);
+  --gsColorPassiveFG: var(--gsThemeWhite);
+  --gsColorHeaderFG: var(--gsThemeBaseReversedLightest);
   --gsColorPassivePrimaryBG: var(--gsThemeBaseReversedDarkest);
   --gsColorSecondaryFG: var(--gsThemeWhiteFade);
   --gsColorActionBG: var(--gsThemeBaseNormalDark);
@@ -203,8 +203,8 @@ td {
 
 .gs-theme-invert {
   --gsColorPassiveBG: var(--gsThemeBlack);
-  --gsColorPassiveFG: var(--gsThemeBaseReversedLightest);
-  --gsColorHeaderFG: var(--gsThemeWhite);
+  --gsColorPassiveFG: var(--gsThemeWhite);
+  --gsColorHeaderFG: var(--gsThemeBaseReversedLightest);
   --gsColorPassivePrimaryBG: var(--gsThemeBaseReversedDark);
   --gsColorSecondaryFG: var(--gsThemeWhiteFade);
   --gsColorActionBG: var(--gsThemeBlack);

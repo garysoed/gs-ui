@@ -1,31 +1,30 @@
 <style>
-  content::content > * {
+  slot::slotted(*) {
     display: block;
     flex: 1;
   }
 
-  .highlight-container {
+  #highlight-container {
     position: relative;
     width: .4rem;
   }
 
-  .highlight {
+  #highlight {
     background-color: var(--gsColorActionFocusFG);
     position: absolute;
     width: .4rem;
   }
 
-  .root {
-    display: inline-block;
+  #root {
     position: relative;
     width: 100%;
   }
 </style>
-<div class="root" layout="row">
-  <div class="tabs" flex>
-    <content select="[gs-tab-id]"></content>
+<div id="root" layout="row">
+  <div id="tabs" flex>
+    <slot></slot>
   </div>
-  <div class="highlight-container">
-    <div class="highlight"></div>
+  <div id="highlight-container">
+    <div id="highlight"></div>
   </div>
 </div>
