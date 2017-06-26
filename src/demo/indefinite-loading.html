@@ -47,40 +47,6 @@
       </section>
     </section>
 
-    <gs-basic-button class="colorPicker gs-theme-normal gs-primary">
-      <div gs-content><gs-icon>color_lens</gs-icon></div>
-      <gs-menu>
-        <div class="menuRoot gs-theme-normal" gs-content selected-tab="base">
-          <div class="colorPickerMenu base"></div>
-          <div class="colorPickerMenu accent"></div>
-          <gs-horizontal-tab gs-selected-tab="base">
-            <gs-basic-button gs-tab-id="base">
-              <div gs-content>Base</div>
-            </gs-basic-button>
-            <gs-basic-button gs-tab-id="accent">
-              <div gs-content>Accent</div>
-            </gs-basic-button>
-          </gs-horizontal-tab>
-        </div>
-      </gs-menu>
-    </gs-basic-button>
-
-    <div class="gs-theme-normal" id="contrastContainer">
-      <gs-drawer
-          gs-align-content="left"
-          gs-anchor-point="right"
-          gs-min-width="3.5rem"
-          gs-max-width="9rem"
-          id="contrastDrawer">
-        <div gs-content id="contrastContent" layout="row">
-          <gs-basic-button class="gs-primary" id="contrastButton">
-            <gs-icon slot="content">accessibility</gs-icon>
-          </gs-basic-button>
-          <gs-float-input flex gs-value="4.5" id="contrastInput"></gs-float-input>
-        </div>
-      </gs-drawer>
-    </div>
-
     <script src="demo.js"></script>
   </body>
 </html>

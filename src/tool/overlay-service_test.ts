@@ -35,11 +35,7 @@ describe('gs.tool.OverlayService', () => {
       const mockBody = jasmine.createSpyObj('Body', ['appendChild']);
       mockDocument.body = mockBody;
 
-      const listenableContainer = Mocks.disposable('listenableContainer');
-      spyOn(ListenableDom, 'of').and.returnValue(listenableContainer);
-
-      assert(service['getOverlayContainerEl_']()).to.equal(listenableContainer);
-      assert(ListenableDom.of).to.haveBeenCalledWith(menuContainerEl);
+      assert(service['getOverlayContainerEl_']()).to.equal(menuContainerEl);
       assert(mockBody.appendChild).to.haveBeenCalledWith(menuContainerEl);
       assert(mockDocument.createElement).to.haveBeenCalledWith('gs-overlay-container');
       assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-overlay-container');
@@ -52,11 +48,7 @@ describe('gs.tool.OverlayService', () => {
       const mockBody = jasmine.createSpyObj('Body', ['appendChild']);
       mockDocument.body = mockBody;
 
-      const listenableContainer = Mocks.disposable('listenableContainer');
-      spyOn(ListenableDom, 'of').and.returnValue(listenableContainer);
-
-      assert(service['getOverlayContainerEl_']()).to.equal(listenableContainer);
-      assert(ListenableDom.of).to.haveBeenCalledWith(menuContainerEl);
+      assert(service['getOverlayContainerEl_']()).to.equal(menuContainerEl);
       assert(mockDocument.createElement).toNot.haveBeenCalled();
       assert(mockDocument.querySelector).to.haveBeenCalledWith('gs-overlay-container');
     });
@@ -82,8 +74,7 @@ describe('gs.tool.OverlayService', () => {
     it('should hide the menu container', () => {
       const id = Symbol('id');
       const mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['setAttribute']);
-      spyOn(service, 'getOverlayContainerEl_').and
-          .returnValue({getEventTarget: () => mockMenuContainer});
+      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockMenuContainer);
       spyOn(service, 'getShownId_').and.returnValue(id);
       Fakes.build(spyOn(OverlayBus, 'dispatch')).call((_: any, fn: () => void) => fn());
       service.hideOverlay(id);
@@ -94,8 +85,6 @@ describe('gs.tool.OverlayService', () => {
 
     it(`should do nothing if the ID does not match`, () => {
       const mockMenuContainer = jasmine.createSpyObj('MenuContainer', ['setAttribute']);
-      spyOn(service, 'getOverlayContainerEl_').and
-          .returnValue({getEventTarget: () => mockMenuContainer});
       spyOn(service, 'getShownId_').and.returnValue(Symbol('otherId'));
       Fakes.build(spyOn(OverlayBus, 'dispatch')).call((_: any, fn: () => void) => fn());
       service.hideOverlay(Symbol('id'));
@@ -263,14 +252,15 @@ describe('gs.tool.OverlayService', () => {
           ['appendChild', 'setAttribute']);
       const mockListenableMenuContainer = jasmine.createSpyObj(
           'ListenableMenuContainer',
-          ['getEventTarget', 'once']);
+          ['dispose', 'getEventTarget', 'once']);
       mockListenableMenuContainer.getEventTarget.and.returnValue(mockMenuContainerEl);
       Fakes.build(mockListenableMenuContainer.once)
           .call((_eventType: any, handler: () => void, _useCapture: any) => {
             handler();
             return Mocks.disposable('ListenableMenuContainer.once');
           });
-      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockListenableMenuContainer);
+      spyOn(ListenableDom, 'of').and.returnValue(mockListenableMenuContainer);
+      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockMenuContainerEl);
 
       const mockAnchorTargetWatcher = jasmine
           .createSpyObj('AnchorTargetWatcher', ['dispose', 'on', 'start']);
@@ -317,6 +307,9 @@ describe('gs.tool.OverlayService', () => {
 
       assert(Interval.newInstance)
           .to.haveBeenCalledWith(OverlayService['ANCHOR_TARGET_INTERVAL_']);
+
+      assert(ListenableDom.of).to.haveBeenCalledWith(mockMenuContainerEl);
+      assert(mockListenableMenuContainer.dispose).to.haveBeenCalledWith();
     });
 
     it(`should hide the previous overlay if one is already shown`, async () => {
@@ -335,14 +328,16 @@ describe('gs.tool.OverlayService', () => {
           ['appendChild', 'setAttribute']);
       const mockListenableMenuContainer = jasmine.createSpyObj(
           'ListenableMenuContainer',
-          ['getEventTarget', 'once']);
+          ['dispose', 'getEventTarget', 'once']);
       mockListenableMenuContainer.getEventTarget.and.returnValue(mockMenuContainerEl);
       Fakes.build(mockListenableMenuContainer.once)
           .call((_eventType: any, handler: () => void, _useCapture: any) => {
             handler();
             return Mocks.disposable('ListenableMenuContainer.once');
           });
-      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockListenableMenuContainer);
+      spyOn(ListenableDom, 'of').and.returnValue(mockListenableMenuContainer);
+
+      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockMenuContainerEl);
 
       const mockAnchorTargetWatcher = jasmine
           .createSpyObj('AnchorTargetWatcher', ['dispose', 'on', 'start']);
@@ -402,16 +397,7 @@ describe('gs.tool.OverlayService', () => {
       const mockMenuContainerEl = jasmine.createSpyObj(
           'MenuContainerEl',
           ['appendChild', 'setAttribute']);
-      const mockListenableMenuContainer = jasmine.createSpyObj(
-          'ListenableMenuContainer',
-          ['getEventTarget', 'once']);
-      mockListenableMenuContainer.getEventTarget.and.returnValue(mockMenuContainerEl);
-      Fakes.build(mockListenableMenuContainer.once)
-          .call((_eventType: any, handler: () => void, _useCapture: any) => {
-            handler();
-            return Mocks.disposable('ListenableMenuContainer.once');
-          });
-      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockListenableMenuContainer);
+      spyOn(service, 'getOverlayContainerEl_').and.returnValue(mockMenuContainerEl);
 
       const mockAnchorTargetWatcher = jasmine
           .createSpyObj('AnchorTargetWatcher', ['dispose', 'start']);

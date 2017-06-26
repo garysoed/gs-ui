@@ -1,5 +1,4 @@
 import { Interval } from 'external/gs_tools/src/async';
-import { cache } from 'external/gs_tools/src/data/cache';
 import { BaseListener, ListenableDom } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, EnumParser, FloatParser } from 'external/gs_tools/src/parse';
@@ -21,22 +20,17 @@ export class OverlayService extends BaseListener {
     super();
   }
 
-  @cache()
-  private getOverlayContainerEl_(): ListenableDom<HTMLElement> {
+  private getOverlayContainerEl_(): HTMLElement {
     // Checks if there is a gs-overlay-container element.
-    const overlayContainerEl = this.document_.querySelector('gs-overlay-container');
-    if (overlayContainerEl === null) {
-      const newOverlayContainerEl = this.document_.createElement('gs-overlay-container');
-      const listenableNewOverlayContainer = ListenableDom.of(newOverlayContainerEl);
-      this.addDisposable(listenableNewOverlayContainer);
-      this.document_.body.appendChild(newOverlayContainerEl);
-
-      return listenableNewOverlayContainer;
-    } else {
-      const listenableOverlayContainerEl = ListenableDom.of(overlayContainerEl as HTMLElement);
-      this.addDisposable(listenableOverlayContainerEl);
-      return listenableOverlayContainerEl;
+    const overlayContainerEl =
+        this.document_.querySelector('gs-overlay-container') as HTMLElement | null;
+    if (overlayContainerEl !== null) {
+      return overlayContainerEl;
     }
+    const newOverlayContainerEl = this.document_.createElement('gs-overlay-container');
+    this.document_.body.appendChild(newOverlayContainerEl);
+
+    return newOverlayContainerEl;
   }
 
   private getShownId_(): symbol | null {
@@ -52,7 +46,7 @@ export class OverlayService extends BaseListener {
     }
     const overlayContainerEl = this.getOverlayContainerEl_();
     OverlayBus.dispatch({id, type: 'hide'}, () => {
-      overlayContainerEl.getEventTarget().setAttribute('visible', BooleanParser.stringify(false));
+      overlayContainerEl.setAttribute('visible', BooleanParser.stringify(false));
       overlayContainerEl[__shownId] = null;
     });
   }
@@ -140,28 +134,30 @@ export class OverlayService extends BaseListener {
     const anchorTargetWatcher = Interval.newInstance(OverlayService.ANCHOR_TARGET_INTERVAL_);
     this.addDisposable(anchorTargetWatcher.on(
         'tick',
-        this.onTick_.bind(this, overlayContainerEl.getEventTarget(), anchorTarget, anchorElement),
+        this.onTick_.bind(this, overlayContainerEl, anchorTarget, anchorElement),
         this));
     anchorTargetWatcher.start();
 
-    const overlayContainerElTarget = overlayContainerEl.getEventTarget();
-    overlayContainerElTarget.appendChild(overlayContent);
-    overlayContainerElTarget.setAttribute(
+    overlayContainerEl.appendChild(overlayContent);
+    overlayContainerEl.setAttribute(
         'anchor-point', EnumParser(AnchorLocation).stringify(anchorPoint));
-    this.setAnchorTarget_(overlayContainerElTarget, anchorTarget, anchorElement);
+    this.setAnchorTarget_(overlayContainerEl, anchorTarget, anchorElement);
 
+    const listenableOverlayContainerEl = ListenableDom.of(overlayContainerEl);
+    this.addDisposable(listenableOverlayContainerEl);
     return new Promise<void>((resolve: () => void): void => {
-      this.addDisposable(overlayContainerEl.once(
+      this.addDisposable(listenableOverlayContainerEl.once(
           'gs-hide',
           () => {
             anchorTargetWatcher.dispose();
             overlayParent.appendChild(overlayContent);
             this.hideOverlay(id);
+            listenableOverlayContainerEl.dispose();
             resolve();
           },
           false));
       OverlayBus.dispatch({id, type: 'show'}, () => {
-        overlayContainerElTarget.setAttribute('visible', BooleanParser.stringify(true));
+        overlayContainerEl.setAttribute('visible', BooleanParser.stringify(true));
         overlayContainerEl[__shownId] = id;
       });
     });
