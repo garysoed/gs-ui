@@ -1,11 +1,10 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import { Mocks } from 'external/gs_tools/src/mock';
+import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { RadioButtonService } from './radio-button-service';
-
+import { RadioButtonService } from '../input/radio-button-service';
 
 describe('input.RadioButtonService', () => {
   let mockDocument: any;
@@ -21,59 +20,59 @@ describe('input.RadioButtonService', () => {
     let mockButtonEl: any;
 
     beforeEach(() => {
-      mockButtonEl = jasmine.createSpyObj('ButtonEl', ['getAttribute']);
+      mockButtonEl = jasmine.createSpyObj('ButtonEl', ['getAttribute', 'setAttribute']);
       mockButtonEl.nodeName = 'gs-radio-button';
     });
 
     it('should unselect any checked buttons and update the given button', () => {
-      const otherButton = Mocks.object('otherButton');
-      mockDocument.querySelector.and.returnValue(otherButton);
+      const mockOtherButton = jasmine.createSpyObj('OtherButton', ['setAttribute']);
+      mockDocument.querySelector.and.returnValue(mockOtherButton);
 
-      mockButtonEl.getAttribute.and.returnValue('group');
+      Fakes.build(mockButtonEl.getAttribute)
+          .when('group-id').return('group')
+          .when('checked').return('false');
 
       service.setSelected(mockButtonEl, true);
 
-      assert(mockButtonEl['gsChecked'] as boolean).to.beTrue();
-      assert(otherButton['gsChecked'] as boolean).to.beFalse();
+      assert(mockButtonEl.setAttribute).to.haveBeenCalledWith('checked', 'true');
+      assert(mockOtherButton.setAttribute).to.haveBeenCalledWith('checked', 'false');
       assert(mockDocument.querySelector)
-          .to.haveBeenCalledWith(jasmine.stringMatching(/gs-group="group"/));
-      assert(mockButtonEl.getAttribute).to.haveBeenCalledWith('gs-group');
+          .to.haveBeenCalledWith(jasmine.stringMatching(/group-id="group"/));
+      assert(mockButtonEl.getAttribute).to.haveBeenCalledWith('group-id');
     });
 
     it('should not unselect the button if the currently selected button is the given button',
         () => {
-          const mockGsCheckedSetter = jasmine.createSpy('GsCheckedSetter');
-          Object.defineProperty(mockButtonEl, 'gsChecked', {
-            get: () => {},
-            set: mockGsCheckedSetter,
-          });
-          mockDocument.querySelector.and.returnValue(mockButtonEl);
-
-          service.setSelected(mockButtonEl, true);
-
-          assert(mockGsCheckedSetter).to.haveBeenCalledWith(true);
-          assert(mockGsCheckedSetter).toNot.haveBeenCalledWith(false);
-        });
-
-    it('should not unselect the button if there are no selected buttons', () => {
-      mockDocument.querySelector.and.returnValue(null);
+      mockDocument.querySelector.and.returnValue(mockButtonEl);
+      mockButtonEl.getAttribute.and.returnValue('false');
 
       service.setSelected(mockButtonEl, true);
 
-      assert(mockButtonEl['gsChecked'] as boolean).to.beTrue();
+      assert(mockButtonEl.setAttribute).to.haveBeenCalledWith('checked', 'true');
+      assert(mockButtonEl.setAttribute).toNot.haveBeenCalledWith('checked', 'false');
+    });
+
+    it('should not throw errors the button if there are no selected buttons', () => {
+      mockDocument.querySelector.and.returnValue(null);
+      mockButtonEl.getAttribute.and.returnValue('false');
+
+      assert(() => {
+        service.setSelected(mockButtonEl, true);
+      }).toNot.throw();
     });
 
     it('should not unselect any buttons if the request is to unselect a button', () => {
-      const otherButton = Mocks.object('otherButton');
-      otherButton['gsChecked'] = true;
-      mockDocument.querySelector.and.returnValue(otherButton);
+      const mockOtherButton = jasmine.createSpyObj('OtherButton', ['setAttribute']);
+      mockDocument.querySelector.and.returnValue(mockOtherButton);
 
-      mockButtonEl.getAttribute.and.returnValue('group');
+      Fakes.build(mockButtonEl.getAttribute)
+          .when('group-id').return('group')
+          .when('checked').return('true');
 
       service.setSelected(mockButtonEl, false);
 
-      assert(mockButtonEl['gsChecked'] as boolean).to.beFalse();
-      assert(otherButton['gsChecked'] as boolean).to.beTrue();
+      assert(mockButtonEl.setAttribute).to.haveBeenCalledWith('checked', 'false');
+      assert(mockOtherButton.setAttribute).toNot.haveBeenCalled();
     });
 
     it('should throw error if the element name is not gs-radio-button', () => {

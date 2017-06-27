@@ -1,90 +1,73 @@
+/**
+ * @webcomponent gs-radio-button
+ * A radio button.
+ *
+ * @attr {boolean} checked True iff the button is checked.
+ * @attr {boolean} disabled True iff the button is disabled.
+ * @attr {string} group-id ID of the group that the button belongs to. Only one button in the group
+ *     can be checked at any time.
+ */
 import { eventDetails } from 'external/gs_tools/src/event';
 import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
-import {
-  customElement,
-  dom,
-  DomHook,
-  hook,
-  onDom} from 'external/gs_tools/src/webc';
+import { customElement, dom, onDom } from 'external/gs_tools/src/webc';
 
-import { BaseActionElement } from '../common/base-action-element';
+import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { RadioButtonService } from '../input/radio-button-service';
 import { ThemeService } from '../theming/theme-service';
 
-
-const CHECKED_ATTRIBUTE = {name: 'gs-checked', parser: BooleanParser, selector: null};
-const GROUP_ATTRIBUTE = {name: 'gs-group', parser: StringParser, selector: null};
-
+const CHECKED_ATTR = {name: 'checked', parser: BooleanParser, selector: null};
+const DISABLED_ATTR = {name: 'disabled', parser: BooleanParser, selector: null};
+const GROUP_ATTRIBUTE = {name: 'group-id', parser: StringParser, selector: null};
 
 @customElement({
-  attributes: {
-    'gsChecked': BooleanParser,
-    'gsGroup': StringParser,
-  },
   dependencies: ImmutableSet.of([RadioButtonService]),
   tag: 'gs-radio-button',
   templateKey: 'src/input/radio-button',
 })
-export class RadioButton extends BaseActionElement {
-  protected radioButtonService_: RadioButtonService;
-
-  @hook(null).attribute('gs-checked', BooleanParser)
-  private gsCheckedHook_: DomHook<boolean>;
-
+export class RadioButton extends BaseThemedElement2 {
   constructor(
-      @inject('input.RadioButtonService') radioButtonService: RadioButtonService,
+      @inject('input.RadioButtonService') private readonly radioButtonService_: RadioButtonService,
       @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-    this.gsCheckedHook_ = DomHook.of<boolean>(false /* deleteOnFalsy */);
-    this.radioButtonService_ = radioButtonService;
+  }
+
+  /**
+   * Handles event when checked attribute is changed.
+   *
+   * @param newValue The new value of checked.
+   * @param oldValue The old value of checked.
+   */
+  @onDom.attributeChange(CHECKED_ATTR)
+  onCheckedChanged_(
+      @dom.attribute(CHECKED_ATTR) newValue: boolean,
+      @dom.element(null) element: HTMLElement,
+      @eventDetails() {oldValue}: {oldValue: boolean}): void {
+    if (newValue !== oldValue) {
+      this.radioButtonService_.setSelected(element, newValue);
+    }
   }
 
   /**
    * @override
    */
-  protected onClick_(): void {
-    super.onClick_();
-    const element = this.getElement();
-    if (!this.isDisabled() && element !== null) {
-      this.radioButtonService_.setSelected(element.getEventTarget(), true);
+  @onDom.event(null, 'click')
+  onClick_(
+      @dom.element(null) element: HTMLElement,
+      @dom.attribute(DISABLED_ATTR) disabled: boolean | null): void {
+    if (!disabled) {
+      this.radioButtonService_.setSelected(element, true);
     }
   }
 
   /**
-   * Handles event when gs-checked attribute is changed.
-   *
-   * @param newValue The new value of gs-checked.
-   * @param oldValue The old value of gs-checked.
-   */
-  @onDom.attributeChange(CHECKED_ATTRIBUTE)
-  protected onGsCheckedChanged_(
-      @dom.attribute(CHECKED_ATTRIBUTE) newValue: boolean,
-      @eventDetails() {oldValue}: {oldValue: boolean}): void {
-    if (newValue !== oldValue) {
-      this.updateService_(newValue);
-    }
-  }
-
-  /**
-   * Handles event when gs-group attribute is changed.
+   * Handles event when group-id attribute is changed.
    */
   @onDom.attributeChange(GROUP_ATTRIBUTE)
-  protected onGsGroupChanged_(): void {
-    this.updateService_(this.gsCheckedHook_.get() || false);
-  }
-
-  /**
-   * Updates the radio button service.
-   *
-   * @param isChecked True iff the element should be checked.
-   */
-  protected updateService_(isChecked: boolean): void {
-    const element = this.getElement();
-    if (element !== null) {
-      this.radioButtonService_.setSelected(element.getEventTarget(), isChecked);
-    }
+  onGroupChanged_(
+      @dom.element(null) element: HTMLElement,
+      @dom.attribute(CHECKED_ATTR) checked: boolean | null): void {
+    this.radioButtonService_.setSelected(element, checked || false);
   }
 }
-// TODO: Mutable
