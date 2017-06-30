@@ -1,54 +1,61 @@
-
+/**
+ * @webcomponent gs-text-input
+ * Element for inputting texts.
+ *
+ * @attr {boolean} disabled True iff the input should be disabled.
+ * @attr {float} value Value of the input.
+ *
+ * @event {{}} change Dispatched when the value has changed.
+ */
+import { ListenableDom } from 'external/gs_tools/src/event';
 import { inject } from 'external/gs_tools/src/inject';
-import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
-import {
-  customElement,
-  dom,
-  DomHook,
-  hook,
-  onDom} from 'external/gs_tools/src/webc';
+import { Event } from 'external/gs_tools/src/interfaces';
+import { Disposable, ElementSelector } from 'external/gs_tools/src/interfaces';
+import { StringParser } from 'external/gs_tools/src/parse';
+import { customElement } from 'external/gs_tools/src/webc';
 
-import { BaseInput } from '../input/base-input';
+import { BaseInput2 } from '../input/base-input2';
 import { ThemeService } from '../theming/theme-service';
-
-
-const VALUE_ATTRIBUTE = {name: 'gs-value', parser: StringParser, selector: null};
-
 
 @customElement({
   tag: 'gs-text-input',
   templateKey: 'src/input/text-input',
 })
-export class TextInput extends BaseInput<string> {
-  @hook(null).attribute('gs-value', StringParser)
-  private readonly boundGsValueHook_: DomHook<string>;
-
-  @hook('#input').attribute('disabled', BooleanParser)
-  private readonly boundInputDisabledHook_: DomHook<boolean>;
-
-  @hook('#input').property('value')
-  private readonly boundInputValueHook_: DomHook<string>;
-
+export class TextInput extends BaseInput2<string> {
   constructor(@inject('theming.ThemeService') themeService: ThemeService) {
-    super(
-        themeService,
-        DomHook.of<string>(),
-        DomHook.of<string>(),
-        StringParser);
-    this.boundGsValueHook_ = this.gsValueHook_;
-    this.boundInputDisabledHook_ = this.inputDisabledHook_;
-    this.boundInputValueHook_ = this.inputValueHook_;
+    super(themeService, StringParser);
   }
 
-  /**
-   * Handles event when the value of gs-value attribute was changed.
-   *
-   * @param newValue The value it was changed to.
-   */
-  @onDom.attributeChange(VALUE_ATTRIBUTE)
-  protected onGsValueChange_(
-      @dom.attribute(VALUE_ATTRIBUTE) newValue: string): void {
-    super.onGsValueChange_(newValue);
+  protected getInputElSelector_(): ElementSelector {
+    return '#input';
+  }
+
+  protected getInputElValue_(inputEl: HTMLInputElement): string {
+    return inputEl.value;
+  }
+
+  protected isValueChanged_(oldValue: string | null, newValue: string | null): boolean {
+    return oldValue !== newValue;
+  }
+
+  protected listenToValueChanges_(
+      element: HTMLInputElement,
+      callback: (event: Event<any>) => void): Disposable {
+    const listenableDom = ListenableDom.of(element);
+    const disposable = listenableDom.on('change', callback, this);
+    this.addDisposable(listenableDom);
+    return disposable;
+  }
+
+  protected setInputElDisabled_(inputEl: HTMLInputElement, disabled: boolean): void {
+    if (disabled) {
+      inputEl.setAttribute('disabled', '');
+    } else {
+      inputEl.removeAttribute('disabled');
+    }
+  }
+
+  protected setInputElValue_(inputEl: HTMLInputElement, newValue: string): void {
+    inputEl.value = newValue;
   }
 }
-// TODO: Mutable
