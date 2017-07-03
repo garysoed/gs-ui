@@ -6,7 +6,7 @@ import { Disposable, ElementSelector } from 'external/gs_tools/src/interfaces';
 import { StringParser } from 'external/gs_tools/src/parse';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { BaseInput } from '../input/base-input2';
+import { BaseInput } from '../input/base-input';
 
 class TestInput extends BaseInput<string> {
   constructor() {
