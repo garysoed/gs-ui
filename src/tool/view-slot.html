@@ -2,12 +2,8 @@
   .hidden {
     display: none;
   }
-
-  ::slotted > * {
-    flex: 1
-  }
 </style>
 
 <div fill-parent id="root" layout="column">
-  <content select="[gs-view-active=&quot;true&quot;]"></content>
+  <gs-switch fill-parent id="switch"></gs-switch>
 </div>

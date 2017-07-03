@@ -186,7 +186,10 @@ export class Switch extends BaseThemedElement2 {
       @dom.attribute(VALUE_ATTRIBUTE) value: string | null,
       @dom.element(ROOT_EL) rootEl: HTMLElement,
       @monad(ActionTracker) lastAction: Action): void {
-    const id = value || NULL_ID;
+    const slotName = value || NULL_ID;
+    const id = slotName
+        .replace(/\./g, 'u0023_')
+        .replace(/\//g, 'u002F_');
 
     // Delete any animation with the same value.
     for (const oldEl of ImmutableList.of(rootEl.querySelectorAll(`div#${id}`))) {
@@ -199,7 +202,7 @@ export class Switch extends BaseThemedElement2 {
         this.computeAnimations_(boundingRect, center);
 
     const slotEl = this.document_.createElement('slot');
-    slotEl.setAttribute('name', StringParser.stringify(id));
+    slotEl.setAttribute('name', StringParser.stringify(slotName));
 
     const slotContainerEl = this.document_.createElement('div');
     slotContainerEl.style.height = `${boundingRect.height}px`;

@@ -302,6 +302,61 @@ describe('tool.Switch', () => {
       assert(switchEl['getAnimationCircleCenter_']).to.haveBeenCalledWith(lastAction);
     });
 
+    it(`should handle '.' and '/' correctly`, () => {
+      const value = './.';
+      const normalizedValue = 'u0023_u002F_u0023_';
+      const height = 12;
+      const width = 34;
+      const clientRect = {height, width} as any;
+      const center = Vector2d.of(56, 78);
+      const rootEl = document.createElement('div');
+      spyOn(rootEl, 'getBoundingClientRect').and.returnValue(clientRect);
+      const otherEl = document.createElement('div');
+      otherEl.id = normalizedValue;
+      rootEl.appendChild(otherEl);
+
+      const containerEl = document.createElement('div');
+      const slotContainerEl = document.createElement('div');
+      const slotEl = document.createElement('slot');
+      let callCount = 0;
+      Fakes.build(mockDocument.createElement)
+          .when('div').call(() => {
+            const toReturn = callCount === 0 ? slotContainerEl : containerEl;
+            callCount++;
+            return toReturn;
+          })
+          .when('slot').return(slotEl);
+
+      const lastAction = Mocks.object('lastAction');
+      const mockContainerAnimation = jasmine.createSpyObj('ContainerAnimation', ['start']);
+      const mockSlotAnimation = jasmine.createSpyObj('SlotAnimation', ['start']);
+
+      spyOn(switchEl, 'computeAnimations_').and.returnValue({
+        container: mockContainerAnimation,
+        slot: mockSlotAnimation,
+      });
+      spyOn(switchEl, 'getAnimationCircleCenter_').and.returnValue(center);
+
+      switchEl.onValueChange_(value, rootEl, lastAction);
+      assert(mockSlotAnimation.start).to.haveBeenCalledWith(switchEl, `#${normalizedValue} > *`);
+      assert(mockContainerAnimation.start).to.haveBeenCalledWith(switchEl, `#${normalizedValue}`);
+      assert(rootEl).to.haveChildren([containerEl]);
+
+      assert(containerEl).to.haveChildren([slotContainerEl]);
+      assert(containerEl).to.haveClasses(['container']);
+      assert(containerEl.id).to.equal(normalizedValue);
+
+      assert(slotContainerEl).to.haveChildren([slotEl]);
+      assert(slotContainerEl).to.haveClasses(['slotContainer']);
+      assert(slotContainerEl.style).to
+          .equal(Matchers.objectContaining({height: `${height}px`, width: `${width}px`}));
+
+      assert(slotEl.getAttribute('name')).to.equal(value);
+
+      assert(switchEl['computeAnimations_']).to.haveBeenCalledWith(clientRect, center);
+      assert(switchEl['getAnimationCircleCenter_']).to.haveBeenCalledWith(lastAction);
+    });
+
     it(`should handle null values correctly`, () => {
       const height = 12;
       const width = 34;

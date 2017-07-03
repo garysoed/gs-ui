@@ -1,98 +1,107 @@
-import { ImmutableList } from 'external/gs_tools/src/immutable';
+/**
+ * @webcomponent gs-view-slot
+ * A wrapper around gs-switch that uses gs-tools.ui.LocationService to decide what to display.
+ *
+ * To use this, add children to the component. Each child should have a `gs-view-path` attribute
+ * with a path matcher. This path matcher is relative to the closest ancestor gs-view-slot child.
+ * The component will be displayed if the current URL location matches this path.
+ *
+ * Make sure that the children have actual size or `fill-parent` so they can be displayed correctly.
+ */
+import { on } from 'external/gs_tools/src/event';
+import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import { Doms, LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
-import { customElement, DomHook, hook } from 'external/gs_tools/src/webc';
+import { customElement, dom, onDom, onLifecycle } from 'external/gs_tools/src/webc';
 
-import { BaseThemedElement } from '../common/base-themed-element';
+import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
+import { Switch } from '../tool/switch';
 
-export const __FULL_PATH = Symbol('fullPath');
+export const __fullPath = Symbol('fullPath');
+
+const ROOT_EL = '#root';
+const SWITCH_EL = '#switch';
 
 @customElement({
-  attributes: {
-    'gsFullPath': StringParser,
-  },
+  dependencies: ImmutableSet.of([Switch]),
   tag: 'gs-view-slot',
   templateKey: 'src/tool/view-slot',
 })
-export class ViewSlot extends BaseThemedElement {
-  @hook('#root').property('classList')
-  readonly rootElClassListHook_: DomHook<DOMTokenList>;
-
-  private readonly locationService_: LocationService;
-  private path_: string | null;
-
+export class ViewSlot extends BaseThemedElement2 {
   /**
    * @param locationService
    */
   constructor(
-      @inject('theming.ThemeService') themeService: ThemeService,
-      @inject('gs.LocationService') locationService: LocationService) {
+      @inject('x.dom.document') private readonly document_: Document,
+      @inject('gs.LocationService') private readonly locationService_: LocationService,
+      @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-    this.locationService_ = locationService;
-    this.path_ = null;
-    this.rootElClassListHook_ = DomHook.of<DOMTokenList>();
+  }
+
+  private getFullPath_(element: HTMLElement): string | null {
+    return element[__fullPath] || null;
+  }
+
+  @onDom.childListChange(null)
+  onChildListChange_(
+      @dom.element(null) element: HTMLElement,
+      @dom.element(ROOT_EL) rootEl: HTMLElement,
+      @dom.element(SWITCH_EL) switchEl: HTMLElement): void {
+    // Delete all the children of the switch.
+    for (const child of ImmutableList.of(switchEl.children)) {
+      child.remove();
+    }
+
+    for (const child of ImmutableList.of(element.children)) {
+      const slotName = child.getAttribute('gs-view-path');
+      if (!slotName) {
+        continue;
+      }
+      const slotEl = this.document_.createElement('slot') as HTMLSlotElement;
+      slotEl.name = slotName;
+      slotEl.setAttribute('slot', slotName);
+      switchEl.appendChild(slotEl);
+      child.setAttribute('slot', slotName);
+    }
+
+    this.updateActiveView_(element, rootEl, switchEl);
   }
 
   /**
    * @override
    */
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    this.listenTo(
-        this.locationService_,
-        LocationServiceEvents.CHANGED,
-        this.onLocationChanged_);
-  }
-
-  /**
-   * @override
-   */
-  onInserted(element: HTMLElement): void {
-    super.onInserted(element);
-
+  @onLifecycle('insert')
+  onInserted(
+      @dom.element(null) element: HTMLElement,
+      @dom.element(ROOT_EL) rootEl: HTMLElement,
+      @dom.element(SWITCH_EL) switchEl: HTMLElement): void {
     // Update the path.
     let rootPath: string = '';
     let currentPath: string = '';
     for (const currentElement of Doms.parentIterable(element, true /* bustShadow */)) {
       if (currentElement !== element && currentElement.nodeName === 'GS-VIEW-SLOT') {
-        rootPath = currentElement[__FULL_PATH];
+        rootPath = currentElement[__fullPath];
         break;
       } else if (!!currentElement.getAttribute('gs-view-path')) {
         currentPath = currentElement.getAttribute('gs-view-path') || '';
       }
     }
 
-    element[__FULL_PATH] = LocationService.appendParts(ImmutableList.of([rootPath, currentPath]));
+    element[__fullPath] = LocationService.appendParts(ImmutableList.of([rootPath, currentPath]));
 
-    this.updateActiveView_();
-  }
-
-  /**
-   * Handles event when the location was changed.
-   */
-  private onLocationChanged_(): void {
-    this.updateActiveView_();
+    this.updateActiveView_(element, rootEl, switchEl);
   }
 
   /**
    * @param targetEl The element to be set as the active element, if any. If null, this will
    *    deactivate all elements.
    */
-  setActiveElement_(targetEl: Element | null): void {
-    const listenableElement = this.getElement();
-    if (listenableElement !== null) {
-      const element = listenableElement.getEventTarget();
-      const currentActive = element
-          .querySelector(`[gs-view-active="${BooleanParser.stringify(true)}"]`);
-      if (currentActive !== null) {
-        currentActive.setAttribute('gs-view-active', BooleanParser.stringify(false));
-      }
-    }
-
-    if (targetEl !== null) {
-      targetEl.setAttribute('gs-view-active', BooleanParser.stringify(true));
+  setActiveElement_(slotName: string | null, switchEl: HTMLElement): void {
+    if (slotName) {
+      switchEl.setAttribute('value', slotName);
+    } else {
+      switchEl.removeAttribute('value');
     }
   }
 
@@ -101,34 +110,35 @@ export class ViewSlot extends BaseThemedElement {
    *
    * @param visible True iff the root element should be visible.
    */
-  private setRootElVisible_(visible: boolean): void {
-    const classList = this.rootElClassListHook_.get();
-    if (classList !== null) {
-      classList.toggle('hidden', !visible);
-    }
+  private setRootElVisible_(rootEl: HTMLElement, visible: boolean): void {
+    rootEl.classList.toggle('hidden', !visible);
   }
 
   /**
    * Updates the selector.
    */
-  private updateActiveView_(): void {
-    const listenableElement = this.getElement();
-    if (listenableElement !== null) {
-      const element = listenableElement.getEventTarget();
-      const targetEl = ImmutableList
-          .of(element.children)
-          .find((child: Element) => {
-            const path = child.getAttribute('gs-view-path');
-            if (!path) {
-              return false;
-            }
-            const joinedParts = LocationService.appendParts(
-                ImmutableList.of<string>([element[__FULL_PATH], path]));
-            return this.locationService_.hasMatch(joinedParts);
-          });
-      this.setActiveElement_(targetEl);
-      this.setRootElVisible_(targetEl !== null);
+  @on((instance: ViewSlot) => instance.locationService_, LocationServiceEvents.CHANGED)
+  updateActiveView_(
+      @dom.element(null) element: HTMLElement,
+      @dom.element(ROOT_EL) rootEl: HTMLElement,
+      @dom.element(SWITCH_EL) switchEl: HTMLElement): void {
+    const fullPath = this.getFullPath_(element);
+    if (!fullPath) {
+      return;
     }
+    const targetEl = ImmutableList
+        .of(element.children)
+        .find((child: Element) => {
+          const path = child.getAttribute('gs-view-path');
+          if (!path) {
+            return false;
+          }
+          const joinedParts = LocationService.appendParts(
+              ImmutableList.of<string>([fullPath, path]));
+          return this.locationService_.hasMatch(joinedParts);
+        });
+    const slotName = targetEl ? targetEl.getAttribute('slot') : null;
+    this.setActiveElement_(slotName, switchEl);
+    this.setRootElVisible_(rootEl, slotName !== null);
   }
 }
-// TODO: Mutable
