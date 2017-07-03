@@ -1,71 +1,57 @@
-import { Interval } from 'external/gs_tools/src/async';
-import { DomEvent } from 'external/gs_tools/src/event';
-import { Parser } from 'external/gs_tools/src/interfaces';
-import { BooleanParser } from 'external/gs_tools/src/parse';
-import { deprecated } from 'external/gs_tools/src/typescript';
-import { Log } from 'external/gs_tools/src/util';
-import { dom, DomHook, onDom } from 'external/gs_tools/src/webc';
+import { MonadSetter, MonadUtil } from 'external/gs_tools/src/event';
+import { ImmutableMap } from 'external/gs_tools/src/immutable';
+import {
+  DispatchFn,
+  Disposable,
+  ElementSelector,
+  Event,
+  Parser } from 'external/gs_tools/src/interfaces';
+import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
+import { dom, domOut, onDom, onLifecycle, Util } from 'external/gs_tools/src/webc';
 
-import { BaseActionElement } from '../common/base-action-element';
+import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
 
+const DISABLED_ATTR = {name: 'disabled', parser: BooleanParser, selector: null};
+const VALUE_ATTR = {name: 'value', selector: null, parser: StringParser};
+const CHANGE_EVENT = 'change';
 
-const DISABLED_ATTRIBUTE = {name: 'disabled', parser: BooleanParser, selector: null};
-const LOGGER = Log.of('gs-ui.input.BaseInput');
-
-export abstract class BaseInput<T> extends BaseActionElement {
-  private static INPUT_INTERVAL_: number = 500;
-
-  protected readonly gsValueHook_: DomHook<T>;
-  protected readonly inputDisabledHook_: DomHook<boolean>;
-  protected readonly inputValueHook_: DomHook<string>;
-  protected readonly valueParser_: Parser<T>;
-
-  private inputEl_: HTMLInputElement | null = null;
-  private readonly interval_: Interval;
-
+export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
+    extends BaseThemedElement2 {
   constructor(
       themeService: ThemeService,
-      gsValueHook: DomHook<T>,
-      valueHook: DomHook<string>,
-      valueParser: Parser<T>) {
+      private readonly valueParser_: Parser<T>) {
     super(themeService);
-    this.gsValueHook_ = gsValueHook;
-    this.inputDisabledHook_ = DomHook.of<boolean>(true);
-    this.inputValueHook_ = valueHook;
-    this.valueParser_ = valueParser;
-    this.interval_ = new Interval(BaseInput.INPUT_INTERVAL_);
-    this.addDisposable(this.interval_);
   }
 
-  protected isValueChanged_(oldValue: T | null, newValue: T | null): boolean {
-    return oldValue !== newValue;
+  protected getInputEl_(element: HTMLElement): E {
+    return Util.requireSelector(this.getInputElSelector_(), element) as E;
   }
 
-  /**
-   * @override
-   */
-  protected onClick_(): void {
-    super.onClick_();
-    if (this.inputEl_ !== null && !this.isDisabled()) {
-      // TODO: Bind element.
-      this.inputEl_.click();
-      this.inputEl_.focus();
-    }
-  }
+  protected abstract getInputElSelector_(): ElementSelector;
+
+  protected abstract getInputElValue_(inputEl: E): string;
+
+  protected abstract isValueChanged_(oldValue: T | null, newValue: T | null): boolean;
+
+  protected abstract listenToValueChanges_(
+      element: E,
+      callback: (event: Event<any>) => void): Disposable;
 
   /**
    * @override
    */
-  @deprecated(LOGGER, 'Use BaseInput2 instead')
-  onCreated(element: HTMLElement): void {
-    super.onCreated(element);
-    const shadowRoot = element.shadowRoot;
-    if (shadowRoot === null) {
-      throw new Error('No shadow roots were found');
+  @onDom.event(null, 'click')
+  onClick_(
+      @dom.attribute(DISABLED_ATTR) disabled: boolean,
+      @dom.element(null) rootEl: HTMLElement): void {
+    if (disabled) {
+      return;
     }
-    this.inputEl_ = shadowRoot.querySelector('input');
-    this.addDisposable(this.interval_.on('tick', this.onInputTick_, this));
+
+    const inputEl = this.getInputEl_(rootEl);
+    inputEl.click();
+    inputEl.focus();
   }
 
   /**
@@ -73,10 +59,11 @@ export abstract class BaseInput<T> extends BaseActionElement {
    *
    * @param newValue The value of the disabled attribute..
    */
-  @onDom.attributeChange(DISABLED_ATTRIBUTE)
-  protected onDisabledChange_(
-      @dom.attribute(DISABLED_ATTRIBUTE) newValue: boolean): void {
-    this.inputDisabledHook_.set(newValue);
+  @onDom.attributeChange(DISABLED_ATTR)
+  onDisabledChange_(
+      @dom.element(null) element: HTMLElement,
+      @dom.attribute(DISABLED_ATTR) newValue: boolean): void {
+    this.setInputElDisabled_(this.getInputEl_(element), newValue);
   }
 
   /**
@@ -84,48 +71,48 @@ export abstract class BaseInput<T> extends BaseActionElement {
    *
    * @param newValue The value it was changed to.
    */
-  protected onGsValueChange_(newValue: T): void {
-    const parsedValue = this.valueParser_.parse(this.inputValueHook_.get());
-    if (this.isValueChanged_(parsedValue, newValue)) {
-      this.inputValueHook_.set(this.valueParser_.stringify(newValue));
+  @onDom.attributeChange(VALUE_ATTR)
+  onElValueChange_(
+      @dom.attribute(VALUE_ATTR) elValue: string | null,
+      @dom.element(null) element: HTMLElement): void {
+    const inputEl = this.getInputEl_(element);
+    const inputValue = this.getInputElValue_(inputEl);
+    const parsedInputValue = this.valueParser_.parse(inputValue);
+    const parsedElValue = this.valueParser_.parse(elValue);
+    if (!this.isValueChanged_(parsedInputValue, parsedElValue)) {
+      return;
     }
+
+    this.setInputElValue_(inputEl, elValue || '');
   }
 
   /**
    * Handler called when the input element fires a change event.
    */
-  protected onInputTick_(): void {
-    const previousValue = this.gsValueHook_.get();
-    const parsedNewValue: T | null = this.valueParser_.parse(this.inputValueHook_.get());
-    if (parsedNewValue === null) {
-      return;
+  onInputChange_(
+      @domOut.attribute(VALUE_ATTR) {id: elValueId, value: elValue}: MonadSetter<string | null>,
+      @dom.element(null) element: HTMLElement,
+      @dom.eventDispatcher() dispatcher: DispatchFn<{}>): ImmutableMap<string, any> {
+    const inputValue = this.getInputElValue_(this.getInputEl_(element));
+    const parsedInputValue = this.valueParser_.parse(inputValue);
+    const parsedElValue = this.valueParser_.parse(elValue);
+    if (!this.isValueChanged_(parsedInputValue, parsedElValue)) {
+      return ImmutableMap.of<string, any>([]);
     }
 
-    if (!this.isValueChanged_(previousValue, parsedNewValue)) {
-      return;
-    }
-
-    this.gsValueHook_.set(parsedNewValue);
-    const element = this.getElement();
-    if (element !== null) {
-      element.dispatch(DomEvent.CHANGE);
-    }
+    dispatcher(CHANGE_EVENT, {});
+    return ImmutableMap.of([[elValueId, inputValue]]);
   }
 
-  /**
-   * @override
-   */
-  onInserted(element: HTMLElement): void {
-    super.onInserted(element);
-    this.interval_.start();
+  @onLifecycle('insert')
+  onInserted_(@dom.element(null) element: HTMLElement): void {
+    const inputEl = this.getInputEl_(element);
+    this.addDisposable(this.listenToValueChanges_(inputEl, (event: Event<any>) => {
+      MonadUtil.callFunction(event, this, 'onInputChange_');
+    }));
   }
 
-  /**
-   * @override
-   */
-  onRemoved(element: HTMLElement): void {
-    super.onRemoved(element);
-    this.interval_.stop();
-  }
+  protected abstract setInputElDisabled_(inputEl: E, disabled: boolean): void;
+
+  protected abstract setInputElValue_(inputEl: E, newValue: string): void;
 }
-// TODO: Mutable

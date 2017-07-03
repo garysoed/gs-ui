@@ -13,7 +13,7 @@ import { FloatParser } from 'external/gs_tools/src/parse';
 import { customElement } from 'external/gs_tools/src/webc';
 
 import { ListenableDom } from 'external/gs_tools/src/event';
-import { BaseInput2 } from '../input/base-input2';
+import { BaseInput } from '../input/base-input';
 import { ThemeService } from '../theming/theme-service';
 
 const INPUT_EL = 'input';
@@ -22,7 +22,7 @@ const INPUT_EL = 'input';
   tag: 'gs-float-input',
   templateKey: 'src/input/float-input',
 })
-export class FloatInput extends BaseInput2<number> {
+export class FloatInput extends BaseInput<number> {
   constructor( @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService, FloatParser);
   }

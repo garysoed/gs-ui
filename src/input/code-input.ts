@@ -20,7 +20,7 @@ import {
 
 import { DisposableFunction } from 'external/gs_tools/src/dispose';
 import { ThemeServiceEvents } from '../const/theme-service-events';
-import { BaseInput2 } from '../input/base-input2';
+import { BaseInput } from '../input/base-input';
 import { DefaultPalettes } from '../theming/default-palettes';
 import { ThemeService } from '../theming/theme-service';
 
@@ -46,7 +46,7 @@ const SHOW_GUTTER_ATTRIBUTE = {name: 'show-gutter', parser: BooleanParser, selec
   tag: 'gs-code-input',
   templateKey: 'src/input/code-input',
 })
-export class CodeInput extends BaseInput2<string, HTMLDivElement> {
+export class CodeInput extends BaseInput<string, HTMLDivElement> {
   private readonly ace_: AceAjax.Ace;
   private readonly document_: Document;
   private readonly window_: Window;

@@ -1,157 +1,204 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Matchers, Mocks, TestBase } from '../test-base';
 TestBase.setup();
 
-import { DomEvent } from 'external/gs_tools/src/event';
-import { Mocks } from 'external/gs_tools/src/mock';
+import { MonadUtil } from 'external/gs_tools/src/event';
+import { Disposable, ElementSelector } from 'external/gs_tools/src/interfaces';
 import { StringParser } from 'external/gs_tools/src/parse';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { BaseInput } from '../input/base-input';
+import { BaseInput } from '../input/base-input2';
 
+class TestInput extends BaseInput<string> {
+  constructor() {
+    super(Mocks.object('ThemeService'), StringParser);
+  }
 
-class Input extends BaseInput<string> { }
+  protected getInputElSelector_(): ElementSelector {
+    throw new Error('Method not implemented.');
+  }
+
+  protected getInputElValue_(): string {
+    throw new Error('Method not implemented.');
+  }
+
+  isValueChanged_(): boolean {
+    throw new Error(`Unimplemented`);
+  }
+
+  protected listenToValueChanges_(): Disposable {
+    throw new Error('Method not implemented.');
+  }
+
+  protected setInputElDisabled_(): void {
+    throw new Error('Method not implemented.');
+  }
+
+  protected setInputElValue_(): void {
+    throw new Error('Method not implemented.');
+  }
+}
 
 describe('input.BaseInput', () => {
-  let mockGsValueHook: any;
-  let mockValueHook: any;
-  let input: Input;
+  let input: BaseInput<string>;
 
   beforeEach(() => {
-    mockGsValueHook = jasmine.createSpyObj('GsValueHook', ['get', 'set']);
-    mockValueHook = jasmine.createSpyObj('ValueHook', ['get', 'set']);
-    const mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
-    input = new Input(mockThemeService, mockGsValueHook, mockValueHook, StringParser);
+    input = new TestInput();
     TestDispose.add(input);
   });
 
   describe('onClick_', () => {
-    it('should click and focus the input element', () => {
-      const mockInputElement = jasmine.createSpyObj('InputElement', ['click', 'focus']);
-      input['inputEl_'] = mockInputElement;
+    it(`should click on the input element and focus on it`, () => {
+      const mockInputEl = jasmine.createSpyObj('InputEl', ['click', 'focus']);
+      const element = Mocks.object('element');
+      spyOn(input, 'getInputEl_').and.returnValue(mockInputEl);
 
-      spyOn(input, 'isDisabled').and.returnValue(true);
-
-      input['onClick_']();
-
-      assert(mockInputElement.click).toNot.haveBeenCalled();
-      assert(mockInputElement.focus).toNot.haveBeenCalled();
-    });
-  });
-
-  describe('onGsValueChange_', () => {
-    it('should update the input target value', () => {
-      const value = 'value';
-      mockValueHook.get.and.returnValue(null);
-
-      input['onGsValueChange_'](value);
-
-      assert(mockValueHook.set).to.haveBeenCalledWith(value);
+      input.onClick_(false, element);
+      assert(mockInputEl.click).to.haveBeenCalledWith();
+      assert(mockInputEl.focus).to.haveBeenCalledWith();
+      assert(input['getInputEl_']).to.haveBeenCalledWith(element);
     });
 
-    it('should not update the input value if it is the same', () => {
-      const value = 'value';
-      mockValueHook.get.and.returnValue(value);
+    it(`should do nothing if disabled`, () => {
+      const mockInputEl = jasmine.createSpyObj('InputEl', ['click', 'focus']);
+      const element = Mocks.object('element');
+      spyOn(input, 'getInputEl_').and.returnValue(mockInputEl);
 
-      input['onGsValueChange_'](value);
-
-      assert(mockValueHook.set).toNot.haveBeenCalled();
+      input.onClick_(true, element);
+      assert(mockInputEl.click).toNot.haveBeenCalled();
+      assert(mockInputEl.focus).toNot.haveBeenCalled();
+      assert(input['getInputEl_']).toNot.haveBeenCalled();
     });
   });
 
   describe('onDisabledChange_', () => {
-    it('should set the value to the input element', () => {
-      const value = true;
-      spyOn(input['inputDisabledHook_'], 'set');
-      input['onDisabledChange_'](value);
-      assert(input['inputDisabledHook_'].set).to.haveBeenCalledWith(value);
-    });
-  });
-
-  describe('onInputTick_', () => {
-    it('should set the new value and dispatch a CHANGE event', () => {
-      const oldValue = 'oldValue';
-      mockGsValueHook.get.and.returnValue(oldValue);
-
-      const value = 'value';
-      mockValueHook.get.and.returnValue(value);
-
-      const mockElement = jasmine.createSpyObj('Element', ['dispatch']);
-
-      spyOn(input, 'getElement').and.returnValue(mockElement);
-
-      input['onInputTick_']();
-
-      assert(mockGsValueHook.set).to.haveBeenCalledWith(value);
-      assert(mockElement.dispatch).to.haveBeenCalledWith(DomEvent.CHANGE);
-    });
-
-    it('should not set the new value if the value does not change', () => {
-      const value = 'value';
-      mockValueHook.get.and.returnValue(value);
-      mockGsValueHook.get.and.returnValue(value);
-
-      const mockElement = jasmine.createSpyObj('Element', ['dispatch']);
-
-      spyOn(input, 'getElement').and.returnValue(mockElement);
-
-      input['onInputTick_']();
-
-      assert(mockGsValueHook.set).toNot.haveBeenCalled();
-      assert(mockElement.dispatch).toNot.haveBeenCalled();
-    });
-
-    it('should not dispatch event if there are no elements', () => {
-      const value = 'value';
-      mockValueHook.get.and.returnValue(value);
-      mockGsValueHook.get.and.returnValue('oldValue');
-
-      spyOn(input, 'getElement').and.returnValue(null);
-
-      input['onInputTick_']();
-
-      assert(mockGsValueHook.set).to.haveBeenCalledWith(value);
-    });
-  });
-
-  describe('onCreated', () => {
-    it('should initialize correctly', () => {
-      const inputElement = Mocks.object('inputElement');
-      const mockShadowRoot = jasmine.createSpyObj('ShadowRoot', ['querySelector']);
-      mockShadowRoot.querySelector.and.returnValue(inputElement);
-
+    it(`should propagate the value to the input element`, () => {
+      const newValue = true;
+      const inputEl = jasmine.createSpyObj('InputEl', ['click', 'focus']);
       const element = Mocks.object('element');
-      element.shadowRoot = mockShadowRoot;
+      spyOn(input, 'getInputEl_').and.returnValue(inputEl);
+      spyOn(input, 'setInputElDisabled_');
 
-      spyOn(input, 'listenTo');
-      spyOn(input['interval_'], 'on').and
-          .returnValue(jasmine.createSpyObj('DisposableFn', ['dispose']));
-
-      input.onCreated(element);
-
-      assert(input['interval_'].on).to.haveBeenCalledWith('tick', input['onInputTick_'], input);
-      assert(input['inputEl_']).to.equal(inputElement);
-      assert(mockShadowRoot.querySelector).to.haveBeenCalledWith('input');
+      input.onDisabledChange_(element, newValue);
+      assert(input['setInputElDisabled_']).to.haveBeenCalledWith(inputEl, newValue);
+      assert(input['getInputEl_']).to.haveBeenCalledWith(element);
     });
   });
 
-  describe('onInserted', () => {
-    it('should start the interval', () => {
+  describe('onElValueChange_', () => {
+    it(`should update the value on the input element`, () => {
+      const elValue = 'elValue';
+      const inputValue = 'inputValue';
       const element = Mocks.object('element');
-      spyOn(input['interval_'], 'start');
-      input.onInserted(element);
+      const inputEl = Mocks.object('inputEl');
+      spyOn(input, 'getInputEl_').and.returnValue(inputEl);
+      spyOn(input, 'setInputElValue_');
+      spyOn(input, 'getInputElValue_').and.returnValue(inputValue);
+      spyOn(input, 'isValueChanged_').and.returnValue(true);
 
-      assert(input['interval_'].start).to.haveBeenCalledWith();
+      input.onElValueChange_(elValue, element);
+      assert(input['setInputElValue_']).to.haveBeenCalledWith(inputEl, elValue);
+      assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, elValue);
+      assert(input['getInputElValue_']).to.haveBeenCalledWith(inputEl);
+      assert(input['getInputEl_']).to.haveBeenCalledWith(element);
+    });
+
+    it(`should set the value to empty string if null`, () => {
+      const inputValue = 'inputValue';
+      const element = Mocks.object('element');
+      const inputEl = Mocks.object('inputEl');
+      spyOn(input, 'getInputEl_').and.returnValue(inputEl);
+      spyOn(input, 'setInputElValue_');
+      spyOn(input, 'getInputElValue_').and.returnValue(inputValue);
+      spyOn(input, 'isValueChanged_').and.returnValue(true);
+
+      input.onElValueChange_(null, element);
+      assert(input['setInputElValue_']).to.haveBeenCalledWith(inputEl, '');
+      assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, null);
+      assert(input['getInputElValue_']).to.haveBeenCalledWith(inputEl);
+      assert(input['getInputEl_']).to.haveBeenCalledWith(element);
+    });
+
+    it(`should do nothing if the value does not change`, () => {
+      const elValue = 'elValue';
+      const inputValue = 'inputValue';
+      const element = Mocks.object('element');
+      const inputEl = Mocks.object('inputEl');
+      spyOn(input, 'getInputEl_').and.returnValue(inputEl);
+      spyOn(input, 'setInputElValue_');
+      spyOn(input, 'getInputElValue_').and.returnValue(inputValue);
+      spyOn(input, 'isValueChanged_').and.returnValue(false);
+
+      input.onElValueChange_(elValue, element);
+      assert(input['setInputElValue_']).toNot.haveBeenCalled();
+      assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, elValue);
+      assert(input['getInputElValue_']).to.haveBeenCalledWith(inputEl);
+      assert(input['getInputEl_']).to.haveBeenCalledWith(element);
     });
   });
 
-  describe('onRemoved', () => {
-    it('should stop the interval', () => {
+  describe('onInputChange_', () => {
+    it(`should update the value on the element and dispatch the change event`, () => {
+      const elValueId = 'elValueId';
+      const elValue = 'elValue';
+      const inputValue = 'inputValue';
       const element = Mocks.object('element');
-      spyOn(input['interval_'], 'stop');
-      input.onRemoved(element);
+      const inputEl = Mocks.object('inputEl');
+      spyOn(input, 'getInputElValue_').and.returnValue(inputValue);
+      spyOn(input, 'getInputEl_').and.returnValue(inputEl);
+      const mockDispatcher = jasmine.createSpy('Dispatcher');
 
-      assert(input['interval_'].stop).to.haveBeenCalledWith();
+      spyOn(input, 'isValueChanged_').and.returnValue(true);
+
+      assert(input.onInputChange_({id: elValueId, value: elValue}, element, mockDispatcher))
+          .to.haveElements([[elValueId, inputValue]]);
+      assert(mockDispatcher).to.haveBeenCalledWith('change', {});
+      assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, elValue);
+      assert(input['getInputEl_']).to.haveBeenCalledWith(element);
+      assert(input['getInputElValue_']).to.haveBeenCalledWith(inputEl);
+    });
+
+    it(`should do nothing if the value does not change`, () => {
+      const elValueId = 'elValueId';
+      const elValue = 'elValue';
+      const inputValue = 'inputValue';
+      const element = Mocks.object('element');
+      const inputEl = Mocks.object('inputEl');
+      spyOn(input, 'getInputElValue_').and.returnValue(inputValue);
+      spyOn(input, 'getInputEl_').and.returnValue(inputEl);
+      const mockDispatcher = jasmine.createSpy('Dispatcher');
+
+      spyOn(input, 'isValueChanged_').and.returnValue(false);
+
+      assert(input.onInputChange_({id: elValueId, value: elValue}, element, mockDispatcher))
+          .to.haveElements([]);
+      assert(mockDispatcher).toNot.haveBeenCalled();
+      assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, elValue);
+      assert(input['getInputEl_']).to.haveBeenCalledWith(element);
+      assert(input['getInputElValue_']).to.haveBeenCalledWith(inputEl);
+    });
+  });
+
+  describe('onInserted_', () => {
+    it(`should listen to the value changes correctly`, () => {
+      const element = Mocks.object('element');
+      const mockDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
+      const listenSpy = spyOn(input, 'listenToValueChanges_').and.returnValue(mockDisposable);
+
+      const inputEl = Mocks.object('inputEl');
+      spyOn(input, 'getInputEl_').and.returnValue(inputEl);
+      spyOn(input, 'addDisposable').and.callThrough();
+
+      spyOn(MonadUtil, 'callFunction');
+
+      input.onInserted_(element);
+      assert(input.addDisposable).to.haveBeenCalledWith(mockDisposable);
+      assert(input['listenToValueChanges_']).to
+          .haveBeenCalledWith(inputEl, Matchers.any(Function) as any);
+
+      const eventObject = Mocks.object('eventObject');
+      listenSpy.calls.argsFor(0)[1](eventObject);
+      assert(MonadUtil.callFunction).to.haveBeenCalledWith(eventObject, input, 'onInputChange_');
+      assert(input['getInputEl_']).to.haveBeenCalledWith(element);
     });
   });
 });
-

@@ -14,14 +14,14 @@ import { Disposable, ElementSelector } from 'external/gs_tools/src/interfaces';
 import { StringParser } from 'external/gs_tools/src/parse';
 import { customElement } from 'external/gs_tools/src/webc';
 
-import { BaseInput2 } from '../input/base-input2';
+import { BaseInput } from '../input/base-input';
 import { ThemeService } from '../theming/theme-service';
 
 @customElement({
   tag: 'gs-text-input',
   templateKey: 'src/input/text-input',
 })
-export class TextInput extends BaseInput2<string> {
+export class TextInput extends BaseInput<string> {
   constructor(@inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService, StringParser);
   }
