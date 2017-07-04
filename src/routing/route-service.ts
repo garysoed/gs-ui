@@ -18,15 +18,12 @@ const LOGGER = Log.of('gs-ui.routing.RouteService');
       LocationService,
     ])
 export class RouteService<T> extends Bus<RouteServiceEvents, RouteServiceEvent> {
-  private readonly locationService_: LocationService;
   private readonly routeFactoryMap_: Map<T, AbstractRouteFactory<T, any, any, any>>;
   private readonly routeFactoryService_: IRouteFactoryService<T>;
 
   constructor(
-      @inject('gs.LocationService') locationService: LocationService,
       @inject('x.gs_ui.routeFactoryService') routeFactoryService: IRouteFactoryService<T>) {
     super(LOGGER);
-    this.locationService_ = locationService;
     this.routeFactoryService_ = routeFactoryService;
     this.routeFactoryMap_ = new Map();
   }
@@ -36,7 +33,7 @@ export class RouteService<T> extends Bus<RouteServiceEvents, RouteServiceEvent> 
    */
   [Reflect.__initialize](): void {
     this.addDisposable(
-        this.locationService_.on(LocationServiceEvents.CHANGED, this.onLocationChanged_, this));
+        LocationService.on(LocationServiceEvents.CHANGED, this.onLocationChanged_, this));
 
     for (const factory of this.routeFactoryService_.getFactories()) {
       this.routeFactoryMap_.set(factory.getType(), factory);
@@ -60,7 +57,7 @@ export class RouteService<T> extends Bus<RouteServiceEvents, RouteServiceEvent> 
    * @return The current path.
    */
   getPath(): string {
-    return this.locationService_.getPath();
+    return LocationService.getPath();
   }
 
   /**
@@ -100,7 +97,7 @@ export class RouteService<T> extends Bus<RouteServiceEvents, RouteServiceEvent> 
    * @param path The path to navigate to.
    */
   goToPath(path: string): void {
-    this.locationService_.goTo(path);
+    LocationService.goTo(path);
   }
 
   /**
@@ -110,4 +107,3 @@ export class RouteService<T> extends Bus<RouteServiceEvents, RouteServiceEvent> 
     this.dispatch({type: RouteServiceEvents.CHANGED});
   }
 }
-// TODO: Mutable

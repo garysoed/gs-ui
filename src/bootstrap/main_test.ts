@@ -17,10 +17,9 @@ describe('bootstrap.Main', () => {
 
   beforeEach(() => {
     const injector = Mocks.object('injector');
-    const locationService = Mocks.disposable('LocationService');
     mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme', 'install']);
     mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
-    main = new Main(injector, locationService, mockThemeService, mockRegistrar);
+    main = new Main(injector, mockThemeService, mockRegistrar);
     TestDispose.add(main);
   });
 

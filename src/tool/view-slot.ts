@@ -34,7 +34,6 @@ export class ViewSlot extends BaseThemedElement2 {
    */
   constructor(
       @inject('x.dom.document') private readonly document_: Document,
-      @inject('gs.LocationService') private readonly locationService_: LocationService,
       @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
   }
@@ -117,7 +116,7 @@ export class ViewSlot extends BaseThemedElement2 {
   /**
    * Updates the selector.
    */
-  @on((instance: ViewSlot) => instance.locationService_, LocationServiceEvents.CHANGED)
+  @on(LocationService, LocationServiceEvents.CHANGED)
   updateActiveView_(
       @dom.element(null) element: HTMLElement,
       @dom.element(ROOT_EL) rootEl: HTMLElement,
@@ -135,7 +134,7 @@ export class ViewSlot extends BaseThemedElement2 {
           }
           const joinedParts = LocationService.appendParts(
               ImmutableList.of<string>([fullPath, path]));
-          return this.locationService_.hasMatch(joinedParts);
+          return LocationService.hasMatch(joinedParts);
         });
     const slotName = targetEl ? targetEl.getAttribute('slot') : null;
     this.setActiveElement_(slotName, switchEl);

@@ -12,15 +12,10 @@ import { __fullPath, ViewSlot } from './view-slot';
 
 describe('tool.ViewSlot', () => {
   let viewSlot: ViewSlot;
-  let mockLocationService: any;
 
   beforeEach(() => {
-    mockLocationService = Mocks.listenable('LocationService');
-    TestDispose.add(mockLocationService);
-
     viewSlot = new ViewSlot(
         document,
-        mockLocationService,
         jasmine.createSpyObj('ThemeService', ['applyTheme']));
     TestDispose.add(viewSlot);
   });
@@ -187,8 +182,7 @@ describe('tool.ViewSlot', () => {
       const appendedPath = 'appendedPath';
       spyOn(LocationService, 'appendParts').and.returnValue(appendedPath);
 
-      mockLocationService.hasMatch = jasmine.createSpy('LocationService.hasMatch').and
-          .returnValue(true);
+      spyOn(LocationService, 'hasMatch').and.returnValue(true);
 
       spyOn(viewSlot, 'setRootElVisible_');
       spyOn(viewSlot, 'setActiveElement_');
@@ -199,7 +193,7 @@ describe('tool.ViewSlot', () => {
       assert(viewSlot['setActiveElement_']).to.haveBeenCalledWith(slotName, switchEl);
 
       assert(LocationService.appendParts).to.haveBeenCalledWith(ImmutableList.of([fullPath, path]));
-      assert(mockLocationService.hasMatch).to.haveBeenCalledWith(appendedPath);
+      assert(LocationService.hasMatch).to.haveBeenCalledWith(appendedPath);
       assert(mockChildWithPath.getAttribute).to.haveBeenCalledWith('gs-view-path');
       assert(mockChildNoPath.getAttribute).to.haveBeenCalledWith('gs-view-path');
     });

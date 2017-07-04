@@ -5,7 +5,7 @@ import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 import { Reflect } from 'external/gs_tools/src/util';
 
-import { LocationServiceEvents } from 'external/gs_tools/src/ui';
+import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
 
 import { RouteService } from './route-service';
 import { RouteServiceEvents } from './route-service-events';
@@ -13,20 +13,18 @@ import { RouteServiceEvents } from './route-service-events';
 
 describe('routing.RouteService', () => {
   let mockRouteFactoryService: any;
-  let mockLocationService: any;
   let service: RouteService<any>;
 
   beforeEach(() => {
     mockRouteFactoryService = jasmine.createSpyObj('RouteFactoryService', ['getFactories']);
-    mockLocationService = jasmine.createSpyObj('LocationService', ['dispose', 'getPath', 'on']);
-    service = new RouteService(mockLocationService, mockRouteFactoryService);
+    service = new RouteService(mockRouteFactoryService);
     TestDispose.add(service);
   });
 
   describe('[Reflect.__initialize]', () => {
     it('should listen to the CHANGED event on the location service', () => {
       const mockDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
-      mockLocationService.on.and.returnValue(mockDisposable);
+      spyOn(LocationService, 'on').and.returnValue(mockDisposable);
       spyOn(service, 'addDisposable').and.callThrough();
 
       const type1 = Mocks.object('type1');
@@ -41,7 +39,7 @@ describe('routing.RouteService', () => {
 
       service[Reflect.__initialize]();
 
-      assert(mockLocationService.on).to.haveBeenCalledWith(
+      assert(LocationService.on).to.haveBeenCalledWith(
           LocationServiceEvents.CHANGED,
           service['onLocationChanged_'],
           service);
@@ -93,7 +91,7 @@ describe('routing.RouteService', () => {
   describe('getPath', () => {
     it('should return the path', () => {
       const path = 'path';
-      mockLocationService.getPath.and.returnValue(path);
+      spyOn(LocationService, 'getPath').and.returnValue(path);
       assert(service.getPath()).to.equal(path);
     });
   });
@@ -101,7 +99,7 @@ describe('routing.RouteService', () => {
   describe('getRoute', () => {
     it('should return the first matching route', () => {
       const path = 'path';
-      mockLocationService.getPath.and.returnValue(path);
+      spyOn(LocationService, 'getPath').and.returnValue(path);
 
       const route = Mocks.object('route');
       const mockFactory1 = jasmine.createSpyObj('Factory1', ['createFromPath']);
@@ -126,7 +124,7 @@ describe('routing.RouteService', () => {
     });
 
     it('should return null if there are no matching routes', () => {
-      mockLocationService.getPath.and.returnValue('path');
+      spyOn(LocationService, 'getPath').and.returnValue('path');
 
       const mockFactory = jasmine.createSpyObj('Factory', ['createFromPath']);
       mockFactory.createFromPath.and.returnValue(null);
@@ -171,10 +169,10 @@ describe('routing.RouteService', () => {
 
   describe('goToPath', () => {
     it('should navigate to the given path', () => {
-      mockLocationService.goTo = jasmine.createSpy('LocationService#goTo');
+      spyOn(LocationService, 'goTo');
       const path = 'path';
       service.goToPath(path);
-      assert(mockLocationService.goTo).to.haveBeenCalledWith(path);
+      assert(LocationService.goTo).to.haveBeenCalledWith(path);
     });
   });
 });

@@ -1,9 +1,6 @@
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
-import { ListenableDom } from 'external/gs_tools/src/event';
 import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { Injector } from 'external/gs_tools/src/inject';
-import { LocationService } from 'external/gs_tools/src/ui';
-import { Reflect } from 'external/gs_tools/src/util';
 import { BaseElement, ElementRegistrar } from 'external/gs_tools/src/webc';
 import { Templates } from 'external/gs_tools/src/webc';
 
@@ -67,14 +64,12 @@ export class Main extends BaseDisposable {
 
   constructor(
       injector: Injector,
-      locationService: LocationService,
       themeService: ThemeService,
       registrar: ElementRegistrar) {
     super();
     this.injector_ = injector;
     this.themeService_ = themeService;
     this.registrar_ = registrar;
-    this.addDisposable(locationService);
   }
 
   /**
@@ -122,7 +117,6 @@ export class Main extends BaseDisposable {
         routeFactoryServiceCtor?: gs.ICtor<IRouteFactoryService<any>>,
       } = {}): Main {
     const templates = Templates.newInstance();
-    const locationService = Reflect.construct(LocationService, [ListenableDom.of(window)]);
 
     Injector.bindProvider(() => document, 'x.dom.document');
     Injector.bindProvider(() => window, 'x.dom.window');
@@ -133,14 +127,12 @@ export class Main extends BaseDisposable {
     if (!!config.ace) {
       Injector.bindProvider(() => config.ace, 'x.ace');
     }
-    Injector.bindProvider(() => locationService, 'gs.LocationService');
 
     const injector = Injector.newInstance();
     const themeService = injector.getBoundValue('theming.ThemeService') as ThemeService;
     themeService.initialize();
     return new Main(
         injector,
-        locationService,
         themeService,
         ElementRegistrar.newInstance(injector, templates));
   }
