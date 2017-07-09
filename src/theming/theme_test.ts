@@ -808,6 +808,16 @@ describe('theming.Theme', () => {
     });
   });
 
+  describe('getBlackFader', () => {
+    it('should return the correct color', () => {
+      const fade = Mocks.object('fade');
+      spyOn(Theme, 'getForegroundFade_').and.returnValue(fade);
+
+      assert(theme.getBlackFader()).to.equal(fade);
+      assert(Theme['getForegroundFade_']).to.haveBeenCalledWith(BLACK, WHITE, 4);
+    });
+  });
+
   describe('getBlackOnAccent', () => {
     it('should return BLACK if it has a bigger contrast', () => {
       Fakes.build(spyOn(Colors, 'getContrast'))
@@ -880,6 +890,16 @@ describe('theming.Theme', () => {
       assert(theme.getWhiteFade()).to.equal(fade);
       assert(Theme['getForegroundFade_']).to.haveBeenCalledWith(WHITE, baseNormalDark, 8);
       assert(theme.getBaseDark).to.haveBeenCalledWith(false);
+    });
+  });
+
+  describe('getWhiteFader', () => {
+    it('should return the correct color', () => {
+      const fade = Mocks.object('fade');
+      spyOn(Theme, 'getForegroundFade_').and.returnValue(fade);
+
+      assert(theme.getWhiteFader()).to.equal(fade);
+      assert(Theme['getForegroundFade_']).to.haveBeenCalledWith(WHITE, BLACK, 4);
     });
   });
 

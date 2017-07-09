@@ -1,5 +1,5 @@
 <style>
-  .root {
+  #root {
     background-color: var(--gsButtonBG);
     color: var(--gsButtonFG);
     font-weight: var(--gsFontWeightBold);
@@ -11,6 +11,10 @@
     -moz-user-select: none;
     -ms-user-select: none;
     -webkit-user-select: none;
+  }
+
+  slot::slotted(*) {
+    color: var(--gsButtonFG);
   }
 
   :host {
@@ -44,6 +48,6 @@
     --gsButtonBG: var(--gsColorActionPrimaryFocusBG);
   }
 </style>
-<div class="root">
+<div id="root">
   <slot></slot>
 </div>

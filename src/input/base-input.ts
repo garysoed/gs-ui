@@ -67,7 +67,7 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
   }
 
   /**
-   * Handles event when the value of gs-value attribute was changed.
+   * Handles event when the value of value attribute was changed.
    *
    * @param newValue The value it was changed to.
    */

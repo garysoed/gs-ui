@@ -101,6 +101,11 @@ export class Theme {
   }
 
   @cache()
+  getBlackFader(): Color {
+    return Theme.getForegroundFade_(BLACK, WHITE, this.contrast_ / 3);
+  }
+
+  @cache()
   getBlackOnAccent(): Color {
     const accent = this.getAccent();
     return Colors.getContrast(BLACK, accent) > Colors.getContrast(WHITE, accent) ? BLACK : WHITE;
@@ -113,6 +118,11 @@ export class Theme {
   @cache()
   getWhiteFade(): Color {
     return Theme.getForegroundFade_(WHITE, this.getBaseDark(false), this.contrast_ * 2 / 3);
+  }
+
+  @cache()
+  getWhiteFader(): Color {
+    return Theme.getForegroundFade_(WHITE, BLACK, this.contrast_ / 3);
   }
 
   /**

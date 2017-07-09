@@ -1,7 +1,7 @@
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
 import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { Injector } from 'external/gs_tools/src/inject';
-import { BaseElement, ElementRegistrar } from 'external/gs_tools/src/webc';
+import { ElementRegistrar } from 'external/gs_tools/src/webc';
 import { Templates } from 'external/gs_tools/src/webc';
 
 import { BasicButton } from '../button/basic-button';
@@ -86,7 +86,7 @@ export class Main extends BaseDisposable {
    *
    * @param theme The theme to apply to the app.
    */
-  bootstrap(theme: Theme = DEFAULT_THEME_, customElements: gs.ICtor<BaseElement>[] = []): void {
+  bootstrap(theme: Theme = DEFAULT_THEME_, customElements: gs.ICtor<BaseDisposable>[] = []): void {
     const ctors = ImmutableSet.of(DEFAULT_ELEMENTS_).addAll(ImmutableSet.of(customElements));
     for (const ctor of ctors) {
       this.registrar_.register(ctor);

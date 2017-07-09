@@ -25,7 +25,7 @@ import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
 import { Action, ActionTracker } from '../tool/action-tracker';
 
-export const NULL_ID = '_gs-null';
+export const NULL_ID = '_gs_null';
 const ROOT_EL = '#root';
 const VALUE_ATTRIBUTE = {name: 'value', parser: StringParser, selector: null};
 
@@ -187,9 +187,7 @@ export class Switch extends BaseThemedElement2 {
       @dom.element(ROOT_EL) rootEl: HTMLElement,
       @monad(ActionTracker) lastAction: Action): void {
     const slotName = value || NULL_ID;
-    const id = slotName
-        .replace(/\./g, 'u0023_')
-        .replace(/\//g, 'u002F_');
+    const id = slotName.replace(/[^a-z0-9A-Z]/g, '_');
 
     // Delete any animation with the same value.
     for (const oldEl of ImmutableList.of(rootEl.querySelectorAll(`div#${id}`))) {

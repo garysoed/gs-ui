@@ -170,7 +170,7 @@ td {
   --gsColorActionBG: var(--gsThemeWhite);
   --gsColorActionFG: var(--gsThemeActionNormalDark);
   --gsColorActionFocusFG: var(--gsThemeAccent);
-  --gsColorActionDisabledFG: var(--gsThemeBlackFade);
+  --gsColorActionDisabledFG: var(--gsThemeBlackFader);
   --gsColorActionPrimaryBG: var(--gsThemeActionNormalLight);
   --gsColorActionPrimaryFG: var(--gsThemeBlack);
   --gsColorActionPrimaryFocusBG: var(--gsThemeAccent);
@@ -190,7 +190,7 @@ td {
   --gsColorActionBG: var(--gsThemeBaseNormalDark);
   --gsColorActionFG: var(--gsThemeActionReversedLight);
   --gsColorActionFocusFG: var(--gsThemeAccent);
-  --gsColorActionDisabledFG: var(--gsThemeWhiteFade);
+  --gsColorActionDisabledFG: var(--gsThemeWhiteFader);
   --gsColorActionPrimaryBG: var(--gsThemeActionReversedDark);
   --gsColorActionPrimaryFG: var(--gsThemeWhite);
   --gsColorActionPrimaryFocusFG: var(--gsThemeBlackOnAccent);
@@ -210,7 +210,7 @@ td {
   --gsColorActionBG: var(--gsThemeBlack);
   --gsColorActionFG: var(--gsThemeActionReversedLight);
   --gsColorActionFocusFG: var(--gsThemeAccent);
-  --gsColorActionDisabledFG: var(--gsThemeWhiteFade);
+  --gsColorActionDisabledFG: var(--gsThemeWhiteFader);
   --gsColorActionPrimaryBG: var(--gsThemeActionReversedDark);
   --gsColorActionPrimaryFG: var(--gsThemeWhite);
   --gsColorActionPrimaryFocusBG: var(--gsThemeAccent);
@@ -230,7 +230,7 @@ td {
   --gsColorActionBG: var(--gsThemeBaseReversedLightest);
   --gsColorActionFG: var(--gsThemeActionNormalDarkest);
   --gsColorActionFocusFG: var(--gsThemeAccent);
-  --gsColorActionDisabledFG: var(--gsThemeBlackFade);
+  --gsColorActionDisabledFG: var(--gsThemeBlackFader);
   --gsColorActionPrimaryBG: var(--gsThemeActionNormalLight);
   --gsColorActionPrimaryFG: var(--gsThemeBlack);
   --gsColorActionPrimaryFocusBG: var(--gsThemeAccent);

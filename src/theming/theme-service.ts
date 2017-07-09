@@ -118,8 +118,10 @@ export class ThemeService extends Bus<ThemeServiceEvents, ThemeServiceEvent> {
           'gsThemeBaseReversedLight': theme.getBaseLight(true),
           'gsThemeBaseReversedLightest': theme.getBaseLightest(true),
           'gsThemeBlackFade': theme.getBlackFade(),
+          'gsThemeBlackFader': theme.getBlackFader(),
           'gsThemeBlackOnAccent': theme.getBlackOnAccent(),
           'gsThemeWhiteFade': theme.getWhiteFade(),
+          'gsThemeWhiteFader': theme.getWhiteFader(),
         })
         .entries()
         .mapItem(([name, color]: [string, Color]) => {

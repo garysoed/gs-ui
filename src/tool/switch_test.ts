@@ -304,7 +304,7 @@ describe('tool.Switch', () => {
 
     it(`should handle '.' and '/' correctly`, () => {
       const value = './.';
-      const normalizedValue = 'u0023_u002F_u0023_';
+      const normalizedValue = '___';
       const height = 12;
       const width = 34;
       const clientRect = {height, width} as any;
@@ -358,6 +358,7 @@ describe('tool.Switch', () => {
     });
 
     it(`should handle null values correctly`, () => {
+      const value = null;
       const height = 12;
       const width = 34;
       const clientRect = {height, width} as any;
@@ -390,7 +391,7 @@ describe('tool.Switch', () => {
       });
       spyOn(switchEl, 'getAnimationCircleCenter_').and.returnValue(center);
 
-      switchEl.onValueChange_(null, rootEl, lastAction);
+      switchEl.onValueChange_(value, rootEl, lastAction);
       assert(mockSlotAnimation.start).to.haveBeenCalledWith(switchEl, `#${NULL_ID} > *`);
       assert(mockContainerAnimation.start).to.haveBeenCalledWith(switchEl, `#${NULL_ID}`);
       assert(rootEl).to.haveChildren([containerEl]);
