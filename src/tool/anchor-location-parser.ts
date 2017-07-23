@@ -1,7 +1,7 @@
 import { Parser } from 'external/gs_tools/src/interfaces';
 import { Enums } from 'external/gs_tools/src/typescript';
 
-import { AnchorLocation } from './anchor-location';
+import { AnchorLocation } from '../const';
 
 
 /**

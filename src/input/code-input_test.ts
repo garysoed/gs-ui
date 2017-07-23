@@ -3,13 +3,13 @@ TestBase.setup();
 
 import { Interval } from 'external/gs_tools/src/async';
 import { Colors, HslColor, RgbColor } from 'external/gs_tools/src/color';
+import { DisposableFunction } from 'external/gs_tools/src/dispose';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { Solve, Spec } from 'external/gs_tools/src/solver';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { DisposableFunction } from 'external/gs_tools/src/dispose';
-import { DefaultPalettes } from '../theming/default-palettes';
-import { CodeInput, Languages } from './code-input';
+import { CodeInput, Languages } from '../input';
+import { DefaultPalettes } from '../theming';
 
 describe('input.CodeInput', () => {
   let mockAce: any;
@@ -279,7 +279,7 @@ describe('input.CodeInput', () => {
       spyOn(input, 'onTick_');
 
       assert(input.onCreated({id: showGutterId, value: null}, customStyleEl, editorEl))
-          .to.haveElements([[showGutterId, true]]);
+          .to.haveElements([Matchers.monadSetterWith(true)]);
 
       assert(input.onThemeChanged_).to.haveBeenCalledWith(customStyleEl, editorEl);
       assert(mockInterval.on).to.haveBeenCalledWith('tick', Matchers.any(Function), input);

@@ -1,10 +1,10 @@
 import { Interval } from 'external/gs_tools/src/async';
 import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
 import { cache } from 'external/gs_tools/src/data/cache';
-import { MonadSetter, on } from 'external/gs_tools/src/event';
-import { ImmutableMap, Iterables } from 'external/gs_tools/src/immutable';
+import { on } from 'external/gs_tools/src/event';
+import { ImmutableList, ImmutableMap, Iterables } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { Disposable, ElementSelector, Event } from 'external/gs_tools/src/interfaces';
+import { Disposable, ElementSelector, Event, MonadSetter } from 'external/gs_tools/src/interfaces';
 import {
   BooleanParser,
   EnumParser,
@@ -19,10 +19,10 @@ import {
   onLifecycle} from 'external/gs_tools/src/webc';
 
 import { DisposableFunction } from 'external/gs_tools/src/dispose';
+
 import { ThemeServiceEvents } from '../const/theme-service-events';
 import { BaseInput } from '../input/base-input';
-import { DefaultPalettes } from '../theming/default-palettes';
-import { ThemeService } from '../theming/theme-service';
+import { DefaultPalettes, ThemeService } from '../theming';
 
 export enum Languages {
   CSS,
@@ -163,14 +163,14 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
    */
   @onLifecycle('create')
   onCreated(
-      @domOut.attribute(SHOW_GUTTER_ATTRIBUTE)
-          {id: showGutterId, value: showGutter}: MonadSetter<boolean | null>,
+      @domOut.attribute(SHOW_GUTTER_ATTRIBUTE) showGutterSetter: MonadSetter<boolean | null>,
       @dom.element(CUSTOM_STYLE_EL) customStyleEl: HTMLStyleElement,
       @dom.element(EDITOR_EL) editorEl: HTMLElement):
-      ImmutableMap<string, any> {
-    const changes = new Map<string, any>();
-    if (showGutter === null) {
-      changes.set(showGutterId, true);
+      ImmutableList<MonadSetter<any>> {
+    const changes: MonadSetter<any>[] = [];
+    if (showGutterSetter.value === null) {
+      showGutterSetter.value = true;
+      changes.push(showGutterSetter);
     }
 
     const interval = Interval.newInstance(500);
@@ -179,7 +179,7 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
     interval.start();
 
     this.onThemeChanged_(customStyleEl, editorEl);
-    return ImmutableMap.of(changes);
+    return ImmutableList.of(changes);
   }
 
   @onDom.attributeChange(LANGUAGE_ATTRIBUTE)

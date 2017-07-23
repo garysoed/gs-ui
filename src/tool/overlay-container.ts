@@ -17,11 +17,11 @@
  * @event {} gs-show The overlay is shown.
  */
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
-import { eventDetails, MonadSetter } from 'external/gs_tools/src/event';
+import { eventDetails } from 'external/gs_tools/src/event';
 import { on } from 'external/gs_tools/src/event/on';
-import { ImmutableMap } from 'external/gs_tools/src/immutable';
+import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { DispatchFn } from 'external/gs_tools/src/interfaces';
+import { DispatchFn, MonadSetter } from 'external/gs_tools/src/interfaces';
 import { BooleanParser, EnumParser, FloatParser } from 'external/gs_tools/src/parse';
 import {
   Animation,
@@ -33,9 +33,9 @@ import {
   onDom} from 'external/gs_tools/src/webc';
 import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
-import { WINDOW_BUS } from '../common/window-bus';
-import { AnchorLocation } from '../tool/anchor-location';
-import { Anchors } from '../tool/anchors';
+import { WINDOW_BUS } from '../common';
+import { AnchorLocation } from '../const';
+import { Anchors } from '../tool';
 
 
 const BACKDROP_EL = '#backdrop';
@@ -138,9 +138,10 @@ export class OverlayContainer extends BaseDisposable {
    */
   @onDom.event(BACKDROP_EL, 'click')
   onBackdropClick_(
-      @domOut.attribute(VISIBLE_ATTR) {id}: MonadSetter<boolean>):
-      ImmutableMap<any, any> {
-    return ImmutableMap.of([[id, false]]);
+      @domOut.attribute(VISIBLE_ATTR) visibleSetter: MonadSetter<boolean>):
+      ImmutableList<MonadSetter<any>> {
+    visibleSetter.value = false;
+    return ImmutableList.of([visibleSetter]);
   }
 
   /**
@@ -149,11 +150,14 @@ export class OverlayContainer extends BaseDisposable {
    */
   @onLifecycle('create')
   onCreated(
-      @domOut.attribute(ANCHOR_POINT_ATTR)
-          {id: anchorPointId, value: anchorPoint}: MonadSetter<AnchorLocation | null>):
-      ImmutableMap<string, any> {
-    return anchorPoint === null ? ImmutableMap.of([[anchorPointId, AnchorLocation.AUTO]]) :
-        ImmutableMap.of<string, any>([]);
+      @domOut.attribute(ANCHOR_POINT_ATTR) anchorPointSetter: MonadSetter<AnchorLocation | null>):
+      ImmutableList<MonadSetter<any>> {
+    if (anchorPointSetter.value === null) {
+      anchorPointSetter.value = AnchorLocation.AUTO;
+      return ImmutableList.of([anchorPointSetter]);
+    } else {
+      return ImmutableList.of([]);
+    }
   }
 
   /**
@@ -177,10 +181,6 @@ export class OverlayContainer extends BaseDisposable {
       @dom.element(ROOT_EL) rootEl: HTMLElement,
       @dom.element(SLOT_EL) slotEl: HTMLSlotElement,
       @dom.eventDispatcher() dispatcher: DispatchFn<{}>): void {
-    if (isVisible === null) {
-      return;
-    }
-
     if (isVisible) {
       this.show_(rootEl, slotEl, dispatcher);
     } else {

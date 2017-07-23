@@ -3,8 +3,8 @@ TestBase.setup();
 
 import { Mocks } from 'external/gs_tools/src/mock';
 
-import { AnchorLocation } from './anchor-location';
-import { Anchors } from './anchors';
+import { AnchorLocation } from '../const';
+import { Anchors } from '../tool';
 
 
 describe('tool.Anchors', () => {

@@ -5,15 +5,16 @@
  * This component works closely with the gs-ui.routing.RouteService to come up with the segments
  * for the current path, as well as the name and link for each segment.
  */
-import { MonadSetter, on } from 'external/gs_tools/src/event';
-import { ImmutableList, ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
+import { on } from 'external/gs_tools/src/event';
+import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
+import { MonadSetter } from 'external/gs_tools/src/interfaces';
 import { customElement, domOut, onLifecycle } from 'external/gs_tools/src/webc';
 
-import { BaseThemedElement2 } from '../common/base-themed-element2';
-import { RouteService } from '../routing/route-service';
-import { RouteServiceEvents } from '../routing/route-service-events';
-import { ThemeService } from '../theming/theme-service';
+import { BaseThemedElement2 } from '../common';
+import { RouteServiceEvents } from '../const';
+import { RouteService } from '../routing';
+import { ThemeService } from '../theming';
 
 export const __FULL_PATH = Symbol('fullPath');
 
@@ -98,8 +99,9 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
   @onLifecycle('insert')
   onInserted(
       @domOut.childElements(CRUMB_CHILDREN_CONFIG)
-          monadSetter: MonadSetter<ImmutableList<CrumbData>>): Promise<ImmutableMap<string, any>> {
-    return this.onRouteChanged_(monadSetter);
+          crumbSetter: MonadSetter<ImmutableList<CrumbData>>):
+      Promise<ImmutableList<MonadSetter<any>>> {
+    return this.onRouteChanged_(crumbSetter);
   }
 
   /**
@@ -108,18 +110,18 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
   @on((instance: Breadcrumb<any>) => instance.routeService_, RouteServiceEvents.CHANGED)
   async onRouteChanged_(
       @domOut.childElements(CRUMB_CHILDREN_CONFIG)
-          {id: crumbId}: MonadSetter<ImmutableList<CrumbData>>):
-      Promise<ImmutableMap<string, any>> {
+          crumbSetter: MonadSetter<ImmutableList<CrumbData>>):
+      Promise<ImmutableList<MonadSetter<any>>> {
     const route = this.routeService_.getRoute();
     if (route === null) {
-      return Promise.resolve(ImmutableMap.of<string, any>([]));
+      return Promise.resolve(ImmutableList.of([]));
     }
 
     const params = route.getParams();
     const routeFactory = this.routeService_.getRouteFactory(route.getType());
 
     if (!routeFactory) {
-      return Promise.resolve(ImmutableMap.of<string, any>([]));
+      return Promise.resolve(ImmutableList.of([]));
     }
 
     const names = routeFactory.getCascadeNames(params);
@@ -132,7 +134,7 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
         })
         .toArray();
     const data = await Promise.all(promises);
-    const crumbData = ImmutableList
+    crumbSetter.value = ImmutableList
         .of(data)
         .map(([name, url]: [string, string]) => {
           return {
@@ -140,6 +142,6 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
             url: url,
           };
         });
-    return ImmutableMap.of([[crumbId, crumbData]]);
+    return ImmutableList.of([crumbSetter]);
   }
 }

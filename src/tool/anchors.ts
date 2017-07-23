@@ -1,5 +1,4 @@
-import { AnchorLocation } from './anchor-location';
-
+import { AnchorLocation } from '../const';
 
 export class Anchors {
   /**
@@ -27,4 +26,3 @@ export class Anchors {
     }
   }
 }
-// TODO: Mutable

@@ -3,10 +3,8 @@ import { bind, inject } from 'external/gs_tools/src/inject';
 import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
 import { Log, Reflect } from 'external/gs_tools/src/util';
 
-import { AbstractRouteFactory } from '../routing/abstract-route-factory';
-import { IRouteFactoryService } from '../routing/i-route-factory-service';
-import { Route } from '../routing/route';
-import { RouteServiceEvents } from '../routing/route-service-events';
+import { RouteServiceEvents } from '../const';
+import { AbstractRouteFactory, IRouteFactoryService, Route } from '../routing';
 
 type RouteServiceEvent = {type: RouteServiceEvents};
 

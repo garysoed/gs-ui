@@ -7,8 +7,8 @@ import { Reflect } from 'external/gs_tools/src/util';
 
 import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
 
-import { RouteService } from './route-service';
-import { RouteServiceEvents } from './route-service-events';
+import { RouteServiceEvents } from '../const';
+import { RouteService } from '../routing';
 
 
 describe('routing.RouteService', () => {

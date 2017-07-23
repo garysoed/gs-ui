@@ -150,7 +150,7 @@ describe('input.BaseInput', () => {
       spyOn(input, 'isValueChanged_').and.returnValue(true);
 
       assert(input.onInputChange_({id: elValueId, value: elValue}, element, mockDispatcher))
-          .to.haveElements([[elValueId, inputValue]]);
+          .to.haveElements([Matchers.monadSetterWith(inputValue)]);
       assert(mockDispatcher).to.haveBeenCalledWith('change', {});
       assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, elValue);
       assert(input['getInputEl_']).to.haveBeenCalledWith(element);

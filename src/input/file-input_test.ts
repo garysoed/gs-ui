@@ -1,11 +1,11 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
 import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { FileInput } from '../input/file-input';
+import { FileInput } from '../input';
 
 
 describe('input.FileInput', () => {
@@ -75,13 +75,13 @@ describe('input.FileInput', () => {
       const filename2 = 'filename2';
       spyOn(input, 'getFiles_').and.returnValue([{name: filename1}, {name: filename2}]);
 
-      const map = input.onBundleIdChanged_(
+      const list = input.onBundleIdChanged_(
           {oldValue: 'oldValue'} as any,
           mockDeleteBundleFn,
           bundleId,
           droppedMessageEl,
           {id: switchId} as any);
-      assert(map).to.haveElements([[switchId, 'dropped']]);
+      assert(list).to.haveElements([Matchers.monadSetterWith('dropped')]);
       assert(droppedMessageEl.innerText as string).to
           .match(new RegExp(`files: ${filename1}, ${filename2}`));
       assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
@@ -96,13 +96,13 @@ describe('input.FileInput', () => {
       const filename = 'filename';
       spyOn(input, 'getFiles_').and.returnValue([{name: filename}]);
 
-      const map = input.onBundleIdChanged_(
+      const list = input.onBundleIdChanged_(
           {oldValue: 'oldValue'} as any,
           mockDeleteBundleFn,
           bundleId,
           droppedMessageEl,
           {id: switchId} as any);
-      assert(map).to.haveElements([[switchId, 'dropped']]);
+      assert(list).to.haveElements([Matchers.monadSetterWith('dropped')]);
       assert(droppedMessageEl.innerText as string).to.match(new RegExp(`file: ${filename}`));
       assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
     });
@@ -121,7 +121,7 @@ describe('input.FileInput', () => {
           bundleId,
           droppedMessageEl,
           {id: switchId} as any);
-      assert(map).to.haveElements([[switchId, 'initial']]);
+      assert(map).to.haveElements([Matchers.monadSetterWith('initial')]);
       assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
     });
 
@@ -139,7 +139,7 @@ describe('input.FileInput', () => {
           bundleId,
           droppedMessageEl,
           {id: switchId} as any);
-      assert(map).to.haveElements([[switchId, 'initial']]);
+      assert(map).to.haveElements([Matchers.monadSetterWith('initial')]);
       assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
     });
 
@@ -191,12 +191,15 @@ describe('input.FileInput', () => {
           const dataTransfer = Mocks.object('dataTransfer');
           spyOn(input, 'isValid_').and.returnValue(true);
 
-          const map = input.onDragEnter_(
+          const list = input.onDragEnter_(
               {id: dragDepthId, value: dragDepth},
               mimeTypes,
               {id: switchId} as any,
               {dataTransfer: dataTransfer} as any);
-          assert(map).to.haveElements([[dragDepthId, dragDepth + 1], [switchId, 'dragging']]);
+          assert(list).to.haveElements([
+            Matchers.monadSetterWith(dragDepth + 1),
+            Matchers.monadSetterWith('dragging'),
+          ]);
 
           assert(input['isValid_']).to.haveBeenCalledWith(mimeTypes, dataTransfer);
         });
@@ -211,12 +214,15 @@ describe('input.FileInput', () => {
           const dataTransfer = Mocks.object('dataTransfer');
           spyOn(input, 'isValid_').and.returnValue(false);
 
-          const map = input.onDragEnter_(
+          const list = input.onDragEnter_(
               {id: dragDepthId, value: dragDepth},
               mimeTypes,
               {id: switchId} as any,
               {dataTransfer: dataTransfer} as any);
-          assert(map).to.haveElements([[dragDepthId, dragDepth + 1], [switchId, 'error']]);
+          assert(list).to.haveElements([
+            Matchers.monadSetterWith(dragDepth + 1),
+            Matchers.monadSetterWith('error'),
+          ]);
 
           assert(input['isValid_']).to.haveBeenCalledWith(mimeTypes, dataTransfer);
         });
@@ -229,12 +235,12 @@ describe('input.FileInput', () => {
       const dataTransfer = Mocks.object('dataTransfer');
       spyOn(input, 'isValid_').and.returnValue(false);
 
-      const map = input.onDragEnter_(
+      const list = input.onDragEnter_(
           {id: dragDepthId, value: dragDepth},
           mimeTypes,
           {id: switchId} as any,
           {dataTransfer: dataTransfer} as any);
-      assert(map).to.haveElements([[dragDepthId, dragDepth + 1]]);
+      assert(list).to.haveElements([Matchers.monadSetterWith(dragDepth + 1)]);
     });
   });
 
@@ -251,7 +257,10 @@ describe('input.FileInput', () => {
               {id: dragDepthId, value: dragDepth},
               {id: switchId} as any,
               bundleId);
-          assert(map).to.haveElements([[dragDepthId, dragDepth - 1], [switchId, 'dropped']]);
+          assert(map).to.haveElements([
+            Matchers.monadSetterWith(dragDepth - 1),
+            Matchers.monadSetterWith('dropped'),
+          ]);
           assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
         });
 
@@ -267,7 +276,10 @@ describe('input.FileInput', () => {
               {id: dragDepthId, value: dragDepth},
               {id: switchId} as any,
               bundleId);
-          assert(map).to.haveElements([[dragDepthId, dragDepth - 1], [switchId, 'initial']]);
+          assert(map).to.haveElements([
+            Matchers.monadSetterWith(dragDepth - 1),
+            Matchers.monadSetterWith('initial'),
+          ]);
           assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
         });
 
@@ -283,7 +295,10 @@ describe('input.FileInput', () => {
               {id: dragDepthId, value: dragDepth},
               {id: switchId} as any,
               bundleId);
-          assert(map).to.haveElements([[dragDepthId, dragDepth - 1], [switchId, 'initial']]);
+          assert(map).to.haveElements([
+            Matchers.monadSetterWith(dragDepth - 1),
+            Matchers.monadSetterWith('initial'),
+          ]);
           assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
         });
 
@@ -298,7 +313,7 @@ describe('input.FileInput', () => {
           {id: dragDepthId, value: dragDepth},
           {id: switchId} as any,
           bundleId);
-      assert(map).to.haveElements([[dragDepthId, dragDepth - 1]]);
+      assert(map).to.haveElements([Matchers.monadSetterWith(dragDepth - 1)]);
     });
   });
 
@@ -366,7 +381,10 @@ describe('input.FileInput', () => {
           {id: deleteBundleId, value: null},
           {id: bundleId} as any,
           mimeTypes);
-      assert(map).to.haveElements([[deleteBundleId, deleteBundleFn], [bundleId, newBundleId]]);
+      assert(map).to.haveElements([
+        Matchers.monadSetterWith(deleteBundleFn),
+        Matchers.monadSetterWith(newBundleId),
+      ]);
       assert(mockFileService.addBundle).to.haveBeenCalledWith(files);
       assert(mockEvent.preventDefault).to.haveBeenCalledWith();
       assert(mockEvent.stopPropagation).to.haveBeenCalledWith();
@@ -405,7 +423,10 @@ describe('input.FileInput', () => {
           {id: deleteBundleId, value: mockDeleteBundleFn},
           {id: bundleId} as any,
           mimeTypes);
-      assert(map).to.haveElements([[deleteBundleId, deleteBundleFn], [bundleId, newBundleId]]);
+      assert(map).to.haveElements([
+        Matchers.monadSetterWith(deleteBundleFn),
+        Matchers.monadSetterWith(newBundleId),
+      ]);
       assert(mockFileService.addBundle).to.haveBeenCalledWith(files);
       assert(mockEvent.preventDefault).to.haveBeenCalledWith();
       assert(mockEvent.stopPropagation).to.haveBeenCalledWith();

@@ -13,17 +13,18 @@
  * @attr {boolean} visible True iff the menu is shown.
  */
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
-import { eventDetails, MonadSetter, on } from 'external/gs_tools/src/event';
-import { ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
+import { eventDetails, on } from 'external/gs_tools/src/event';
+import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
+import { MonadSetter } from 'external/gs_tools/src/interfaces';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import { customElement, dom, domOut, onDom} from 'external/gs_tools/src/webc';
 import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
-import { AnchorLocation } from '../tool/anchor-location';
+import { AnchorLocation } from '../const';
+import { OverlayService } from '../tool';
 import { AnchorLocationParser } from '../tool/anchor-location-parser';
 import { OverlayBus, OverlayEventType } from '../tool/overlay-bus';
-import { OverlayService } from '../tool/overlay-service';
 
 
 const ANCHOR_POINT_ATTR = {
@@ -55,43 +56,37 @@ export class Menu extends BaseDisposable {
 
   @onLifecycle('create')
   onCreated_(
-      @domOut.attribute(ANCHOR_POINT_ATTR)
-          {id: anchorPointId, value: anchorPoint}: MonadSetter<null | AnchorLocation>,
-      @domOut.attribute(ANCHOR_TARGET_ATTR)
-          {id: anchorTargetId, value: anchorTarget}: MonadSetter<null | AnchorLocation>,
-      @domOut.attribute(VISIBLE_ATTR)
-          {id: visibleId, value: visible}: MonadSetter<null | boolean>):
-      ImmutableMap<any, any> {
-    if (anchorPoint === null) {
-      anchorPoint = AnchorLocation.AUTO;
+      @domOut.attribute(ANCHOR_POINT_ATTR) anchorPointSetter: MonadSetter<null | AnchorLocation>,
+      @domOut.attribute(ANCHOR_TARGET_ATTR) anchorTargetSetter: MonadSetter<null | AnchorLocation>,
+      @domOut.attribute(VISIBLE_ATTR) visibleSetter: MonadSetter<null | boolean>):
+      ImmutableList<MonadSetter<any>> {
+    if (anchorPointSetter.value === null) {
+      anchorPointSetter.value = AnchorLocation.AUTO;
     }
 
-    if (anchorTarget === null) {
-      anchorTarget = AnchorLocation.AUTO;
+    if (anchorTargetSetter.value === null) {
+      anchorTargetSetter.value = AnchorLocation.AUTO;
     }
 
-    if (visible === null) {
-      visible = false;
+    if (visibleSetter.value === null) {
+      visibleSetter.value = false;
     }
 
-    return ImmutableMap.of([
-      [anchorPointId, anchorPoint],
-      [anchorTargetId, anchorTarget],
-      [visibleId, visible],
-    ]);
+    return ImmutableList.of([anchorPointSetter, anchorTargetSetter, visibleSetter]);
   }
 
   @on(OverlayBus, 'show')
   @on(OverlayBus, 'hide')
   onOverlayVisibilityChange_(
       @eventDetails() {id, type}: {id: symbol, type: OverlayEventType},
-      @domOut.attribute(VISIBLE_ATTR) {id: visibleId}: MonadSetter<boolean | null>):
-      ImmutableMap<string, any> {
+      @domOut.attribute(VISIBLE_ATTR) visibleSetter: MonadSetter<boolean | null>):
+      ImmutableList<MonadSetter<any>> {
     if (id !== this.id_) {
-      return ImmutableMap.of<string, any>([]);
+      return ImmutableList.of([]);
     }
 
-    return ImmutableMap.of([[visibleId, type === 'show']]);
+    visibleSetter.value = type === 'show';
+    return ImmutableList.of([visibleSetter]);
   }
 
   @onDom.attributeChange(VISIBLE_ATTR)

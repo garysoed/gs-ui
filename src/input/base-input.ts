@@ -1,16 +1,17 @@
-import { MonadSetter, MonadUtil } from 'external/gs_tools/src/event';
-import { ImmutableMap } from 'external/gs_tools/src/immutable';
+import { MonadUtil } from 'external/gs_tools/src/event';
+import { ImmutableList } from 'external/gs_tools/src/immutable';
 import {
   DispatchFn,
   Disposable,
   ElementSelector,
   Event,
-  Parser } from 'external/gs_tools/src/interfaces';
+  MonadSetter,
+  Parser} from 'external/gs_tools/src/interfaces';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import { dom, domOut, onDom, onLifecycle, Util } from 'external/gs_tools/src/webc';
 
-import { BaseThemedElement2 } from '../common/base-themed-element2';
-import { ThemeService } from '../theming/theme-service';
+import { BaseThemedElement2 } from '../common';
+import { ThemeService } from '../theming';
 
 const DISABLED_ATTR = {name: 'disabled', parser: BooleanParser, selector: null};
 const VALUE_ATTR = {name: 'value', selector: null, parser: StringParser};
@@ -90,18 +91,19 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
    * Handler called when the input element fires a change event.
    */
   onInputChange_(
-      @domOut.attribute(VALUE_ATTR) {id: elValueId, value: elValue}: MonadSetter<string | null>,
+      @domOut.attribute(VALUE_ATTR) valueSetter: MonadSetter<string | null>,
       @dom.element(null) element: HTMLElement,
-      @dom.eventDispatcher() dispatcher: DispatchFn<{}>): ImmutableMap<string, any> {
+      @dom.eventDispatcher() dispatcher: DispatchFn<{}>): ImmutableList<MonadSetter<any>> {
     const inputValue = this.getInputElValue_(this.getInputEl_(element));
     const parsedInputValue = this.valueParser_.parse(inputValue);
-    const parsedElValue = this.valueParser_.parse(elValue);
+    const parsedElValue = this.valueParser_.parse(valueSetter.value);
     if (!this.isValueChanged_(parsedInputValue, parsedElValue)) {
-      return ImmutableMap.of<string, any>([]);
+      return ImmutableList.of([]);
     }
 
     dispatcher(CHANGE_EVENT, {});
-    return ImmutableMap.of([[elValueId, inputValue]]);
+    valueSetter.value = inputValue;
+    return ImmutableList.of([valueSetter]);
   }
 
   @onLifecycle('insert')

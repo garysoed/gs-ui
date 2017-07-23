@@ -1,13 +1,13 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 import { AnimationEventDetail } from 'external/gs_tools/src/webc';
 
-import { AnchorLocation } from '../tool/anchor-location';
-import { Anchors } from '../tool/anchors';
-import { HIDE_ANIM, OverlayContainer } from '../tool/overlay-container';
+import { AnchorLocation } from '../const';
+import { Anchors, OverlayContainer } from '../tool';
+import { HIDE_ANIM } from '../tool/overlay-container';
 
 
 describe('tool.OverlayContainer', () => {
@@ -70,7 +70,8 @@ describe('tool.OverlayContainer', () => {
       const id = 123;
       const value = true;
       spyOn(container, 'hide_');
-      assert(container.onBackdropClick_({id, value})).to.haveElements([[id, false]]);
+      assert(container.onBackdropClick_({id, value})).to
+          .haveElements([Matchers.monadSetterWith(false)]);
     });
   });
 
@@ -78,7 +79,7 @@ describe('tool.OverlayContainer', () => {
     it('should default the anchor point to AUTO if not given', () => {
       const anchorPointId = 'anchorPointId';
       assert(container.onCreated({id: anchorPointId, value: null})).to.haveElements(
-          [[anchorPointId, AnchorLocation.AUTO]]);
+          [Matchers.monadSetterWith(AnchorLocation.AUTO)]);
     });
 
     it('should use the existing anchor point if given', () => {
@@ -139,19 +140,6 @@ describe('tool.OverlayContainer', () => {
           Mocks.object('slotEl'),
           Mocks.object('dispatcher'));
       assert(container['hide_']).to.haveBeenCalledWith();
-    });
-
-    it(`should do nothing if visibility is null`, () => {
-      spyOn(container, 'show_');
-      spyOn(container, 'hide_');
-
-      container.onVisibilityChange_(
-          null,
-          Mocks.object('rootEl'),
-          Mocks.object('slotEl'),
-          Mocks.object('dispatcher'));
-      assert(container['show_']).toNot.haveBeenCalled();
-      assert(container['hide_']).toNot.haveBeenCalled();
     });
   });
 

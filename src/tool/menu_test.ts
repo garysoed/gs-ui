@@ -1,12 +1,11 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { AnchorLocation } from '../tool/anchor-location';
-import { Menu } from '../tool/menu';
-
+import { AnchorLocation } from '../const';
+import { Menu } from '../tool';
 
 describe('tool.Menu', () => {
   let menu: Menu;
@@ -32,9 +31,9 @@ describe('tool.Menu', () => {
           {id: visibleId, value: visible});
 
       assert(value).to.haveElements([
-        [anchorPointId, anchorPoint],
-        [anchorTargetId, AnchorLocation.AUTO],
-        [visibleId, visible],
+        Matchers.monadSetterWith(anchorPoint),
+        Matchers.monadSetterWith(AnchorLocation.AUTO),
+        Matchers.monadSetterWith(visible),
       ]);
     });
 
@@ -51,9 +50,9 @@ describe('tool.Menu', () => {
           {id: visibleId, value: visible});
 
       assert(value).to.haveElements([
-        [anchorPointId, AnchorLocation.AUTO],
-        [anchorTargetId, anchorTarget],
-        [visibleId, visible],
+        Matchers.monadSetterWith(AnchorLocation.AUTO),
+        Matchers.monadSetterWith(anchorTarget),
+        Matchers.monadSetterWith(visible),
       ]);
     });
 
@@ -70,9 +69,9 @@ describe('tool.Menu', () => {
           {id: visibleId, value: null});
 
       assert(value).to.haveElements([
-        [anchorPointId, anchorPoint],
-        [anchorTargetId, anchorTarget],
-        [visibleId, false],
+        Matchers.monadSetterWith(anchorPoint),
+        Matchers.monadSetterWith(anchorTarget),
+        Matchers.monadSetterWith(false),
       ]);
     });
   });
@@ -82,14 +81,14 @@ describe('tool.Menu', () => {
       const visibleId = 'visibleId';
       const event = {id: menu['id_'], type: 'show' as 'show'};
       assert(menu.onOverlayVisibilityChange_(event, {id: visibleId, value: null})).to
-          .haveElements([[visibleId, true]]);
+          .haveElements([Matchers.monadSetterWith(true)]);
     });
 
     it(`should set the visible attribute to hide if event type is hide`, () => {
       const visibleId = 'visibleId';
       const event = {id: menu['id_'], type: 'hide' as 'hide'};
       assert(menu.onOverlayVisibilityChange_(event, {id: visibleId, value: null})).to
-          .haveElements([[visibleId, false]]);
+          .haveElements([Matchers.monadSetterWith(false)]);
     });
 
     it(`should do nothing the ID does not match`, () => {

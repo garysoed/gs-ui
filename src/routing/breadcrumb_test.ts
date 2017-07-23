@@ -5,7 +5,9 @@ import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { Breadcrumb, CRUMB_CHILDREN_CONFIG, CrumbData } from '../routing/breadcrumb';
+import { Breadcrumb } from '../routing';
+import { CRUMB_CHILDREN_CONFIG, CrumbData } from '../routing/breadcrumb';
+
 
 describe('CRUMB_DATA_HELPER', () => {
   describe('create', () => {
@@ -151,9 +153,9 @@ describe('routing.Breadcrumb', () => {
           .and.returnValue(mockRoute);
 
       const crumbId = 'crumbId';
-      const map = await breadcrumb.onRouteChanged_({id: crumbId} as any);
-      assert(map).to.haveElements([[crumbId, Matchers.any(ImmutableList)]]);
-      assert(map.get(crumbId) as ImmutableList<CrumbData>).to.haveElements([
+      const list = await breadcrumb.onRouteChanged_({id: crumbId} as any);
+      assert(list).to.haveElements([Matchers.monadSetterWith(Matchers.any(ImmutableList))]);
+      assert(list.getAt(0)!.value as ImmutableList<CrumbData>).to.haveElements([
         {name: name1, url: url1},
         {name: name2, url: url2},
       ]);

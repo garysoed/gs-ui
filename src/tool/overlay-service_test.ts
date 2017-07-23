@@ -7,11 +7,10 @@ import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { EnumParser } from 'external/gs_tools/src/parse';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { AnchorLocation } from '../tool/anchor-location';
-import { Anchors } from '../tool/anchors';
+import { AnchorLocation } from '../const';
+import { Anchors, OverlayService } from '../tool';
 import { OverlayBus } from '../tool/overlay-bus';
-import { __shownId, OverlayService } from '../tool/overlay-service';
-
+import { __shownId } from '../tool/overlay-service';
 
 describe('gs.tool.OverlayService', () => {
   let mockDocument: any;

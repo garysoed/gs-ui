@@ -3,10 +3,9 @@ import { BaseListener, ListenableDom } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { BooleanParser, EnumParser, FloatParser } from 'external/gs_tools/src/parse';
 
-import { AnchorLocation } from '../tool/anchor-location';
-import { Anchors } from '../tool/anchors';
+import { AnchorLocation } from '../const';
+import { Anchors, OverlayContainer } from '../tool';
 import { OverlayBus } from '../tool/overlay-bus';
-import { OverlayContainer } from '../tool/overlay-container';
 
 export const __shownId = Symbol('shownId');
 
