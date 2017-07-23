@@ -42,7 +42,7 @@ export class TextInput extends BaseInput<string> {
       element: HTMLInputElement,
       callback: (event: Event<any>) => void): Disposable {
     const listenableDom = ListenableDom.of(element);
-    const disposable = listenableDom.on('change', callback, this);
+    const disposable = listenableDom.on('input', callback, this);
     this.addDisposable(listenableDom);
     return disposable;
   }

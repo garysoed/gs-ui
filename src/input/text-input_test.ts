@@ -46,7 +46,7 @@ describe('input.TextInput', () => {
 
       assert(input['listenToValueChanges_'](element, callback)).to.equal(disposable);
       assert(input.addDisposable).to.haveBeenCalledWith(mockListenableDom);
-      assert(mockListenableDom.on).to.haveBeenCalledWith('change', callback, input);
+      assert(mockListenableDom.on).to.haveBeenCalledWith('input', callback, input);
       assert(ListenableDom.of).to.haveBeenCalledWith(element);
     });
   });
