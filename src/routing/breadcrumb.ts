@@ -121,8 +121,7 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
         .of(names)
         .map((promise: Promise<string>, index: number) => {
           return Promise.all([promise, paths[index]]);
-        })
-        .toArray();
+        });
     const data = await Promise.all(promises);
     const crumbData = ImmutableList
         .of(data)

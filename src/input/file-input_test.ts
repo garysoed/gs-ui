@@ -2,7 +2,7 @@ import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
 import { FakeMonadSetter } from 'external/gs_tools/src/event';
-import { ImmutableList, Iterables } from 'external/gs_tools/src/immutable';
+import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
@@ -456,7 +456,7 @@ describe('input.FileInput', () => {
           fakeBundleFnSetter,
           fakeBundleIdSetter,
           mimeTypes);
-      assert(Iterables.unsafeToArray(list)).to.equal([]);
+      assert([...list]).to.equal([]);
       assert(mockFileService.addBundle).toNot.haveBeenCalled();
       assert(mockEvent.preventDefault).to.haveBeenCalledWith();
       assert(mockEvent.stopPropagation).to.haveBeenCalledWith();

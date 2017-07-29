@@ -1,11 +1,11 @@
-import { Color } from 'external/gs_tools/src/color';
 import { Bus } from 'external/gs_tools/src/event';
-import { ImmutableMap, Iterables } from 'external/gs_tools/src/immutable';
+import { ImmutableMap } from 'external/gs_tools/src/immutable';
 import { bind, inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import { Log } from 'external/gs_tools/src/util';
 import { Templates } from 'external/gs_tools/src/webc';
 
+import { Color } from 'external/gs_tools/src/interfaces';
 import { ThemeServiceEvents } from '../const/theme-service-events';
 import { Theme } from '../theming/theme';
 
@@ -127,7 +127,7 @@ export class ThemeService extends Bus<ThemeServiceEvents, ThemeServiceEvent> {
         .mapItem(([name, color]: [string, Color]) => {
           return `--${name}:rgb(${color.getRed()},${color.getGreen()},${color.getBlue()});`;
         });
-    const vars = Iterables.toArray(mappedEntries).join('');
+    const vars = [...mappedEntries].join('');
 
     this.dispatch(
         {type: ThemeServiceEvents.THEME_CHANGED},

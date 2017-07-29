@@ -5,7 +5,6 @@ import { Interval } from 'external/gs_tools/src/async';
 import { Colors, HslColor, RgbColor } from 'external/gs_tools/src/color';
 import { DisposableFunction } from 'external/gs_tools/src/dispose';
 import { FakeMonadSetter } from 'external/gs_tools/src/event';
-import { Iterables } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { Solve, Spec } from 'external/gs_tools/src/solver';
 import { TestDispose } from 'external/gs_tools/src/testing';
@@ -305,7 +304,7 @@ describe('input.CodeInput', () => {
 
       const fakeShowGutterSetter = new FakeMonadSetter<boolean | null>(true);
       const list = input.onCreated(fakeShowGutterSetter, customStyleEl, editorEl);
-      assert(Iterables.unsafeToArray(list)).to.equal([]);
+      assert([...list]).to.equal([]);
     });
   });
 

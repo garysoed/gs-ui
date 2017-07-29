@@ -1,5 +1,6 @@
-import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
-import { Iterables, OrderedMap } from 'external/gs_tools/src/immutable';
+import { Colors, HslColor } from 'external/gs_tools/src/color';
+import { OrderedMap } from 'external/gs_tools/src/immutable';
+import { Color } from 'external/gs_tools/src/interfaces';
 
 
 const COLOR_MAP: OrderedMap<string, Color> = OrderedMap.of([
@@ -67,7 +68,7 @@ export const DefaultPalettes = {
   },
 
   getNames(): string[] {
-    return Iterables.toArray(COLOR_MAP.keys());
+    return [...COLOR_MAP.keys()];
   },
 };
 // TODO: Mutable

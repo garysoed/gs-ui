@@ -1,15 +1,16 @@
 import { Interval } from 'external/gs_tools/src/async';
-import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
+import { Colors, HslColor } from 'external/gs_tools/src/color';
 import { cache } from 'external/gs_tools/src/data/cache';
 import { on } from 'external/gs_tools/src/event';
-import { ImmutableMap, ImmutableSet, Iterables } from 'external/gs_tools/src/immutable';
+import { ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import {
+  Color,
   Disposable,
   ElementSelector,
   Event,
   MonadSetter,
-  MonadValue } from 'external/gs_tools/src/interfaces';
+  MonadValue} from 'external/gs_tools/src/interfaces';
 import {
   BooleanParser,
   EnumParser,
@@ -277,7 +278,7 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
         .mapItem(([name, color]: [string, Color]) => {
           return `--${name}:rgb(${color.getRed()},${color.getGreen()},${color.getBlue()});`;
         });
-    const cssContent = Iterables.toArray(mappedEntries).join('');
+    const cssContent = [...mappedEntries].join('');
     customStyleEl.innerHTML = `#editor {${cssContent}}`;
   }
 

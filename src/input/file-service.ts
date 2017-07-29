@@ -1,6 +1,6 @@
 import { DomEvent, ListenableDom } from 'external/gs_tools/src/event';
 import { BaseListener } from 'external/gs_tools/src/event/base-listener';
-import { ImmutableMap, ImmutableSet, Iterables } from 'external/gs_tools/src/immutable';
+import { ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { bind } from 'external/gs_tools/src/inject';
 import { SimpleIdGenerator } from 'external/gs_tools/src/random';
 
@@ -21,7 +21,7 @@ export class FileService extends BaseListener {
    * @return Object containing the bundle ID and a function to delete the bundle.
    */
   addBundle(files: File[]): {deleteFn: () => void, id: string} {
-    const id = this.idGenerator_.generate(Iterables.toArray(ImmutableMap.of(this.bundles_).keys()));
+    const id = this.idGenerator_.generate([...ImmutableMap.of(this.bundles_).keys()]);
     this.bundles_.set(id, files);
     return {
       deleteFn: function(this: FileService): void {
@@ -54,11 +54,11 @@ export class FileService extends BaseListener {
       return Promise.resolve(null);
     }
 
-    const promises = Iterables.toArray(ImmutableSet
+    const promises = ImmutableSet
         .of(files)
         .mapItem((file: File) => {
           return Promise.all([file, this.processFile_(file)]);
-        }));
+        });
     return new Map(await Promise.all(promises));
   }
 

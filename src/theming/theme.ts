@@ -1,5 +1,6 @@
-import { Color, Colors, HslColor, RgbColor } from 'external/gs_tools/src/color';
+import { Colors, HslColor, RgbColor } from 'external/gs_tools/src/color';
 import { cache } from 'external/gs_tools/src/data/cache';
+import { Color } from 'external/gs_tools/src/interfaces';
 import { Solve, Spec } from 'external/gs_tools/src/solver';
 import { Log } from 'external/gs_tools/src/util';
 

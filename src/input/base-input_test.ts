@@ -6,7 +6,6 @@ import { Disposable, ElementSelector } from 'external/gs_tools/src/interfaces';
 import { StringParser } from 'external/gs_tools/src/parse';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { Iterables } from 'external/gs_tools/src/immutable';
 import { BaseInput } from '../input/base-input';
 
 class TestInput extends BaseInput<string> {
@@ -173,7 +172,7 @@ describe('input.BaseInput', () => {
       const fakeValueSetter = new FakeMonadSetter(elValue);
 
       const list = input.onInputChange_(fakeValueSetter, element, mockDispatcher);
-      assert(Iterables.unsafeToArray(list)).to.equal([]);
+      assert([...list]).to.equal([]);
       assert(mockDispatcher).toNot.haveBeenCalled();
       assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, elValue);
       assert(input['getInputEl_']).to.haveBeenCalledWith(element);

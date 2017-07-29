@@ -115,14 +115,13 @@ export class FileInput extends BaseThemedElement2 {
       return ImmutableSet.of([switchSetter.set('initial')]);
     }
 
-    const fileNames = ImmutableList
+    const components = ImmutableList
         .of(files)
         .map((file: File) => {
           return file.name;
         })
-        .sort(Orderings.natural())
-        .toArray()
-        .join(', ');
+        .sort(Orderings.natural());
+    const fileNames = [...components].join(', ');
     droppedMessageEl.innerText = files.length > 1 ?
         `Added files: ${fileNames}` :
         `Added file: ${fileNames}`;
@@ -195,7 +194,7 @@ export class FileInput extends BaseThemedElement2 {
       }
 
       const {id, deleteFn: newDeleteFn} =
-          this.fileService_.addBundle(ImmutableList.of(event.dataTransfer.files).toArray());
+          this.fileService_.addBundle([...ImmutableList.of(event.dataTransfer.files)]);
       changes.push(deleteFnSetter.set(newDeleteFn));
       changes.push(bundleIdSetter.set(id));
     }

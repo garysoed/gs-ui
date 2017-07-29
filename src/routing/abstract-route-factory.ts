@@ -55,7 +55,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
       names.push(current.getName(params));
       current = current.parent_;
     }
-    return ImmutableList.of(names).reverse().toArray();
+    return [...ImmutableList.of(names).reverse()];
   }
 
   /**
@@ -70,7 +70,7 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
       paths.push(current.getPath(params));
       current = current.parent_;
     }
-    return ImmutableList.of(paths).reverse().toArray();
+    return [...ImmutableList.of(paths).reverse()];
   }
 
   /**

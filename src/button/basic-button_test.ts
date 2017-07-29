@@ -2,7 +2,6 @@ import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
 import { FakeMonadSetter } from 'external/gs_tools/src/event';
-import { Iterables } from 'external/gs_tools/src/immutable';
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
@@ -36,7 +35,7 @@ describe('button.BasicButton', () => {
     it('should not dispatch any events if disabled', () => {
       const mockEventDispatcher = jasmine.createSpy('EventDispatcher');
       const list = button.onClick_(true, mockEventDispatcher, {} as any, {} as any);
-      assert(Iterables.unsafeToArray(list)).to.equal([]);
+      assert([...list]).to.equal([]);
       assert(mockEventDispatcher).toNot.haveBeenCalled();
     });
   });
