@@ -11,9 +11,9 @@
  * @event {{}} gs-action Dispatched when the button is clicked.
  */
 import { eventDetails, monadOut } from 'external/gs_tools/src/event';
-import { ImmutableList } from 'external/gs_tools/src/immutable';
+import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { DispatchFn, MonadSetter } from 'external/gs_tools/src/interfaces';
+import { DispatchFn, MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import { customElement, dom, onDom } from 'external/gs_tools/src/webc';
 
@@ -39,12 +39,11 @@ export class BasicButton extends BaseThemedElement2 {
       @dom.eventDispatcher() dispatcher: DispatchFn<{}>,
       @eventDetails() event: MouseEvent,
       @monadOut(ActionTracker) actionSetter: MonadSetter<Action | null>):
-      ImmutableList<MonadSetter<any>> {
+      Iterable<MonadValue<any>> {
     if (disabled) {
-      return ImmutableList.of([]);
+      return ImmutableSet.of([]);
     }
     dispatcher('gs-action', {});
-    actionSetter.value = {type: 'click', x: event.x, y: event.y};
-    return ImmutableList.of([actionSetter]);
+    return ImmutableSet.of([actionSetter.set({type: 'click', x: event.x, y: event.y})]);
   }
 }

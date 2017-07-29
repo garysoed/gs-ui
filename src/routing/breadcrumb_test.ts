@@ -1,6 +1,7 @@
-import { assert, Matchers, TestBase } from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
+import { FakeMonadSetter } from 'external/gs_tools/src/event';
 import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
@@ -116,17 +117,6 @@ describe('routing.Breadcrumb', () => {
     TestDispose.add(breadcrumb);
   });
 
-  describe('onInserted', () => {
-    it('should call route changed method', () => {
-      const monadSetter = Mocks.object('monadSetter');
-      spyOn(breadcrumb, 'onRouteChanged_');
-
-      breadcrumb.onInserted(monadSetter);
-
-      assert(breadcrumb.onRouteChanged_).to.haveBeenCalledWith(monadSetter);
-    });
-  });
-
   describe('onRouteChanged_', () => {
     it('should set the bridge with the correct data', async () => {
       const name1 = 'name1';
@@ -152,10 +142,10 @@ describe('routing.Breadcrumb', () => {
       mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
           .and.returnValue(mockRoute);
 
-      const crumbId = 'crumbId';
-      const list = await breadcrumb.onRouteChanged_({id: crumbId} as any);
-      assert(list).to.haveElements([Matchers.monadSetterWith(Matchers.any(ImmutableList))]);
-      assert(list.getAt(0)!.value as ImmutableList<CrumbData>).to.haveElements([
+      const fakeCrumbSetter = new FakeMonadSetter<ImmutableList<CrumbData>>(ImmutableList.of([]));
+
+      const list = await breadcrumb.onRouteChanged_(fakeCrumbSetter);
+      assert(fakeCrumbSetter.findValue(list)!.value).to.haveElements([
         {name: name1, url: url1},
         {name: name2, url: url2},
       ]);
@@ -176,15 +166,20 @@ describe('routing.Breadcrumb', () => {
       mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
           .and.returnValue(mockRoute);
 
+      const fakeCrumbSetter = new FakeMonadSetter<ImmutableList<CrumbData>>(ImmutableList.of([]));
 
-      assert(await breadcrumb.onRouteChanged_({id: 'crumbId'} as any)).to.haveElements([]);
+      const list = await breadcrumb.onRouteChanged_(fakeCrumbSetter);
+      assert([...list]).to.equal([]);
     });
 
     it('should not update the bridge if there are no routes', async () => {
       mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
           .and.returnValue(null);
 
-      assert(await breadcrumb.onRouteChanged_({id: 'crumbId'} as any)).to.haveElements([]);
+      const fakeCrumbSetter = new FakeMonadSetter<ImmutableList<CrumbData>>(ImmutableList.of([]));
+
+      const list = await breadcrumb.onRouteChanged_(fakeCrumbSetter);
+      assert([...list]).to.equal([]);
     });
   });
 });

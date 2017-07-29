@@ -1,11 +1,12 @@
 import { MonadUtil } from 'external/gs_tools/src/event';
-import { ImmutableList } from 'external/gs_tools/src/immutable';
+import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import {
   DispatchFn,
   Disposable,
   ElementSelector,
   Event,
   MonadSetter,
+  MonadValue,
   Parser} from 'external/gs_tools/src/interfaces';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import { dom, domOut, onDom, onLifecycle, Util } from 'external/gs_tools/src/webc';
@@ -93,17 +94,16 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
   onInputChange_(
       @domOut.attribute(VALUE_ATTR) valueSetter: MonadSetter<string | null>,
       @dom.element(null) element: HTMLElement,
-      @dom.eventDispatcher() dispatcher: DispatchFn<{}>): ImmutableList<MonadSetter<any>> {
+      @dom.eventDispatcher() dispatcher: DispatchFn<{}>): Iterable<MonadValue<any>> {
     const inputValue = this.getInputElValue_(this.getInputEl_(element));
     const parsedInputValue = this.valueParser_.parse(inputValue);
     const parsedElValue = this.valueParser_.parse(valueSetter.value);
     if (!this.isValueChanged_(parsedInputValue, parsedElValue)) {
-      return ImmutableList.of([]);
+      return ImmutableSet.of([]);
     }
 
     dispatcher(CHANGE_EVENT, {});
-    valueSetter.value = inputValue;
-    return ImmutableList.of([valueSetter]);
+    return ImmutableSet.of([valueSetter.set(inputValue)]);
   }
 
   @onLifecycle('insert')

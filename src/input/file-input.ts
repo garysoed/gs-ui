@@ -14,7 +14,7 @@ import {
   ImmutableSet,
   Orderings } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { MonadFactory, MonadSetter } from 'external/gs_tools/src/interfaces';
+import { MonadFactory, MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
 import { ListParser, StringParser } from 'external/gs_tools/src/parse';
 import { customElement, dom, domOut, onDom } from 'external/gs_tools/src/webc';
 
@@ -47,7 +47,7 @@ const DRAG_DEPTH_FACTORY: MonadFactory<number> = (instance: FileInput) => {
   };
 };
 
-type DeleteBundleFn = () => void | null;
+export type DeleteBundleFn = () => void | null;
 const __deleteBundleFn = Symbol('deleteBundleFn');
 const DELETE_BUNDLE_FN_FACTORY: MonadFactory<DeleteBundleFn> = (instance: FileInput) => {
   return {
@@ -105,15 +105,14 @@ export class FileInput extends BaseThemedElement2 {
       @dom.attribute(BUNDLE_ID_ATTR) bundleId: string | null,
       @dom.element(DROPPED_MESSAGE_EL) droppedMessageEl: HTMLElement,
       @domOut.attribute(SWITCH_VALUE_ATTR) switchSetter: MonadSetter<string | null>):
-      ImmutableList<MonadSetter<any>> {
+      Iterable<MonadValue<any>> {
     if (deleteBundleFn !== null && oldValue !== null) {
       deleteBundleFn();
     }
 
     const files = this.getFiles_(bundleId);
     if (files === null || files.length === 0) {
-      switchSetter.value = 'initial';
-      return ImmutableList.of([switchSetter]);
+      return ImmutableSet.of([switchSetter.set('initial')]);
     }
 
     const fileNames = ImmutableList
@@ -127,51 +126,46 @@ export class FileInput extends BaseThemedElement2 {
     droppedMessageEl.innerText = files.length > 1 ?
         `Added files: ${fileNames}` :
         `Added file: ${fileNames}`;
-    switchSetter.value = 'dropped';
-    return ImmutableList.of([switchSetter]);
+    return ImmutableSet.of([switchSetter.set('dropped')]);
   }
 
   @onDom.event(ROOT_EL, 'dragenter')
   onDragEnter_(
       @monadOut(DRAG_DEPTH_FACTORY) dragDepthSetter: MonadSetter<number>,
       @dom.attribute(MIME_TYPES_ATTR) mimeTypes: ImmutableList<string>,
-      @domOut.attribute(SWITCH_VALUE_ATTR) switchSetter: MonadSetter<string>,
-      @eventDetails() event: DragEvent): ImmutableList<MonadSetter<any>> {
+      @domOut.attribute(SWITCH_VALUE_ATTR) switchSetter: MonadSetter<string | null>,
+      @eventDetails() event: DragEvent): Iterable<MonadValue<any>> {
     const dragDepthValue = dragDepthSetter.value;
-    dragDepthSetter.value++;
-    const changes: MonadSetter<any>[] = [dragDepthSetter];
+    const changes: MonadValue<any>[] = [dragDepthSetter.set(dragDepthValue + 1)];
     if (dragDepthValue >= 0) {
       if (this.isValid_(mimeTypes, event.dataTransfer)) {
-        switchSetter.value = 'dragging';
+        changes.push(switchSetter.set('dragging'));
       } else {
-        switchSetter.value = 'error';
+        changes.push(switchSetter.set('error'));
       }
-      changes.push(switchSetter);
     }
 
-    return ImmutableList.of(changes);
+    return ImmutableSet.of(changes);
   }
 
   @onDom.event(ROOT_EL, 'dragleave')
   @onDom.event(ROOT_EL, 'drop')
   onDragLeave_(
       @monadOut(DRAG_DEPTH_FACTORY) dragDepthSetter: MonadSetter<number>,
-      @domOut.attribute(SWITCH_VALUE_ATTR) switchSetter: MonadSetter<string>,
+      @domOut.attribute(SWITCH_VALUE_ATTR) switchSetter: MonadSetter<string | null>,
       @dom.attribute(BUNDLE_ID_ATTR) bundleId: string | null):
-      ImmutableList<MonadSetter<any>> {
-    dragDepthSetter.value--;
-    const changes: MonadSetter<any>[] = [dragDepthSetter];
+      Iterable<MonadValue<any>> {
+    const changes: MonadValue<any>[] = [dragDepthSetter.set(dragDepthSetter.value - 1)];
     if (dragDepthSetter.value <= 1) {
       const files = this.getFiles_(bundleId);
       if (files === null || files.length <= 0) {
-        switchSetter.value = 'initial';
+        changes.push(switchSetter.set('initial'));
       } else {
-        switchSetter.value = 'dropped';
+        changes.push(switchSetter.set('dropped'));
       }
-      changes.push(switchSetter);
     }
 
-    return ImmutableList.of(changes);
+    return ImmutableSet.of(changes);
   }
 
   @onDom.event(ROOT_EL, 'dragover')
@@ -190,7 +184,7 @@ export class FileInput extends BaseThemedElement2 {
       @monadOut(DELETE_BUNDLE_FN_FACTORY) deleteFnSetter: MonadSetter<DeleteBundleFn | null>,
       @domOut.attribute(BUNDLE_ID_ATTR) bundleIdSetter: MonadSetter<string | null>,
       @dom.attribute(MIME_TYPES_ATTR) mimeTypes: ImmutableList<string>):
-      ImmutableList<MonadSetter<any>> {
+      Iterable<MonadValue<any>> {
     const changes = [];
     event.preventDefault();
     event.stopPropagation();
@@ -202,13 +196,11 @@ export class FileInput extends BaseThemedElement2 {
 
       const {id, deleteFn: newDeleteFn} =
           this.fileService_.addBundle(ImmutableList.of(event.dataTransfer.files).toArray());
-      deleteFnSetter.value = newDeleteFn;
-      bundleIdSetter.value = id;
-      changes.push(deleteFnSetter);
-      changes.push(bundleIdSetter);
+      changes.push(deleteFnSetter.set(newDeleteFn));
+      changes.push(bundleIdSetter.set(id));
     }
 
-    return ImmutableList.of(changes);
+    return ImmutableSet.of(changes);
   }
 
   /**

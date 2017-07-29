@@ -2,9 +2,14 @@ import { Interval } from 'external/gs_tools/src/async';
 import { Color, Colors, HslColor } from 'external/gs_tools/src/color';
 import { cache } from 'external/gs_tools/src/data/cache';
 import { on } from 'external/gs_tools/src/event';
-import { ImmutableList, ImmutableMap, Iterables } from 'external/gs_tools/src/immutable';
+import { ImmutableMap, ImmutableSet, Iterables } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { Disposable, ElementSelector, Event, MonadSetter } from 'external/gs_tools/src/interfaces';
+import {
+  Disposable,
+  ElementSelector,
+  Event,
+  MonadSetter,
+  MonadValue } from 'external/gs_tools/src/interfaces';
 import {
   BooleanParser,
   EnumParser,
@@ -166,11 +171,10 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
       @domOut.attribute(SHOW_GUTTER_ATTRIBUTE) showGutterSetter: MonadSetter<boolean | null>,
       @dom.element(CUSTOM_STYLE_EL) customStyleEl: HTMLStyleElement,
       @dom.element(EDITOR_EL) editorEl: HTMLElement):
-      ImmutableList<MonadSetter<any>> {
-    const changes: MonadSetter<any>[] = [];
+      Iterable<MonadValue<any>> {
+    const changes: MonadValue<any>[] = [];
     if (showGutterSetter.value === null) {
-      showGutterSetter.value = true;
-      changes.push(showGutterSetter);
+      changes.push(showGutterSetter.set(true));
     }
 
     const interval = Interval.newInstance(500);
@@ -179,7 +183,7 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
     interval.start();
 
     this.onThemeChanged_(customStyleEl, editorEl);
-    return ImmutableList.of(changes);
+    return ImmutableSet.of(changes);
   }
 
   @onDom.attributeChange(LANGUAGE_ATTRIBUTE)

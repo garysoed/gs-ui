@@ -14,17 +14,17 @@
  */
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
 import { eventDetails, on } from 'external/gs_tools/src/event';
-import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
+import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { MonadSetter } from 'external/gs_tools/src/interfaces';
+import { MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import { customElement, dom, domOut, onDom} from 'external/gs_tools/src/webc';
 import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
 import { AnchorLocation } from '../const';
-import { OverlayService } from '../tool';
 import { AnchorLocationParser } from '../tool/anchor-location-parser';
 import { OverlayBus, OverlayEventType } from '../tool/overlay-bus';
+import { OverlayService } from '../tool/overlay-service';
 
 
 const ANCHOR_POINT_ATTR = {
@@ -59,20 +59,21 @@ export class Menu extends BaseDisposable {
       @domOut.attribute(ANCHOR_POINT_ATTR) anchorPointSetter: MonadSetter<null | AnchorLocation>,
       @domOut.attribute(ANCHOR_TARGET_ATTR) anchorTargetSetter: MonadSetter<null | AnchorLocation>,
       @domOut.attribute(VISIBLE_ATTR) visibleSetter: MonadSetter<null | boolean>):
-      ImmutableList<MonadSetter<any>> {
+      Iterable<MonadValue<any>> {
+    const values: MonadValue<any>[] = [];
     if (anchorPointSetter.value === null) {
-      anchorPointSetter.value = AnchorLocation.AUTO;
+      values.push(anchorPointSetter.set(AnchorLocation.AUTO));
     }
 
     if (anchorTargetSetter.value === null) {
-      anchorTargetSetter.value = AnchorLocation.AUTO;
+      values.push(anchorTargetSetter.set(AnchorLocation.AUTO));
     }
 
     if (visibleSetter.value === null) {
-      visibleSetter.value = false;
+      values.push(visibleSetter.set(false));
     }
 
-    return ImmutableList.of([anchorPointSetter, anchorTargetSetter, visibleSetter]);
+    return ImmutableSet.of(values);
   }
 
   @on(OverlayBus, 'show')
@@ -80,13 +81,12 @@ export class Menu extends BaseDisposable {
   onOverlayVisibilityChange_(
       @eventDetails() {id, type}: {id: symbol, type: OverlayEventType},
       @domOut.attribute(VISIBLE_ATTR) visibleSetter: MonadSetter<boolean | null>):
-      ImmutableList<MonadSetter<any>> {
+      Iterable<MonadValue<any>> {
     if (id !== this.id_) {
-      return ImmutableList.of([]);
+      return ImmutableSet.of([]);
     }
 
-    visibleSetter.value = type === 'show';
-    return ImmutableList.of([visibleSetter]);
+    return ImmutableSet.of([visibleSetter.set(type === 'show')]);
   }
 
   @onDom.attributeChange(VISIBLE_ATTR)

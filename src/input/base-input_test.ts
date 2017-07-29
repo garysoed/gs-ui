@@ -1,11 +1,12 @@
 import { assert, Matchers, Mocks, TestBase } from '../test-base';
 TestBase.setup();
 
-import { MonadUtil } from 'external/gs_tools/src/event';
+import { FakeMonadSetter, MonadUtil } from 'external/gs_tools/src/event';
 import { Disposable, ElementSelector } from 'external/gs_tools/src/interfaces';
 import { StringParser } from 'external/gs_tools/src/parse';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
+import { Iterables } from 'external/gs_tools/src/immutable';
 import { BaseInput } from '../input/base-input';
 
 class TestInput extends BaseInput<string> {
@@ -138,7 +139,6 @@ describe('input.BaseInput', () => {
 
   describe('onInputChange_', () => {
     it(`should update the value on the element and dispatch the change event`, () => {
-      const elValueId = 'elValueId';
       const elValue = 'elValue';
       const inputValue = 'inputValue';
       const element = Mocks.object('element');
@@ -149,8 +149,10 @@ describe('input.BaseInput', () => {
 
       spyOn(input, 'isValueChanged_').and.returnValue(true);
 
-      assert(input.onInputChange_({id: elValueId, value: elValue}, element, mockDispatcher))
-          .to.haveElements([Matchers.monadSetterWith(inputValue)]);
+      const fakeValueSetter = new FakeMonadSetter(elValue);
+
+      const list = input.onInputChange_(fakeValueSetter, element, mockDispatcher);
+      assert(fakeValueSetter.findValue(list)!.value).to.equal(inputValue);
       assert(mockDispatcher).to.haveBeenCalledWith('change', {});
       assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, elValue);
       assert(input['getInputEl_']).to.haveBeenCalledWith(element);
@@ -158,7 +160,6 @@ describe('input.BaseInput', () => {
     });
 
     it(`should do nothing if the value does not change`, () => {
-      const elValueId = 'elValueId';
       const elValue = 'elValue';
       const inputValue = 'inputValue';
       const element = Mocks.object('element');
@@ -169,8 +170,10 @@ describe('input.BaseInput', () => {
 
       spyOn(input, 'isValueChanged_').and.returnValue(false);
 
-      assert(input.onInputChange_({id: elValueId, value: elValue}, element, mockDispatcher))
-          .to.haveElements([]);
+      const fakeValueSetter = new FakeMonadSetter(elValue);
+
+      const list = input.onInputChange_(fakeValueSetter, element, mockDispatcher);
+      assert(Iterables.unsafeToArray(list)).to.equal([]);
       assert(mockDispatcher).toNot.haveBeenCalled();
       assert(input['isValueChanged_']).to.haveBeenCalledWith(inputValue, elValue);
       assert(input['getInputEl_']).to.haveBeenCalledWith(element);

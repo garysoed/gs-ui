@@ -4,6 +4,8 @@ TestBase.setup();
 import { Interval } from 'external/gs_tools/src/async';
 import { Colors, HslColor, RgbColor } from 'external/gs_tools/src/color';
 import { DisposableFunction } from 'external/gs_tools/src/dispose';
+import { FakeMonadSetter } from 'external/gs_tools/src/event';
+import { Iterables } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { Solve, Spec } from 'external/gs_tools/src/solver';
 import { TestDispose } from 'external/gs_tools/src/testing';
@@ -266,7 +268,6 @@ describe('input.CodeInput', () => {
 
   describe('onCreated', () => {
     it('should initialize correctly', () => {
-      const showGutterId = 'showGutterId';
       const customStyleEl = Mocks.object('customStyleEl');
       const editorEl = Mocks.object('editorEl');
 
@@ -278,8 +279,10 @@ describe('input.CodeInput', () => {
       spyOn(input, 'onThemeChanged_');
       spyOn(input, 'onTick_');
 
-      assert(input.onCreated({id: showGutterId, value: null}, customStyleEl, editorEl))
-          .to.haveElements([Matchers.monadSetterWith(true)]);
+      const fakeShowGutterSetter = new FakeMonadSetter<boolean | null>(null);
+
+      const list = input.onCreated(fakeShowGutterSetter, customStyleEl, editorEl);
+      assert(fakeShowGutterSetter.findValue(list)!.value).to.beTrue();
 
       assert(input.onThemeChanged_).to.haveBeenCalledWith(customStyleEl, editorEl);
       assert(mockInterval.on).to.haveBeenCalledWith('tick', Matchers.any(Function), input);
@@ -290,7 +293,6 @@ describe('input.CodeInput', () => {
     });
 
     it(`should not override the show-gutter value if specified`, () => {
-      const showGutterId = 'showGutterId';
       const customStyleEl = Mocks.object('customStyleEl');
       const editorEl = Mocks.object('editorEl');
 
@@ -301,8 +303,9 @@ describe('input.CodeInput', () => {
       spyOn(input, 'onThemeChanged_');
       spyOn(input, 'onTick_');
 
-      assert(input.onCreated({id: showGutterId, value: true}, customStyleEl, editorEl))
-          .to.haveElements([]);
+      const fakeShowGutterSetter = new FakeMonadSetter<boolean | null>(true);
+      const list = input.onCreated(fakeShowGutterSetter, customStyleEl, editorEl);
+      assert(Iterables.unsafeToArray(list)).to.equal([]);
     });
   });
 

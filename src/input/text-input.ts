@@ -3,7 +3,7 @@
  * Element for inputting texts.
  *
  * @attr {boolean} disabled True iff the input should be disabled.
- * @attr {float} value Value of the input.
+ * @attr {string} value Value of the input.
  *
  * @event {{}} change Dispatched when the value has changed.
  */

@@ -1,9 +1,10 @@
-import { assert, Matchers, TestBase } from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
+import { FakeMonadSetter } from 'external/gs_tools/src/event';
 import { AnchorLocation } from '../const';
 import { Menu } from '../tool';
 
@@ -19,82 +20,80 @@ describe('tool.Menu', () => {
 
   describe('onCreated_', () => {
     it('should default the anchor target to AUTO', () => {
-      const anchorPointId = Mocks.object('anchorPointId');
-      const anchorTargetId = Mocks.object('anchorTargetId');
-      const visibleId = 'visibleId';
       const anchorPoint = AnchorLocation.BOTTOM_LEFT;
       const visible = true;
 
-      const value = menu.onCreated_(
-          {id: anchorPointId, value: anchorPoint},
-          {id: anchorTargetId, value: null},
-          {id: visibleId, value: visible});
+      const fakeAnchorPointSetter = new FakeMonadSetter<AnchorLocation | null>(anchorPoint);
+      const fakeAnchorTargetSetter = new FakeMonadSetter<AnchorLocation | null>(null);
+      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(visible);
 
-      assert(value).to.haveElements([
-        Matchers.monadSetterWith(anchorPoint),
-        Matchers.monadSetterWith(AnchorLocation.AUTO),
-        Matchers.monadSetterWith(visible),
-      ]);
+      const list = menu.onCreated_(
+          fakeAnchorPointSetter,
+          fakeAnchorTargetSetter,
+          fakeVisibleSetter);
+      assert(fakeAnchorPointSetter.findValue(list)).to.beNull();
+      assert(fakeAnchorTargetSetter.findValue(list)!.value).to.equal(AnchorLocation.AUTO);
+      assert(fakeVisibleSetter.findValue(list)).to.beNull();
     });
 
     it('should default the anchor point to AUTO', () => {
-      const anchorPointId = Mocks.object('anchorPointId');
-      const anchorTargetId = Mocks.object('anchorTargetId');
-      const visibleId = 'visibleId';
       const anchorTarget = AnchorLocation.BOTTOM_LEFT;
       const visible = true;
 
-      const value = menu.onCreated_(
-          {id: anchorPointId, value: null},
-          {id: anchorTargetId, value: anchorTarget},
-          {id: visibleId, value: visible});
+      const fakeAnchorPointSetter = new FakeMonadSetter<AnchorLocation | null>(null);
+      const fakeAnchorTargetSetter = new FakeMonadSetter<AnchorLocation | null>(anchorTarget);
+      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(visible);
 
-      assert(value).to.haveElements([
-        Matchers.monadSetterWith(AnchorLocation.AUTO),
-        Matchers.monadSetterWith(anchorTarget),
-        Matchers.monadSetterWith(visible),
-      ]);
+      const list = menu.onCreated_(
+          fakeAnchorPointSetter,
+          fakeAnchorTargetSetter,
+          fakeVisibleSetter);
+      assert(fakeAnchorPointSetter.findValue(list)!.value).to.equal(AnchorLocation.AUTO);
+      assert(fakeAnchorTargetSetter.findValue(list)).to.beNull();
+      assert(fakeVisibleSetter.findValue(list)).to.beNull();
     });
 
     it(`should default the visibility to false`, () => {
-      const anchorPointId = Mocks.object('anchorPointId');
-      const anchorTargetId = Mocks.object('anchorTargetId');
-      const visibleId = 'visibleId';
       const anchorTarget = AnchorLocation.BOTTOM_LEFT;
       const anchorPoint = AnchorLocation.BOTTOM_LEFT;
 
-      const value = menu.onCreated_(
-          {id: anchorPointId, value: anchorPoint},
-          {id: anchorTargetId, value: anchorTarget},
-          {id: visibleId, value: null});
+      const fakeAnchorPointSetter = new FakeMonadSetter<AnchorLocation | null>(anchorPoint);
+      const fakeAnchorTargetSetter = new FakeMonadSetter<AnchorLocation | null>(anchorTarget);
+      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(null);
 
-      assert(value).to.haveElements([
-        Matchers.monadSetterWith(anchorPoint),
-        Matchers.monadSetterWith(anchorTarget),
-        Matchers.monadSetterWith(false),
-      ]);
+      const list = menu.onCreated_(
+          fakeAnchorPointSetter,
+          fakeAnchorTargetSetter,
+          fakeVisibleSetter);
+      assert(fakeAnchorPointSetter.findValue(list)).to.beNull();
+      assert(fakeAnchorTargetSetter.findValue(list)).to.beNull();
+      assert(fakeVisibleSetter.findValue(list)!.value).to.beFalse();
     });
   });
 
   describe('onOverlayVisibilityChange_', () => {
     it(`should set the visible attribute to true if event type is show`, () => {
-      const visibleId = 'visibleId';
       const event = {id: menu['id_'], type: 'show' as 'show'};
-      assert(menu.onOverlayVisibilityChange_(event, {id: visibleId, value: null})).to
-          .haveElements([Matchers.monadSetterWith(true)]);
+      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(null);
+
+      const list = menu.onOverlayVisibilityChange_(event, fakeVisibleSetter);
+      assert(fakeVisibleSetter.findValue(list)!.value).to.beTrue();
     });
 
     it(`should set the visible attribute to hide if event type is hide`, () => {
-      const visibleId = 'visibleId';
       const event = {id: menu['id_'], type: 'hide' as 'hide'};
-      assert(menu.onOverlayVisibilityChange_(event, {id: visibleId, value: null})).to
-          .haveElements([Matchers.monadSetterWith(false)]);
+      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(null);
+
+      const list = menu.onOverlayVisibilityChange_(event, fakeVisibleSetter);
+      assert(fakeVisibleSetter.findValue(list)!.value).to.beFalse();
     });
 
     it(`should do nothing the ID does not match`, () => {
       const event = {id: Symbol('otherId'), type: 'hide' as 'hide'};
-      assert(menu.onOverlayVisibilityChange_(event, {id: 'visibleId', value: null})).to
-          .haveElements([]);
+      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(null);
+
+      const list = menu.onOverlayVisibilityChange_(event, fakeVisibleSetter);
+      assert([...list]).to.equal([]);
     });
   });
 

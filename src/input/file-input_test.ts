@@ -1,11 +1,13 @@
-import { assert, Matchers, TestBase } from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import { ImmutableList } from 'external/gs_tools/src/immutable';
+import { FakeMonadSetter } from 'external/gs_tools/src/event';
+import { ImmutableList, Iterables } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { FileInput } from '../input';
+import { DeleteBundleFn } from '../input/file-input';
 
 
 describe('input.FileInput', () => {
@@ -69,19 +71,20 @@ describe('input.FileInput', () => {
       const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
       const bundleId = 'bundleId';
       const droppedMessageEl = Mocks.object('droppedMessageEl');
-      const switchId = 'switchId';
 
       const filename1 = 'filename1';
       const filename2 = 'filename2';
       spyOn(input, 'getFiles_').and.returnValue([{name: filename1}, {name: filename2}]);
+
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
 
       const list = input.onBundleIdChanged_(
           {oldValue: 'oldValue'} as any,
           mockDeleteBundleFn,
           bundleId,
           droppedMessageEl,
-          {id: switchId} as any);
-      assert(list).to.haveElements([Matchers.monadSetterWith('dropped')]);
+          fakeSwitchSetter);
+      assert(fakeSwitchSetter.findValue(list)!.value).to.equal('dropped');
       assert(droppedMessageEl.innerText as string).to
           .match(new RegExp(`files: ${filename1}, ${filename2}`));
       assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
@@ -91,18 +94,19 @@ describe('input.FileInput', () => {
       const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
       const bundleId = 'bundleId';
       const droppedMessageEl = Mocks.object('droppedMessageEl');
-      const switchId = 'switchId';
 
       const filename = 'filename';
       spyOn(input, 'getFiles_').and.returnValue([{name: filename}]);
+
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
 
       const list = input.onBundleIdChanged_(
           {oldValue: 'oldValue'} as any,
           mockDeleteBundleFn,
           bundleId,
           droppedMessageEl,
-          {id: switchId} as any);
-      assert(list).to.haveElements([Matchers.monadSetterWith('dropped')]);
+          fakeSwitchSetter);
+      assert(fakeSwitchSetter.findValue(list)!.value).to.equal('dropped');
       assert(droppedMessageEl.innerText as string).to.match(new RegExp(`file: ${filename}`));
       assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
     });
@@ -111,17 +115,18 @@ describe('input.FileInput', () => {
       const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
       const bundleId = 'bundleId';
       const droppedMessageEl = Mocks.object('droppedMessageEl');
-      const switchId = 'switchId';
 
       spyOn(input, 'getFiles_').and.returnValue([]);
 
-      const map = input.onBundleIdChanged_(
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
+
+      const list = input.onBundleIdChanged_(
           {oldValue: 'oldValue'} as any,
           mockDeleteBundleFn,
           bundleId,
           droppedMessageEl,
-          {id: switchId} as any);
-      assert(map).to.haveElements([Matchers.monadSetterWith('initial')]);
+          fakeSwitchSetter);
+      assert(fakeSwitchSetter.findValue(list)!.value).to.equal('initial');
       assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
     });
 
@@ -129,17 +134,18 @@ describe('input.FileInput', () => {
       const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
       const bundleId = 'bundleId';
       const droppedMessageEl = Mocks.object('droppedMessageEl');
-      const switchId = 'switchId';
 
       spyOn(input, 'getFiles_').and.returnValue(null);
 
-      const map = input.onBundleIdChanged_(
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
+
+      const list = input.onBundleIdChanged_(
           {oldValue: 'oldValue'} as any,
           mockDeleteBundleFn,
           bundleId,
           droppedMessageEl,
-          {id: switchId} as any);
-      assert(map).to.haveElements([Matchers.monadSetterWith('initial')]);
+          fakeSwitchSetter);
+      assert(fakeSwitchSetter.findValue(list)!.value).to.equal('initial');
       assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
     });
 
@@ -148,16 +154,17 @@ describe('input.FileInput', () => {
       const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
       const bundleId = 'bundleId';
       const droppedMessageEl = Mocks.object('droppedMessageEl');
-      const switchId = 'switchId';
 
       spyOn(input, 'getFiles_').and.returnValue(null);
+
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
 
       input.onBundleIdChanged_(
           {oldValue: 'oldValue'} as any,
           mockDeleteBundleFn,
           bundleId,
           droppedMessageEl,
-          {id: switchId} as any);
+          fakeSwitchSetter);
       assert(mockDeleteBundleFn).to.haveBeenCalledWith();
     });
 
@@ -166,154 +173,148 @@ describe('input.FileInput', () => {
       const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
       const bundleId = 'bundleId';
       const droppedMessageEl = Mocks.object('droppedMessageEl');
-      const switchId = 'switchId';
 
       spyOn(input, 'getFiles_').and.returnValue(null);
+
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
 
       input.onBundleIdChanged_(
           {oldValue: null} as any,
           mockDeleteBundleFn,
           bundleId,
           droppedMessageEl,
-          {id: switchId} as any);
+          fakeSwitchSetter);
       assert(mockDeleteBundleFn).toNot.haveBeenCalled();
     });
   });
 
   describe('onDragEnter_', () => {
     it('should increment the drag depth and set the switch to "dragging" if data transfer is '
-        + 'valid',
-        () => {
-          const switchId = 'switchId';
-          const mimeTypes = Mocks.object('mimeTypes');
-          const dragDepthId = 'dragDepthId';
-          const dragDepth = 123;
-          const dataTransfer = Mocks.object('dataTransfer');
-          spyOn(input, 'isValid_').and.returnValue(true);
+        + 'valid', () => {
+      const mimeTypes = Mocks.object('mimeTypes');
+      const dragDepth = 123;
+      const dataTransfer = Mocks.object('dataTransfer');
+      spyOn(input, 'isValid_').and.returnValue(true);
 
-          const list = input.onDragEnter_(
-              {id: dragDepthId, value: dragDepth},
-              mimeTypes,
-              {id: switchId} as any,
-              {dataTransfer: dataTransfer} as any);
-          assert(list).to.haveElements([
-            Matchers.monadSetterWith(dragDepth + 1),
-            Matchers.monadSetterWith('dragging'),
-          ]);
+      const fakeDragDepthSetter = new FakeMonadSetter<number>(dragDepth);
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
 
-          assert(input['isValid_']).to.haveBeenCalledWith(mimeTypes, dataTransfer);
-        });
+      const list = input.onDragEnter_(
+          fakeDragDepthSetter,
+          mimeTypes,
+          fakeSwitchSetter,
+          {dataTransfer: dataTransfer} as any);
+      assert(fakeDragDepthSetter.findValue(list)!.value).to.equal(dragDepth + 1);
+      assert(fakeSwitchSetter.findValue(list)!.value).to.equal('dragging');
+      assert(input['isValid_']).to.haveBeenCalledWith(mimeTypes, dataTransfer);
+    });
 
     it('should increment the drag depth and set the switch to "error" if data transfer is '
-        + 'invalid',
-        () => {
-          const switchId = 'switchId';
-          const mimeTypes = Mocks.object('mimeTypes');
-          const dragDepthId = 'dragDepthId';
-          const dragDepth = 123;
-          const dataTransfer = Mocks.object('dataTransfer');
-          spyOn(input, 'isValid_').and.returnValue(false);
+        + 'invalid', () => {
+      const mimeTypes = Mocks.object('mimeTypes');
+      const dragDepth = 123;
+      const dataTransfer = Mocks.object('dataTransfer');
+      spyOn(input, 'isValid_').and.returnValue(false);
 
-          const list = input.onDragEnter_(
-              {id: dragDepthId, value: dragDepth},
-              mimeTypes,
-              {id: switchId} as any,
-              {dataTransfer: dataTransfer} as any);
-          assert(list).to.haveElements([
-            Matchers.monadSetterWith(dragDepth + 1),
-            Matchers.monadSetterWith('error'),
-          ]);
+      const fakeDragDepthSetter = new FakeMonadSetter<number>(dragDepth);
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
 
-          assert(input['isValid_']).to.haveBeenCalledWith(mimeTypes, dataTransfer);
-        });
+      const list = input.onDragEnter_(
+          fakeDragDepthSetter,
+          mimeTypes,
+          fakeSwitchSetter,
+          {dataTransfer: dataTransfer} as any);
+      assert(fakeDragDepthSetter.findValue(list)!.value).to.equal(dragDepth + 1);
+      assert(fakeSwitchSetter.findValue(list)!.value).to.equal('error');
+
+      assert(input['isValid_']).to.haveBeenCalledWith(mimeTypes, dataTransfer);
+    });
 
     it('should not set the switch if drag depth is < 0', () => {
-      const switchId = 'switchId';
       const mimeTypes = Mocks.object('mimeTypes');
-      const dragDepthId = 'dragDepthId';
       const dragDepth = -1;
       const dataTransfer = Mocks.object('dataTransfer');
       spyOn(input, 'isValid_').and.returnValue(false);
 
+      const fakeDragDepthSetter = new FakeMonadSetter<number>(dragDepth);
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
+
       const list = input.onDragEnter_(
-          {id: dragDepthId, value: dragDepth},
+          fakeDragDepthSetter,
           mimeTypes,
-          {id: switchId} as any,
+          fakeSwitchSetter,
           {dataTransfer: dataTransfer} as any);
-      assert(list).to.haveElements([Matchers.monadSetterWith(dragDepth + 1)]);
+      assert(fakeDragDepthSetter.findValue(list)!.value).to.equal(dragDepth + 1);
     });
   });
 
   describe('onDragLeave_', () => {
-    it('should decrement the drag depth and set the switch to "dropped" if there is a file',
-        () => {
-          const dragDepthId = 'dragDepthId';
-          const dragDepth = 1;
-          const switchId = 'switchId';
-          const bundleId = 'bundleId';
-          spyOn(input, 'getFiles_').and.returnValue([{}, {}]);
+    it('should decrement the drag depth and set the switch to "dropped" if there is a file', () => {
+      const dragDepth = 1;
+      const bundleId = 'bundleId';
+      spyOn(input, 'getFiles_').and.returnValue([{}, {}]);
 
-          const map = input.onDragLeave_(
-              {id: dragDepthId, value: dragDepth},
-              {id: switchId} as any,
-              bundleId);
-          assert(map).to.haveElements([
-            Matchers.monadSetterWith(dragDepth - 1),
-            Matchers.monadSetterWith('dropped'),
-          ]);
-          assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
-        });
+      const fakeDragDepthSetter = new FakeMonadSetter<number>(dragDepth);
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
+
+      const list = input.onDragLeave_(
+          fakeDragDepthSetter,
+          fakeSwitchSetter,
+          bundleId);
+      assert(fakeDragDepthSetter.findValue(list)!.value).to.equal(dragDepth - 1);
+      assert(fakeSwitchSetter.findValue(list)!.value).to.equal('dropped');
+      assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
+    });
 
     it('should decrement the drag depth and set the switch to "initial" if there are no files',
         () => {
-          const dragDepthId = 'dragDepthId';
-          const dragDepth = 1;
-          const switchId = 'switchId';
-          const bundleId = 'bundleId';
-          spyOn(input, 'getFiles_').and.returnValue([]);
+      const dragDepth = 1;
+      const bundleId = 'bundleId';
+      spyOn(input, 'getFiles_').and.returnValue([]);
 
-          const map = input.onDragLeave_(
-              {id: dragDepthId, value: dragDepth},
-              {id: switchId} as any,
-              bundleId);
-          assert(map).to.haveElements([
-            Matchers.monadSetterWith(dragDepth - 1),
-            Matchers.monadSetterWith('initial'),
-          ]);
-          assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
-        });
+      const fakeDragDepthSetter = new FakeMonadSetter<number>(dragDepth);
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
+
+      const list = input.onDragLeave_(
+          fakeDragDepthSetter,
+          fakeSwitchSetter,
+          bundleId);
+      assert(fakeDragDepthSetter.findValue(list)!.value).to.equal(dragDepth - 1);
+      assert(fakeSwitchSetter.findValue(list)!.value).to.equal('initial');
+      assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
+    });
 
     it('should decrement the drag depth and set the switch to "initial" if there are no bundles',
         () => {
-          const dragDepthId = 'dragDepthId';
-          const dragDepth = 1;
-          const switchId = 'switchId';
-          const bundleId = 'bundleId';
-          spyOn(input, 'getFiles_').and.returnValue(null);
-
-          const map = input.onDragLeave_(
-              {id: dragDepthId, value: dragDepth},
-              {id: switchId} as any,
-              bundleId);
-          assert(map).to.haveElements([
-            Matchers.monadSetterWith(dragDepth - 1),
-            Matchers.monadSetterWith('initial'),
-          ]);
-          assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
-        });
-
-    it('should not set the switch if drag depth is more than 1', () => {
-      const dragDepthId = 'dragDepthId';
-      const dragDepth = 123;
-      const switchId = 'switchId';
+      const dragDepth = 1;
       const bundleId = 'bundleId';
       spyOn(input, 'getFiles_').and.returnValue(null);
 
-      const map = input.onDragLeave_(
-          {id: dragDepthId, value: dragDepth},
-          {id: switchId} as any,
+      const fakeDragDepthSetter = new FakeMonadSetter<number>(dragDepth);
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
+
+      const list = input.onDragLeave_(
+          fakeDragDepthSetter,
+          fakeSwitchSetter,
           bundleId);
-      assert(map).to.haveElements([Matchers.monadSetterWith(dragDepth - 1)]);
+      assert(fakeDragDepthSetter.findValue(list)!.value).to.equal(dragDepth - 1);
+      assert(fakeSwitchSetter.findValue(list)!.value).to.equal('initial');
+      assert(input['getFiles_']).to.haveBeenCalledWith(bundleId);
+    });
+
+    it('should not set the switch if drag depth is more than 1', () => {
+      const dragDepth = 123;
+      const bundleId = 'bundleId';
+      spyOn(input, 'getFiles_').and.returnValue(null);
+
+      const fakeDragDepthSetter = new FakeMonadSetter<number>(dragDepth);
+      const fakeSwitchSetter = new FakeMonadSetter<string | null>(null);
+
+      const list = input.onDragLeave_(
+          fakeDragDepthSetter,
+          fakeSwitchSetter,
+          bundleId);
+      assert(fakeDragDepthSetter.findValue(list)!.value).to.equal(dragDepth - 1);
     });
   });
 
@@ -351,8 +352,6 @@ describe('input.FileInput', () => {
 
   describe('onDrop_', () => {
     it('should prevent default and add the bundle correctly if valid', () => {
-      const deleteBundleId = 'deleteBundleId';
-      const bundleId = 'bundleId';
       const mimeTypes = Mocks.object('mimeTypes');
       const file1 = Mocks.object('file1');
       const file2 = Mocks.object('file2');
@@ -376,15 +375,16 @@ describe('input.FileInput', () => {
       spyOn(input, 'isValid_').and.returnValue(true);
       spyOn(input, 'onDragLeave_');
 
-      const map = input.onDrop_(
+      const fakeBundleFnSetter = new FakeMonadSetter<DeleteBundleFn | null>(null);
+      const fakeBundleIdSetter = new FakeMonadSetter<string | null>(null);
+
+      const list = input.onDrop_(
           mockEvent,
-          {id: deleteBundleId, value: null},
-          {id: bundleId} as any,
+          fakeBundleFnSetter,
+          fakeBundleIdSetter,
           mimeTypes);
-      assert(map).to.haveElements([
-        Matchers.monadSetterWith(deleteBundleFn),
-        Matchers.monadSetterWith(newBundleId),
-      ]);
+      assert(fakeBundleFnSetter.findValue(list)!.value).to.equal(deleteBundleFn);
+      assert(fakeBundleIdSetter.findValue(list)!.value).to.equal(newBundleId);
       assert(mockFileService.addBundle).to.haveBeenCalledWith(files);
       assert(mockEvent.preventDefault).to.haveBeenCalledWith();
       assert(mockEvent.stopPropagation).to.haveBeenCalledWith();
@@ -392,8 +392,6 @@ describe('input.FileInput', () => {
     });
 
     it('should delete the previous bundle if valid and exist', () => {
-      const deleteBundleId = 'deleteBundleId';
-      const bundleId = 'bundleId';
       const mimeTypes = Mocks.object('mimeTypes');
       const file1 = Mocks.object('file1');
       const file2 = Mocks.object('file2');
@@ -418,15 +416,16 @@ describe('input.FileInput', () => {
       spyOn(input, 'onDragLeave_');
 
       const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
-      const map = input.onDrop_(
+      const fakeBundleFnSetter = new FakeMonadSetter<DeleteBundleFn | null>(mockDeleteBundleFn);
+      const fakeBundleIdSetter = new FakeMonadSetter<string | null>(null);
+
+      const list = input.onDrop_(
           mockEvent,
-          {id: deleteBundleId, value: mockDeleteBundleFn},
-          {id: bundleId} as any,
+          fakeBundleFnSetter,
+          fakeBundleIdSetter,
           mimeTypes);
-      assert(map).to.haveElements([
-        Matchers.monadSetterWith(deleteBundleFn),
-        Matchers.monadSetterWith(newBundleId),
-      ]);
+      assert(fakeBundleFnSetter.findValue(list)!.value).to.equal(deleteBundleFn);
+      assert(fakeBundleIdSetter.findValue(list)!.value).to.equal(newBundleId);
       assert(mockFileService.addBundle).to.haveBeenCalledWith(files);
       assert(mockEvent.preventDefault).to.haveBeenCalledWith();
       assert(mockEvent.stopPropagation).to.haveBeenCalledWith();
@@ -435,7 +434,6 @@ describe('input.FileInput', () => {
     });
 
     it('should do nothing if not valid', () => {
-      const bundleId = 'bundleId';
       const mimeTypes = Mocks.object('mimeTypes');
       const dataTransfer = Mocks.object('dataTransfer');
 
@@ -450,12 +448,15 @@ describe('input.FileInput', () => {
       spyOn(input, 'onDragLeave_');
 
       const mockDeleteBundleFn = jasmine.createSpy('DeleteBundleFn');
-      const map = input.onDrop_(
+      const fakeBundleFnSetter = new FakeMonadSetter<DeleteBundleFn | null>(mockDeleteBundleFn);
+      const fakeBundleIdSetter = new FakeMonadSetter<string | null>(null);
+
+      const list = input.onDrop_(
           mockEvent,
-          {id: 'deleteBundleId', value: mockDeleteBundleFn},
-          {id: bundleId} as any,
+          fakeBundleFnSetter,
+          fakeBundleIdSetter,
           mimeTypes);
-      assert(map).to.haveElements([]);
+      assert(Iterables.unsafeToArray(list)).to.equal([]);
       assert(mockFileService.addBundle).toNot.haveBeenCalled();
       assert(mockEvent.preventDefault).to.haveBeenCalledWith();
       assert(mockEvent.stopPropagation).to.haveBeenCalledWith();

@@ -8,7 +8,7 @@
 import { on } from 'external/gs_tools/src/event';
 import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { MonadSetter } from 'external/gs_tools/src/interfaces';
+import { MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
 import { customElement, domOut, onLifecycle } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement2 } from '../common';
@@ -94,24 +94,14 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
   }
 
   /**
-   * @override
-   */
-  @onLifecycle('insert')
-  onInserted(
-      @domOut.childElements(CRUMB_CHILDREN_CONFIG)
-          crumbSetter: MonadSetter<ImmutableList<CrumbData>>):
-      Promise<ImmutableList<MonadSetter<any>>> {
-    return this.onRouteChanged_(crumbSetter);
-  }
-
-  /**
    * Handles event when the route is changed.
    */
   @on((instance: Breadcrumb<any>) => instance.routeService_, RouteServiceEvents.CHANGED)
+  @onLifecycle('insert')
   async onRouteChanged_(
       @domOut.childElements(CRUMB_CHILDREN_CONFIG)
           crumbSetter: MonadSetter<ImmutableList<CrumbData>>):
-      Promise<ImmutableList<MonadSetter<any>>> {
+      Promise<Iterable<MonadValue<any>>> {
     const route = this.routeService_.getRoute();
     if (route === null) {
       return Promise.resolve(ImmutableList.of([]));
@@ -134,7 +124,7 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
         })
         .toArray();
     const data = await Promise.all(promises);
-    crumbSetter.value = ImmutableList
+    const crumbData = ImmutableList
         .of(data)
         .map(([name, url]: [string, string]) => {
           return {
@@ -142,6 +132,6 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
             url: url,
           };
         });
-    return ImmutableList.of([crumbSetter]);
+    return ImmutableSet.of([crumbSetter.set(crumbData)]);
   }
 }

@@ -21,7 +21,7 @@ import { eventDetails } from 'external/gs_tools/src/event';
 import { on } from 'external/gs_tools/src/event/on';
 import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { DispatchFn, MonadSetter } from 'external/gs_tools/src/interfaces';
+import { DispatchFn, MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
 import { BooleanParser, EnumParser, FloatParser } from 'external/gs_tools/src/parse';
 import {
   Animation,
@@ -139,9 +139,8 @@ export class OverlayContainer extends BaseDisposable {
   @onDom.event(BACKDROP_EL, 'click')
   onBackdropClick_(
       @domOut.attribute(VISIBLE_ATTR) visibleSetter: MonadSetter<boolean>):
-      ImmutableList<MonadSetter<any>> {
-    visibleSetter.value = false;
-    return ImmutableList.of([visibleSetter]);
+      Iterable<MonadValue<any>> {
+    return ImmutableList.of([visibleSetter.set(false)]);
   }
 
   /**
@@ -151,10 +150,9 @@ export class OverlayContainer extends BaseDisposable {
   @onLifecycle('create')
   onCreated(
       @domOut.attribute(ANCHOR_POINT_ATTR) anchorPointSetter: MonadSetter<AnchorLocation | null>):
-      ImmutableList<MonadSetter<any>> {
+      Iterable<MonadValue<any>> {
     if (anchorPointSetter.value === null) {
-      anchorPointSetter.value = AnchorLocation.AUTO;
-      return ImmutableList.of([anchorPointSetter]);
+      return ImmutableList.of([anchorPointSetter.set(AnchorLocation.AUTO)]);
     } else {
       return ImmutableList.of([]);
     }

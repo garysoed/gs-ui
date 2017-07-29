@@ -1,6 +1,7 @@
-import { assert, Matchers, TestBase } from '../test-base';
+import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
+import { FakeMonadSetter } from 'external/gs_tools/src/event';
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 import { AnimationEventDetail } from 'external/gs_tools/src/webc';
@@ -67,24 +68,28 @@ describe('tool.OverlayContainer', () => {
 
   describe('onBackdropClick_', () => {
     it('should hide the menu', () => {
-      const id = 123;
       const value = true;
       spyOn(container, 'hide_');
-      assert(container.onBackdropClick_({id, value})).to
-          .haveElements([Matchers.monadSetterWith(false)]);
+      const fakeVisibleSetter = new FakeMonadSetter<boolean>(value);
+
+      const list = container.onBackdropClick_(fakeVisibleSetter);
+      assert(fakeVisibleSetter.findValue(list)!.value).to.beFalse();
     });
   });
 
   describe('onCreated', () => {
     it('should default the anchor point to AUTO if not given', () => {
-      const anchorPointId = 'anchorPointId';
-      assert(container.onCreated({id: anchorPointId, value: null})).to.haveElements(
-          [Matchers.monadSetterWith(AnchorLocation.AUTO)]);
+      const fakeAnchorPointSetter = new FakeMonadSetter<AnchorLocation | null>(null);
+
+      const list = container.onCreated(fakeAnchorPointSetter);
+      assert(fakeAnchorPointSetter.findValue(list)!.value).to.equal(AnchorLocation.AUTO);
     });
 
     it('should use the existing anchor point if given', () => {
-      assert(container.onCreated({id: 'anchorPointId', value: AnchorLocation.AUTO}))
-          .to.haveElements([]);
+      const fakeAnchorPointSetter = new FakeMonadSetter<AnchorLocation>(AnchorLocation.AUTO);
+
+      const list = container.onCreated(fakeAnchorPointSetter);
+      assert([...list]).to.equal([]);
     });
   });
 
