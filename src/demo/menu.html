@@ -76,6 +76,11 @@
         <section class="cell gs-theme-invert"></section>
         <section class="cell gs-theme-invert-hilite"></section>
       </section>
+      <section layout="row" flex-align="flex-start">
+        <gs-basic-button class="gs-theme-normal" id="global">
+          <div>Global</div>
+        </gs-basic-button>
+      </section>
     </section>
 
     <script src="demo.js"></script>
@@ -87,6 +92,8 @@
           menu.setAttribute('visible', 'true');
         });
       });
+
+      document.querySelector('gs-menu').setAttribute('triggered-by', '#global');
     </script>
   </body>
 </html>

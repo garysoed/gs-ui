@@ -5,19 +5,24 @@
  * The menu content is the child element(s). Use the `visible` attribute to show / hide the menu.
  * The menu conten will be anchored to the parent element.
  *
- * @attr {enum<AnchorLocation>} gs-anchor-point Location on the menu content to anchor it to.
- * @attr {enum<AnchorLocation>} gs-anchor-target Location on the parent element to anchor the menu
+ * @attr {enum<AnchorLocation>} anchor-point Location on the menu content to anchor it to.
+ * @attr {enum<AnchorLocation>} anchor-target Location on the parent element to anchor the menu
  *     content to.
- * @attr {boolean} gs-fit-parent-width True iff the menu content should fit the parent element's
+ * @attr {boolean} fit-parent-width True iff the menu content should fit the parent element's
  *     width.
+ * @attr {string} triggered-by Selector that points to an element that is a descendant of the
+ *     gs-menu's root node. Whenever this element dispatches a gs-action event, this menu will
+ *     toggle its visibility.
  * @attr {boolean} visible True iff the menu is shown.
  */
-import { BaseDisposable } from 'external/gs_tools/src/dispose';
-import { eventDetails, on } from 'external/gs_tools/src/event';
+import { BaseDisposable, DisposableFunction } from 'external/gs_tools/src/dispose';
+import { eventDetails, monadOut, MonadUtil, on, SimpleMonad } from 'external/gs_tools/src/event';
 import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
-import { BooleanParser } from 'external/gs_tools/src/parse';
+import { Disposable, MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
+import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
+import { QuerySelectorType } from 'external/gs_tools/src/ui';
+import { Log } from 'external/gs_tools/src/util';
 import { customElement, dom, domOut, onDom} from 'external/gs_tools/src/webc';
 import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
@@ -26,19 +31,23 @@ import { AnchorLocationParser } from '../tool/anchor-location-parser';
 import { OverlayBus, OverlayEventType } from '../tool/overlay-bus';
 import { OverlayService } from '../tool/overlay-service';
 
+const LOG = Log.of('gs-ui.Menu');
 
 const ANCHOR_POINT_ATTR = {
-  name: 'gs-anchor-point',
+  name: 'anchor-point',
   parser: AnchorLocationParser,
   selector: null,
 };
 const ANCHOR_TARGET_ATTR = {
-  name: 'gs-anchor-target',
+  name: 'anchor-target',
   parser: AnchorLocationParser,
   selector: null,
 };
-const FIT_PARENT_WIDTH_ATTR = {name: 'gs-fit-parent-width', parser: BooleanParser, selector: null};
+const FIT_PARENT_WIDTH_ATTR = {name: 'fit-parent-width', parser: BooleanParser, selector: null};
+const TRIGGERED_BY_ATTR = {name: 'triggered-by', parser: StringParser, selector: null};
 const VISIBLE_ATTR = {name: 'visible', parser: BooleanParser, selector: null};
+
+const TRIGGERED_BY_REGISTRATION_FACTORY = SimpleMonad.newFactory(Symbol('triggeredBy'), null);
 
 @customElement({
   dependencies: ImmutableSet.of([
@@ -87,6 +96,50 @@ export class Menu extends BaseDisposable {
     }
 
     return ImmutableSet.of([visibleSetter.set(type === 'show')]);
+  }
+
+  onTriggered_(
+      @domOut.attribute(VISIBLE_ATTR) visibleAttrSetter: MonadSetter<boolean | null>):
+      Iterable<MonadValue<any>> {
+    return ImmutableSet.of([
+      visibleAttrSetter.set(!visibleAttrSetter.value),
+    ]);
+  }
+
+  @onDom.attributeChange(TRIGGERED_BY_ATTR)
+  onTriggeredByChanged_(
+      @monadOut(TRIGGERED_BY_REGISTRATION_FACTORY) triggeredByRegistrationSetter:
+          MonadSetter<Disposable | null>,
+      @dom.element(null) element: HTMLElement,
+      @dom.attribute(TRIGGERED_BY_ATTR) triggeredBy: string | null): Iterable<MonadValue<any>> {
+    if (triggeredByRegistrationSetter.value) {
+      triggeredByRegistrationSetter.value.dispose();
+    }
+
+    if (!triggeredBy) {
+      return ImmutableSet.of([]);
+    }
+
+    const rootNode = element.getRootNode();
+    if (!QuerySelectorType.check(rootNode)) {
+      throw new Error(`Cannot run query selector on ${rootNode}`);
+    }
+
+    const targetEl = rootNode.querySelector(triggeredBy);
+    if (!targetEl) {
+      Log.warn(LOG, 'No target elements found for', triggeredBy, 'in', rootNode);
+      return ImmutableSet.of([]);
+    }
+
+    const listener = (event: Event) => {
+      MonadUtil.callFunction(event, this, 'onTriggered_');
+    };
+    targetEl.addEventListener('gs-action', listener);
+    return ImmutableSet.of([
+      triggeredByRegistrationSetter.set(DisposableFunction.of(() => {
+        targetEl.removeEventListener('gs-action', listener);
+      })),
+    ]);
   }
 
   @onDom.attributeChange(VISIBLE_ATTR)

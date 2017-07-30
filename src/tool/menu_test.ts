@@ -1,10 +1,11 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
+import { FakeMonadSetter, MonadUtil } from 'external/gs_tools/src/event';
+import { Disposable } from 'external/gs_tools/src/interfaces';
 import { Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { FakeMonadSetter } from 'external/gs_tools/src/event';
 import { AnchorLocation } from '../const';
 import { Menu } from '../tool';
 
@@ -94,6 +95,97 @@ describe('tool.Menu', () => {
 
       const list = menu.onOverlayVisibilityChange_(event, fakeVisibleSetter);
       assert([...list]).to.equal([]);
+    });
+  });
+
+  describe('onTriggered_', () => {
+    it(`should toggle the visible attribute`, () => {
+      const fakeVisibleAttrSetter = new FakeMonadSetter<boolean>(false);
+
+      const updates = menu.onTriggered_(fakeVisibleAttrSetter);
+      assert(fakeVisibleAttrSetter.findValue(updates)!.value).to.beTrue();
+    });
+  });
+
+  describe('onTriggeredByChanged_', () => {
+    it(`should listen for gs-action events from the element and dispose the previous '
+        + 'registration`, () => {
+      const triggeredBy = 'triggeredBy';
+      const mockDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
+      const mockTargetEl =
+          jasmine.createSpyObj('TargetEl', ['addEventListener', 'removeEventListener']);
+
+      const mockRootNode = jasmine.createSpyObj('RootNode', ['querySelector']);
+      Object.setPrototypeOf(mockRootNode, Element.prototype);
+      mockRootNode.querySelector.and.returnValue(mockTargetEl);
+
+      const mockElement = jasmine.createSpyObj('Element', ['getRootNode']);
+      mockElement.getRootNode.and.returnValue(mockRootNode);
+
+      spyOn(MonadUtil, 'callFunction');
+
+      const fakeTriggeredByRegistrationSetter = new FakeMonadSetter<Disposable>(mockDisposable);
+      const updates = menu.onTriggeredByChanged_(
+          fakeTriggeredByRegistrationSetter,
+          mockElement,
+          triggeredBy);
+      const disposable = fakeTriggeredByRegistrationSetter.findValue(updates)!.value;
+      disposable.dispose();
+      assert(mockTargetEl.removeEventListener).to
+          .haveBeenCalledWith('gs-action', Matchers.any(Function));
+
+      const handler = mockTargetEl.removeEventListener.calls.argsFor(0)[1];
+      assert(mockTargetEl.addEventListener).to.haveBeenCalledWith('gs-action', handler);
+      assert(mockRootNode.querySelector).to.haveBeenCalledWith(triggeredBy);
+      assert(mockDisposable.dispose).to.haveBeenCalledWith();
+
+      const event = Mocks.object('event');
+      handler(event);
+      assert(MonadUtil.callFunction).to.haveBeenCalledWith(event, menu, 'onTriggered_');
+    });
+
+    it(`should do nothing if the target element cannot be found`, () => {
+      const triggeredBy = 'triggeredBy';
+
+      const mockRootNode = jasmine.createSpyObj('RootNode', ['querySelector']);
+      Object.setPrototypeOf(mockRootNode, Element.prototype);
+      mockRootNode.querySelector.and.returnValue(null);
+
+      const mockElement = jasmine.createSpyObj('Element', ['getRootNode']);
+      mockElement.getRootNode.and.returnValue(mockRootNode);
+
+      const fakeTriggeredByRegistrationSetter = new FakeMonadSetter<Disposable | null>(null);
+      const updates = menu.onTriggeredByChanged_(
+          fakeTriggeredByRegistrationSetter,
+          mockElement,
+          triggeredBy);
+      assert([...updates]).to.equal([]);
+
+      assert(mockRootNode.querySelector).to.haveBeenCalledWith(triggeredBy);
+    });
+
+    it(`should throw error if the root node is not a query selector type`, () => {
+      const rootNode = Mocks.object('rootNode');
+      const mockElement = jasmine.createSpyObj('Element', ['getRootNode']);
+      mockElement.getRootNode.and.returnValue(rootNode);
+
+      const fakeTriggeredByRegistrationSetter = new FakeMonadSetter<Disposable | null>(null);
+      assert(() => {
+        menu.onTriggeredByChanged_(
+            fakeTriggeredByRegistrationSetter,
+            mockElement,
+            'triggeredBy');
+      }).to.throwError(/Cannot run query selector/);
+    });
+
+    it(`should do nothing if the triggeredBy value is falsy`, () => {
+      const element = Mocks.object('element');
+      const fakeTriggeredByRegistrationSetter = new FakeMonadSetter<Disposable | null>(null);
+      const updates = menu.onTriggeredByChanged_(
+          fakeTriggeredByRegistrationSetter,
+          element,
+          '');
+      assert([...updates]).to.equal([]);
     });
   });
 
