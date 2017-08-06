@@ -7,6 +7,7 @@
  *
  * @attr {string} bundle-id The ID of the bundle of attached files.
  * @attr {string} label Initial message to display.
+ * @attr {string[]} mime-types Array of MIME types that are acceptable.
  */
 import { eventDetails, monad, monadOut } from 'external/gs_tools/src/event';
 import {
