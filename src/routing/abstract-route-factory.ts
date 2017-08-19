@@ -31,7 +31,11 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
    * @return The path created from the given params.
    */
   create(params: CR): Route<T, CR> {
-    return new Route(this.type_, this.getPath(params), params);
+    return {
+      params,
+      path: this.getPath(params),
+      type: this.type_,
+    };
   }
 
   /**
@@ -145,4 +149,3 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
     return this.type_;
   }
 }
-// TODO: Mutable

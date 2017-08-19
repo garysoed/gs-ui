@@ -89,10 +89,11 @@ describe('routing.AbstractRouteFactory', () => {
       const params = Mocks.object('params');
       spyOn(factory, 'getPath').and.returnValue(path);
 
-      const route = factory.create(params);
-      assert(route.getParams()).to.equal(params);
-      assert(route.getPath()).to.equal(path);
-      assert(route.getType()).to.equal(TYPE);
+      assert(factory.create(params)).to.equal({
+        params,
+        path,
+        type: TYPE,
+      });
     });
   });
 

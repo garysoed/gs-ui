@@ -5,7 +5,7 @@
  * This component works closely with the gs-ui.routing.RouteService to come up with the segments
  * for the current path, as well as the name and link for each segment.
  */
-import { on } from 'external/gs_tools/src/event';
+import { monad, on } from 'external/gs_tools/src/event';
 import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
@@ -13,7 +13,7 @@ import { customElement, domOut, onLifecycle } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement2 } from '../common';
 import { RouteServiceEvents } from '../const';
-import { RouteService } from '../routing';
+import { RouteNavigator, RouteService } from '../routing';
 import { ThemeService } from '../theming';
 
 export const __FULL_PATH = Symbol('fullPath');
@@ -99,16 +99,18 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
   @on((instance: Breadcrumb<any>) => instance.routeService_, RouteServiceEvents.CHANGED)
   @onLifecycle('insert')
   async onRouteChanged_(
+      @monad((instance: Breadcrumb<any>) => instance.routeService_.monad())
+          routeNavigator: RouteNavigator<any>,
       @domOut.childElements(CRUMB_CHILDREN_CONFIG)
           crumbSetter: MonadSetter<ImmutableList<CrumbData>>):
       Promise<Iterable<MonadValue<any>>> {
-    const route = this.routeService_.getRoute();
-    if (route === null) {
+    const match = routeNavigator.getMatch();
+    if (match === null) {
       return Promise.resolve(ImmutableList.of([]));
     }
 
-    const params = route.getParams();
-    const routeFactory = this.routeService_.getRouteFactory(route.getType());
+    const {params, type} = match;
+    const routeFactory = this.routeService_.getRouteFactory(type);
 
     if (!routeFactory) {
       return Promise.resolve(ImmutableList.of([]));

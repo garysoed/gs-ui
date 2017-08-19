@@ -6,7 +6,7 @@ import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { Breadcrumb } from '../routing';
+import { Breadcrumb, FakeRouteNavigator } from '../routing';
 import { CRUMB_CHILDREN_CONFIG, CrumbData } from '../routing/breadcrumb';
 
 
@@ -133,18 +133,16 @@ describe('routing.Breadcrumb', () => {
 
       const type = Mocks.object('type');
       const params = Mocks.object('params');
-      const mockRoute = jasmine.createSpyObj('Route', ['getParams', 'getType']);
-      mockRoute.getParams.and.returnValue(params);
-      mockRoute.getType.and.returnValue(type);
 
       mockRouteService.getRouteFactory = jasmine.createSpy('RouteService.getRouteFactory')
           .and.returnValue(mockRouteFactory);
-      mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
-          .and.returnValue(mockRoute);
 
       const fakeCrumbSetter = new FakeMonadSetter<ImmutableList<CrumbData>>(ImmutableList.of([]));
+      const fakeRouteNavigator = new FakeRouteNavigator([
+        [/.*/, {params, type}] as any,
+      ]);
 
-      const list = await breadcrumb.onRouteChanged_(fakeCrumbSetter);
+      const list = await breadcrumb.onRouteChanged_(fakeRouteNavigator, fakeCrumbSetter);
       assert(fakeCrumbSetter.findValue(list)!.value).to.haveElements([
         {name: name1, url: url1},
         {name: name2, url: url2},
@@ -163,22 +161,21 @@ describe('routing.Breadcrumb', () => {
 
       mockRouteService.getRouteFactory = jasmine.createSpy('RouteService.getRouteFactory')
           .and.returnValue(null);
-      mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
-          .and.returnValue(mockRoute);
 
       const fakeCrumbSetter = new FakeMonadSetter<ImmutableList<CrumbData>>(ImmutableList.of([]));
+      const fakeRouteNavigator = new FakeRouteNavigator([
+        [/.*/, {params, type}] as any,
+      ]);
 
-      const list = await breadcrumb.onRouteChanged_(fakeCrumbSetter);
+      const list = await breadcrumb.onRouteChanged_(fakeRouteNavigator, fakeCrumbSetter);
       assert([...list]).to.equal([]);
     });
 
-    it('should not update the bridge if there are no routes', async () => {
-      mockRouteService.getRoute = jasmine.createSpy('RouteService.getRoute')
-          .and.returnValue(null);
-
+    it('should not update the bridge if there are no matches', async () => {
       const fakeCrumbSetter = new FakeMonadSetter<ImmutableList<CrumbData>>(ImmutableList.of([]));
+      const fakeRouteNavigator = new FakeRouteNavigator();
 
-      const list = await breadcrumb.onRouteChanged_(fakeCrumbSetter);
+      const list = await breadcrumb.onRouteChanged_(fakeRouteNavigator, fakeCrumbSetter);
       assert([...list]).to.equal([]);
     });
   });

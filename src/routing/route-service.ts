@@ -1,10 +1,13 @@
 import { Bus } from 'external/gs_tools/src/event';
 import { bind, inject } from 'external/gs_tools/src/inject';
+import { Monad } from 'external/gs_tools/src/interfaces';
 import { LocationService, LocationServiceEvents } from 'external/gs_tools/src/ui';
 import { Log, Reflect } from 'external/gs_tools/src/util';
 
 import { RouteServiceEvents } from '../const';
-import { AbstractRouteFactory, IRouteFactoryService, Route } from '../routing';
+import { AbstractRouteFactory } from '../routing/abstract-route-factory';
+import { IRouteFactoryService } from '../routing/i-route-factory-service';
+import { RouteNavigator } from '../routing/route-navigator';
 
 type RouteServiceEvent = {type: RouteServiceEvents};
 
@@ -39,41 +42,6 @@ export class RouteService<T> extends Bus<RouteServiceEvents, RouteServiceEvent> 
   }
 
   /**
-   * @param routeFactory Route factory to use to retrieve the params.
-   * @return The params for the current path, or null if it does not match the given route factory.
-   */
-  getParams<CR>(routeFactory: AbstractRouteFactory<T, any, CR, any>): CR | null {
-    const route = routeFactory.createFromPath(this.getPath());
-    if (route === null) {
-      return null;
-    }
-
-    return route.getParams();
-  }
-
-  /**
-   * @return The current path.
-   */
-  getPath(): string {
-    return LocationService.getPath();
-  }
-
-  /**
-   * @return The currently matching route, or null if there are none.
-   */
-  getRoute(): Route<T, any> | null {
-    const path = this.getPath();
-    let route: Route<T, any> | null = null;
-    for (const factory of this.routeFactoryService_.getFactories()) {
-      route = factory.createFromPath(path);
-      if (route !== null) {
-        break;
-      }
-    }
-    return route;
-  }
-
-  /**
    * @param type Type of RouteFactory to return.
    * @return The RouteFactory matching the given type, or null if there are none.
    */
@@ -81,21 +49,18 @@ export class RouteService<T> extends Bus<RouteServiceEvents, RouteServiceEvent> 
     return this.routeFactoryMap_.get(type) || null;
   }
 
-  /**
-   * Go to the given route object.
-   * @param routeFactory Factory to generate the route.
-   * @param params Parameters to generate the route.
-   */
-  goTo<CR>(routeFactory: AbstractRouteFactory<T, any, CR, any>, params: CR): void {
-    this.goToPath(routeFactory.create(params).getPath());
-  }
-
-  /**
-   * Navigate to the given path.
-   * @param path The path to navigate to.
-   */
-  goToPath(path: string): void {
-    LocationService.goTo(path);
+  monad(): Monad<RouteNavigator<T>> {
+    return {
+      get: () => {
+        return new RouteNavigator(this.routeFactoryService_.getFactories(), null);
+      },
+      set: (routeNavigator: RouteNavigator<T>) => {
+        const destination = routeNavigator.getDestination();
+        if (destination) {
+          LocationService.goTo(destination.path);
+        }
+      },
+    };
   }
 
   /**
