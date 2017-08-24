@@ -6,7 +6,7 @@
  * with a path matcher. This path matcher is relative to the closest ancestor gs-view-slot child.
  * The component will be displayed if the current URL location matches this path.
  *
- * Children that are currently active will have the 'gs-view-attribute' set to truthy.
+ * Children that are currently active will have the 'gs-view-active' set to truthy.
  *
  * Make sure that the children have actual size or `fill-parent` so they can be displayed correctly.
  */

@@ -44,11 +44,28 @@ describe('tool.DownloadService', () => {
       const blob = Mocks.object('blob');
       spyOn(service, 'createBlob_').and.returnValue(blob);
       spyOn(service, 'download');
+
       service.downloadJson(json, filename);
       assert(service.download).to.haveBeenCalledWith(blob, filename);
       assert(service['createBlob_']).to.haveBeenCalledWith(
           [JSON.stringify(json, null)],
           {type: 'application/json'});
+    });
+  });
+
+  describe('downloadString', () => {
+    it(`should initiate the download correctly`, () => {
+      const str = 'str';
+      const filename = 'filename';
+      const blob = Mocks.object('blob');
+      spyOn(service, 'createBlob_').and.returnValue(blob);
+      spyOn(service, 'download');
+
+      service.downloadString(str, filename);
+      assert(service.download).to.haveBeenCalledWith(blob, filename);
+      assert(service['createBlob_']).to.haveBeenCalledWith(
+          [str],
+          {type: 'text/plain'});
     });
   });
 
@@ -60,19 +77,8 @@ describe('tool.DownloadService', () => {
       window.document = mockDocument;
 
       assert(service['getLinkEl_']()).to.equal(linkEl);
-      assert(service['linkEl_']).to.equal(linkEl);
       assert(linkEl.target).to.equal('_blank');
       assert(mockDocument.createElement).to.haveBeenCalledWith('a');
-    });
-
-    it('should return the cached link element', () => {
-      const linkEl = Mocks.object('linkEl');
-      service['linkEl_'] = linkEl;
-      const mockDocument = jasmine.createSpyObj('Document', ['createElement']);
-      window.document = mockDocument;
-
-      assert(service['getLinkEl_']()).to.equal(linkEl);
-      assert(mockDocument.createElement).toNot.haveBeenCalled();
     });
   });
 });

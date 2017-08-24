@@ -1,4 +1,4 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
 import { FakeMonadSetter } from 'external/gs_tools/src/event';
@@ -179,7 +179,7 @@ describe('tool.OverlayContainer', () => {
           assert(mockClassList.add).to.haveBeenCalledWith(OverlayContainer['SHOW_CLASS_']);
           assert(mockAnimation.start).to.haveBeenCalledWith(container, '#container');
           assert(OverlayContainer['BASE_SHOW_ANIMATION_'].appendKeyframe).to.haveBeenCalledWith(
-              jasmine.objectContaining({
+              Matchers.objectContaining({
                 height: `${height}px`,
                 width: `${width}px`,
               }));

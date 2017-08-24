@@ -1,13 +1,12 @@
+import { cache } from 'external/gs_tools/src/data';
 import { bind, inject } from 'external/gs_tools/src/inject';
 
 
 @bind('gs.tool.DownloadService')
 export class DownloadService {
-  private linkEl_: HTMLAnchorElement | null;
   private readonly window_: Window;
 
   constructor(@inject('x.dom.window') window: Window) {
-    this.linkEl_ = null;
     this.window_ = window;
   }
 
@@ -47,18 +46,20 @@ export class DownloadService {
     this.download(blob, filename);
   }
 
+  downloadString(str: string, filename: string): void {
+    const blob = this.createBlob_(
+        [str],
+        {type: 'text/plain'});
+    this.download(blob, filename);
+  }
+
   /**
    * @return The link element used for downloading.
    */
+  @cache()
   private getLinkEl_(): HTMLAnchorElement {
-    if (this.linkEl_ !== null) {
-      return this.linkEl_;
-    }
-
     const linkEl = this.window_.document.createElement('a');
     linkEl.target = '_blank';
-    this.linkEl_ = linkEl;
     return linkEl;
   }
 }
-// TODO: Mutable
