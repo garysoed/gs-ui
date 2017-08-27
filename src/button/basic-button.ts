@@ -10,21 +10,42 @@
  *
  * @event {{}} gs-action Dispatched when the button is clicked.
  */
-import { eventDetails, monadOut } from 'external/gs_tools/src/event';
-import { ImmutableSet } from 'external/gs_tools/src/immutable';
+import { BooleanType, NullableType } from 'external/gs_tools/src/check';
+import { Graph } from 'external/gs_tools/src/graph';
 import { inject } from 'external/gs_tools/src/inject';
-import { DispatchFn, MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
 import { BooleanParser } from 'external/gs_tools/src/parse';
-import { customElement, dom, onDom } from 'external/gs_tools/src/webc';
+import {
+  attributeSelector,
+  component,
+  dispatcherSelector,
+  elementSelector,
+  onDom,
+  resolveSelectors,
+  shadowHostSelector} from 'external/gs_tools/src/persona';
 
 import { BaseThemedElement2 } from '../common';
 import { ThemeService } from '../theming';
-import { Action, ActionTracker } from '../tool';
+import { ActionTracker } from '../tool';
 
+const $ = resolveSelectors({
+  host: {
+    attrs: {
+      disabled: attributeSelector(
+          elementSelector('host.el'),
+          'disabled',
+          BooleanParser,
+          NullableType(BooleanType)),
+    },
+    dispatch: dispatcherSelector<null>(elementSelector('host.el')),
+    el: shadowHostSelector,
+  },
+});
 
-const DISABLED_ATTR = {name: 'disabled', parser: BooleanParser, selector: null};
-
-@customElement({
+@component({
+  inputs: [
+    $.host.attrs.disabled,
+    $.host.dispatch,
+  ],
   tag: 'gs-basic-button',
   templateKey: 'src/button/basic-button',
 })
@@ -33,17 +54,17 @@ export class BasicButton extends BaseThemedElement2 {
     super(themeService);
   }
 
-  @onDom.event(null, 'click')
-  onClick_(
-      @dom.attribute(DISABLED_ATTR) disabled: boolean | null,
-      @dom.eventDispatcher() dispatcher: DispatchFn<{}>,
-      @eventDetails() event: MouseEvent,
-      @monadOut(ActionTracker) actionSetter: MonadSetter<Action | null>):
-      Iterable<MonadValue<any>> {
+  @onDom.event($.host.el, 'click')
+  async onClick_(event: MouseEvent): Promise<void> {
+    const [disabled, dispatcher] = await Promise.all([
+      Graph.get($.host.attrs.disabled.getId(), this),
+      Graph.get($.host.dispatch.getId(), this),
+    ]);
+
     if (disabled) {
-      return ImmutableSet.of([]);
+      return;
     }
-    dispatcher('gs-action', {});
-    return ImmutableSet.of([actionSetter.set({type: 'click', x: event.x, y: event.y})]);
+    dispatcher('gs-action', null);
+    ActionTracker.set({type: 'click', x: event.x, y: event.y});
   }
 }

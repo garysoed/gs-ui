@@ -3,6 +3,7 @@ TestBase.setup();
 
 import { Injector } from 'external/gs_tools/src/inject';
 import { Mocks } from 'external/gs_tools/src/mock';
+import { Persona } from 'external/gs_tools/src/persona';
 import { TestDispose, TestInject } from 'external/gs_tools/src/testing';
 import { ElementRegistrar } from 'external/gs_tools/src/webc';
 import { Templates } from 'external/gs_tools/src/webc';
@@ -58,6 +59,7 @@ describe('bootstrap.Main', () => {
       const mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
 
       spyOn(ElementRegistrar, 'newInstance').and.returnValue(mockRegistrar);
+      spyOn(Persona, 'registerAll');
 
       const main = Main.newInstance({
         ace: ace,
@@ -80,13 +82,16 @@ describe('bootstrap.Main', () => {
       assert(TestInject.getBoundValue('x.ace')()).to.equal(ace);
 
       assert(Templates.newInstance).to.haveBeenCalledWith();
+      assert(Persona.registerAll).to.haveBeenCalledWith(mockInjector, templates);
     });
 
     it('should not throw error if config is empty', () => {
       const mockThemeService = jasmine.createSpyObj('ThemeService', ['initialize', 'install']);
       const mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'getBoundValue']);
       mockInjector.getBoundValue.and.returnValue(mockThemeService);
+
       spyOn(Injector, 'newInstance').and.returnValue(mockInjector);
+      spyOn(Persona, 'registerAll');
 
       const mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);
 

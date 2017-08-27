@@ -4,6 +4,7 @@ import { Injector } from 'external/gs_tools/src/inject';
 import { ElementRegistrar } from 'external/gs_tools/src/webc';
 import { Templates } from 'external/gs_tools/src/webc';
 
+import { Persona } from 'external/gs_tools/src/persona';
 import { BasicButton } from '../button/basic-button';
 import { CodeInput } from '../input/code-input';
 import { FileInput } from '../input/file-input';
@@ -131,6 +132,7 @@ export class Main extends BaseDisposable {
     const injector = Injector.newInstance();
     const themeService = injector.getBoundValue('theming.ThemeService') as ThemeService;
     themeService.initialize();
+    Persona.registerAll(injector, templates);
     return new Main(
         injector,
         themeService,

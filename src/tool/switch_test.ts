@@ -5,6 +5,7 @@ import { Vector2d } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
+import { ActionTracker } from '../tool';
 import { ANIMATE_CONTAINER_ID, ANIMATE_SLOT_ID, NULL_ID, Switch } from '../tool/switch';
 
 describe('tool.Switch', () => {
@@ -248,7 +249,7 @@ describe('tool.Switch', () => {
   });
 
   describe('onValueChange_', () => {
-    it(`should delete old duplicate animations and create the animations correctly`, () => {
+    it(`should delete old duplicate animations and create the animations correctly`, async () => {
       const value = 'value';
       const height = 12;
       const width = 34;
@@ -273,6 +274,8 @@ describe('tool.Switch', () => {
           .when('slot').return(slotEl);
 
       const lastAction = Mocks.object('lastAction');
+      spyOn(ActionTracker, 'get').and.returnValue(Promise.resolve(lastAction));
+
       const mockContainerAnimation = jasmine.createSpyObj('ContainerAnimation', ['start']);
       const mockSlotAnimation = jasmine.createSpyObj('SlotAnimation', ['start']);
 
@@ -282,7 +285,7 @@ describe('tool.Switch', () => {
       });
       spyOn(switchEl, 'getAnimationCircleCenter_').and.returnValue(center);
 
-      switchEl.onValueChange_(value, rootEl, lastAction);
+      await switchEl.onValueChange_(value, rootEl);
       assert(mockSlotAnimation.start).to.haveBeenCalledWith(switchEl, `#${value} > *`);
       assert(mockContainerAnimation.start).to.haveBeenCalledWith(switchEl, `#${value}`);
       assert(rootEl).to.haveChildren([containerEl]);
@@ -302,7 +305,7 @@ describe('tool.Switch', () => {
       assert(switchEl['getAnimationCircleCenter_']).to.haveBeenCalledWith(lastAction);
     });
 
-    it(`should handle '.' and '/' correctly`, () => {
+    it(`should handle '.' and '/' correctly`, async () => {
       const value = './.';
       const normalizedValue = '___';
       const height = 12;
@@ -328,6 +331,8 @@ describe('tool.Switch', () => {
           .when('slot').return(slotEl);
 
       const lastAction = Mocks.object('lastAction');
+      spyOn(ActionTracker, 'get').and.returnValue(Promise.resolve(lastAction));
+
       const mockContainerAnimation = jasmine.createSpyObj('ContainerAnimation', ['start']);
       const mockSlotAnimation = jasmine.createSpyObj('SlotAnimation', ['start']);
 
@@ -337,7 +342,7 @@ describe('tool.Switch', () => {
       });
       spyOn(switchEl, 'getAnimationCircleCenter_').and.returnValue(center);
 
-      switchEl.onValueChange_(value, rootEl, lastAction);
+      await switchEl.onValueChange_(value, rootEl);
       assert(mockSlotAnimation.start).to.haveBeenCalledWith(switchEl, `#${normalizedValue} > *`);
       assert(mockContainerAnimation.start).to.haveBeenCalledWith(switchEl, `#${normalizedValue}`);
       assert(rootEl).to.haveChildren([containerEl]);
@@ -357,7 +362,7 @@ describe('tool.Switch', () => {
       assert(switchEl['getAnimationCircleCenter_']).to.haveBeenCalledWith(lastAction);
     });
 
-    it(`should handle null values correctly`, () => {
+    it(`should handle null values correctly`, async () => {
       const value = null;
       const height = 12;
       const width = 34;
@@ -382,6 +387,8 @@ describe('tool.Switch', () => {
           .when('slot').return(slotEl);
 
       const lastAction = Mocks.object('lastAction');
+      spyOn(ActionTracker, 'get').and.returnValue(Promise.resolve(lastAction));
+
       const mockContainerAnimation = jasmine.createSpyObj('ContainerAnimation', ['start']);
       const mockSlotAnimation = jasmine.createSpyObj('SlotAnimation', ['start']);
 
@@ -391,7 +398,7 @@ describe('tool.Switch', () => {
       });
       spyOn(switchEl, 'getAnimationCircleCenter_').and.returnValue(center);
 
-      switchEl.onValueChange_(value, rootEl, lastAction);
+      await switchEl.onValueChange_(value, rootEl);
       assert(mockSlotAnimation.start).to.haveBeenCalledWith(switchEl, `#${NULL_ID} > *`);
       assert(mockContainerAnimation.start).to.haveBeenCalledWith(switchEl, `#${NULL_ID}`);
       assert(rootEl).to.haveChildren([containerEl]);

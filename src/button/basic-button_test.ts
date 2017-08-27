@@ -1,42 +1,56 @@
-import { assert, TestBase } from '../test-base';
+import { TestBase } from '../test-base';
 TestBase.setup();
 
-import { FakeMonadSetter } from 'external/gs_tools/src/event';
-import { Mocks } from 'external/gs_tools/src/mock';
-import { TestDispose } from 'external/gs_tools/src/testing';
+import { Injector } from 'external/gs_tools/src/inject';
+import { Persona } from 'external/gs_tools/src/persona';
+import { forceImport } from 'external/gs_tools/src/typescript';
+import { Templates } from 'external/gs_tools/src/webc';
 
 import { BasicButton } from '../button';
-import { Action } from '../tool';
 
+forceImport(BasicButton);
 
-describe('button.BasicButton', () => {
-  let button: BasicButton;
+describe('button.BasicButton HTMLElement', () => {
+  let button: HTMLElement;
+
+  beforeAll(() => {
+    const mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
+    const injector = Injector.newInstance();
+    Injector.bindProvider(() => mockThemeService, 'theming.ThemeService');
+
+    Templates.register('src/button/basic-button', '<div></div>');
+    Persona.registerAll(injector, Templates.newInstance());
+  });
 
   beforeEach(() => {
-    button = new BasicButton(Mocks.object('ThemeService'));
-    TestDispose.add(button);
+    button = document.createElement('gs-basic-button');
+    document.body.appendChild(button);
+  });
+
+  afterEach(() => {
+    button.remove();
   });
 
   describe('onClick_', () => {
-    it('should dispatch the correct event', () => {
-      const x = 12;
-      const y = 34;
-      const mockEventDispatcher = jasmine.createSpy('EventDispatcher');
-      const fakeActionSetter = new FakeMonadSetter<Action | null>(null);
-      const list = button.onClick_(
-          false,
-          mockEventDispatcher,
-          {x, y} as MouseEvent,
-          fakeActionSetter);
-      assert(fakeActionSetter.findValue(list)!.value).to.equal({type: 'click', x, y});
-      assert(mockEventDispatcher).to.haveBeenCalledWith('gs-action', {});
+    it('should dispatch the correct event', async () => {
+      const eventPromise = new Promise((resolve: any) => {
+        button.addEventListener('gs-action', resolve);
+      });
+      button.click();
+
+      await eventPromise;
     });
 
-    it('should not dispatch any events if disabled', () => {
-      const mockEventDispatcher = jasmine.createSpy('EventDispatcher');
-      const list = button.onClick_(true, mockEventDispatcher, {} as any, {} as any);
-      assert([...list]).to.equal([]);
-      assert(mockEventDispatcher).toNot.haveBeenCalled();
+    it('should not dispatch any events if disabled', async () => {
+      const eventPromise = new Promise((resolve: any, reject: any) => {
+        button.addEventListener('gs-action', reject);
+        setTimeout(resolve, 100);
+      });
+
+      button.setAttribute('disabled', 'true');
+      button.click();
+
+      await eventPromise;
     });
   });
 });

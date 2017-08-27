@@ -8,7 +8,7 @@
  * @attr {string} value Current value of the switch.
  */
 
-import { eventDetails, monad } from 'external/gs_tools/src/event';
+import { eventDetails } from 'external/gs_tools/src/event';
 import { ImmutableList, Vector2d } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
@@ -182,10 +182,9 @@ export class Switch extends BaseThemedElement2 {
   }
 
   @onDom.attributeChange(VALUE_ATTRIBUTE)
-  onValueChange_(
+  async onValueChange_(
       @dom.attribute(VALUE_ATTRIBUTE) value: string | null,
-      @dom.element(ROOT_EL) rootEl: HTMLElement,
-      @monad(ActionTracker) lastAction: Action): void {
+      @dom.element(ROOT_EL) rootEl: HTMLElement): Promise<void> {
     const slotName = value || NULL_ID;
     const id = slotName.replace(/[^a-z0-9A-Z]/g, '_');
 
@@ -193,6 +192,7 @@ export class Switch extends BaseThemedElement2 {
     for (const oldEl of ImmutableList.of(rootEl.querySelectorAll(`div#${id}`))) {
       oldEl.remove();
     }
+    const lastAction = await ActionTracker.get();
     const center = this.getAnimationCircleCenter_(lastAction);
 
     const boundingRect = rootEl.getBoundingClientRect();
