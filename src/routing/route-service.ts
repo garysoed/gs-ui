@@ -9,6 +9,7 @@ import { AbstractRouteFactory } from '../routing/abstract-route-factory';
 import { IRouteFactoryService } from '../routing/i-route-factory-service';
 import { RouteNavigator } from '../routing/route-navigator';
 
+// TODO: DELETE
 type RouteServiceEvent = {type: RouteServiceEvents};
 
 const LOGGER = Log.of('gs-ui.routing.RouteService');

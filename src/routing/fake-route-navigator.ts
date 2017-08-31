@@ -2,7 +2,7 @@ import { LocationService } from 'external/gs_tools/src/ui';
 
 import { Route } from '../routing/route';
 import { RouteNavigator } from '../routing/route-navigator';
-
+// TODO: DELETE
 export class FakeRouteNavigator<T> extends RouteNavigator<T> {
   constructor(private readonly matches_: Iterable<[RegExp, Route<T, any>]> = []) {
     super([], null);

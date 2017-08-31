@@ -5,134 +5,132 @@
  * This component works closely with the gs-ui.routing.RouteService to come up with the segments
  * for the current path, as well as the name and link for each segment.
  */
-import { monad, on } from 'external/gs_tools/src/event';
-import { ImmutableList, ImmutableSet } from 'external/gs_tools/src/immutable';
+import {
+  HasPropertiesType,
+  InstanceofType,
+  StringType} from 'external/gs_tools/src/check';
+import { nodeIn } from 'external/gs_tools/src/graph';
+import { ImmutableList, ImmutableMap } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
-import { MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
-import { customElement, domOut, onLifecycle } from 'external/gs_tools/src/webc';
+import {
+  childrenSelector,
+  component,
+  elementSelector,
+  render,
+  resolveSelectors } from 'external/gs_tools/src/persona';
 
 import { BaseThemedElement2 } from '../common';
-import { RouteServiceEvents } from '../const';
-import { RouteNavigator, RouteService } from '../routing';
+import { AbstractRouteFactory } from '../routing/abstract-route-factory';
+import { Route } from '../routing/route';
+import { $route } from '../routing/route-graph';
+import { RouteService } from '../routing/route-service';
 import { ThemeService } from '../theming';
 
 export const __FULL_PATH = Symbol('fullPath');
 
 export type CrumbData = {name: string, url: string};
 
-const CONTAINER_EL = '#container';
-export const CRUMB_CHILDREN_CONFIG = {
-  bridge: {
-    create(document: Document): Element {
-      const rootCrumb = document.createElement('div');
-      rootCrumb.classList.add('crumb');
-      rootCrumb.setAttribute('layout', 'row');
-      rootCrumb.setAttribute('flex-align', 'center');
+export function crumbFactory(document: Document): Element {
+  const rootCrumb = document.createElement('div');
+  rootCrumb.classList.add('crumb');
+  rootCrumb.setAttribute('layout', 'row');
+  rootCrumb.setAttribute('flex-align', 'center');
 
-      const link = document.createElement('a');
-      const arrow = document.createElement('gs-icon');
-      arrow.textContent = 'keyboard_arrow_right';
-      rootCrumb.appendChild(link);
-      rootCrumb.appendChild(arrow);
-      return rootCrumb;
-    },
+  const link = document.createElement('a');
+  const arrow = document.createElement('gs-icon');
+  arrow.textContent = 'keyboard_arrow_right';
+  rootCrumb.appendChild(link);
+  rootCrumb.appendChild(arrow);
+  return rootCrumb;
+}
 
-    get(element: Element): CrumbData | null {
-      const linkEl = element.querySelector('a');
-      if (linkEl === null) {
-        return null;
-      }
+export function crumbGetter(element: Element): CrumbData | null {
+  const linkEl = element.querySelector('a');
+  if (linkEl === null) {
+    return null;
+  }
 
-      const href = linkEl.href;
-      if (!href.startsWith('#')) {
-        return null;
-      }
+  const href = linkEl.href;
+  if (!href.startsWith('#')) {
+    return null;
+  }
 
-      const name = linkEl.textContent;
-      if (name === null) {
-        return null;
-      }
+  const name = linkEl.textContent;
+  if (name === null) {
+    return null;
+  }
 
-      return {
-        name,
-        url: href.substr(1),
-      };
-    },
+  return {
+    name,
+    url: href.substr(1),
+  };
+}
 
-    set(data: CrumbData, element: Element): void {
-      const linkEl = element.querySelector('a');
-      if (linkEl === null) {
-        throw new Error('Link element not found');
-      }
-      linkEl.href = `#${data.url}`;
-      linkEl.textContent = data.name;
-    },
+export function crumbSetter(data: CrumbData, element: Element): void {
+  const linkEl = element.querySelector('a');
+  if (linkEl === null) {
+    throw new Error('Link element not found');
+  }
+  linkEl.href = `#${data.url}`;
+  linkEl.textContent = data.name;
+}
+
+const $ = resolveSelectors({
+  container: {
+    children: childrenSelector(
+        elementSelector('container.el'),
+        crumbFactory,
+        crumbGetter,
+        crumbSetter,
+        HasPropertiesType({
+          name: StringType,
+          url: StringType,
+        }),
+        InstanceofType(HTMLDivElement)),
+    el: elementSelector('#container', InstanceofType(HTMLDivElement)),
   },
+});
 
-  selector: CONTAINER_EL,
-};
-
-@customElement({
-  dependencies: ImmutableSet.of([
+@component({
+  dependencies: [
     RouteService,
-  ]),
+  ],
   tag: 'gs-breadcrumb',
   templateKey: 'src/routing/breadcrumb',
 })
 export class Breadcrumb<T> extends BaseThemedElement2 {
-  private readonly routeService_: RouteService<T>;
-
   /**
-   * @param routeService
    * @param themeService
    */
   constructor(
-      @inject('gs.routing.RouteService') routeService: RouteService<T>,
       @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-    this.routeService_ = routeService;
   }
 
-  /**
-   * Handles event when the route is changed.
-   */
-  @on((instance: Breadcrumb<any>) => instance.routeService_, RouteServiceEvents.CHANGED)
-  @onLifecycle('insert')
-  async onRouteChanged_(
-      @monad((instance: Breadcrumb<any>) => instance.routeService_.monad())
-          routeNavigator: RouteNavigator<any>,
-      @domOut.childElements(CRUMB_CHILDREN_CONFIG)
-          crumbSetter: MonadSetter<ImmutableList<CrumbData>>):
-      Promise<Iterable<MonadValue<any>>> {
-    const match = routeNavigator.getMatch();
+  @render.children($.container.children)
+  async renderChildren_(
+      @nodeIn($route.match) match: Route<T, any> | null,
+      @nodeIn($route.routeFactoryMap)
+          routeFactoryMap: ImmutableMap<T, AbstractRouteFactory<T, any, any, any>>):
+      Promise<ImmutableList<CrumbData>> {
     if (match === null) {
-      return Promise.resolve(ImmutableList.of([]));
+      return ImmutableList.of([]);
     }
 
     const {params, type} = match;
-    const routeFactory = this.routeService_.getRouteFactory(type);
+    const routeFactory = routeFactoryMap.get(type);
 
     if (!routeFactory) {
-      return Promise.resolve(ImmutableList.of([]));
+      return ImmutableList.of([]);
     }
-
     const names = routeFactory.getCascadeNames(params);
     const paths = routeFactory.getCascadePaths(params);
-
     const promises = ImmutableList
         .of(names)
         .map((promise: Promise<string>, index: number) => {
           return Promise.all([promise, paths[index]]);
         });
-    const data = await Promise.all(promises);
-    const crumbData = ImmutableList
-        .of(data)
-        .map(([name, url]: [string, string]) => {
-          return {
-            name: name,
-            url: url,
-          };
-        });
-    return ImmutableSet.of([crumbSetter.set(crumbData)]);
+    return ImmutableList.of(await Promise.all(promises))
+        .map(([name, url]: [string, string]) => ({name, url}));
   }
 }

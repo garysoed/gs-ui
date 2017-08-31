@@ -2,6 +2,7 @@ import { LocationService } from 'external/gs_tools/src/ui';
 import { AbstractRouteFactory } from '../routing/abstract-route-factory';
 import { Route } from '../routing/route';
 
+// TODO: DELETE
 export class RouteNavigator<T> {
   constructor(
     private readonly routeFactories_: Iterable<AbstractRouteFactory<T, any, any, any>>,

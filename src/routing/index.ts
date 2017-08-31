@@ -3,6 +3,7 @@ export { Breadcrumb } from './breadcrumb';
 export { FakeRouteFactory } from './fake-route-factory';
 export { FakeRouteFactoryService } from './fake-route-factory-service';
 export { FakeRouteNavigator } from './fake-route-navigator';
+export { routeFactoriesProvider } from './route-graph';
 export * from './i-route-factory-service';
 export * from './route';
 export * from './route-navigator';
