@@ -2,7 +2,6 @@ import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Mocks } from 'external/gs_tools/src/mock';
-import { __onCreated } from 'external/gs_tools/src/persona';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { BaseThemedElement2 } from '../common/base-themed-element2';
@@ -16,15 +15,6 @@ describe('common.BaseThemedElement2', () => {
     mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
     element = new BaseThemedElement2(mockThemeService);
     TestDispose.add(element);
-  });
-
-  describe('__onCreated', () => {
-    it(`should apply the theme to the shadow root correctly`, () => {
-      const shadowRoot = Mocks.object('shadowRoot');
-
-      element[__onCreated](shadowRoot);
-      assert(mockThemeService.applyTheme).to.haveBeenCalledWith(shadowRoot);
-    });
   });
 
   describe('onCreate', () => {
@@ -42,6 +32,15 @@ describe('common.BaseThemedElement2', () => {
       assert(() => {
         element.onCreate(htmlElement);
       }).to.throwError(/Shadow root is null/i);
+    });
+  });
+
+  describe('onShadowHostCreated', () => {
+    it(`should apply the theme to the shadow root correctly`, () => {
+      const shadowRoot = Mocks.object('shadowRoot');
+
+      element.onShadowHostCreated({target: {shadowRoot}} as any);
+      assert(mockThemeService.applyTheme).to.haveBeenCalledWith(shadowRoot);
     });
   });
 });

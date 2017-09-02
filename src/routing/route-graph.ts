@@ -52,7 +52,7 @@ export function providesMatch<T>(
 
   return null;
 }
-Graph.registerProvider($route.match, true, providesMatch, $location.path, $route.routeFactoryMap);
+Graph.registerProvider($route.match, providesMatch, $location.path, $route.routeFactoryMap);
 
 export function providesRouteFactoryMap<T>(
     routeFactories: Iterable<RouteFactory<T>>): RouteFactoryMap<T> {
@@ -64,7 +64,6 @@ export function providesRouteFactoryMap<T>(
 }
 Graph.registerProvider(
     $route.routeFactoryMap,
-    true,
     providesRouteFactoryMap,
     $route.routeFactories);
 
