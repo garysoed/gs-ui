@@ -3,39 +3,50 @@
  * Element for inputting texts.
  *
  * @attr {boolean} disabled True iff the input should be disabled.
- * @attr {string} value Value of the input.
+ * @attr {string} in-value Value to set the input.
+ * @attr {string} out-value New value of the input.
  *
- * @event {{}} change Dispatched when the value has changed.
+ * @event {null} change Dispatched when the value has changed.
  */
+import { InstanceofType } from 'external/gs_tools/src/check';
 import { ListenableDom } from 'external/gs_tools/src/event';
+import { Graph } from 'external/gs_tools/src/graph';
 import { inject } from 'external/gs_tools/src/inject';
 import { Event } from 'external/gs_tools/src/interfaces';
-import { Disposable, ElementSelector } from 'external/gs_tools/src/interfaces';
+import { Disposable } from 'external/gs_tools/src/interfaces';
 import { StringParser } from 'external/gs_tools/src/parse';
-import { customElement } from 'external/gs_tools/src/webc';
+import { component, elementSelector, resolveSelectors } from 'external/gs_tools/src/persona';
 
-import { BaseInput } from '../input/base-input';
+import { $ as $base, BaseInput } from '../input/base-input2';
 import { ThemeService } from '../theming/theme-service';
 
-@customElement({
+export const $ = resolveSelectors({
+  input: {
+    el: elementSelector('#input', InstanceofType(HTMLInputElement)),
+  },
+});
+
+@component({
+  inputs: [
+    $.input.el,
+    $base.host.disabled,
+    $base.host.dispatch,
+    $base.host.inValue,
+  ],
   tag: 'gs-text-input',
   templateKey: 'src/input/text-input',
 })
 export class TextInput extends BaseInput<string> {
-  constructor(@inject('theming.ThemeService') themeService: ThemeService) {
+  constructor( @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService, StringParser);
   }
 
-  protected getInputElSelector_(): ElementSelector {
-    return '#input';
+  protected getInputEl_(): Promise<HTMLInputElement> {
+    return Graph.get($.input.el.getId(), this);
   }
 
   protected getInputElValue_(inputEl: HTMLInputElement): string {
     return inputEl.value;
-  }
-
-  protected isValueChanged_(oldValue: string | null, newValue: string | null): boolean {
-    return oldValue !== newValue;
   }
 
   protected listenToValueChanges_(

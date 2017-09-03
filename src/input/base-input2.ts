@@ -82,6 +82,7 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
    * @param newValue The value of the disabled attribute..
    */
   @onDom.attributeChange($.host.disabled)
+  @onDom.event(shadowHostSelector, 'gs-create')
   async onDisabledChange_(): Promise<void> {
     const [disabled, inputEl] = await Promise.all([
       Graph.get($.host.disabled.getId(), this),
@@ -104,6 +105,7 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
    * @param newValue The value it was changed to.
    */
   @onDom.attributeChange($.host.inValue)
+  @onDom.event(shadowHostSelector, 'gs-create')
   async onInValueChange_(): Promise<void> {
     const [inputEl, inValue] = await Promise.all([
       this.getInputEl_(),

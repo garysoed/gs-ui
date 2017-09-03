@@ -1,10 +1,11 @@
-import { assert, Mocks, TestBase } from '../test-base';
+import { assert, Mocks, TestBase, TestGraph } from '../test-base';
 TestBase.setup();
 
 import { ListenableDom } from 'external/gs_tools/src/event';
+import { Graph } from 'external/gs_tools/src/graph';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { TextInput } from '../input/text-input';
+import { $, TextInput } from '../input/text-input';
 
 
 describe('input.TextInput', () => {
@@ -13,6 +14,16 @@ describe('input.TextInput', () => {
   beforeEach(() => {
     input = new TextInput(Mocks.object('ThemeService'));
     TestDispose.add(input);
+    TestGraph.setup(Graph);
+  });
+
+  describe('getInputEl_', () => {
+    it(`should return the correct element`, async () => {
+      const inputEl = Mocks.object('inputEl');
+      TestGraph.set($.input.el.getId(), input, inputEl);
+
+      assert(await input['getInputEl_']()).to.equal(inputEl);
+    });
   });
 
   describe('getInputElValue_', () => {
@@ -21,16 +32,6 @@ describe('input.TextInput', () => {
       const inputEl = Mocks.object('inputEl');
       inputEl.value = value;
       assert(input['getInputElValue_'](inputEl)).to.equal(value);
-    });
-  });
-
-  describe('isValueChanged_', () => {
-    it(`should return true if the values are different`, () => {
-      assert(input['isValueChanged_']('value1', 'value2')).to.beTrue();
-    });
-
-    it(`should return false if the values are the same`, () => {
-      assert(input['isValueChanged_']('value', 'value')).to.beFalse();
     });
   });
 
