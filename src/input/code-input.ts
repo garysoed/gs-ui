@@ -1,33 +1,47 @@
+/**
+ * @webcomponent gs-code-input
+ * Input component for codes.
+ *
+ * To use this, watch for changes to the bundle-id attribute. Whenever it changes, you can grab the
+ * file and its contents using gs-ui.input.FileService.
+ *
+ * @attr {string} in-value The initial value of the editor.
+ * @attr {string} out-value The output value of the editor.
+ * @attr {enum<Language>} language Language for syntax highlighting the code.
+ * @attr {boolean} show-gutter True iff the gutter should be shown.
+ *
+ * @event {null} change Dispatched when the out-value has been updated. Value might stay the same.
+ */
+
 import { Interval } from 'external/gs_tools/src/async';
+import { BooleanType, EnumType, InstanceofType, NullableType } from 'external/gs_tools/src/check';
 import { Colors, HslColor } from 'external/gs_tools/src/color';
 import { cache } from 'external/gs_tools/src/data/cache';
+import { DisposableFunction } from 'external/gs_tools/src/dispose';
 import { on } from 'external/gs_tools/src/event';
-import { ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
+import { Graph } from 'external/gs_tools/src/graph';
+import { ImmutableMap } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import {
   Color,
   Disposable,
-  ElementSelector,
-  Event,
-  MonadSetter,
-  MonadValue} from 'external/gs_tools/src/interfaces';
+  Event } from 'external/gs_tools/src/interfaces';
 import {
   BooleanParser,
   EnumParser,
   StringParser } from 'external/gs_tools/src/parse';
+import {
+  attributeSelector,
+  component,
+  elementSelector,
+  onDom,
+  resolveSelectors,
+  shadowHostSelector } from 'external/gs_tools/src/persona';
 import { Solve, Spec } from 'external/gs_tools/src/solver';
 import { Enums } from 'external/gs_tools/src/typescript';
-import {
-  customElement,
-  dom,
-  domOut,
-  onDom,
-  onLifecycle} from 'external/gs_tools/src/webc';
-
-import { DisposableFunction } from 'external/gs_tools/src/dispose';
 
 import { ThemeServiceEvents } from '../const/theme-service-events';
-import { BaseInput } from '../input/base-input';
+import { $ as $base, BaseInput } from '../input/base-input2';
 import { DefaultPalettes, ThemeService } from '../theming';
 
 export enum Languages {
@@ -38,17 +52,42 @@ export enum Languages {
   TYPESCRIPT,
 }
 
-const CUSTOM_STYLE_EL = '#customStyle';
-const EDITOR_EL_ID = 'editor';
-const EDITOR_EL = `#${EDITOR_EL_ID}`;
-
-const LANGUAGE_ATTRIBUTE = {name: 'language', parser: EnumParser(Languages), selector: null};
-const SHOW_GUTTER_ATTRIBUTE = {name: 'show-gutter', parser: BooleanParser, selector: null};
+export const $ = resolveSelectors({
+  customStyle: {
+    el: elementSelector('#customStyle', InstanceofType(HTMLStyleElement)),
+  },
+  editor: {
+    el: elementSelector('#editor', InstanceofType(HTMLDivElement)),
+  },
+  host: {
+    el: shadowHostSelector,
+    language: attributeSelector(
+        elementSelector('host.el'),
+        'language',
+        EnumParser(Languages),
+        NullableType<Languages | null>(EnumType(Languages))),
+    showGutter: attributeSelector(
+        elementSelector('host.el'),
+        'show-gutter',
+        BooleanParser,
+        BooleanType,
+        true),
+  },
+});
 
 /**
  * Element to input code.
  */
-@customElement({
+@component({
+  inputs: [
+    $.host.showGutter,
+    $.host.language,
+    $.customStyle.el,
+    $.editor.el,
+    $base.host.disabled,
+    $base.host.dispatch,
+    $base.host.inValue,
+  ],
   tag: 'gs-code-input',
   templateKey: 'src/input/code-input',
 })
@@ -126,8 +165,8 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
     return editor;
   }
 
-  protected getInputElSelector_(): ElementSelector {
-    return EDITOR_EL;
+  protected getInputEl_(): Promise<HTMLDivElement> {
+    return Graph.get($.editor.el.getId(), this);
   }
 
   protected getInputElValue_(containerEl: HTMLDivElement): string {
@@ -143,10 +182,6 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
    */
   private isHighContrast_(foreground: Color, background: Color, idealContrast: number): boolean {
     return Colors.getContrast(foreground, background) >= idealContrast;
-  }
-
-  protected isValueChanged_(oldValue: string | null, newValue: string | null): boolean {
-    return oldValue !== newValue;
   }
 
   protected listenToValueChanges_(
@@ -167,30 +202,24 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
   /**
    * @override
    */
-  @onLifecycle('create')
-  onCreated(
-      @domOut.attribute(SHOW_GUTTER_ATTRIBUTE) showGutterSetter: MonadSetter<boolean | null>,
-      @dom.element(CUSTOM_STYLE_EL) customStyleEl: HTMLStyleElement,
-      @dom.element(EDITOR_EL) editorEl: HTMLElement):
-      Iterable<MonadValue<any>> {
-    const changes: MonadValue<any>[] = [];
-    if (showGutterSetter.value === null) {
-      changes.push(showGutterSetter.set(true));
-    }
+  @onDom.event(shadowHostSelector, 'gs-create')
+  async onCodeHostCreated_(): Promise<void> {
+    const editorEl = await Graph.get($.editor.el.getId(), this);
 
     const interval = Interval.newInstance(500);
     this.addDisposable(interval);
     this.addDisposable(interval.on('tick', this.onTick_.bind(this, editorEl), this));
     interval.start();
-
-    this.onThemeChanged_(customStyleEl, editorEl);
-    return ImmutableSet.of(changes);
   }
 
-  @onDom.attributeChange(LANGUAGE_ATTRIBUTE)
-  onLanguageAttrChange_(
-      @dom.element(EDITOR_EL) editorEl: HTMLDivElement,
-      @dom.attribute(LANGUAGE_ATTRIBUTE) newValue: Languages | null): void {
+  @onDom.attributeChange($.host.language)
+  @onDom.event(shadowHostSelector, 'gs-create')
+  async onLanguageAttrChange_(): Promise<void> {
+    const [editorEl, newValue] = await Promise.all([
+      Graph.get($.editor.el.getId(), this),
+      Graph.get($.host.language.getId(), this),
+    ]);
+
     if (newValue !== null) {
       this.getEditor_(editorEl)
           .getSession()
@@ -198,20 +227,25 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
     }
   }
 
-  @onDom.attributeChange(SHOW_GUTTER_ATTRIBUTE)
-  onShowGutterAttrChange_(
-      @dom.element(EDITOR_EL) editorEl: HTMLDivElement,
-      @dom.attribute(SHOW_GUTTER_ATTRIBUTE) newValue: boolean | null): void {
-    this.getEditor_(editorEl).renderer.setShowGutter(newValue === null ? true : newValue);
+  @onDom.attributeChange($.host.showGutter)
+  async onShowGutterAttrChange_(): Promise<void> {
+    const [editorEl, newValue] = await Promise.all([
+      Graph.get($.editor.el.getId(), this),
+      Graph.get($.host.showGutter.getId(), this),
+    ]);
+    this.getEditor_(editorEl).renderer.setShowGutter(newValue);
   }
 
   /**
    * Handles when the theme is changed.
    */
   @on((instance: CodeInput) => instance.themeService_, ThemeServiceEvents.THEME_CHANGED)
-  onThemeChanged_(
-      @dom.element(CUSTOM_STYLE_EL) customStyleEl: HTMLStyleElement,
-      @dom.element(EDITOR_EL) editorEl: HTMLElement): void {
+  @onDom.event(shadowHostSelector, 'gs-create')
+  async onThemeChanged_(): Promise<void> {
+    const [customStyleEl, editorEl] = await Promise.all([
+      Graph.get($.customStyle.el.getId(), this),
+      Graph.get($.editor.el.getId(), this),
+    ]);
     const theme = this.themeService_.getTheme();
     if (theme === null) {
       return;

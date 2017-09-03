@@ -29,13 +29,11 @@ import { ActionTracker } from '../tool';
 
 const $ = resolveSelectors({
   host: {
-    attrs: {
-      disabled: attributeSelector(
-          elementSelector('host.el'),
-          'disabled',
-          BooleanParser,
-          NullableType(BooleanType)),
-    },
+    disabled: attributeSelector(
+        elementSelector('host.el'),
+        'disabled',
+        BooleanParser,
+        NullableType(BooleanType)),
     dispatch: dispatcherSelector<null>(elementSelector('host.el')),
     el: shadowHostSelector,
   },
@@ -43,7 +41,7 @@ const $ = resolveSelectors({
 
 @component({
   inputs: [
-    $.host.attrs.disabled,
+    $.host.disabled,
     $.host.dispatch,
   ],
   tag: 'gs-basic-button',
@@ -57,7 +55,7 @@ export class BasicButton extends BaseThemedElement2 {
   @onDom.event($.host.el, 'click')
   async onClick_(event: MouseEvent): Promise<void> {
     const [disabled, dispatcher] = await Promise.all([
-      Graph.get($.host.attrs.disabled.getId(), this),
+      Graph.get($.host.disabled.getId(), this),
       Graph.get($.host.dispatch.getId(), this),
     ]);
 

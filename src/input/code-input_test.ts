@@ -1,15 +1,15 @@
-import { assert, Matchers, TestBase } from '../test-base';
+import { assert, Matchers, TestBase, TestDispose, TestGraph } from '../test-base';
 TestBase.setup();
 
 import { Interval } from 'external/gs_tools/src/async';
 import { Colors, HslColor, RgbColor } from 'external/gs_tools/src/color';
 import { DisposableFunction } from 'external/gs_tools/src/dispose';
-import { FakeMonadSetter } from 'external/gs_tools/src/event';
+import { Graph } from 'external/gs_tools/src/graph';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { Solve, Spec } from 'external/gs_tools/src/solver';
-import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { CodeInput, Languages } from '../input';
+import { $ } from '../input/code-input';
 import { DefaultPalettes } from '../theming';
 
 describe('input.CodeInput', () => {
@@ -28,6 +28,7 @@ describe('input.CodeInput', () => {
     mockWindow = jasmine.createSpyObj('Window', ['getComputedStyle']);
     input = new CodeInput(mockThemeService, mockAce, mockDocument, mockWindow);
     TestDispose.add(input);
+    TestGraph.setup(Graph);
   });
 
   describe('getColorShade_', () => {
@@ -231,16 +232,6 @@ describe('input.CodeInput', () => {
     });
   });
 
-  describe('isValueChanged_', () => {
-    it(`should return true if the value has changed`, () => {
-      assert(input['isValueChanged_']('a', 'b')).to.beTrue();
-    });
-
-    it(`should return false if the value has not changed`, () => {
-      assert(input['isValueChanged_']('a', 'a')).to.beFalse();
-    });
-  });
-
   describe('listenToValueChange', () => {
     it(`should listen to the editor correctly`, () => {
       const containerEl = Mocks.object('containerEl');
@@ -265,9 +256,8 @@ describe('input.CodeInput', () => {
     });
   });
 
-  describe('onCreated', () => {
-    it('should initialize correctly', () => {
-      const customStyleEl = Mocks.object('customStyleEl');
+  describe('onCodeHostCreated_', () => {
+    it('should initialize correctly', async () => {
       const editorEl = Mocks.object('editorEl');
 
       const mockInterval = jasmine.createSpyObj('Interval', ['dispose', 'on', 'start']);
@@ -278,100 +268,82 @@ describe('input.CodeInput', () => {
       spyOn(input, 'onThemeChanged_');
       spyOn(input, 'onTick_');
 
-      const fakeShowGutterSetter = new FakeMonadSetter<boolean | null>(null);
+      TestGraph.set($.editor.el.getId(), input, editorEl);
 
-      const list = input.onCreated(fakeShowGutterSetter, customStyleEl, editorEl);
-      assert(fakeShowGutterSetter.findValue(list)!.value).to.beTrue();
-
-      assert(input.onThemeChanged_).to.haveBeenCalledWith(customStyleEl, editorEl);
+      await input.onCodeHostCreated_();
       assert(mockInterval.on).to.haveBeenCalledWith('tick', Matchers.any(Function), input);
       mockInterval.on.calls.argsFor(0)[1]();
       assert(input['onTick_']).to.haveBeenCalledWith(editorEl);
       assert(mockInterval.start).to.haveBeenCalledWith();
       assert(input.addDisposable).to.haveBeenCalledWith(mockInterval);
     });
-
-    it(`should not override the show-gutter value if specified`, () => {
-      const customStyleEl = Mocks.object('customStyleEl');
-      const editorEl = Mocks.object('editorEl');
-
-      const mockInterval = jasmine.createSpyObj('Interval', ['dispose', 'on', 'start']);
-      mockInterval.on.and.returnValue(jasmine.createSpyObj('DisposableFn', ['dispose']));
-      spyOn(Interval, 'newInstance').and.returnValue(mockInterval);
-
-      spyOn(input, 'onThemeChanged_');
-      spyOn(input, 'onTick_');
-
-      const fakeShowGutterSetter = new FakeMonadSetter<boolean | null>(true);
-      const list = input.onCreated(fakeShowGutterSetter, customStyleEl, editorEl);
-      assert([...list]).to.equal([]);
-    });
   });
 
   describe('onLanguageAttrChange_', () => {
-    it('should set the mode correctly', () => {
+    it('should set the mode correctly', async () => {
       const editorEl = Mocks.object('editorEl');
       const mockSession = jasmine.createSpyObj('Session', ['setMode']);
       const mockEditor = jasmine.createSpyObj('Editor', ['destroy', 'getSession']);
       mockEditor.getSession.and.returnValue(mockSession);
       spyOn(input, 'getEditor_').and.returnValue(mockEditor);
 
-      input.onLanguageAttrChange_(editorEl, Languages.JAVASCRIPT);
+      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.host.language.getId(), input, Languages.JAVASCRIPT);
 
+      await input.onLanguageAttrChange_();
       assert(mockSession.setMode).to.haveBeenCalledWith('ace/mode/javascript');
       assert(input['getEditor_']).to.haveBeenCalledWith(editorEl);
     });
 
-    it('should do nothing if the new language is null', () => {
+    it('should do nothing if the new language is null', async () => {
       const editorEl = Mocks.object('editorEl');
       const mockSession = jasmine.createSpyObj('Session', ['setMode']);
       const mockEditor = jasmine.createSpyObj('Editor', ['destroy', 'getSession']);
       mockEditor.getSession.and.returnValue(mockSession);
       spyOn(input, 'getEditor_').and.returnValue(mockEditor);
 
-      input.onLanguageAttrChange_(editorEl, null);
+      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.host.language.getId(), input, null);
 
+      await input.onLanguageAttrChange_();
       assert(mockSession.setMode).toNot.haveBeenCalled();
     });
   });
 
-  describe('onShowGutterAttrChange_', () => {
-    it('should set the show gutter to true if the new value is true', () => {
+  describe('onShowGutterAttrChange_', async () => {
+    it('should set the show gutter to true if the new value is true', async () => {
       const editorEl = Mocks.object('editorEl');
       const mockRenderer = jasmine.createSpyObj('Renderer', ['setShowGutter']);
       const mockEditor = jasmine.createSpyObj('Editor', ['destroy']);
       mockEditor.renderer = mockRenderer;
       spyOn(input, 'getEditor_').and.returnValue(mockEditor);
-      input.onShowGutterAttrChange_(editorEl, true);
+
+      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.host.showGutter.getId(), input, true);
+
+      await input.onShowGutterAttrChange_();
       assert(mockRenderer.setShowGutter).to.haveBeenCalledWith(true);
       assert(input['getEditor_']).to.haveBeenCalledWith(editorEl);
     });
 
-    it('should set the show gutter to false if the new value is false', () => {
+    it('should set the show gutter to false if the new value is false', async () => {
       const editorEl = Mocks.object('editorEl');
       const mockRenderer = jasmine.createSpyObj('Renderer', ['setShowGutter']);
       const mockEditor = jasmine.createSpyObj('Editor', ['destroy']);
       mockEditor.renderer = mockRenderer;
       spyOn(input, 'getEditor_').and.returnValue(mockEditor);
-      input.onShowGutterAttrChange_(editorEl, false);
+
+      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.host.showGutter.getId(), input, false);
+
+      await input.onShowGutterAttrChange_();
       assert(mockRenderer.setShowGutter).to.haveBeenCalledWith(false);
-      assert(input['getEditor_']).to.haveBeenCalledWith(editorEl);
-    });
-
-    it('should set the show gutter to true if the new value is null', () => {
-      const editorEl = Mocks.object('editorEl');
-      const mockRenderer = jasmine.createSpyObj('Renderer', ['setShowGutter']);
-      const mockEditor = jasmine.createSpyObj('Editor', ['destroy']);
-      mockEditor.renderer = mockRenderer;
-      spyOn(input, 'getEditor_').and.returnValue(mockEditor);
-      input.onShowGutterAttrChange_(editorEl, null);
-      assert(mockRenderer.setShowGutter).to.haveBeenCalledWith(true);
       assert(input['getEditor_']).to.haveBeenCalledWith(editorEl);
     });
   });
 
   describe('onThemeChanged_', () => {
-    it('should update the custom style correctly', () => {
+    it('should update the custom style correctly', async () => {
       const customStyleEl = Mocks.object('customStyleEl');
 
       const baseHue = Mocks.object('baseHue');
@@ -393,7 +365,10 @@ describe('input.CodeInput', () => {
 
       spyOn(input, 'getColorShade_').and.returnValue(RgbColor.newInstance(0, 0, 0));
 
-      input.onThemeChanged_(customStyleEl, editorEl);
+      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+
+      await input.onThemeChanged_();
 
       assert(customStyleEl.innerHTML).to
           .equal(Matchers.stringMatching(/#editor {.*--gsCodeInputColorCharacter.*}/));
@@ -404,7 +379,7 @@ describe('input.CodeInput', () => {
       assert(mockThemeService.isReversedMode).to.haveBeenCalledWith(editorEl);
     });
 
-    it('should do nothing if background color cannot be determined', () => {
+    it('should do nothing if background color cannot be determined', async () => {
       const customStyleEl = Mocks.object('customStyleEl');
 
       const baseHue = Mocks.object('baseHue');
@@ -422,12 +397,15 @@ describe('input.CodeInput', () => {
       mockThemeService.isHighlightMode.and.returnValue(false);
       mockThemeService.isReversedMode.and.returnValue(false);
 
-      input.onThemeChanged_(customStyleEl, editorEl);
+      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+
+      await input.onThemeChanged_();
 
       assert(customStyleEl.innerHTML).toNot.beDefined();
     });
 
-    it('should do nothing if highlight mode cannot be determined', () => {
+    it('should do nothing if highlight mode cannot be determined', async () => {
       const customStyleEl = Mocks.object('customStyleEl');
 
       const baseHue = Mocks.object('baseHue');
@@ -442,12 +420,15 @@ describe('input.CodeInput', () => {
       mockThemeService.isHighlightMode.and.returnValue(null);
       mockThemeService.isReversedMode.and.returnValue(false);
 
-      input.onThemeChanged_(customStyleEl, editorEl);
+      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+
+      await input.onThemeChanged_();
 
       assert(customStyleEl.innerHTML).toNot.beDefined();
     });
 
-    it('should do nothing if reversed mode cannot be determined', () => {
+    it('should do nothing if reversed mode cannot be determined', async () => {
       const customStyleEl = Mocks.object('customStyleEl');
 
       const baseHue = Mocks.object('baseHue');
@@ -461,12 +442,15 @@ describe('input.CodeInput', () => {
 
       mockThemeService.isReversedMode.and.returnValue(null);
 
-      input.onThemeChanged_(customStyleEl, editorEl);
+      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+
+      await input.onThemeChanged_();
 
       assert(customStyleEl.innerHTML).toNot.beDefined();
     });
 
-    it('should do nothing if theme cannot be found', () => {
+    it('should do nothing if theme cannot be found', async () => {
       const customStyleEl = Mocks.object('customStyleEl');
       const editorEl = Mocks.object('editorEl');
 
@@ -476,7 +460,10 @@ describe('input.CodeInput', () => {
 
       mockThemeService.isReversedMode.and.returnValue(null);
 
-      input.onThemeChanged_(customStyleEl, editorEl);
+      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+
+      await input.onThemeChanged_();
 
       assert(customStyleEl.innerHTML).toNot.beDefined();
     });
