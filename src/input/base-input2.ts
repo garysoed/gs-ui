@@ -14,7 +14,7 @@ import {
   resolveSelectors,
   shadowHostSelector} from 'external/gs_tools/src/persona';
 
-import { Graph, nodeIn } from 'external/gs_tools/src/graph';
+import { Graph, GraphTime, nodeIn } from 'external/gs_tools/src/graph';
 import { BaseThemedElement2 } from '../common';
 import { ThemeService } from '../theming';
 
@@ -34,12 +34,14 @@ export const $ = resolveSelectors({
         elementSelector('host.el'),
         'in-value',
         StringParser,
-        StringType),
+        StringType,
+        ''),
     outValue: attributeSelector(
         elementSelector('host.el'),
         'out-value',
         StringParser,
-        StringType),
+        StringType,
+        ''),
   },
 });
 
@@ -51,7 +53,7 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
     super(themeService);
   }
 
-  protected abstract getInputEl_(): Promise<E>;
+  protected abstract getInputEl_(time: GraphTime): Promise<E>;
 
   protected abstract getInputElValue_(inputEl: E): string;
 
@@ -64,9 +66,10 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
    */
   @onDom.event(shadowHostSelector, 'click')
   async onClick_(): Promise<void> {
+    const time = Graph.getTimestamp();
     const [disabled, inputEl] = await Promise.all([
-      Graph.get($.host.disabled.getId(), this),
-      this.getInputEl_(),
+      Graph.get($.host.disabled.getId(), time, this),
+      this.getInputEl_(time),
     ]);
 
     if (disabled) {
@@ -84,16 +87,18 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
   @onDom.attributeChange($.host.disabled)
   @onDom.event(shadowHostSelector, 'gs-create')
   async onDisabledChange_(): Promise<void> {
+    const time = Graph.getTimestamp();
     const [disabled, inputEl] = await Promise.all([
-      Graph.get($.host.disabled.getId(), this),
-      this.getInputEl_(),
+      Graph.get($.host.disabled.getId(), time, this),
+      this.getInputEl_(time),
     ]);
     this.setInputElDisabled_(inputEl, disabled);
   }
 
   @onDom.event(shadowHostSelector, 'gs-create')
   async onHostCreated_(): Promise<void> {
-    const inputEl = await this.getInputEl_();
+    const time = Graph.getTimestamp();
+    const inputEl = await this.getInputEl_(time);
     this.addDisposable(this.listenToValueChanges_(inputEl, () => {
       Graph.refresh($.host.outValue.getId(), this);
     }));
@@ -107,9 +112,10 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
   @onDom.attributeChange($.host.inValue)
   @onDom.event(shadowHostSelector, 'gs-create')
   async onInValueChange_(): Promise<void> {
+    const time = Graph.getTimestamp();
     const [inputEl, inValue] = await Promise.all([
-      this.getInputEl_(),
-      Graph.get($.host.inValue.getId(), this),
+      this.getInputEl_(time),
+      Graph.get($.host.inValue.getId(), time, this),
     ]);
     this.setInputElValue_(inputEl, this.valueParser_.parse(inValue));
   }
@@ -122,7 +128,8 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
   async renderOutValue_(
       @nodeIn($.host.dispatch.getId()) dispatcher: DispatchFn<null>):
       Promise<string> {
-    const inputEl = await this.getInputEl_();
+    const time = Graph.getTimestamp();
+    const inputEl = await this.getInputEl_(time);
     const inputValue = this.getInputElValue_(inputEl);
     dispatcher(CHANGE_EVENT, null);
     return inputValue;

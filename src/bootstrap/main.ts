@@ -1,16 +1,17 @@
 import { BaseDisposable } from 'external/gs_tools/src/dispose';
 import { ImmutableSet } from 'external/gs_tools/src/immutable';
 import { Injector } from 'external/gs_tools/src/inject';
+import { Persona } from 'external/gs_tools/src/persona';
 import { ElementRegistrar } from 'external/gs_tools/src/webc';
 import { Templates } from 'external/gs_tools/src/webc';
 
-import { Persona } from 'external/gs_tools/src/persona';
 import { BasicButton } from '../button/basic-button';
 import { CodeInput } from '../input/code-input';
 import { FileInput } from '../input/file-input';
 import { FloatInput } from '../input/float-input';
 import { RadioButton } from '../input/radio-button';
 import { TextInput } from '../input/text-input';
+import { routeFactoriesProvider } from '../routing';
 import { Breadcrumb } from '../routing/breadcrumb';
 import { IRouteFactoryService } from '../routing/i-route-factory-service';
 import { Drawer } from '../section/drawer';
@@ -122,10 +123,10 @@ export class Main extends BaseDisposable {
     Injector.bindProvider(() => document, 'x.dom.document');
     Injector.bindProvider(() => window, 'x.dom.window');
     Injector.bindProvider(() => templates, 'x.gs_tools.templates');
-    if (!!config.routeFactoryServiceCtor) {
+    if (config.routeFactoryServiceCtor) {
       Injector.bind(config.routeFactoryServiceCtor, 'x.gs_ui.routeFactoryService');
     }
-    if (!!config.ace) {
+    if (config.ace) {
       Injector.bindProvider(() => config.ace, 'x.ace');
     }
 
@@ -133,10 +134,12 @@ export class Main extends BaseDisposable {
     const themeService = injector.getBoundValue('theming.ThemeService') as ThemeService;
     themeService.initialize();
     Persona.registerAll(injector, templates);
+    if (config.routeFactoryServiceCtor) {
+      routeFactoriesProvider(injector.getBoundValue('x.gs_ui.routeFactoryService').getFactories());
+    }
     return new Main(
         injector,
         themeService,
         ElementRegistrar.newInstance(injector, templates));
   }
 }
-// TODO: Mutable

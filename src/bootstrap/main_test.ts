@@ -1,4 +1,4 @@
-import { assert, TestBase } from '../test-base';
+import { assert, Fakes, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Injector } from 'external/gs_tools/src/inject';
@@ -52,8 +52,13 @@ describe('bootstrap.Main', () => {
       spyOn(Templates, 'newInstance').and.returnValue(templates);
 
       const mockThemeService = jasmine.createSpyObj('ThemeService', ['initialize', 'install']);
+      const factories = Mocks.object('factories');
+      const mockRouteFactoryService = jasmine.createSpyObj('RouteFactoryService', ['getFactories']);
+      mockRouteFactoryService.getFactories.and.returnValue(factories);
       const mockInjector = jasmine.createSpyObj('Injector', ['bindProvider', 'getBoundValue']);
-      mockInjector.getBoundValue.and.returnValue(mockThemeService);
+      Fakes.build(mockInjector.getBoundValue)
+          .when('theming.ThemeService').return(mockThemeService)
+          .when('x.gs_ui.routeFactoryService').return(mockRouteFactoryService);
       spyOn(Injector, 'newInstance').and.returnValue(mockInjector);
 
       const mockRegistrar = jasmine.createSpyObj('Registrar', ['register']);

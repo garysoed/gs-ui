@@ -9,6 +9,7 @@
  */
 
 import { eventDetails } from 'external/gs_tools/src/event';
+  import { Graph } from 'external/gs_tools/src/graph';
 import { ImmutableList, Vector2d } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
@@ -185,6 +186,7 @@ export class Switch extends BaseThemedElement2 {
   async onValueChange_(
       @dom.attribute(VALUE_ATTRIBUTE) value: string | null,
       @dom.element(ROOT_EL) rootEl: HTMLElement): Promise<void> {
+    const time = Graph.getTimestamp();
     const slotName = value || NULL_ID;
     const id = slotName.replace(/[^a-z0-9A-Z]/g, '_');
 
@@ -192,7 +194,7 @@ export class Switch extends BaseThemedElement2 {
     for (const oldEl of ImmutableList.of(rootEl.querySelectorAll(`div#${id}`))) {
       oldEl.remove();
     }
-    const lastAction = await ActionTracker.get();
+    const lastAction = await ActionTracker.get(time);
     const center = this.getAnimationCircleCenter_(lastAction);
 
     const boundingRect = rootEl.getBoundingClientRect();

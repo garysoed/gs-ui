@@ -9,7 +9,7 @@ import {
   TupleOfType} from 'external/gs_tools/src/check';
 import { Graph, staticId } from 'external/gs_tools/src/graph';
 import { ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
-import { $location } from 'external/gs_tools/src/ui';
+import { $location, navigateToHash } from 'external/gs_tools/src/ui';
 
 import { AbstractRouteFactory } from '../routing/abstract-route-factory';
 import { Route } from '../routing/route';
@@ -39,6 +39,14 @@ export const $route = {
             InstanceofType<RouteFactory<any>>(AbstractRouteFactory),
           ]))),
 };
+
+export function navigateTo<CR>(
+    factory: AbstractRouteFactory<any, any, CR, any>,
+    params: CR): void {
+  window.setTimeout(() => {
+    navigateToHash(factory.create(params).path);
+  }, 0);
+}
 
 export function providesMatch<T>(
     path: string,

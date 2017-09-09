@@ -22,7 +22,7 @@ describe('input.TextInput', () => {
       const inputEl = Mocks.object('inputEl');
       TestGraph.set($.input.el.getId(), input, inputEl);
 
-      assert(await input['getInputEl_']()).to.equal(inputEl);
+      assert(await input['getInputEl_'](Graph.getTimestamp())).to.equal(inputEl);
     });
   });
 

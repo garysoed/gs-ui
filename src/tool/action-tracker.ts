@@ -9,7 +9,7 @@ import {
   NumberType,
   StringType,
   UnionType } from 'external/gs_tools/src/check';
-import { Graph, staticId } from 'external/gs_tools/src/graph';
+import { Graph, GraphTime, staticId } from 'external/gs_tools/src/graph';
 
 type ClickAction = { type: 'click', x: number, y: number };
 export type Action = ClickAction;
@@ -31,10 +31,10 @@ const $lastActionTimestamp = staticId('lastActionTimestamp', TimestampType);
 const lastActionTimestampProvider = Graph.createProvider($lastActionTimestamp, null);
 
 export const ActionTracker = {
-  async get(): Promise<Action | null> {
+  async get(time: GraphTime): Promise<Action | null> {
     const [lastAction, lastActionTimestamp] = await Promise.all([
-      Graph.get($lastAction),
-      Graph.get($lastActionTimestamp),
+      Graph.get($lastAction, time),
+      Graph.get($lastActionTimestamp, time),
     ]);
 
     if (lastActionTimestamp === null) {

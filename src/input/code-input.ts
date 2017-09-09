@@ -19,7 +19,7 @@ import { Colors, HslColor } from 'external/gs_tools/src/color';
 import { cache } from 'external/gs_tools/src/data/cache';
 import { DisposableFunction } from 'external/gs_tools/src/dispose';
 import { on } from 'external/gs_tools/src/event';
-import { Graph } from 'external/gs_tools/src/graph';
+import { Graph, GraphTime } from 'external/gs_tools/src/graph';
 import { ImmutableMap } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import {
@@ -65,7 +65,8 @@ export const $ = resolveSelectors({
         elementSelector('host.el'),
         'language',
         EnumParser(Languages),
-        NullableType<Languages | null>(EnumType(Languages))),
+        NullableType<Languages | null>(EnumType(Languages)),
+        null),
     showGutter: attributeSelector(
         elementSelector('host.el'),
         'show-gutter',
@@ -165,8 +166,8 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
     return editor;
   }
 
-  protected getInputEl_(): Promise<HTMLDivElement> {
-    return Graph.get($.editor.el.getId(), this);
+  protected getInputEl_(time: GraphTime): Promise<HTMLDivElement> {
+    return Graph.get($.editor.el.getId(), time, this);
   }
 
   protected getInputElValue_(containerEl: HTMLDivElement): string {
@@ -204,7 +205,7 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
    */
   @onDom.event(shadowHostSelector, 'gs-create')
   async onCodeHostCreated_(): Promise<void> {
-    const editorEl = await Graph.get($.editor.el.getId(), this);
+    const editorEl = await Graph.get($.editor.el.getId(), Graph.getTimestamp(), this);
 
     const interval = Interval.newInstance(500);
     this.addDisposable(interval);
@@ -215,9 +216,10 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
   @onDom.attributeChange($.host.language)
   @onDom.event(shadowHostSelector, 'gs-create')
   async onLanguageAttrChange_(): Promise<void> {
+    const time = Graph.getTimestamp();
     const [editorEl, newValue] = await Promise.all([
-      Graph.get($.editor.el.getId(), this),
-      Graph.get($.host.language.getId(), this),
+      Graph.get($.editor.el.getId(), time, this),
+      Graph.get($.host.language.getId(), time, this),
     ]);
 
     if (newValue !== null) {
@@ -229,9 +231,10 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
 
   @onDom.attributeChange($.host.showGutter)
   async onShowGutterAttrChange_(): Promise<void> {
+    const time = Graph.getTimestamp();
     const [editorEl, newValue] = await Promise.all([
-      Graph.get($.editor.el.getId(), this),
-      Graph.get($.host.showGutter.getId(), this),
+      Graph.get($.editor.el.getId(), time, this),
+      Graph.get($.host.showGutter.getId(), time, this),
     ]);
     this.getEditor_(editorEl).renderer.setShowGutter(newValue);
   }
@@ -242,9 +245,10 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
   @on((instance: CodeInput) => instance.themeService_, ThemeServiceEvents.THEME_CHANGED)
   @onDom.event(shadowHostSelector, 'gs-create')
   async onThemeChanged_(): Promise<void> {
+    const time = Graph.getTimestamp();
     const [customStyleEl, editorEl] = await Promise.all([
-      Graph.get($.customStyle.el.getId(), this),
-      Graph.get($.editor.el.getId(), this),
+      Graph.get($.customStyle.el.getId(), time, this),
+      Graph.get($.editor.el.getId(), time, this),
     ]);
     const theme = this.themeService_.getTheme();
     if (theme === null) {

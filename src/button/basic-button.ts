@@ -10,7 +10,7 @@
  *
  * @event {{}} gs-action Dispatched when the button is clicked.
  */
-import { BooleanType, NullableType } from 'external/gs_tools/src/check';
+import { BooleanType } from 'external/gs_tools/src/check';
 import { Graph } from 'external/gs_tools/src/graph';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
@@ -33,7 +33,8 @@ const $ = resolveSelectors({
         elementSelector('host.el'),
         'disabled',
         BooleanParser,
-        NullableType(BooleanType)),
+        BooleanType,
+        false),
     dispatch: dispatcherSelector<null>(elementSelector('host.el')),
     el: shadowHostSelector,
   },
@@ -54,9 +55,10 @@ export class BasicButton extends BaseThemedElement2 {
 
   @onDom.event($.host.el, 'click')
   async onClick_(event: MouseEvent): Promise<void> {
+    const time = Graph.getTimestamp();
     const [disabled, dispatcher] = await Promise.all([
-      Graph.get($.host.disabled.getId(), this),
-      Graph.get($.host.dispatch.getId(), this),
+      Graph.get($.host.disabled.getId(), time, this),
+      Graph.get($.host.dispatch.getId(), time, this),
     ]);
 
     if (disabled) {

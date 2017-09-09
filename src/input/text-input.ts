@@ -10,7 +10,7 @@
  */
 import { InstanceofType } from 'external/gs_tools/src/check';
 import { ListenableDom } from 'external/gs_tools/src/event';
-import { Graph } from 'external/gs_tools/src/graph';
+import { Graph, GraphTime } from 'external/gs_tools/src/graph';
 import { inject } from 'external/gs_tools/src/inject';
 import { Event } from 'external/gs_tools/src/interfaces';
 import { Disposable } from 'external/gs_tools/src/interfaces';
@@ -41,8 +41,8 @@ export class TextInput extends BaseInput<string> {
     super(themeService, StringParser);
   }
 
-  protected getInputEl_(): Promise<HTMLInputElement> {
-    return Graph.get($.input.el.getId(), this);
+  protected getInputEl_(time: GraphTime): Promise<HTMLInputElement> {
+    return Graph.get($.input.el.getId(), time, this);
   }
 
   protected getInputElValue_(inputEl: HTMLInputElement): string {

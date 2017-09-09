@@ -8,7 +8,7 @@ import { Log } from 'external/gs_tools/src/util';
 import { LogLevel } from 'external/gs_tools/src/util/log';
 
 export { assert, assertColor, Matchers } from 'external/gs_tools/src/jasmine';
-export { Mocks } from 'external/gs_tools/src/mock';
+export { Fakes, Mocks } from 'external/gs_tools/src/mock';
 export { TestDispose, TestGraph } from 'external/gs_tools/src/testing';
 
 const TEST_SETUP = new TestSetup([

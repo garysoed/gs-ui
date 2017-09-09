@@ -1,6 +1,8 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
+import { Graph } from 'external/gs_tools/src/graph';
+
 import { ActionTracker, MAX_ACTION_AGE_ } from '../tool/action-tracker';
 
 describe('tool.ActionTracker', () => {
@@ -11,7 +13,7 @@ describe('tool.ActionTracker', () => {
       spyOn(Date, 'now').and.returnValue(now);
 
       await ActionTracker.set(action);
-      assert(await ActionTracker.get()).to.equal(action);
+      assert(await ActionTracker.get(Graph.getTimestamp())).to.equal(action);
     });
 
     it(`should return null if the last recorded action was too old`, async () => {
@@ -21,7 +23,7 @@ describe('tool.ActionTracker', () => {
       await ActionTracker.set(action);
 
       dateNowSpy.and.returnValue(now + MAX_ACTION_AGE_ + 1);
-      assert(await ActionTracker.get()).to.beNull();
+      assert(await ActionTracker.get(Graph.getTimestamp())).to.beNull();
     });
   });
 });
