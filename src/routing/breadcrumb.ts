@@ -17,7 +17,8 @@ import {
   component,
   elementSelector,
   render,
-  resolveSelectors } from 'external/gs_tools/src/persona';
+  resolveSelectors,
+  slotSelector} from 'external/gs_tools/src/persona';
 
 import { BaseThemedElement2 } from '../common';
 import { AbstractRouteFactory } from '../routing/abstract-route-factory';
@@ -78,7 +79,7 @@ export function crumbSetter(data: CrumbData, element: Element): void {
 const $ = resolveSelectors({
   container: {
     children: childrenSelector(
-        elementSelector('container.el'),
+        slotSelector(elementSelector('container.el'), 'crumbs'),
         crumbFactory,
         crumbGetter,
         crumbSetter,
