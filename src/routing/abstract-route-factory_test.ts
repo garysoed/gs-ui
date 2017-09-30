@@ -97,6 +97,28 @@ describe('routing.AbstractRouteFactory', () => {
     });
   });
 
+  describe('getCascadeCrumbs', () => {
+    it('should return the correct names', async () => {
+      const name = 'name';
+      const url = 'url';
+      spyOn(factory, 'getName').and.returnValue(Promise.resolve(name));
+      spyOn(factory, 'getPath').and.returnValue(url);
+
+      const parentName = 'parentName';
+      const parentUrl = 'parentUrl';
+      spyOn(parentFactory, 'getName').and.returnValue(Promise.resolve(parentName));
+      spyOn(parentFactory, 'getPath').and.returnValue(parentUrl);
+
+      const params = Mocks.object('params');
+      const crumbs = await factory.getCascadeCrumbs(params);
+      assert(crumbs).to.equal([{name: parentName, url: parentUrl}, {name: name, url: url}]);
+      assert(parentFactory.getName).to.haveBeenCalledWith(params);
+      assert(parentFactory.getPath).to.haveBeenCalledWith(params);
+      assert(factory.getName).to.haveBeenCalledWith(params);
+      assert(factory.getPath).to.haveBeenCalledWith(params);
+    });
+  });
+
   describe('getCascadeNames', () => {
     it('should return the correct names', async () => {
       const name = 'name';

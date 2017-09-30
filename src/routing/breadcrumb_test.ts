@@ -1,12 +1,12 @@
 import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
-import { ImmutableMap } from 'external/gs_tools/src/immutable';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
+import { Persona } from 'external/gs_tools/src/persona';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { Breadcrumb } from '../routing';
-import { crumbFactory, crumbGetter, crumbSetter } from '../routing/breadcrumb';
+import { $, crumbFactory, crumbGetter, crumbSetter } from '../routing/breadcrumb';
 
 
 describe('crumbFactory', () => {
@@ -101,70 +101,31 @@ describe('crumbSetter', () => {
 });
 
 describe('routing.Breadcrumb', () => {
-  let breadcrumb: Breadcrumb<any>;
+  let breadcrumb: Breadcrumb;
   let mockRouteService: any;
 
   beforeEach(() => {
     mockRouteService = Mocks.listenable('RouteService');
     TestDispose.add(mockRouteService);
     const mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
-    breadcrumb = new Breadcrumb<any>(mockThemeService);
+    breadcrumb = new Breadcrumb(mockThemeService);
     TestDispose.add(breadcrumb);
   });
 
+  describe('onCrumbChange_', () => {
+    it(`should update the crumb value`, () => {
+      spyOn(Persona, 'updateValue');
+
+      breadcrumb.onCrumbChange_();
+      assert(Persona.updateValue).to.haveBeenCalledWith($.host.crumb, breadcrumb);
+    });
+  });
+
   describe('renderChildren_', () => {
-    it('should return the correct paths', async () => {
-      const name1 = 'name1';
-      const url1 = 'url1';
+    it('should return the correct crumb data', () => {
+      const crumbData = Mocks.object('crumbData');
 
-      const name2 = 'name2';
-      const url2 = 'url2';
-
-      const mockRouteFactory =
-          jasmine.createSpyObj('RouteFactory', ['getCascadeNames', 'getCascadePaths']);
-      mockRouteFactory.getCascadeNames.and
-          .returnValue([Promise.resolve(name1), Promise.resolve(name2)]);
-      mockRouteFactory.getCascadePaths.and.returnValue([url1, url2]);
-
-      const type = Mocks.object('type');
-      const params = Mocks.object('params');
-
-      mockRouteService.getRouteFactory = jasmine.createSpy('RouteService.getRouteFactory')
-          .and.returnValue(mockRouteFactory);
-      const routeFactoryMap = ImmutableMap.of([
-        [type, mockRouteFactory],
-      ]);
-
-      const paths = await breadcrumb.renderChildren_({params, type} as any, routeFactoryMap);
-      assert(paths).to.haveElements([
-        {name: name1, url: url1},
-        {name: name2, url: url2},
-      ]);
-      assert(mockRouteFactory.getCascadePaths).to.haveBeenCalledWith(params);
-      assert(mockRouteFactory.getCascadeNames).to.haveBeenCalledWith(params);
-    });
-
-    it('should return empty list if route factory cannot be found', async () => {
-      const type = Mocks.object('type');
-      const params = Mocks.object('params');
-      const mockRoute = jasmine.createSpyObj('Route', ['getParams', 'getType']);
-      mockRoute.getParams.and.returnValue(params);
-      mockRoute.getType.and.returnValue(type);
-
-      mockRouteService.getRouteFactory = jasmine.createSpy('RouteService.getRouteFactory')
-          .and.returnValue(null);
-
-      const routeFactoryMap = ImmutableMap.of<any, any>([]);
-
-      const paths = await breadcrumb.renderChildren_({params, type} as any, routeFactoryMap);
-      assert(paths).to.haveElements([]);
-    });
-
-    it('should return empty list', async () => {
-      const routeFactoryMap = ImmutableMap.of<any, any>([]);
-
-      const paths = await breadcrumb.renderChildren_(null, routeFactoryMap);
-      assert(paths).to.haveElements([]);
+      assert(breadcrumb.renderChildren_(crumbData)).to.equal(crumbData);
     });
   });
 });

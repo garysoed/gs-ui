@@ -47,6 +47,19 @@ export abstract class AbstractRouteFactory<T, CP, CR extends CP & PR, PR> {
     return matches === null ? null : this.create(this.getMatchParams_(matches));
   }
 
+  async getCascadeCrumbs(params: CR): Promise<{name: string, url: string}[]> {
+    const crumbs: {name: string, url: string}[] = [];
+    let current: AbstractRouteFactory<any, any, any, any> | null = this;
+    while (current !== null) {
+      crumbs.push({
+        name: await current.getName(params),
+        url: current.getPath(params),
+      });
+      current = current.parent_;
+    }
+    return [...ImmutableList.of(crumbs).reverse()];
+  }
+
   /**
    * @param params Params to determine the name of the route.
    * @return Array of names of the current route and its ancestors. The oldest ancestors come

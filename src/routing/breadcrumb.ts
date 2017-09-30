@@ -8,22 +8,25 @@
 import {
   HasPropertiesType,
   InstanceofType,
+  IterableOfType,
   StringType} from 'external/gs_tools/src/check';
 import { nodeIn } from 'external/gs_tools/src/graph';
-import { ImmutableList, ImmutableMap } from 'external/gs_tools/src/immutable';
+import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
+import { ListParser, ObjectParser, StringParser } from 'external/gs_tools/src/parse';
 import {
+  attributeSelector,
   childrenSelector,
   component,
   elementSelector,
+  onDom,
+  Persona,
   render,
   resolveSelectors,
+  shadowHostSelector,
   slotSelector} from 'external/gs_tools/src/persona';
 
 import { BaseThemedElement2 } from '../common';
-import { AbstractRouteFactory } from '../routing/abstract-route-factory';
-import { Route } from '../routing/route';
-import { $route } from '../routing/route-graph';
 import { RouteService } from '../routing/route-service';
 import { ThemeService } from '../theming';
 
@@ -76,7 +79,7 @@ export function crumbSetter(data: CrumbData, element: Element): void {
   linkEl.textContent = data.name;
 }
 
-const $ = resolveSelectors({
+export const $ = resolveSelectors({
   container: {
     children: childrenSelector(
         slotSelector(elementSelector('container.el'), 'crumbs'),
@@ -90,16 +93,27 @@ const $ = resolveSelectors({
         InstanceofType(HTMLDivElement)),
     el: elementSelector('#container', InstanceofType(HTMLDivElement)),
   },
+  host: {
+    crumb: attributeSelector(
+        elementSelector('host.el'),
+        'crumb',
+        ListParser(ObjectParser({name: StringParser, url: StringParser})),
+        IterableOfType<CrumbData, ImmutableList<CrumbData>>(
+            HasPropertiesType({name: StringType, url: StringType})),
+        ImmutableList.of([])),
+    el: shadowHostSelector,
+  },
 });
 
 @component({
   dependencies: [
     RouteService,
   ],
+  inputs: [$.host.crumb],
   tag: 'gs-breadcrumb',
   templateKey: 'src/routing/breadcrumb',
 })
-export class Breadcrumb<T> extends BaseThemedElement2 {
+export class Breadcrumb extends BaseThemedElement2 {
   /**
    * @param themeService
    */
@@ -108,30 +122,14 @@ export class Breadcrumb<T> extends BaseThemedElement2 {
     super(themeService);
   }
 
+  @onDom.attributeChange($.host.crumb)
+  onCrumbChange_(): void {
+    Persona.updateValue($.host.crumb, this);
+  }
+
   @render.children($.container.children)
-  async renderChildren_(
-      @nodeIn($route.match) match: Route<T, any> | null,
-      @nodeIn($route.routeFactoryMap)
-          routeFactoryMap: ImmutableMap<T, AbstractRouteFactory<T, any, any, any>>):
-      Promise<ImmutableList<CrumbData>> {
-    if (match === null) {
-      return ImmutableList.of([]);
-    }
-
-    const {params, type} = match;
-    const routeFactory = routeFactoryMap.get(type);
-
-    if (!routeFactory) {
-      return ImmutableList.of([]);
-    }
-    const names = routeFactory.getCascadeNames(params);
-    const paths = routeFactory.getCascadePaths(params);
-    const promises = ImmutableList
-        .of(names)
-        .map((promise: Promise<string>, index: number) => {
-          return Promise.all([promise, paths[index]]);
-        });
-    return ImmutableList.of(await Promise.all(promises))
-        .map(([name, url]: [string, string]) => ({name, url}));
+  renderChildren_(
+      @nodeIn($.host.crumb.getId()) crumbs: ImmutableList<CrumbData>): ImmutableList<CrumbData> {
+    return crumbs;
   }
 }

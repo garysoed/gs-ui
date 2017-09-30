@@ -64,19 +64,45 @@
 
     <script>
       gs.ui.setLogLevel(0);
-      var Types = {
+      const Types = {
         A: 1,
         B: 2,
         C: 3,
       };
-      var routeFactoryA = new gs.ui.SimpleRouteFactory(Types.A, '/a', 'Page A');
-      var routeFactoryB = new gs.ui.SimpleRouteFactory(Types.B, '/b', 'Page B', routeFactoryA);
-      var routeFactoryC = new gs.ui.SimpleRouteFactory(Types.C, '/c', 'Page C', routeFactoryB);
+      const routeFactoryA = new gs.ui.SimpleRouteFactory(Types.A, '/a', 'Page A');
+      const routeFactoryB = new gs.ui.SimpleRouteFactory(Types.B, '/b', 'Page B', routeFactoryA);
+      const routeFactoryC = new gs.ui.SimpleRouteFactory(Types.C, '/c', 'Page C', routeFactoryB);
       gs.ui.routeFactoriesProvider([
         routeFactoryA,
         routeFactoryB,
         routeFactoryC,
       ]);
+      const factories = new Map([
+        [Types.A, routeFactoryA],
+        [Types.B, routeFactoryB],
+        [Types.C, routeFactoryC],
+      ])
+      gs.ui.Graph.on('change', () => {
+        const timestamp = gs.ui.Graph.getTimestamp();
+        gs.ui.Graph.get(gs.ui.$route.match, timestamp).then((routeMatch) => {
+          if (!routeMatch) {
+            return [];
+          }
+
+          return factories.get(routeMatch.type).getCascadeCrumbs(routeMatch.path);
+        }).then((crumbs) => {
+          for (const breadcrumbs of document.querySelectorAll('gs-breadcrumb')) {
+            breadcrumbs.setAttribute(
+                'crumb',
+                gs.ui.ListParser(
+                    gs.ui.ObjectParser({
+                      name: gs.ui.StringParser,
+                      url: gs.ui.StringParser,
+                    })
+                ).stringify(gs.ui.ImmutableList.of(crumbs)));
+          }
+        });
+      });
     </script>
     <script src="demo.js"></script>
   </body>
