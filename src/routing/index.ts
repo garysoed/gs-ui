@@ -1,5 +1,5 @@
 export { AbstractRouteFactory } from './abstract-route-factory';
-export { Breadcrumb } from './breadcrumb';
+export { Breadcrumb, CrumbData } from './breadcrumb';
 export { FakeRouteFactory } from './fake-route-factory';
 export { FakeRouteFactoryService } from './fake-route-factory-service';
 export { FakeRouteNavigator } from './fake-route-navigator';

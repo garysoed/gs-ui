@@ -1,9 +1,16 @@
-import { BaseElement, customElement } from 'external/gs_tools/src/webc';
+import { inject } from 'external/gs_tools/src/inject';
+import { component } from 'external/gs_tools/src/persona';
+
+import { BaseThemedElement2 } from '../common';
+import { ThemeService } from '../theming';
 
 
-@customElement({
+@component({
   tag: 'gs-icon',
   templateKey: 'src/tool/icon',
 })
-export class Icon extends BaseElement { }
-// TODO: Mutable
+export class Icon extends BaseThemedElement2 {
+  constructor(@inject('theming.ThemeService') themeService: ThemeService) {
+    super(themeService);
+  }
+}

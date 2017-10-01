@@ -4,12 +4,14 @@
  *
  * This component works closely with the gs-ui.routing.RouteService to come up with the segments
  * for the current path, as well as the name and link for each segment.
+ *
+ * @attr <{name: string, url: string}[]> crumb
  */
 import {
   HasPropertiesType,
   InstanceofType,
   IterableOfType,
-  StringType} from 'external/gs_tools/src/check';
+  StringType } from 'external/gs_tools/src/check';
 import { nodeIn } from 'external/gs_tools/src/graph';
 import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
@@ -24,7 +26,7 @@ import {
   render,
   resolveSelectors,
   shadowHostSelector,
-  slotSelector} from 'external/gs_tools/src/persona';
+  slotSelector } from 'external/gs_tools/src/persona';
 
 import { BaseThemedElement2 } from '../common';
 import { RouteService } from '../routing/route-service';
