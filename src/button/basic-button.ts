@@ -20,7 +20,6 @@ import {
   dispatcherSelector,
   elementSelector,
   onDom,
-  Persona,
   resolveSelectors,
   shadowHostSelector} from 'external/gs_tools/src/persona';
 
@@ -67,10 +66,5 @@ export class BasicButton extends BaseThemedElement2 {
     }
     dispatcher('gs-action', null);
     ActionTracker.set({type: 'click', x: event.x, y: event.y});
-  }
-
-  @onDom.attributeChange($.host.disabled)
-  onDisabledChanged_(): void {
-    Persona.updateValue($.host.disabled, this);
   }
 }

@@ -21,8 +21,6 @@ import {
   childrenSelector,
   component,
   elementSelector,
-  onDom,
-  Persona,
   render,
   resolveSelectors,
   shadowHostSelector,
@@ -122,11 +120,6 @@ export class Breadcrumb extends BaseThemedElement2 {
   constructor(
       @inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService);
-  }
-
-  @onDom.attributeChange($.host.crumb)
-  onCrumbChange_(): void {
-    Persona.updateValue($.host.crumb, this);
   }
 
   @render.children($.container.children)

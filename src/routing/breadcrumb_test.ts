@@ -2,11 +2,10 @@ import { assert, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
-import { Persona } from 'external/gs_tools/src/persona';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { Breadcrumb } from '../routing';
-import { $, crumbFactory, crumbGetter, crumbSetter } from '../routing/breadcrumb';
+import { crumbFactory, crumbGetter, crumbSetter } from '../routing/breadcrumb';
 
 
 describe('crumbFactory', () => {
@@ -110,15 +109,6 @@ describe('routing.Breadcrumb', () => {
     const mockThemeService = jasmine.createSpyObj('ThemeService', ['applyTheme']);
     breadcrumb = new Breadcrumb(mockThemeService);
     TestDispose.add(breadcrumb);
-  });
-
-  describe('onCrumbChange_', () => {
-    it(`should update the crumb value`, () => {
-      spyOn(Persona, 'updateValue');
-
-      breadcrumb.onCrumbChange_();
-      assert(Persona.updateValue).to.haveBeenCalledWith($.host.crumb, breadcrumb);
-    });
   });
 
   describe('renderChildren_', () => {
