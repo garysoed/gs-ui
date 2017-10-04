@@ -15,110 +15,118 @@
  *     toggle its visibility.
  * @attr {boolean} visible True iff the menu is shown.
  */
-import { BaseDisposable, DisposableFunction } from 'external/gs_tools/src/dispose';
-import { eventDetails, monadOut, MonadUtil, on, SimpleMonad } from 'external/gs_tools/src/event';
-import { ImmutableSet } from 'external/gs_tools/src/immutable';
+import {
+  BooleanType,
+  EnumType,
+  InstanceofType,
+  NullableType,
+  StringType } from 'external/gs_tools/src/check';
+import { DisposableFunction } from 'external/gs_tools/src/dispose';
+import { Graph, GraphTime, instanceId, nodeIn } from 'external/gs_tools/src/graph';
 import { inject } from 'external/gs_tools/src/inject';
-import { Disposable, MonadSetter, MonadValue } from 'external/gs_tools/src/interfaces';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
+import {
+  attributeSelector,
+  component,
+  elementSelector,
+  onDom,
+  Persona,
+  render,
+  resolveSelectors,
+  shadowHostSelector} from 'external/gs_tools/src/persona';
 import { QuerySelectorType } from 'external/gs_tools/src/ui';
 import { Log } from 'external/gs_tools/src/util';
-import { customElement, dom, domOut, onDom} from 'external/gs_tools/src/webc';
-import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
+import { BaseThemedElement2 } from '../common';
 import { AnchorLocation } from '../const';
+import { ThemeService } from '../theming';
 import { AnchorLocationParser } from '../tool/anchor-location-parser';
-import { OverlayBus, OverlayEventType } from '../tool/overlay-bus';
+import { $overlay } from '../tool/overlay-graph';
 import { OverlayService } from '../tool/overlay-service';
 
 const LOG = Log.of('gs-ui.Menu');
 
-const ANCHOR_POINT_ATTR = {
-  name: 'anchor-point',
-  parser: AnchorLocationParser,
-  selector: null,
-};
-const ANCHOR_TARGET_ATTR = {
-  name: 'anchor-target',
-  parser: AnchorLocationParser,
-  selector: null,
-};
-const FIT_PARENT_WIDTH_ATTR = {name: 'fit-parent-width', parser: BooleanParser, selector: null};
-const TRIGGERED_BY_ATTR = {name: 'triggered-by', parser: StringParser, selector: null};
-const VISIBLE_ATTR = {name: 'visible', parser: BooleanParser, selector: null};
+export const $ = resolveSelectors({
+  host: {
+    anchorPoint: attributeSelector(
+        elementSelector('host.el'),
+        'anchor-point',
+        AnchorLocationParser,
+        EnumType(AnchorLocation),
+        AnchorLocation.AUTO),
+    anchorTarget: attributeSelector(
+        elementSelector('host.el'),
+        'anchor-target',
+        AnchorLocationParser,
+        EnumType(AnchorLocation),
+        AnchorLocation.AUTO),
+    el: shadowHostSelector,
+    fitParentWidth: attributeSelector(
+        elementSelector('host.el'),
+        'fit-parent-width',
+        BooleanParser,
+        BooleanType,
+        false),
+    triggeredBy: attributeSelector(
+        elementSelector('host.el'),
+        'triggered-by',
+        StringParser,
+        NullableType(StringType),
+        null),
+    visible: attributeSelector(
+        elementSelector('host.el'),
+        'visible',
+        BooleanParser,
+        BooleanType,
+        false),
+  },
+});
+export const $triggeredByRegistration = instanceId(
+    'triggeredByRegistration',
+    NullableType(InstanceofType(DisposableFunction)));
+export const triggeredByRegistrationProvider = Graph.createProvider($triggeredByRegistration, null);
 
-const TRIGGERED_BY_REGISTRATION_FACTORY = SimpleMonad.newFactory(Symbol('triggeredBy'), null);
-
-@customElement({
-  dependencies: ImmutableSet.of([
+@component({
+  dependencies: [
     OverlayService,
-  ]),
+  ],
+  inputs: [
+    $.host.anchorPoint,
+    $.host.anchorTarget,
+    $.host.el,
+    $.host.fitParentWidth,
+    $.host.triggeredBy,
+  ],
   tag: 'gs-menu',
   templateKey: 'src/tool/menu',
 })
-export class Menu extends BaseDisposable {
+export class Menu extends BaseThemedElement2 {
   private readonly id_: symbol = Symbol('menuId');
 
-  constructor(@inject('gs.tool.OverlayService') private overlayService_: OverlayService) {
-    super();
+  constructor(
+      @inject('theming.ThemeService') themeService: ThemeService,
+      @inject('gs.tool.OverlayService') private overlayService_: OverlayService) {
+    super(themeService);
   }
 
-  @onLifecycle('create')
-  onCreated_(
-      @domOut.attribute(ANCHOR_POINT_ATTR) anchorPointSetter: MonadSetter<null | AnchorLocation>,
-      @domOut.attribute(ANCHOR_TARGET_ATTR) anchorTargetSetter: MonadSetter<null | AnchorLocation>,
-      @domOut.attribute(VISIBLE_ATTR) visibleSetter: MonadSetter<null | boolean>):
-      Iterable<MonadValue<any>> {
-    const values: MonadValue<any>[] = [];
-    if (anchorPointSetter.value === null) {
-      values.push(anchorPointSetter.set(AnchorLocation.AUTO));
-    }
-
-    if (anchorTargetSetter.value === null) {
-      values.push(anchorTargetSetter.set(AnchorLocation.AUTO));
-    }
-
-    if (visibleSetter.value === null) {
-      values.push(visibleSetter.set(false));
-    }
-
-    return ImmutableSet.of(values);
+  private async onTriggered_(): Promise<void> {
+    const time = Graph.getTimestamp();
+    const visible = await Graph.get($.host.visible.getId(), time, this);
+    this.setOverlayVisible_(!visible, time);
   }
 
-  @on(OverlayBus, 'show')
-  @on(OverlayBus, 'hide')
-  onOverlayVisibilityChange_(
-      @eventDetails() {id, type}: {id: symbol, type: OverlayEventType},
-      @domOut.attribute(VISIBLE_ATTR) visibleSetter: MonadSetter<boolean | null>):
-      Iterable<MonadValue<any>> {
-    if (id !== this.id_) {
-      return ImmutableSet.of([]);
-    }
-
-    return ImmutableSet.of([visibleSetter.set(type === 'show')]);
-  }
-
-  onTriggered_(
-      @domOut.attribute(VISIBLE_ATTR) visibleAttrSetter: MonadSetter<boolean | null>):
-      Iterable<MonadValue<any>> {
-    return ImmutableSet.of([
-      visibleAttrSetter.set(!visibleAttrSetter.value),
-    ]);
-  }
-
-  @onDom.attributeChange(TRIGGERED_BY_ATTR)
-  onTriggeredByChanged_(
-      @monadOut(TRIGGERED_BY_REGISTRATION_FACTORY) triggeredByRegistrationSetter:
-          MonadSetter<Disposable | null>,
-      @dom.element(null) element: HTMLElement,
-      @dom.attribute(TRIGGERED_BY_ATTR) triggeredBy: string | null): Iterable<MonadValue<any>> {
-    if (triggeredByRegistrationSetter.value) {
-      triggeredByRegistrationSetter.value.dispose();
-    }
-
+  @onDom.attributeChange($.host.triggeredBy)
+  async onTriggeredByChanged_(): Promise<void> {
+    const triggeredBy = Persona.getValue($.host.triggeredBy, this);
     if (!triggeredBy) {
-      return ImmutableSet.of([]);
+      return;
     }
+
+    const time = Graph.getTimestamp();
+    const [element, triggeredByRegistration] = await Promise.all([
+      Graph.get($.host.el.getId(), time, this),
+      Graph.get($triggeredByRegistration, time, this),
+    ]);
 
     const rootNode = element.getRootNode();
     if (!QuerySelectorType.check(rootNode)) {
@@ -128,27 +136,50 @@ export class Menu extends BaseDisposable {
     const targetEl = rootNode.querySelector(triggeredBy);
     if (!targetEl) {
       Log.warn(LOG, 'No target elements found for', triggeredBy, 'in', rootNode);
-      return ImmutableSet.of([]);
+      return;
     }
 
-    const listener = (event: Event) => {
-      MonadUtil.callFunction(event, this, 'onTriggered_');
+    if (triggeredByRegistration) {
+      triggeredByRegistration.dispose();
+    }
+
+    const listener = () => {
+      this.onTriggered_();
     };
     targetEl.addEventListener('gs-action', listener);
-    return ImmutableSet.of([
-      triggeredByRegistrationSetter.set(DisposableFunction.of(() => {
-        targetEl.removeEventListener('gs-action', listener);
-      })),
-    ]);
+    return triggeredByRegistrationProvider(
+        DisposableFunction.of(() => {
+          targetEl.removeEventListener('gs-action', listener);
+        }),
+        this);
   }
 
-  @onDom.attributeChange(VISIBLE_ATTR)
-  onVisibleChanged_(
-      @dom.element(null) element: HTMLElement,
-      @dom.attribute(FIT_PARENT_WIDTH_ATTR) fitParentWidth: boolean | null,
-      @dom.attribute(VISIBLE_ATTR) visible: boolean | null,
-      @dom.attribute(ANCHOR_TARGET_ATTR) anchorTarget: AnchorLocation | null,
-      @dom.attribute(ANCHOR_POINT_ATTR) anchorPoint: AnchorLocation | null): void {
+  @onDom.attributeChange($.host.visible)
+  onVisibleChanged_(): void {
+    this.setOverlayVisible_(Persona.getValue($.host.visible, this) || false, Graph.getTimestamp());
+  }
+
+  @render.attribute($.host.visible)
+  renderVisible_(@nodeIn($overlay.state) state: {id: symbol, visible: boolean} | null): boolean {
+    if (!state) {
+      return false;
+    }
+
+    if (state.id !== this.id_) {
+      return false;
+    }
+
+    return state.visible;
+  }
+
+  private async setOverlayVisible_(visible: boolean, time: GraphTime): Promise<void> {
+    const [element, fitParentWidth, anchorTarget, anchorPoint] = await Promise.all([
+      Graph.get($.host.el.getId(), time, this),
+      Graph.get($.host.fitParentWidth.getId(), time, this),
+      Graph.get($.host.anchorTarget.getId(), time, this),
+      Graph.get($.host.anchorPoint.getId(), time, this),
+    ]);
+
     if (visible) {
       const parentElement = element.parentElement;
       if (!parentElement) {

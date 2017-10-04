@@ -50,6 +50,10 @@ export class OverlayService extends BaseListener {
     });
   }
 
+  isShown(): boolean {
+    return !!this.getShownId_();
+  }
+
   private onTick_(
       overlayContainerEl: HTMLElement,
       anchorTarget: AnchorLocation,

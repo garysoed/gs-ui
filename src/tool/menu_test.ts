@@ -1,117 +1,49 @@
 import { assert, Matchers, TestBase } from '../test-base';
 TestBase.setup();
 
-import { FakeMonadSetter, MonadUtil } from 'external/gs_tools/src/event';
-import { Disposable } from 'external/gs_tools/src/interfaces';
+import { DisposableFunction } from 'external/gs_tools/src/dispose';
+import { Graph, GraphTime } from 'external/gs_tools/src/graph';
 import { Mocks } from 'external/gs_tools/src/mock';
+import { Persona } from 'external/gs_tools/src/persona';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { AnchorLocation } from '../const';
 import { Menu } from '../tool';
+import { $, $triggeredByRegistration } from '../tool/menu';
 
 describe('tool.Menu', () => {
   let menu: Menu;
   let mockOverlayService: any;
 
   beforeEach(() => {
+    Graph.clearAllNodesForTest();
     mockOverlayService = jasmine.createSpyObj('MenuService', ['hideOverlay', 'showOverlay']);
-    menu = new Menu(mockOverlayService);
+    menu = new Menu(Mocks.object('ThemeService'), mockOverlayService);
     TestDispose.add(menu);
   });
 
-  describe('onCreated_', () => {
-    it('should default the anchor target to AUTO', () => {
-      const anchorPoint = AnchorLocation.BOTTOM_LEFT;
-      const visible = true;
-
-      const fakeAnchorPointSetter = new FakeMonadSetter<AnchorLocation | null>(anchorPoint);
-      const fakeAnchorTargetSetter = new FakeMonadSetter<AnchorLocation | null>(null);
-      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(visible);
-
-      const list = menu.onCreated_(
-          fakeAnchorPointSetter,
-          fakeAnchorTargetSetter,
-          fakeVisibleSetter);
-      assert(fakeAnchorPointSetter.findValue(list)).to.beNull();
-      assert(fakeAnchorTargetSetter.findValue(list)!.value).to.equal(AnchorLocation.AUTO);
-      assert(fakeVisibleSetter.findValue(list)).to.beNull();
-    });
-
-    it('should default the anchor point to AUTO', () => {
-      const anchorTarget = AnchorLocation.BOTTOM_LEFT;
-      const visible = true;
-
-      const fakeAnchorPointSetter = new FakeMonadSetter<AnchorLocation | null>(null);
-      const fakeAnchorTargetSetter = new FakeMonadSetter<AnchorLocation | null>(anchorTarget);
-      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(visible);
-
-      const list = menu.onCreated_(
-          fakeAnchorPointSetter,
-          fakeAnchorTargetSetter,
-          fakeVisibleSetter);
-      assert(fakeAnchorPointSetter.findValue(list)!.value).to.equal(AnchorLocation.AUTO);
-      assert(fakeAnchorTargetSetter.findValue(list)).to.beNull();
-      assert(fakeVisibleSetter.findValue(list)).to.beNull();
-    });
-
-    it(`should default the visibility to false`, () => {
-      const anchorTarget = AnchorLocation.BOTTOM_LEFT;
-      const anchorPoint = AnchorLocation.BOTTOM_LEFT;
-
-      const fakeAnchorPointSetter = new FakeMonadSetter<AnchorLocation | null>(anchorPoint);
-      const fakeAnchorTargetSetter = new FakeMonadSetter<AnchorLocation | null>(anchorTarget);
-      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(null);
-
-      const list = menu.onCreated_(
-          fakeAnchorPointSetter,
-          fakeAnchorTargetSetter,
-          fakeVisibleSetter);
-      assert(fakeAnchorPointSetter.findValue(list)).to.beNull();
-      assert(fakeAnchorTargetSetter.findValue(list)).to.beNull();
-      assert(fakeVisibleSetter.findValue(list)!.value).to.beFalse();
-    });
-  });
-
-  describe('onOverlayVisibilityChange_', () => {
-    it(`should set the visible attribute to true if event type is show`, () => {
-      const event = {id: menu['id_'], type: 'show' as 'show'};
-      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(null);
-
-      const list = menu.onOverlayVisibilityChange_(event, fakeVisibleSetter);
-      assert(fakeVisibleSetter.findValue(list)!.value).to.beTrue();
-    });
-
-    it(`should set the visible attribute to hide if event type is hide`, () => {
-      const event = {id: menu['id_'], type: 'hide' as 'hide'};
-      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(null);
-
-      const list = menu.onOverlayVisibilityChange_(event, fakeVisibleSetter);
-      assert(fakeVisibleSetter.findValue(list)!.value).to.beFalse();
-    });
-
-    it(`should do nothing the ID does not match`, () => {
-      const event = {id: Symbol('otherId'), type: 'hide' as 'hide'};
-      const fakeVisibleSetter = new FakeMonadSetter<boolean | null>(null);
-
-      const list = menu.onOverlayVisibilityChange_(event, fakeVisibleSetter);
-      assert([...list]).to.equal([]);
-    });
-  });
-
   describe('onTriggered_', () => {
-    it(`should toggle the visible attribute`, () => {
-      const fakeVisibleAttrSetter = new FakeMonadSetter<boolean>(false);
+    it(`should toggle the overlay visibility`, async () => {
+      const time = GraphTime.new();
+      spyOn(Graph, 'getTimestamp').and.returnValue(time);
+      spyOn(menu, 'setOverlayVisible_');
 
-      const updates = menu.onTriggered_(fakeVisibleAttrSetter);
-      assert(fakeVisibleAttrSetter.findValue(updates)!.value).to.beTrue();
+      Graph.createProvider($.host.visible.getId(), true);
+
+      await menu['onTriggered_']();
+      assert(menu['setOverlayVisible_']).to.haveBeenCalledWith(false, time);
     });
   });
 
   describe('onTriggeredByChanged_', () => {
-    it(`should listen for gs-action events from the element and dispose the previous '
-        + 'registration`, () => {
+    it(`should listen for gs-action events from the element and dispose the previous `
+        + `registration`, async () => {
       const triggeredBy = 'triggeredBy';
-      const mockDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
+      spyOn(Persona, 'getValue').and.returnValue(triggeredBy);
+
+      const origDisposable = DisposableFunction.of(() => undefined);
+      Graph.createProvider($triggeredByRegistration, origDisposable);
+
       const mockTargetEl =
           jasmine.createSpyObj('TargetEl', ['addEventListener', 'removeEventListener']);
 
@@ -121,31 +53,34 @@ describe('tool.Menu', () => {
 
       const mockElement = jasmine.createSpyObj('Element', ['getRootNode']);
       mockElement.getRootNode.and.returnValue(mockRootNode);
+      Object.setPrototypeOf(mockElement, HTMLElement.prototype);
+      await Graph.createProvider($.host.el.getId(), mockElement);
 
-      spyOn(MonadUtil, 'callFunction');
+      spyOn(menu, 'onTriggered_');
 
-      const fakeTriggeredByRegistrationSetter = new FakeMonadSetter<Disposable>(mockDisposable);
-      const updates = menu.onTriggeredByChanged_(
-          fakeTriggeredByRegistrationSetter,
-          mockElement,
-          triggeredBy);
-      const disposable = fakeTriggeredByRegistrationSetter.findValue(updates)!.value;
-      disposable.dispose();
+      await menu.onTriggeredByChanged_();
+      const disposable = await Graph.get($triggeredByRegistration, Graph.getTimestamp(), menu);
+      disposable!.dispose();
       assert(mockTargetEl.removeEventListener).to
           .haveBeenCalledWith('gs-action', Matchers.any(Function));
 
       const handler = mockTargetEl.removeEventListener.calls.argsFor(0)[1];
       assert(mockTargetEl.addEventListener).to.haveBeenCalledWith('gs-action', handler);
       assert(mockRootNode.querySelector).to.haveBeenCalledWith(triggeredBy);
-      assert(mockDisposable.dispose).to.haveBeenCalledWith();
+      assert(origDisposable.isDisposed()).to.beTrue();
 
       const event = Mocks.object('event');
       handler(event);
-      assert(MonadUtil.callFunction).to.haveBeenCalledWith(event, menu, 'onTriggered_');
+      assert(Persona.getValue).to.haveBeenCalledWith($.host.triggeredBy, menu);
     });
 
-    it(`should do nothing if the target element cannot be found`, () => {
+    it(`should do nothing if the target element cannot be found`, async () => {
       const triggeredBy = 'triggeredBy';
+      spyOn(Persona, 'getValue').and.returnValue(triggeredBy);
+
+      const origDisposable = DisposableFunction.of(() => undefined);
+      Graph.createProvider($triggeredByRegistration, origDisposable);
+      TestDispose.add(origDisposable);
 
       const mockRootNode = jasmine.createSpyObj('RootNode', ['querySelector']);
       Object.setPrototypeOf(mockRootNode, Element.prototype);
@@ -153,50 +88,89 @@ describe('tool.Menu', () => {
 
       const mockElement = jasmine.createSpyObj('Element', ['getRootNode']);
       mockElement.getRootNode.and.returnValue(mockRootNode);
+      Object.setPrototypeOf(mockElement, HTMLElement.prototype);
+      await Graph.createProvider($.host.el.getId(), mockElement);
 
-      const fakeTriggeredByRegistrationSetter = new FakeMonadSetter<Disposable | null>(null);
-      const updates = menu.onTriggeredByChanged_(
-          fakeTriggeredByRegistrationSetter,
-          mockElement,
-          triggeredBy);
-      assert([...updates]).to.equal([]);
-
+      await menu.onTriggeredByChanged_();
       assert(mockRootNode.querySelector).to.haveBeenCalledWith(triggeredBy);
+      assert(origDisposable.isDisposed()).to.beFalse();
     });
 
-    it(`should throw error if the root node is not a query selector type`, () => {
-      const rootNode = Mocks.object('rootNode');
+    it(`should reject error if the root node is not a query selector type`, async () => {
+      const triggeredBy = 'triggeredBy';
+      spyOn(Persona, 'getValue').and.returnValue(triggeredBy);
+
+      Graph.createProvider($triggeredByRegistration, null);
+
+      const mockRootNode = jasmine.createSpyObj('RootNode', ['querySelector']);
       const mockElement = jasmine.createSpyObj('Element', ['getRootNode']);
-      mockElement.getRootNode.and.returnValue(rootNode);
+      mockElement.getRootNode.and.returnValue(mockRootNode);
+      Object.setPrototypeOf(mockElement, HTMLElement.prototype);
+      await Graph.createProvider($.host.el.getId(), mockElement);
 
-      const fakeTriggeredByRegistrationSetter = new FakeMonadSetter<Disposable | null>(null);
-      assert(() => {
-        menu.onTriggeredByChanged_(
-            fakeTriggeredByRegistrationSetter,
-            mockElement,
-            'triggeredBy');
-      }).to.throwError(/Cannot run query selector/);
+      await assert(menu.onTriggeredByChanged_()).to.rejectWithError(/Cannot run query selector/);
     });
 
-    it(`should do nothing if the triggeredBy value is falsy`, () => {
-      const element = Mocks.object('element');
-      const fakeTriggeredByRegistrationSetter = new FakeMonadSetter<Disposable | null>(null);
-      const updates = menu.onTriggeredByChanged_(
-          fakeTriggeredByRegistrationSetter,
-          element,
-          '');
-      assert([...updates]).to.equal([]);
+    it(`should not reject if the triggeredBy value is falsy`, async () => {
+      spyOn(Persona, 'getValue').and.returnValue(null);
+
+      await menu.onTriggeredByChanged_();
     });
   });
 
   describe('onVisibleChanged_', () => {
-    it('should call the overlay service correctly', () => {
+    it(`should set the overlay to visible correctly`, () => {
+      const time = Graph.getTimestamp();
+
+      spyOn(Persona, 'getValue').and.returnValue(true);
+      spyOn(menu, 'setOverlayVisible_');
+
+      menu.onVisibleChanged_();
+      assert(menu['setOverlayVisible_']).to.haveBeenCalledWith(true, time);
+      assert(Persona.getValue).to.haveBeenCalledWith($.host.visible, menu);
+    });
+
+    it(`should default the visibility to false`, () => {
+      const time = Graph.getTimestamp();
+
+      spyOn(Persona, 'getValue').and.returnValue(null);
+      spyOn(menu, 'setOverlayVisible_');
+
+      menu.onVisibleChanged_();
+      assert(menu['setOverlayVisible_']).to.haveBeenCalledWith(false, time);
+      assert(Persona.getValue).to.haveBeenCalledWith($.host.visible, menu);
+    });
+  });
+
+  describe('renderVisible_', () => {
+    it(`should return the visible state`, () => {
+      const visible = true;
+
+      assert(menu.renderVisible_({id: menu['id_'], visible})).to.be(visible);
+    });
+
+    it(`should return false if the state ID is not the same as the menu ID`, () => {
+      assert(menu.renderVisible_({id: Symbol('otherId'), visible: true})).to.beFalse();
+    });
+
+    it(`should return false if there are no states`, () => {
+      assert(menu.renderVisible_(null)).to.beFalse();
+    });
+  });
+
+  describe('setOverlayVisible_', () => {
+    it('should call the overlay service correctly', async () => {
       const parentWidth = 123;
       const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = parentWidth;
 
+      Graph.createProvider($.host.fitParentWidth.getId(), true);
+
       const anchorPoint = AnchorLocation.BOTTOM_LEFT;
+      Graph.createProvider($.host.anchorPoint.getId(), anchorPoint);
+
       const anchorTarget = AnchorLocation.TOP_RIGHT;
+      Graph.createProvider($.host.anchorTarget.getId(), anchorTarget);
 
       const menuContentStyle = Mocks.object('menuContentStyle');
       const menuContent = Mocks.object('menuContent');
@@ -205,9 +179,10 @@ describe('tool.Menu', () => {
       const element = Mocks.object('element');
       element.firstElementChild = menuContent;
       element.parentElement = parentElement;
+      Object.setPrototypeOf(element, HTMLElement.prototype);
+      Graph.createProvider($.host.el.getId(), element);
 
-      menu.onVisibleChanged_(element, true, true, anchorTarget, anchorPoint);
-
+      await menu['setOverlayVisible_'](true, Graph.getTimestamp());
       assert(mockOverlayService.showOverlay).to.haveBeenCalledWith(
           menu['id_'],
           element,
@@ -218,9 +193,14 @@ describe('tool.Menu', () => {
       assert(menuContentStyle.width).to.equal(`${parentWidth}px`);
     });
 
-    it('should not set the width to the parent element if it-parent-width is not set', () => {
+    it('should not set the width to the parent element if fit-parent-width is not set',
+        async () => {
       const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = 123;
+
+      Graph.createProvider($.host.fitParentWidth.getId(), false);
+      Graph.createProvider($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
+      Graph.createProvider($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
 
       const menuContentStyle = Mocks.object('menuContentStyle');
       const menuContent = Mocks.object('menuContent');
@@ -229,59 +209,58 @@ describe('tool.Menu', () => {
       const element = Mocks.object('element');
       element.firstElementChild = menuContent;
       element.parentElement = parentElement;
+      Object.setPrototypeOf(element, HTMLElement.prototype);
+      Graph.createProvider($.host.el.getId(), element);
 
-      menu.onVisibleChanged_(
-          element,
-          false,
-          true,
-          AnchorLocation.BOTTOM_LEFT,
-          AnchorLocation.TOP_RIGHT);
-
+      await menu['setOverlayVisible_'](true, Graph.getTimestamp());
       assert(menuContentStyle.width).toNot.beDefined();
     });
 
-    it('should throw error if there are no parent elements', () => {
+    it('should reject if there are no parent elements', async () => {
+      Graph.createProvider($.host.fitParentWidth.getId(), false);
+      Graph.createProvider($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
+      Graph.createProvider($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
+
       const element = Mocks.object('element');
       element.parentElement = null;
-      assert(() => {
-        menu.onVisibleChanged_(
-            element,
-            false,
-            true,
-            AnchorLocation.BOTTOM_LEFT,
-            AnchorLocation.TOP_RIGHT);
-      }).to.throwError(/No parent element/i);
+      Object.setPrototypeOf(element, HTMLElement.prototype);
+      Graph.createProvider($.host.el.getId(), element);
+
+      await assert(menu['setOverlayVisible_'](true, Graph.getTimestamp()))
+          .to.rejectWithError(/No parent element/i);
     });
 
-    it('should not throw error if there are no menu contents', () => {
+    it('should resolve if there are no menu contents', async () => {
+      Graph.createProvider($.host.fitParentWidth.getId(), true);
+      Graph.createProvider($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
+      Graph.createProvider($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
+
       const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = 123;
 
-      const menuContentStyle = Mocks.object('menuContentStyle');
-      const menuContent = Mocks.object('menuContent');
-      menuContent.style = menuContentStyle;
+      const element = Mocks.object('element');
+      element.parentElement = parentElement;
+      element.firstElementChild = null;
+      Object.setPrototypeOf(element, HTMLElement.prototype);
+      Graph.createProvider($.host.el.getId(), element);
+
+      await menu['setOverlayVisible_'](true, Graph.getTimestamp());
+    });
+
+    it(`should hide the overlay if set to hide`, async () => {
+      Graph.createProvider($.host.fitParentWidth.getId(), false);
+      Graph.createProvider($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
+      Graph.createProvider($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
+
+      const parentElement = Mocks.object('parentElement');
+      parentElement.clientWidth = 123;
 
       const element = Mocks.object('element');
       element.parentElement = parentElement;
+      Object.setPrototypeOf(element, HTMLElement.prototype);
+      Graph.createProvider($.host.el.getId(), element);
 
-      assert(() => {
-        menu.onVisibleChanged_(
-            element,
-            true,
-            true,
-            AnchorLocation.BOTTOM_LEFT,
-            AnchorLocation.TOP_RIGHT);
-      }).toNot.throw();
-    });
-
-    it(`should hide the overlay if not visible`, () => {
-      menu.onVisibleChanged_(
-          Mocks.object('element'),
-          false,
-          false,
-          AnchorLocation.BOTTOM_LEFT,
-          AnchorLocation.TOP_RIGHT);
-
+      await menu['setOverlayVisible_'](false, Graph.getTimestamp());
       assert(mockOverlayService.hideOverlay).to.haveBeenCalledWith(menu['id_']);
     });
   });

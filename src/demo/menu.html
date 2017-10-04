@@ -53,13 +53,13 @@
           <div class="menu-content">Menu content</div>
         </gs-menu>
       </gs-basic-button>
-      <gs-basic-button class="demo" class="gs-primary">
+      <gs-basic-button class="demo" primary>
         <gs-icon>settings</gs-icon>
         <gs-menu>
           <div class="menu-content">Menu content</div>
         </gs-menu>
       </gs-basic-button>
-      <gs-basic-button class="demo gs-primary" disabled>
+      <gs-basic-button class="demo" disabled primary>
         <gs-icon>settings</gs-icon>
         <gs-menu>
           <div class="menu-content">Menu content</div>
@@ -82,6 +82,9 @@
         </gs-basic-button>
       </section>
     </section>
+    <script>
+      gs.ui.setLogLevel(0);
+    </script>
 
     <script src="demo.js"></script>
     <script>
@@ -93,7 +96,10 @@
         });
       });
 
-      document.querySelector('gs-menu').setAttribute('triggered-by', '#global');
+      var menu = document.querySelector('gs-menu');
+      menu.addEventListener('gs-connected', function() {
+        menu.setAttribute('triggered-by', '#global');
+      });
     </script>
   </body>
 </html>

@@ -2,7 +2,7 @@ import { Bus } from 'external/gs_tools/src/event';
 import { Log } from 'external/gs_tools/src/util';
 
 export type OverlayEventType = 'show' | 'hide';
-type OverlayEvent = {
+export type OverlayEvent = {
   id: symbol,
   type: OverlayEventType,
 };
