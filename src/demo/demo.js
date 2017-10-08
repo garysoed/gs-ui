@@ -163,21 +163,46 @@ function setupContrastPicker() {
   mutationObserver.observe(contrastInput, {attributes: true, attributeFilter: ['value']});
 }
 
+function setupSpacingPicker() {
+  var spacingButton = document.querySelector('#spacingButton');
+  var spacingDrawer = document.querySelector('#spacingDrawer');
+  spacingButton.addEventListener('gs-action', function() {
+    var value = spacingDrawer.getAttribute('expanded') === 'true';
+    spacingDrawer.setAttribute('expanded', !value);
+  });
+
+  var spacingInput = document.querySelector('#spacingInput');
+  var mutationObserver = new MutationObserver(function(records) {
+    records.forEach(function() {
+      var newSpacing = spacingInput.getAttribute('value');
+      if (newSpacing) {
+        document.body.setAttribute('gs-spacing', 'compact');
+      } else {
+        document.body.setAttribute('gs-spacing', '');
+      }
+    });
+  });
+  mutationObserver.observe(spacingInput, {attributes: true, attributeFilter: ['value']});
+}
+
 Promise
     .all([
       fetch('demo-palette-picker.html', {method: 'GET'}),
-      fetch('demo-contrast-picker.html', {method: 'GET'})
+      fetch('demo-contrast-picker.html', {method: 'GET'}),
+      fetch('demo-spacing-picker.html', {method: 'GET'}),
     ])
     .then(function(responses) {
       return Promise.all([
         responses[0].text(),
         responses[1].text(),
+        responses[2].text(),
       ])
     })
     .then(function(textResponses) {
-      document.body.innerHTML += textResponses[0] + textResponses[1];
+      document.body.innerHTML += textResponses[0] + textResponses[1] + textResponses[2];
       setupPalettePicker();
       setupContrastPicker();
+      setupSpacingPicker();
     });
 
 // Set the templates.

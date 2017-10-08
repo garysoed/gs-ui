@@ -147,10 +147,14 @@ td {
 }
 
 /* Theming */
-.gs-theme-normal,
-.gs-theme-normal-hilite,
-.gs-theme-invert,
-.gs-theme-invert-hilite {
+[gs-spacing="compact"] {
+  --gsSizePadding: .4rem;
+}
+
+[gs-theme="normal"],
+[gs-theme="normal"][gs-highlight],
+[gs-theme="invert"],
+[gs-theme="invert"][gs-highlight] {
   --gsColorAccent: var(--gsThemeAccent);
 
   color: var(--gsColorPassiveFG);
@@ -161,7 +165,7 @@ td {
   color: var(--gsColorSecondaryFG);
 }
 
-.gs-theme-normal {
+[gs-theme="normal"] {
   --gsColorPassiveBG: var(--gsThemeWhite);
   --gsColorPassiveFG: var(--gsThemeBlack);
   --gsColorHeaderFG: var(--gsThemeBaseNormalDark);
@@ -181,7 +185,7 @@ td {
   --gsColorHighlightMode: false;
 }
 
-.gs-theme-normal-hilite {
+[gs-theme="normal"][gs-highlight] {
   --gsColorPassiveBG: var(--gsThemeBaseNormalDark);
   --gsColorPassiveFG: var(--gsThemeWhite);
   --gsColorHeaderFG: var(--gsThemeBaseReversedLightest);
@@ -201,7 +205,7 @@ td {
   --gsColorHighlightMode: true;
 }
 
-.gs-theme-invert {
+[gs-theme="invert"] {
   --gsColorPassiveBG: var(--gsThemeBlack);
   --gsColorPassiveFG: var(--gsThemeWhite);
   --gsColorHeaderFG: var(--gsThemeBaseReversedLightest);
@@ -221,7 +225,7 @@ td {
   --gsColorHighlightMode: false;
 }
 
-.gs-theme-invert-hilite {
+[gs-theme="invert"][gs-highlight] {
   --gsColorPassiveBG: var(--gsThemeBaseReversedLightest);
   --gsColorPassiveFG: var(--gsThemeBaseNormalDarkest);
   --gsColorHeaderFG: var(--gsThemeBlack);

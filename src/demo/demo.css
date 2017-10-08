@@ -56,6 +56,38 @@
   width: 240px;
 }
 
+#contrastContainer {
+  bottom: 0;
+  height: calc(var(--gsLineHeight) + 2 * var(--gsSizePadding));
+  position: absolute;
+  right: 0;
+  width: calc(var(--gsLineHeight) + 2 * var(--gsSizePadding));
+}
+
+#contrastContent {
+  width: 9rem;
+}
+
+#contrastInput {
+  padding: 1rem;
+}
+
+#spacingContainer {
+  bottom: calc(var(--gsLineHeight) + 2 * var(--gsSizePadding));
+  height: calc(var(--gsLineHeight) + 2 * var(--gsSizePadding));
+  position: absolute;
+  right: 0;
+  width: calc(var(--gsLineHeight) + 2 * var(--gsSizePadding));
+}
+
+#spacingContent {
+  width: 9rem;
+}
+
+#spacingInput {
+  padding: 1rem;
+}
+
 .menuRoot {
   background-color: white;
 }

@@ -12,22 +12,6 @@
         flex: 1;
         padding: 1rem;
       }
-
-      #contrastContainer {
-        bottom: 0;
-        height: 3.5rem;
-        position: absolute;
-        right: 0;
-        width: 3.5rem;
-      }
-
-      #contrastContent {
-        width: 9rem;
-      }
-
-      #contrastInput {
-        padding: 1rem;
-      }
     </style>
     <link rel="stylesheet" href="demo.css">
   </head>
@@ -49,12 +33,12 @@
 
     <section>
       <section class="row">
-        <section class="cell gs-theme-normal"></section>
-        <section class="cell gs-theme-normal-hilite"></section>
+        <section class="cell" gs-theme="normal"></section>
+        <section class="cell" gs-theme="normal" gs-highlight></section>
       </section>
       <section class="row">
-        <section class="cell gs-theme-invert"></section>
-        <section class="cell gs-theme-invert-hilite"></section>
+        <section class="cell" gs-theme="invert"></section>
+        <section class="cell" gs-theme="invert" gs-highlight></section>
       </section>
     </section>
 

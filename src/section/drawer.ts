@@ -11,11 +11,10 @@
  * @attr {Size} min-width The min width of the drawer when collapsed, in px.
  */
 import { inject } from 'external/gs_tools/src/inject';
-import { BooleanParser, SizeParser, StringSetParser } from 'external/gs_tools/src/parse';
+import { BooleanParser, StringParser, StringSetParser } from 'external/gs_tools/src/parse';
 import { assertUnreachable } from 'external/gs_tools/src/typescript';
 import { customElement, dom, onDom } from 'external/gs_tools/src/webc';
 
-import { Size } from 'external/gs_tools/src/interfaces';
 import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';
 
@@ -25,8 +24,8 @@ const SidesParser = StringSetParser<Sides>(['left', 'right']);
 const ALIGN_CONTENT_ATTR = {name: 'align-content', selector: null, parser: SidesParser};
 const ANCHOR_POINT_ATTR = {name: 'anchor-point', selector: null, parser: SidesParser};
 const IS_EXPANDED_ATTR = {name: 'expanded', selector: null, parser: BooleanParser};
-const MAX_WIDTH_ATTR = {name: 'max-width', selector: null, parser: SizeParser};
-const MIN_WIDTH_ATTR = {name: 'min-width', selector: null, parser: SizeParser};
+const MAX_WIDTH_ATTR = {name: 'max-width', selector: null, parser: StringParser};
+const MIN_WIDTH_ATTR = {name: 'min-width', selector: null, parser: StringParser};
 
 const CONTAINER_EL = '#container';
 const ITEM_EL = '#item';
@@ -113,9 +112,9 @@ export class Drawer extends BaseThemedElement2 {
    */
   @onDom.attributeChange(MAX_WIDTH_ATTR)
   onMaxWidthChanged_(
-      @dom.attribute(MAX_WIDTH_ATTR) width: Size | null,
+      @dom.attribute(MAX_WIDTH_ATTR) width: string | null,
       @dom.element(ROOT_EL) rootEl: HTMLElement): void {
-    rootEl.style.setProperty('--gsDrawerExpandedWidth', SizeParser.stringify(width));
+    rootEl.style.setProperty('--gsDrawerExpandedWidth', StringParser.stringify(width));
   }
 
   /**
@@ -125,8 +124,8 @@ export class Drawer extends BaseThemedElement2 {
    */
   @onDom.attributeChange(MIN_WIDTH_ATTR)
   onMinWidthChanged_(
-      @dom.attribute(MIN_WIDTH_ATTR) width: Size | null,
+      @dom.attribute(MIN_WIDTH_ATTR) width: string | null,
       @dom.element(ROOT_EL) rootEl: HTMLElement): void {
-    rootEl.style.setProperty('--gsDrawerCollapsedWidth', SizeParser.stringify(width));
+    rootEl.style.setProperty('--gsDrawerCollapsedWidth', StringParser.stringify(width));
   }
 }
