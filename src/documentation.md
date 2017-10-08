@@ -43,6 +43,16 @@ types supported are the ones with the corresponding `Parser` in `gs-tools`. This
 -   `percent`
 -   `string`
 
+The type is prefixed by the following depending on whether the attribute is an input, output, or
+both:
+-   `<`: Attribute is an input. The component will never change the value.
+-   `>`: Attribute is an output. The component will never read the value.
+-   `=`: Attribute is an input and an output. The component will:
+    -   Initialize the value at load
+    -   React to changes to the value
+    -   Update the value
+    You cannot set the value of these attributes on load. They have to be programmatically set.
+
 ## CSS
 
 The CSS lists CSS variables that the client code can override. The names should exclude the `--`

@@ -5,15 +5,15 @@
  * The menu content is the child element(s). Use the `visible` attribute to show / hide the menu.
  * The menu conten will be anchored to the parent element.
  *
- * @attr {enum<AnchorLocation>} anchor-point Location on the menu content to anchor it to.
- * @attr {enum<AnchorLocation>} anchor-target Location on the parent element to anchor the menu
+ * @attr {<enum<AnchorLocation>} anchor-point Location on the menu content to anchor it to.
+ * @attr {<enum<AnchorLocation>} anchor-target Location on the parent element to anchor the menu
  *     content to.
- * @attr {boolean} fit-parent-width True iff the menu content should fit the parent element's
+ * @attr {<boolean} fit-parent-width True iff the menu content should fit the parent element's
  *     width.
- * @attr {string} triggered-by Selector that points to an element that is a descendant of the
+ * @attr {<string} triggered-by Selector that points to an element that is a descendant of the
  *     gs-menu's root node. Whenever this element dispatches a gs-action event, this menu will
  *     toggle its visibility.
- * @attr {boolean} visible True iff the menu is shown.
+ * @attr {=boolean} visible True iff the menu is shown.
  */
 import {
   BooleanType,

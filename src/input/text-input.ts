@@ -2,9 +2,8 @@
  * @webcomponent gs-text-input
  * Element for inputting texts.
  *
- * @attr {boolean} disabled True iff the input should be disabled.
- * @attr {string} in-value Value to set the input.
- * @attr {string} out-value New value of the input.
+ * @attr {<boolean} disabled True iff the input should be disabled.
+ * @attr {=string} value Value of the input.
  *
  * @event {null} change Dispatched when the value has changed.
  */
@@ -31,13 +30,12 @@ export const $ = resolveSelectors({
     $.input.el,
     $base.host.disabled,
     $base.host.dispatch,
-    $base.host.inValue,
   ],
   tag: 'gs-text-input',
   templateKey: 'src/input/text-input',
 })
 export class TextInput extends BaseInput<string> {
-  constructor( @inject('theming.ThemeService') themeService: ThemeService) {
+  constructor(@inject('theming.ThemeService') themeService: ThemeService) {
     super(themeService, StringParser);
   }
 

@@ -10,6 +10,7 @@ import {
   dispatcherSelector,
   elementSelector,
   onDom,
+  Persona,
   render,
   resolveSelectors,
   shadowHostSelector} from 'external/gs_tools/src/persona';
@@ -30,15 +31,9 @@ export const $ = resolveSelectors({
         false),
     dispatch: dispatcherSelector<null>(elementSelector('host.el')),
     el: shadowHostSelector,
-    inValue: attributeSelector(
+    value: attributeSelector(
         elementSelector('host.el'),
-        'in-value',
-        StringParser,
-        StringType,
-        ''),
-    outValue: attributeSelector(
-        elementSelector('host.el'),
-        'out-value',
+        'value',
         StringParser,
         StringType,
         ''),
@@ -85,7 +80,7 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
    * @param newValue The value of the disabled attribute..
    */
   @onDom.attributeChange($.host.disabled)
-  @onDom.event(shadowHostSelector, 'gs-create')
+  @onDom.event(shadowHostSelector, 'gs-connected')
   async onDisabledChange_(): Promise<void> {
     const time = Graph.getTimestamp();
     const [disabled, inputEl] = await Promise.all([
@@ -95,12 +90,12 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
     this.setInputElDisabled_(inputEl, disabled);
   }
 
-  @onDom.event(shadowHostSelector, 'gs-create')
+  @onDom.event(shadowHostSelector, 'gs-connected')
   async onHostCreated_(): Promise<void> {
     const time = Graph.getTimestamp();
     const inputEl = await this.getInputEl_(time);
     this.addDisposable(this.listenToValueChanges_(inputEl, () => {
-      Graph.refresh($.host.outValue.getId(), this);
+      Graph.refresh($.host.value.getId(), this);
     }));
   }
 
@@ -109,23 +104,16 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
    *
    * @param newValue The value it was changed to.
    */
-  @onDom.attributeChange($.host.inValue)
-  @onDom.event(shadowHostSelector, 'gs-create')
-  async onInValueChange_(): Promise<void> {
+  @onDom.attributeChange($.host.value)
+  @onDom.event(shadowHostSelector, 'gs-connected')
+  async onValueChange_(): Promise<void> {
     const time = Graph.getTimestamp();
-    const [inputEl, inValue] = await Promise.all([
-      this.getInputEl_(time),
-      Graph.get($.host.inValue.getId(), time, this),
-    ]);
-    this.setInputElValue_(inputEl, this.valueParser_.parse(inValue));
+    const inputEl = await this.getInputEl_(time);
+    this.setInputElValue_(inputEl, this.valueParser_.parse(Persona.getValue($.host.value, this)));
   }
 
-  protected refreshOutValue_(): void {
-    Graph.refresh($.host.outValue.getId(), this);
-  }
-
-  @render.attribute($.host.outValue)
-  async renderOutValue_(
+  @render.attribute($.host.value)
+  async renderValue_(
       @nodeIn($.host.dispatch.getId()) dispatcher: DispatchFn<null>):
       Promise<string> {
     const time = Graph.getTimestamp();

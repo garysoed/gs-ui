@@ -5,10 +5,9 @@
  * To use this, watch for changes to the bundle-id attribute. Whenever it changes, you can grab the
  * file and its contents using gs-ui.input.FileService.
  *
- * @attr {string} in-value The initial value of the editor.
- * @attr {string} out-value The output value of the editor.
- * @attr {enum<Language>} language Language for syntax highlighting the code.
- * @attr {boolean} show-gutter True iff the gutter should be shown.
+ * @attr {<enum<Language>} language Language for syntax highlighting the code.
+ * @attr {<boolean} show-gutter True iff the gutter should be shown.
+ * @attr {=string} value The value of the editor.
  *
  * @event {null} change Dispatched when the out-value has been updated. Value might stay the same.
  */
@@ -87,7 +86,6 @@ export const $ = resolveSelectors({
     $.editor.el,
     $base.host.disabled,
     $base.host.dispatch,
-    $base.host.inValue,
   ],
   tag: 'gs-code-input',
   templateKey: 'src/input/code-input',
@@ -203,7 +201,7 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
   /**
    * @override
    */
-  @onDom.event(shadowHostSelector, 'gs-create')
+  @onDom.event(shadowHostSelector, 'gs-connected')
   async onCodeHostCreated_(): Promise<void> {
     const editorEl = await Graph.get($.editor.el.getId(), Graph.getTimestamp(), this);
 
@@ -214,7 +212,7 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
   }
 
   @onDom.attributeChange($.host.language)
-  @onDom.event(shadowHostSelector, 'gs-create')
+  @onDom.event(shadowHostSelector, 'gs-connected')
   async onLanguageAttrChange_(): Promise<void> {
     const time = Graph.getTimestamp();
     const [editorEl, newValue] = await Promise.all([
@@ -243,7 +241,7 @@ export class CodeInput extends BaseInput<string, HTMLDivElement> {
    * Handles when the theme is changed.
    */
   @on((instance: CodeInput) => instance.themeService_, ThemeServiceEvents.THEME_CHANGED)
-  @onDom.event(shadowHostSelector, 'gs-create')
+  @onDom.event(shadowHostSelector, 'gs-connected')
   async onThemeChanged_(): Promise<void> {
     const time = Graph.getTimestamp();
     const [customStyleEl, editorEl] = await Promise.all([

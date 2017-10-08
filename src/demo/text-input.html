@@ -54,13 +54,13 @@
         <label>
           Input:
         </label>
-        <gs-text-input in-value="Default value"></gs-text-input>
+        <gs-text-input></gs-text-input>
       </div>
       <div class="container">
         <label>
           Disabled:
         </label>
-        <gs-text-input disabled in-value="Default value"></gs-text-input>
+        <gs-text-input disabled></gs-text-input>
       </div>
       <div>
         <div>Value:</div>
@@ -83,10 +83,13 @@
     <script>
       document.querySelectorAll('section.cell').forEach(function(cell) {
         var valueEl = cell.querySelector('.value');
+        cell.querySelectorAll('gs-text-input').forEach((input) => {
+          input.setAttribute('value', 'Default value');
+        });
         cell.querySelector('gs-text-input:not([disabled])').addEventListener(
             'change',
             function(event) {
-              valueEl.innerText = event.target.getAttribute('out-value');
+              valueEl.innerText = event.target.getAttribute('value');
             });
       });
     </script>

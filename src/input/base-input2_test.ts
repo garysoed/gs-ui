@@ -4,6 +4,7 @@ TestBase.setup();
 import { Graph } from 'external/gs_tools/src/graph';
 import { Disposable, ElementSelector } from 'external/gs_tools/src/interfaces';
 import { StringParser } from 'external/gs_tools/src/parse';
+import { Persona } from 'external/gs_tools/src/persona';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
 import { $, BaseInput } from '../input/base-input2';
@@ -96,11 +97,11 @@ describe('input.BaseInput', () => {
       assert(input['listenToValueChanges_']).to.haveBeenCalledWith(inputEl, Matchers.anyFunction());
 
       spyListen.calls.argsFor(0)[1]();
-      assert(Graph.refresh).to.haveBeenCalledWith($.host.outValue.getId(), input);
+      assert(Graph.refresh).to.haveBeenCalledWith($.host.value.getId(), input);
     });
   });
 
-  describe('onInValueChange_', () => {
+  describe('onValueChange_', () => {
     it(`should update the value on the element and dispatch the change event`, async () => {
       const inValue = 'inValue';
       const inputEl = Mocks.object('inputEl');
@@ -108,19 +109,11 @@ describe('input.BaseInput', () => {
 
       spyOn(input, 'setInputElValue_');
 
-      TestGraph.set($.host.inValue.getId(), input, inValue);
+      spyOn(Persona, 'getValue').and.returnValue(inValue);
 
-      await input.onInValueChange_();
+      await input.onValueChange_();
       assert(input['setInputElValue_']).to.haveBeenCalledWith(inputEl, inValue);
-    });
-  });
-
-  describe('refreshOutValue_', () => {
-    it(`should refresh the graph correctly`, () => {
-      spyOn(Graph, 'refresh');
-
-      input['refreshOutValue_']();
-      assert(Graph.refresh).to.haveBeenCalledWith($.host.outValue.getId(), input);
+      assert(Persona.getValue).to.haveBeenCalledWith($.host.value, input);
     });
   });
 
@@ -133,7 +126,7 @@ describe('input.BaseInput', () => {
       const inputEl = Mocks.object('inputEl');
       spyOn(input, 'getInputEl_').and.returnValue(Promise.resolve(inputEl));
 
-      assert(await input.renderOutValue_(mockDispatcher)).to.equal(inputValue);
+      assert(await input.renderValue_(mockDispatcher)).to.equal(inputValue);
       assert(mockDispatcher).to.haveBeenCalledWith('change', null);
       assert(input['getInputElValue_']).to.haveBeenCalledWith(inputEl);
     });

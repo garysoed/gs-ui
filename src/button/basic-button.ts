@@ -2,8 +2,8 @@
  * @webcomponent gs-basic-button
  * A basic button.
  *
- * @attr {boolean} disabled True iff the button should be disabled.
- * @attr {boolean} primary True iff the button is primary button.
+ * @attr {<boolean} disabled True iff the button should be disabled.
+ * @attr {<boolean} primary True iff the button is primary button.
  *
  * @css {color} gsButtonFG The foreground color of the button.
  * @css {color} gsButtonFG The background color of the button.
