@@ -15,7 +15,7 @@ import {
   resolveSelectors,
   shadowHostSelector} from 'external/gs_tools/src/persona';
 
-import { Graph, GraphTime, nodeIn } from 'external/gs_tools/src/graph';
+import { Graph, GraphTime, instanceId, nodeIn } from 'external/gs_tools/src/graph';
 import { BaseThemedElement2 } from '../common';
 import { ThemeService } from '../theming';
 
@@ -39,6 +39,8 @@ export const $ = resolveSelectors({
         ''),
   },
 });
+export const $inputValue = instanceId('inputValue', StringType);
+export const inputValueProvider = Graph.createProvider($inputValue, '');
 
 export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
     extends BaseThemedElement2 {
@@ -50,7 +52,7 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
 
   protected abstract getInputEl_(time: GraphTime): Promise<E>;
 
-  protected abstract getInputElValue_(inputEl: E): string;
+  protected abstract getInputElValue_(inputEl: E): T;
 
   protected abstract listenToValueChanges_(
       element: E,
@@ -62,12 +64,9 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
   @onDom.event(shadowHostSelector, 'click')
   async onClick_(): Promise<void> {
     const time = Graph.getTimestamp();
-    const [disabled, inputEl] = await Promise.all([
-      Graph.get($.host.disabled.getId(), time, this),
-      this.getInputEl_(time),
-    ]);
+    const inputEl = await this.getInputEl_(time);
 
-    if (disabled) {
+    if (Persona.getValue($.host.disabled, this) || false) {
       return;
     }
 
@@ -83,11 +82,8 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
   @onDom.event(shadowHostSelector, 'gs-connected')
   async onDisabledChange_(): Promise<void> {
     const time = Graph.getTimestamp();
-    const [disabled, inputEl] = await Promise.all([
-      Graph.get($.host.disabled.getId(), time, this),
-      this.getInputEl_(time),
-    ]);
-    this.setInputElDisabled_(inputEl, disabled);
+    const inputEl = await this.getInputEl_(time);
+    this.setInputElDisabled_(inputEl, Persona.getValue($.host.disabled, this) || false);
   }
 
   @onDom.event(shadowHostSelector, 'gs-connected')
@@ -95,8 +91,9 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
     const time = Graph.getTimestamp();
     const inputEl = await this.getInputEl_(time);
     this.addDisposable(this.listenToValueChanges_(inputEl, () => {
-      Graph.refresh($.host.value.getId(), this);
+      return inputValueProvider(this.valueParser_.stringify(this.getInputElValue_(inputEl)), this);
     }));
+    await inputValueProvider(this.valueParser_.stringify(this.getInputElValue_(inputEl)), this);
   }
 
   /**
@@ -114,11 +111,8 @@ export abstract class BaseInput<T, E extends HTMLElement = HTMLInputElement>
 
   @render.attribute($.host.value)
   async renderValue_(
-      @nodeIn($.host.dispatch.getId()) dispatcher: DispatchFn<null>):
-      Promise<string> {
-    const time = Graph.getTimestamp();
-    const inputEl = await this.getInputEl_(time);
-    const inputValue = this.getInputElValue_(inputEl);
+      @nodeIn($.host.dispatch.getId()) dispatcher: DispatchFn<null>,
+      @nodeIn($inputValue) inputValue: string): Promise<string> {
     dispatcher(CHANGE_EVENT, null);
     return inputValue;
   }

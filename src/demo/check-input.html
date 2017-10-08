@@ -29,22 +29,6 @@
         height: var(--gsLineHeight);
         padding-left: .5rem;
       }
-
-      #contrastContainer {
-        bottom: 0;
-        height: 3.5rem;
-        position: absolute;
-        right: 0;
-        width: 3.5rem;
-      }
-
-      #contrastContent {
-        width: 9rem;
-      }
-
-      #contrastInput {
-        padding: 1rem;
-      }
     </style>
     <link rel="stylesheet" href="demo.css">
   </head>
@@ -54,13 +38,19 @@
         <label>
           Input:
         </label>
-        <gs-text-input></gs-text-input>
+        <gs-check-input></gs-check-input>
       </div>
       <div class="container">
         <label>
           Disabled:
         </label>
-        <gs-text-input disabled></gs-text-input>
+        <gs-check-input disabled></gs-check-input>
+      </div>
+      <div class="container">
+        <label>
+          Indeterminate:
+        </label>
+        <gs-check-input class="indeterminate"></gs-check-input>
       </div>
       <div>
         <div>Value:</div>
@@ -83,10 +73,10 @@
     <script>
       document.querySelectorAll('section.cell').forEach(function(cell) {
         var valueEl = cell.querySelector('.value');
-        cell.querySelectorAll('gs-text-input').forEach((input) => {
-          input.setAttribute('value', 'Default value');
+        cell.querySelectorAll('gs-check-input.indeterminate').forEach((input) => {
+          input.setAttribute('value', 'indeterminate');
         });
-        cell.querySelector('gs-text-input:not([disabled])').addEventListener(
+        cell.querySelector('gs-check-input:not([disabled])').addEventListener(
             'change',
             function(event) {
               valueEl.innerText = event.target.getAttribute('value');

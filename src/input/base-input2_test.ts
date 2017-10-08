@@ -1,4 +1,4 @@
-import { assert, Matchers, Mocks, TestBase, TestGraph } from '../test-base';
+import { assert, Matchers, Mocks, TestBase } from '../test-base';
 TestBase.setup();
 
 import { Graph } from 'external/gs_tools/src/graph';
@@ -7,7 +7,7 @@ import { StringParser } from 'external/gs_tools/src/parse';
 import { Persona } from 'external/gs_tools/src/persona';
 import { TestDispose } from 'external/gs_tools/src/testing';
 
-import { $, BaseInput } from '../input/base-input2';
+import { $, $inputValue, BaseInput, inputValueProvider } from '../input/base-input2';
 
 class TestInput extends BaseInput<string> {
   constructor() {
@@ -45,28 +45,27 @@ describe('input.BaseInput', () => {
   beforeEach(() => {
     input = new TestInput();
     TestDispose.add(input);
-    TestGraph.setup(Graph);
   });
 
   describe('onClick_', () => {
     it(`should focus on the input element and focus on it`, async () => {
       const mockInputEl = jasmine.createSpyObj('InputEl', ['focus']);
       spyOn(input, 'getInputEl_').and.returnValue(mockInputEl);
-
-      TestGraph.set($.host.disabled.getId(), input, false);
+      spyOn(Persona, 'getValue').and.returnValue(false);
 
       await input.onClick_();
       assert(mockInputEl.focus).to.haveBeenCalledWith();
+      assert(Persona.getValue).to.haveBeenCalledWith($.host.disabled, input);
     });
 
     it(`should do nothing if disabled`, async () => {
       const mockInputEl = jasmine.createSpyObj('InputEl', ['focus']);
       spyOn(input, 'getInputEl_').and.returnValue(mockInputEl);
-
-      TestGraph.set($.host.disabled.getId(), input, true);
+      spyOn(Persona, 'getValue').and.returnValue(true);
 
       await input.onClick_();
       assert(mockInputEl.focus).toNot.haveBeenCalled();
+      assert(Persona.getValue).to.haveBeenCalledWith($.host.disabled, input);
     });
   });
 
@@ -76,11 +75,12 @@ describe('input.BaseInput', () => {
       const inputEl = jasmine.createSpyObj('InputEl', ['click', 'focus']);
       spyOn(input, 'getInputEl_').and.returnValue(inputEl);
       spyOn(input, 'setInputElDisabled_');
-
-      TestGraph.set($.host.disabled.getId(), input, newValue);
+      spyOn(Persona, 'getValue').and.returnValue(newValue);
 
       await input.onDisabledChange_();
       assert(input['setInputElDisabled_']).to.haveBeenCalledWith(inputEl, newValue);
+      assert(Persona.getValue).to.haveBeenCalledWith($.host.disabled, input);
+
     });
   });
 
@@ -91,13 +91,19 @@ describe('input.BaseInput', () => {
 
       const mockDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
       const spyListen = spyOn(input, 'listenToValueChanges_').and.returnValue(mockDisposable);
-      spyOn(Graph, 'refresh');
+
+      const value = 'value';
+      spyOn(input, 'getInputElValue_').and.returnValue(value);
 
       await input.onHostCreated_();
-      assert(input['listenToValueChanges_']).to.haveBeenCalledWith(inputEl, Matchers.anyFunction());
+      assert(await Graph.get($inputValue, Graph.getTimestamp(), input)).to.equal(value);
+      assert(input['getInputElValue_']).to.haveBeenCalledWith(inputEl);
 
-      spyListen.calls.argsFor(0)[1]();
-      assert(Graph.refresh).to.haveBeenCalledWith($.host.value.getId(), input);
+      await inputValueProvider('other', input);
+
+      assert(input['listenToValueChanges_']).to.haveBeenCalledWith(inputEl, Matchers.anyFunction());
+      await spyListen.calls.argsFor(0)[1]();
+      assert(await Graph.get($inputValue, Graph.getTimestamp(), input)).to.equal(value);
     });
   });
 
@@ -117,18 +123,13 @@ describe('input.BaseInput', () => {
     });
   });
 
-  describe('renderOutValue_', () => {
+  describe('renderValue_', () => {
     it(`should render correctly and dispatches the correct event`, async () => {
       const mockDispatcher = jasmine.createSpy('Dispatcher');
-      const inputValue = 'inputValue';
-      spyOn(input, 'getInputElValue_').and.returnValue(inputValue);
+      const value = 'value';
 
-      const inputEl = Mocks.object('inputEl');
-      spyOn(input, 'getInputEl_').and.returnValue(Promise.resolve(inputEl));
-
-      assert(await input.renderValue_(mockDispatcher)).to.equal(inputValue);
+      assert(await input.renderValue_(mockDispatcher, value)).to.equal(value);
       assert(mockDispatcher).to.haveBeenCalledWith('change', null);
-      assert(input['getInputElValue_']).to.haveBeenCalledWith(inputEl);
     });
   });
 });

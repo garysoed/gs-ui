@@ -108,23 +108,23 @@ describe('section.Drawer', () => {
 
   describe('onMaxWidthChanged_', () => {
     it('should set the expanded width correctly', () => {
-      const width = {unit: 'rem' as 'rem', value: 123};
+      const width = '123rem';
       const rootEl = document.createElement('div');
 
       drawer.onMaxWidthChanged_(width, rootEl);
 
-      assert(rootEl.style.getPropertyValue('--gsDrawerExpandedWidth')).to.equal(`123rem`);
+      assert(rootEl.style.getPropertyValue('--gsDrawerExpandedWidth')).to.equal(width);
     });
   });
 
   describe('onMinWidthChanged_', () => {
     it('should set the collapsed width correctly', () => {
-      const width = {unit: 'rem' as 'rem', value: 123};
+      const width = '123rem';
       const rootEl = document.createElement('div');
 
       drawer.onMinWidthChanged_(width, rootEl);
 
-      assert(rootEl.style.getPropertyValue('--gsDrawerCollapsedWidth')).to.equal(`123rem`);
+      assert(rootEl.style.getPropertyValue('--gsDrawerCollapsedWidth')).to.equal(width);
     });
   });
 });

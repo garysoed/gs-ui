@@ -6,6 +6,7 @@ import { ElementRegistrar } from 'external/gs_tools/src/webc';
 import { Templates } from 'external/gs_tools/src/webc';
 
 import { BasicButton } from '../button/basic-button';
+import { CheckInput } from '../input/check-input';
 import { CodeInput } from '../input/code-input';
 import { FileInput } from '../input/file-input';
 import { FloatInput } from '../input/float-input';
@@ -31,6 +32,7 @@ import { ViewSlot } from '../tool/view-slot';
 const DEFAULT_ELEMENTS_: gs.ICtor<BaseDisposable>[] = [
   BasicButton,
   Breadcrumb,
+  CheckInput,
   CodeInput,
   Drawer,
   HorizontalTab,

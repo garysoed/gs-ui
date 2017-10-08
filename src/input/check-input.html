@@ -1,0 +1,23 @@
+<style>
+  #input {
+  }
+
+  #input:focus {
+  }
+
+  :host {
+    cursor: pointer;
+  }
+
+  :host([disabled]) {
+    cursor: default;
+  }
+
+  :host(:not([disabled]):hover) {
+  }
+</style>
+<div class="root">
+  <div>
+    <input id="input" type="checkbox">
+  </div>
+</div>
