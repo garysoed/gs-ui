@@ -19,7 +19,7 @@ body {
   --gsFontFamily: 'Ubuntu', sans-serif;
   --gsFontFamilyCode: 'Ubuntu Mono', monospace;
   --gsFontSizeRoot: 13px;
-  --gsLineHeight: 24px;
+  --gsLineHeight: 1.6rem;
   --gsSizePadding: .8rem;
   --gsZIndexMenuBackdrop: 100;
   --gsBoxShadowAbove: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);

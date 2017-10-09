@@ -1,23 +1,89 @@
 <style>
-  #input {
+  /* Customize the label (the container) */
+  #root {
+    cursor: var(--gsCursor);
+    display: block;
+    font-size: 22px; /* TODO */
+    position: relative;
+    user-select: none;
   }
 
-  #input:focus {
+  /* Hide the browser's default checkbox */
+  #input {
+    cursor: var(--gsCursor);
+    height: var(--gsLineHeight);
+    left: 0;
+    margin: 0;
+    opacity: 0;
+    position: absolute;
+    width: var(--gsLineHeight);
+    z-index: 1;
+  }
+
+  /* Create a custom checkbox */
+  #anchor {
+    background-color: var(--gsColorBackground);
+    border-radius: 25%;
+    height: var(--gsLineHeight);
+    left: 0;
+    position: absolute;
+    width: var(--gsLineHeight);
+    top: 0;
+    z-index: 0;
+  }
+
+  /* On mouse-over, add a grey background color */
+  #root:hover #input ~ #anchor {
+    background-color: var(--gsColorBackground);
+  }
+
+  /* When the checkbox is checked, add a blue background */
+  #input:checked ~ #anchor {
+    background-color: var(--gsColorBackground);
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  #anchor:after {
+    content: "";
+    color: var(--gsColorForeground);
+    display: none;
+    height: var(--gsLineHeight);
+    line-height: var(--gsLineHeight);
+    position: absolute;
+    text-align: center;
+    width: var(--gsLineHeight);
+  }
+
+  /* Style the checkmark/indicator */
+  #input:checked ~ #anchor:after {
+    content: "✔";
+    display: block;
+    font-size: 1rem;
+  }
+
+  #input:indeterminate ~ #anchor:after {
+    content: "-";
+    display: block;
   }
 
   :host {
-    cursor: pointer;
+    --gsColorBackground: var(--gsColorActionPrimaryBG);
+    --gsCursor: pointer;
+    --gsColorForeround: var(--gsColorActionPrimaryFG);
   }
 
   :host([disabled]) {
-    cursor: default;
+    --gsColorBackground: var(--gsColorActionPrimaryDisabledBG);
+    --gsCursor: default;
+    --gsColorForeground: var(--gsColorActionPrimaryDisabledFG);
   }
 
   :host(:not([disabled]):hover) {
+    --gsColorBackground: var(--gsColorActionPrimaryFocusBG);
+    --gsColorForeground: var(--gsColorActionPrimaryFocusFG);
   }
 </style>
-<div class="root">
-  <div>
-    <input id="input" type="checkbox">
-  </div>
+<div id="root">
+  <input id="input" type="checkbox">
+  <span id="anchor"></span>
 </div>
