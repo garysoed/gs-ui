@@ -10,8 +10,8 @@
  *
  * @event {{}} gs-action Dispatched when the button is clicked.
  */
-import { BooleanType } from 'external/gs_tools/src/check';
-import { Graph } from 'external/gs_tools/src/graph';
+import { BooleanType, InstanceofType } from 'external/gs_tools/src/check';
+import { Graph, nodeIn } from 'external/gs_tools/src/graph';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import {
@@ -20,6 +20,7 @@ import {
   dispatcherSelector,
   elementSelector,
   onDom,
+  render,
   resolveSelectors,
   shadowHostSelector} from 'external/gs_tools/src/persona';
 
@@ -37,6 +38,15 @@ export const $ = resolveSelectors({
         false),
     dispatch: dispatcherSelector<null>(elementSelector('host.el')),
     el: shadowHostSelector,
+  },
+  root: {
+    ariaDisabled: attributeSelector(
+        elementSelector('root.el'),
+        'aria-disabled',
+        BooleanParser,
+        BooleanType,
+        false),
+    el: elementSelector('#root', InstanceofType(HTMLDivElement)),
   },
 });
 
@@ -66,5 +76,10 @@ export class BasicButton extends BaseThemedElement2 {
     }
     dispatcher('gs-action', null);
     ActionTracker.set({type: 'click', x: event.x, y: event.y});
+  }
+
+  @render.attribute($.root.ariaDisabled)
+  renderRootAriaDisabled_(@nodeIn($.host.disabled.getId()) hostDisabled: boolean): boolean {
+    return hostDisabled;
   }
 }

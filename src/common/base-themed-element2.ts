@@ -18,7 +18,7 @@ export class BaseThemedElement2 extends BaseDisposable {
     this.themeService_.applyTheme(shadowRoot);
   }
 
-  @onDom.event(shadowHostSelector, 'gs-create')
+  @onDom.event(shadowHostSelector, 'gs-connected')
   onShadowHostCreated(event: Event): void {
     this.themeService_.applyTheme((event.target as HTMLElement).shadowRoot!);
   }

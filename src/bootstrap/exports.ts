@@ -28,7 +28,3 @@ Jsons.setValue(window, 'gs.ui.ObjectParser', ObjectParser);
 Jsons.setValue(window, 'gs.ui.StringParser', StringParser);
 Jsons.setValue(window, 'gs.ui.ImmutableList', ImmutableList);
 Jsons.setValue(window, 'gs.tools.Graph.Debug', Debug);
-
-Graph.on('change', () => {
-  Graph.getTimestamp();
-}, window);
