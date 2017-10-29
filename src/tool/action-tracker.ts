@@ -11,8 +11,9 @@ import {
   UnionType } from 'external/gs_tools/src/check';
 import { Graph, GraphTime, staticId } from 'external/gs_tools/src/graph';
 
-type ClickAction = { type: 'click', x: number, y: number };
-export type Action = ClickAction;
+type ClickAction = {type: 'click', x: number, y: number};
+type KeyboardAction = {type: 'keyboard'};
+export type Action = ClickAction | KeyboardAction;
 
 export const MAX_ACTION_AGE_ = 300;
 

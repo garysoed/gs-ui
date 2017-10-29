@@ -10,8 +10,8 @@
  *
  * @event {{}} gs-action Dispatched when the button is clicked.
  */
-import { BooleanType, InstanceofType } from 'external/gs_tools/src/check';
-import { Graph, nodeIn } from 'external/gs_tools/src/graph';
+import { BooleanType } from 'external/gs_tools/src/check';
+import { Graph, GraphTime, nodeIn } from 'external/gs_tools/src/graph';
 import { inject } from 'external/gs_tools/src/inject';
 import { BooleanParser } from 'external/gs_tools/src/parse';
 import {
@@ -30,6 +30,12 @@ import { ActionTracker } from '../tool';
 
 export const $ = resolveSelectors({
   host: {
+    ariaDisabled: attributeSelector(
+        elementSelector('host.el'),
+        'aria-disabled',
+        BooleanParser,
+        BooleanType,
+        false),
     disabled: attributeSelector(
         elementSelector('host.el'),
         'disabled',
@@ -39,18 +45,13 @@ export const $ = resolveSelectors({
     dispatch: dispatcherSelector<null>(elementSelector('host.el')),
     el: shadowHostSelector,
   },
-  root: {
-    ariaDisabled: attributeSelector(
-        elementSelector('root.el'),
-        'aria-disabled',
-        BooleanParser,
-        BooleanType,
-        false),
-    el: elementSelector('#root', InstanceofType(HTMLDivElement)),
-  },
 });
 
 @component({
+  defaultAttrs: new Map([
+    ['role', 'button'],
+    ['tabindex', '0'],
+  ]),
   inputs: [
     $.host.disabled,
     $.host.dispatch,
@@ -63,9 +64,7 @@ export class BasicButton extends BaseThemedElement2 {
     super(themeService);
   }
 
-  @onDom.event($.host.el, 'click')
-  async onClick_(event: MouseEvent): Promise<void> {
-    const time = Graph.getTimestamp();
+  private async activate_(time: GraphTime): Promise<void> {
     const [disabled, dispatcher] = await Promise.all([
       Graph.get($.host.disabled.getId(), time, this),
       Graph.get($.host.dispatch.getId(), time, this),
@@ -75,10 +74,22 @@ export class BasicButton extends BaseThemedElement2 {
       return;
     }
     dispatcher('gs-action', null);
+  }
+
+  @onDom.keystroke($.host.el, 'Enter')
+  @onDom.keystroke($.host.el, ' ')
+  onAction_(): void {
+    this.activate_(Graph.getTimestamp());
+    ActionTracker.set({type: 'keyboard'});
+  }
+
+  @onDom.event($.host.el, 'click')
+  onClick_(event: MouseEvent): void {
+    this.activate_(Graph.getTimestamp());
     ActionTracker.set({type: 'click', x: event.x, y: event.y});
   }
 
-  @render.attribute($.root.ariaDisabled)
+  @render.attribute($.host.ariaDisabled)
   renderRootAriaDisabled_(@nodeIn($.host.disabled.getId()) hostDisabled: boolean): boolean {
     return hostDisabled;
   }

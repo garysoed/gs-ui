@@ -16,33 +16,48 @@ describe('button.BasicButton HTMLElement', () => {
     TestDispose.add(button);
   });
 
-  describe('onClick_', () => {
+  describe('activate_', () => {
     it('should dispatch the correct event', async () => {
-      const x = 123;
-      const y = 456;
       const mockDispatcher = jasmine.createSpy('Dispatcher');
       Graph.createProvider($.host.dispatch.getId(), mockDispatcher);
       Graph.createProvider($.host.disabled.getId(), false);
 
-      spyOn(ActionTracker, 'set');
-
-      await button.onClick_({x, y} as any);
-      assert(ActionTracker.set).to.haveBeenCalledWith({type: 'click', x, y});
+      await button['activate_'](Graph.getTimestamp());
       assert(mockDispatcher).to.haveBeenCalledWith('gs-action', null);
     });
 
     it('should not dispatch any events if disabled', async () => {
-      const x = 123;
-      const y = 456;
       const mockDispatcher = jasmine.createSpy('Dispatcher');
       Graph.createProvider($.host.dispatch.getId(), mockDispatcher);
       Graph.createProvider($.host.disabled.getId(), true);
 
+      await button['activate_'](Graph.getTimestamp());
+      assert(mockDispatcher).toNot.haveBeenCalled();
+    });
+  });
+
+  describe('onAction_', () => {
+    it('should activate correctly', async () => {
       spyOn(ActionTracker, 'set');
+      spyOn(button, 'activate_');
+
+      await button.onAction_();
+      assert(ActionTracker.set).to.haveBeenCalledWith({type: 'keyboard'});
+      assert(button['activate_']).to.haveBeenCalledWith(Graph.getTimestamp());
+    });
+  });
+
+  describe('onClick_', () => {
+    it('should activate correctly', async () => {
+      const x = 123;
+      const y = 456;
+
+      spyOn(ActionTracker, 'set');
+      spyOn(button, 'activate_');
 
       await button.onClick_({x, y} as any);
-      assert(ActionTracker.set).toNot.haveBeenCalled();
-      assert(mockDispatcher).toNot.haveBeenCalled();
+      assert(ActionTracker.set).to.haveBeenCalledWith({type: 'click', x, y});
+      assert(button['activate_']).to.haveBeenCalledWith(Graph.getTimestamp());
     });
   });
 });

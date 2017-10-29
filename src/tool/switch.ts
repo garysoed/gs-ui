@@ -9,11 +9,10 @@
  */
 
 import { eventDetails } from 'external/gs_tools/src/event';
-  import { Graph } from 'external/gs_tools/src/graph';
+import { Graph } from 'external/gs_tools/src/graph';
 import { ImmutableList, Vector2d } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
 import { StringParser } from 'external/gs_tools/src/parse';
-import { assertUnreachable } from 'external/gs_tools/src/typescript';
 import {
   Animation,
   AnimationEasing,
@@ -113,13 +112,11 @@ export class Switch extends BaseThemedElement2 {
       return Vector2d.of(this.window_.innerWidth / 2, 0);
     }
 
-    const actionType = recentAction.type;
-
-    switch (actionType) {
+    switch (recentAction.type) {
       case 'click':
         return Vector2d.of(recentAction.x, recentAction.y);
-      default:
-        throw assertUnreachable(actionType);
+      case 'keyboard':
+        return Vector2d.of(0, 0);
     }
   }
 

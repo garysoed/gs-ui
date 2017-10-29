@@ -175,12 +175,14 @@ td {
   --gsColorActionFG: var(--gsThemeActionNormalDark);
   --gsColorActionFocusFG: var(--gsThemeAccent);
   --gsColorActionDisabledFG: var(--gsThemeBlackFader);
+  --gsColorActionDisabledFocusFG: var(--gsColorSecondaryFG);
   --gsColorActionPrimaryBG: var(--gsThemeActionNormalLight);
   --gsColorActionPrimaryFG: var(--gsThemeBlack);
   --gsColorActionPrimaryFocusBG: var(--gsThemeAccent);
   --gsColorActionPrimaryFocusFG: var(--gsThemeBlackOnAccent);
-  --gsColorActionPrimaryDisabledBG: var(--gsThemeWhite);
-  --gsColorActionPrimaryDisabledFG: var(--gsThemeBlackFade);
+  --gsColorActionPrimaryDisabledBG: var(--gsColorPassiveBG);
+  --gsColorActionPrimaryDisabledFG: var(--gsColorActionDisabledFG);
+  --gsColorActionPrimaryDisabledFocusFG: var(--gsColorActionDisabledFocusFG);
   --gsColorReverseMode: false;
   --gsColorHighlightMode: false;
 }
@@ -195,12 +197,14 @@ td {
   --gsColorActionFG: var(--gsThemeActionReversedLight);
   --gsColorActionFocusFG: var(--gsThemeAccent);
   --gsColorActionDisabledFG: var(--gsThemeWhiteFader);
+  --gsColorActionDisabledFocusFG: var(--gsColorSecondaryFG);
   --gsColorActionPrimaryBG: var(--gsThemeActionReversedDark);
   --gsColorActionPrimaryFG: var(--gsThemeWhite);
   --gsColorActionPrimaryFocusFG: var(--gsThemeBlackOnAccent);
   --gsColorActionPrimaryFocusBG: var(--gsThemeAccent);
-  --gsColorActionPrimaryDisabledBG: var(--gsThemeBaseNormalDark);
-  --gsColorActionPrimaryDisabledFG: var(--gsThemeWhiteFade);
+  --gsColorActionPrimaryDisabledBG: var(--gsColorPassiveBG);
+  --gsColorActionPrimaryDisabledFG: var(--gsColorActionDisabledFG);
+  --gsColorActionPrimaryDisabledFocusFG: var(--gsColorActionDisabledFocusFG);
   --gsColorReverseMode: true;
   --gsColorHighlightMode: true;
 }
@@ -215,12 +219,14 @@ td {
   --gsColorActionFG: var(--gsThemeActionReversedLight);
   --gsColorActionFocusFG: var(--gsThemeAccent);
   --gsColorActionDisabledFG: var(--gsThemeWhiteFader);
+  --gsColorActionDisabledFocusFG: var(--gsColorSecondaryFG);
   --gsColorActionPrimaryBG: var(--gsThemeActionReversedDark);
   --gsColorActionPrimaryFG: var(--gsThemeWhite);
   --gsColorActionPrimaryFocusBG: var(--gsThemeAccent);
   --gsColorActionPrimaryFocusFG: var(--gsThemeBlackOnAccent);
-  --gsColorActionPrimaryDisabledBG: var(--gsThemeBlack);
-  --gsColorActionPrimaryDisabledFG: var(--gsThemeWhiteFade);
+  --gsColorActionPrimaryDisabledBG: var(--gsColorPassiveBG);
+  --gsColorActionPrimaryDisabledFG: var(--gsColorActionDisabledFG);
+  --gsColorActionPrimaryDisabledFocusFG: var(--gsColorActionDisabledFocusFG);
   --gsColorReverseMode: true;
   --gsColorHighlightMode: false;
 }
@@ -235,12 +241,14 @@ td {
   --gsColorActionFG: var(--gsThemeActionNormalDarkest);
   --gsColorActionFocusFG: var(--gsThemeAccent);
   --gsColorActionDisabledFG: var(--gsThemeBlackFader);
+  --gsColorActionDisabledFocusFG: var(--gsColorSecondaryFG);
   --gsColorActionPrimaryBG: var(--gsThemeActionNormalLight);
   --gsColorActionPrimaryFG: var(--gsThemeBlack);
   --gsColorActionPrimaryFocusBG: var(--gsThemeAccent);
   --gsColorActionPrimaryFocusFG: var(--gsThemeBlackOnAccent);
-  --gsColorActionPrimaryDisabledBG: var(--gsThemeBaseReversedLightest);
-  --gsColorActionPrimaryDisabledFG: var(--gsThemeBlackFade);
+  --gsColorActionPrimaryDisabledBG: var(--gsColorPassiveBG);
+  --gsColorActionPrimaryDisabledFG: var(--gsColorActionDisabledFG);
+  --gsColorActionPrimaryDisabledFocusFG: var(--gsColorActionDisabledFocusFG);
   --gsColorReverseMode: false;
   --gsColorHighlightMode: true;
 }
