@@ -3,6 +3,7 @@ import { Jsons } from 'external/gs_tools/src/data';
 import { Debug, Graph } from 'external/gs_tools/src/graph';
 import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { ListParser, ObjectParser, StringParser } from 'external/gs_tools/src/parse';
+import { $location } from 'external/gs_tools/src/ui';
 import { Log } from 'external/gs_tools/src/util';
 import { Templates } from 'external/gs_tools/src/webc';
 
@@ -22,6 +23,7 @@ Jsons.setValue(window, 'gs.ui.Theme', Theme);
 Jsons.setValue(window, 'gs.ui.routeFactoriesProvider', routeFactoriesProvider);
 Jsons.setValue(window, 'gs.ui.setLogLevel', Log.setEnabledLevel);
 Jsons.setValue(window, 'gs.ui.Graph', Graph);
+Jsons.setValue(window, 'gs.ui.$location', $location);
 Jsons.setValue(window, 'gs.ui.$route', $route);
 Jsons.setValue(window, 'gs.ui.ListParser', ListParser);
 Jsons.setValue(window, 'gs.ui.ObjectParser', ObjectParser);

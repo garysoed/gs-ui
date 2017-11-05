@@ -56,10 +56,10 @@
     </template>
 
     <section>
-      <section class="cell gs-theme-normal" layout="row"></section>
-      <section class="cell gs-theme-normal-hilite" layout="row"></section>
-      <section class="cell gs-theme-invert" layout="row"></section>
-      <section class="cell gs-theme-invert-hilite" layout="row"></section>
+      <section class="cell" gs-theme="normal" layout="row"></section>
+      <section class="cell" gs-theme="normal" gs-highlight layout="row"></section>
+      <section class="cell" gs-theme="invert" layout="row"></section>
+      <section class="cell" gs-theme="invert" gs-highlight layout="row"></section>
     </section>
 
     <script>
@@ -72,17 +72,13 @@
       const routeFactoryA = new gs.ui.SimpleRouteFactory(Types.A, '/a', 'Page A');
       const routeFactoryB = new gs.ui.SimpleRouteFactory(Types.B, '/b', 'Page B', routeFactoryA);
       const routeFactoryC = new gs.ui.SimpleRouteFactory(Types.C, '/c', 'Page C', routeFactoryB);
-      gs.ui.routeFactoriesProvider([
-        routeFactoryA,
-        routeFactoryB,
-        routeFactoryC,
-      ]);
       const factories = new Map([
         [Types.A, routeFactoryA],
         [Types.B, routeFactoryB],
         [Types.C, routeFactoryC],
-      ])
-      gs.ui.Graph.on('change', () => {
+      ]);
+
+      function updateCrumbs() {
         const timestamp = gs.ui.Graph.getTimestamp();
         gs.ui.Graph.get(gs.ui.$route.match, timestamp).then((routeMatch) => {
           if (!routeMatch) {
@@ -102,7 +98,20 @@
                 ).stringify(gs.ui.ImmutableList.of(crumbs)));
           }
         });
-      });
+      }
+
+      gs.ui
+          .routeFactoriesProvider([
+            routeFactoryA,
+            routeFactoryB,
+            routeFactoryC,
+          ])
+          .then(() => {
+            gs.ui.Graph.onChange(gs.ui.$location.path, () => {
+              updateCrumbs();
+            });
+            updateCrumbs();
+          });
     </script>
     <script src="demo.js"></script>
   </body>
