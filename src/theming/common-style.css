@@ -4,10 +4,14 @@ a, .gs-action {
   text-decoration: none;
 }
 
-a:hover, .gs-action:hover {
+a:hover, a:focus, .gs-action:hover {
   color: var(--gsColorActionFocusFG);
   cursor: pointer;
   text-decoration: underline;
+}
+
+a:focus {
+  outline: none;
 }
 
 a[disabled], .gs-action[disabled] {

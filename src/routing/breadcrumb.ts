@@ -8,10 +8,10 @@
  * @attr <{name: string, url: string}[]> crumb
  */
 import {
+  ElementWithTagType,
   HasPropertiesType,
-  InstanceofType,
   IterableOfType,
-  StringType } from 'external/gs_tools/src/check';
+  StringType} from 'external/gs_tools/src/check';
 import { nodeIn } from 'external/gs_tools/src/graph';
 import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
@@ -35,7 +35,7 @@ export const __FULL_PATH = Symbol('fullPath');
 export type CrumbData = {name: string, url: string};
 
 export function crumbFactory(document: Document): Element {
-  const rootCrumb = document.createElement('div');
+  const rootCrumb = document.createElement('li');
   rootCrumb.classList.add('crumb');
   rootCrumb.setAttribute('layout', 'row');
   rootCrumb.setAttribute('flex-align', 'center');
@@ -43,6 +43,8 @@ export function crumbFactory(document: Document): Element {
   const link = document.createElement('a');
   const arrow = document.createElement('gs-icon');
   arrow.textContent = 'keyboard_arrow_right';
+  arrow.setAttribute('aria-hidden', 'true');
+
   rootCrumb.appendChild(link);
   rootCrumb.appendChild(arrow);
   return rootCrumb;
@@ -70,13 +72,19 @@ export function crumbGetter(element: Element): CrumbData | null {
   };
 }
 
-export function crumbSetter(data: CrumbData, element: Element): void {
+export function crumbSetter(data: CrumbData, element: Element, index: number, count: number): void {
   const linkEl = element.querySelector('a');
   if (linkEl === null) {
     throw new Error('Link element not found');
   }
   linkEl.href = `#${data.url}`;
   linkEl.textContent = data.name;
+
+  if (index + 1 === count) {
+    linkEl.setAttribute('aria-current', 'page');
+  } else {
+    linkEl.removeAttribute('aria-current');
+  }
 }
 
 export const $ = resolveSelectors({
@@ -90,8 +98,8 @@ export const $ = resolveSelectors({
           name: StringType,
           url: StringType,
         }),
-        InstanceofType(HTMLDivElement)),
-    el: elementSelector('#container', InstanceofType(HTMLDivElement)),
+        ElementWithTagType('li')),
+    el: elementSelector('#container', ElementWithTagType('ul')),
   },
   host: {
     crumb: attributeSelector(

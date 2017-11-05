@@ -15,10 +15,10 @@ describe('crumbFactory', () => {
     mockRootEl.classList = mockClassList;
 
     const linkEl = Mocks.object('linkEl');
-    const arrowEl = Mocks.object('arrowEl');
+    const arrowEl = document.createElement('div');
     const mockDocument = jasmine.createSpyObj('Document', ['createElement']);
     Fakes.build(mockDocument.createElement)
-        .when('div').return(mockRootEl)
+        .when('li').return(mockRootEl)
         .when('a').return(linkEl)
         .when('gs-icon').return(arrowEl);
 
@@ -26,6 +26,7 @@ describe('crumbFactory', () => {
     assert(mockRootEl.appendChild).to.haveBeenCalledWith(arrowEl);
     assert(mockRootEl.appendChild).to.haveBeenCalledWith(linkEl);
     assert(arrowEl.textContent).to.equal('keyboard_arrow_right');
+    assert(arrowEl.getAttribute('aria-hidden')).to.equal('true');
     assert(mockRootEl.setAttribute).to.haveBeenCalledWith('flex-align', 'center');
     assert(mockRootEl.setAttribute).to.haveBeenCalledWith('layout', 'row');
     assert(mockClassList.add).to.haveBeenCalledWith('crumb');
@@ -76,17 +77,34 @@ describe('crumbGetter', () => {
 
 describe('crumbSetter', () => {
   it('should set the data correctly', () => {
-    const linkEl = Mocks.object('linkEl');
+    const linkEl = document.createElement('a');
     const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
     mockElement.querySelector.and.returnValue(linkEl);
 
     const url = 'url';
     const name = 'name';
-    crumbSetter({name: name, url: url}, mockElement);
+    crumbSetter({name: name, url: url}, mockElement, 3, 4);
 
     assert(linkEl.textContent).to.equal(name);
-    assert(linkEl.href).to.equal(`#${url}`);
+    assert(linkEl.href).to.match(/#url$/);
     assert(mockElement.querySelector).to.haveBeenCalledWith('a');
+    assert(linkEl.getAttribute('aria-current')).to.equal('page');
+  });
+
+  it(`should delete the aria-current if not the last crumb`, () => {
+    const linkEl = document.createElement('a');
+    linkEl.setAttribute('aria-current', 'page');
+    const mockElement = jasmine.createSpyObj('Element', ['querySelector']);
+    mockElement.querySelector.and.returnValue(linkEl);
+
+    const url = 'url';
+    const name = 'name';
+    crumbSetter({name: name, url: url}, mockElement, 3, 5);
+
+    assert(linkEl.textContent).to.equal(name);
+    assert(linkEl.href).to.match(/#url$/);
+    assert(mockElement.querySelector).to.haveBeenCalledWith('a');
+    assert(linkEl.hasAttribute('aria-current')).to.beFalse();
   });
 
   it('should throw error if the link element cannot be found', () => {
@@ -94,7 +112,7 @@ describe('crumbSetter', () => {
     mockElement.querySelector.and.returnValue(null);
 
     assert(() => {
-      crumbSetter({name: 'name', url: 'url'}, mockElement);
+      crumbSetter({name: 'name', url: 'url'}, mockElement, 1, 2);
     }).to.throwError(/element not found/);
   });
 });

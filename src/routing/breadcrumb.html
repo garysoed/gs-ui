@@ -2,7 +2,14 @@
   .crumb:last-child > gs-icon {
     display: none;
   }
+
+  #container {
+    margin: 0;
+    padding: 0;
+  }
 </style>
-<div fill-parent id="container" layout="row">
-  <!--slot(crumbs)-->
-</div>
+<nav fill-parent layout="column" flex-justify="center">
+  <ul id="container" layout="row">
+    <!--slot(crumbs)-->
+  </ul>
+</nav>
