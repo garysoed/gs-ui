@@ -116,12 +116,12 @@ export class Main extends BaseDisposable {
    * Creates a new instance of the app.
    * TODO: Make a builder
    */
-  static newInstance(config: {
+  static newInstance(
+      config: {
         ace?: AceAjax.Ace,
         routeFactoryServiceCtor?: gs.ICtor<IRouteFactoryService<any>>,
-      } = {}): Main {
-    const templates = Templates.newInstance();
-
+      } = {},
+      templates: Templates = Templates.newInstance()): Main {
     Injector.bindProvider(() => document, 'x.dom.document');
     Injector.bindProvider(() => window, 'x.dom.window');
     Injector.bindProvider(() => templates, 'x.gs_tools.templates');

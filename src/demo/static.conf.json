@@ -1,0 +1,6 @@
+{
+  "/bazel-genfiles/*": "../../bazel-genfiles/$0",
+  "/node_modules/*": "../../node_modules/$0",
+  "/:file": "$file",
+  "/:file/*": "$file"
+}
