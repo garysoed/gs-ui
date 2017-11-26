@@ -4,7 +4,6 @@ TestBase.setup();
 import { Interval } from 'external/gs_tools/src/async';
 import { Colors, HslColor, RgbColor } from 'external/gs_tools/src/color';
 import { DisposableFunction } from 'external/gs_tools/src/dispose';
-import { Graph } from 'external/gs_tools/src/graph';
 import { Fakes, Mocks } from 'external/gs_tools/src/mock';
 import { Solve, Spec } from 'external/gs_tools/src/solver';
 
@@ -28,7 +27,6 @@ describe('input.CodeInput', () => {
     mockWindow = jasmine.createSpyObj('Window', ['getComputedStyle']);
     input = new CodeInput(mockThemeService, mockAce, mockDocument, mockWindow);
     TestDispose.add(input);
-    TestGraph.setup(Graph);
   });
 
   describe('getColorShade_', () => {
@@ -268,7 +266,7 @@ describe('input.CodeInput', () => {
       spyOn(input, 'onThemeChanged_');
       spyOn(input, 'onTick_');
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
+      TestGraph.set($.editor.el.getId(), editorEl);
 
       await input.onCodeHostCreated_();
       assert(mockInterval.on).to.haveBeenCalledWith('tick', Matchers.any(Function), input);
@@ -287,8 +285,8 @@ describe('input.CodeInput', () => {
       mockEditor.getSession.and.returnValue(mockSession);
       spyOn(input, 'getEditor_').and.returnValue(mockEditor);
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
-      TestGraph.set($.host.language.getId(), input, Languages.JAVASCRIPT);
+      TestGraph.set($.editor.el.getId(), editorEl);
+      TestGraph.set($.host.language.getId(), Languages.JAVASCRIPT);
 
       await input.onLanguageAttrChange_();
       assert(mockSession.setMode).to.haveBeenCalledWith('ace/mode/javascript');
@@ -302,8 +300,8 @@ describe('input.CodeInput', () => {
       mockEditor.getSession.and.returnValue(mockSession);
       spyOn(input, 'getEditor_').and.returnValue(mockEditor);
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
-      TestGraph.set($.host.language.getId(), input, null);
+      TestGraph.set($.editor.el.getId(), editorEl);
+      TestGraph.set($.host.language.getId(), null);
 
       await input.onLanguageAttrChange_();
       assert(mockSession.setMode).toNot.haveBeenCalled();
@@ -318,8 +316,8 @@ describe('input.CodeInput', () => {
       mockEditor.renderer = mockRenderer;
       spyOn(input, 'getEditor_').and.returnValue(mockEditor);
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
-      TestGraph.set($.host.showGutter.getId(), input, true);
+      TestGraph.set($.editor.el.getId(), editorEl);
+      TestGraph.set($.host.showGutter.getId(), true);
 
       await input.onShowGutterAttrChange_();
       assert(mockRenderer.setShowGutter).to.haveBeenCalledWith(true);
@@ -333,8 +331,8 @@ describe('input.CodeInput', () => {
       mockEditor.renderer = mockRenderer;
       spyOn(input, 'getEditor_').and.returnValue(mockEditor);
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
-      TestGraph.set($.host.showGutter.getId(), input, false);
+      TestGraph.set($.editor.el.getId(), editorEl);
+      TestGraph.set($.host.showGutter.getId(), false);
 
       await input.onShowGutterAttrChange_();
       assert(mockRenderer.setShowGutter).to.haveBeenCalledWith(false);
@@ -365,8 +363,8 @@ describe('input.CodeInput', () => {
 
       spyOn(input, 'getColorShade_').and.returnValue(RgbColor.newInstance(0, 0, 0));
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
-      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+      TestGraph.set($.editor.el.getId(), editorEl);
+      TestGraph.set($.customStyle.el.getId(), customStyleEl);
 
       await input.onThemeChanged_();
 
@@ -397,8 +395,8 @@ describe('input.CodeInput', () => {
       mockThemeService.isHighlightMode.and.returnValue(false);
       mockThemeService.isReversedMode.and.returnValue(false);
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
-      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+      TestGraph.set($.editor.el.getId(), editorEl);
+      TestGraph.set($.customStyle.el.getId(), customStyleEl);
 
       await input.onThemeChanged_();
 
@@ -420,8 +418,8 @@ describe('input.CodeInput', () => {
       mockThemeService.isHighlightMode.and.returnValue(null);
       mockThemeService.isReversedMode.and.returnValue(false);
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
-      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+      TestGraph.set($.editor.el.getId(), editorEl);
+      TestGraph.set($.customStyle.el.getId(), customStyleEl);
 
       await input.onThemeChanged_();
 
@@ -442,8 +440,8 @@ describe('input.CodeInput', () => {
 
       mockThemeService.isReversedMode.and.returnValue(null);
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
-      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+      TestGraph.set($.editor.el.getId(), editorEl);
+      TestGraph.set($.customStyle.el.getId(), customStyleEl);
 
       await input.onThemeChanged_();
 
@@ -460,8 +458,8 @@ describe('input.CodeInput', () => {
 
       mockThemeService.isReversedMode.and.returnValue(null);
 
-      TestGraph.set($.editor.el.getId(), input, editorEl);
-      TestGraph.set($.customStyle.el.getId(), input, customStyleEl);
+      TestGraph.set($.editor.el.getId(), editorEl);
+      TestGraph.set($.customStyle.el.getId(), customStyleEl);
 
       await input.onThemeChanged_();
 

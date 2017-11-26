@@ -1,4 +1,4 @@
-import { assert, Matchers, TestBase } from '../test-base';
+import { assert, Matchers, TestBase, TestGraph } from '../test-base';
 TestBase.setup();
 
 import { DisposableFunction } from 'external/gs_tools/src/dispose';
@@ -16,7 +16,6 @@ describe('tool.Menu', () => {
   let mockOverlayService: any;
 
   beforeEach(() => {
-    Graph.clearAllNodesForTest();
     mockOverlayService = jasmine.createSpyObj('MenuService', ['hideOverlay', 'showOverlay']);
     menu = new Menu(Mocks.object('ThemeService'), mockOverlayService);
     TestDispose.add(menu);
@@ -28,7 +27,7 @@ describe('tool.Menu', () => {
       spyOn(Graph, 'getTimestamp').and.returnValue(time);
       spyOn(menu, 'setOverlayVisible_');
 
-      Graph.createProvider($.host.visible.getId(), true);
+      TestGraph.set($.host.visible.getId(), true);
 
       await menu['onTriggered_']();
       assert(menu['setOverlayVisible_']).to.haveBeenCalledWith(false, time);
@@ -42,7 +41,7 @@ describe('tool.Menu', () => {
       spyOn(Persona, 'getValue').and.returnValue(triggeredBy);
 
       const origDisposable = DisposableFunction.of(() => undefined);
-      Graph.createProvider($triggeredByRegistration, origDisposable);
+      TestGraph.set($triggeredByRegistration, origDisposable);
 
       const mockTargetEl =
           jasmine.createSpyObj('TargetEl', ['addEventListener', 'removeEventListener']);
@@ -54,7 +53,7 @@ describe('tool.Menu', () => {
       const mockElement = jasmine.createSpyObj('Element', ['getRootNode']);
       mockElement.getRootNode.and.returnValue(mockRootNode);
       Object.setPrototypeOf(mockElement, HTMLElement.prototype);
-      await Graph.createProvider($.host.el.getId(), mockElement);
+      await TestGraph.set($.host.el.getId(), mockElement);
 
       spyOn(menu, 'onTriggered_');
 
@@ -79,7 +78,7 @@ describe('tool.Menu', () => {
       spyOn(Persona, 'getValue').and.returnValue(triggeredBy);
 
       const origDisposable = DisposableFunction.of(() => undefined);
-      Graph.createProvider($triggeredByRegistration, origDisposable);
+      TestGraph.set($triggeredByRegistration, origDisposable);
       TestDispose.add(origDisposable);
 
       const mockRootNode = jasmine.createSpyObj('RootNode', ['querySelector']);
@@ -89,7 +88,7 @@ describe('tool.Menu', () => {
       const mockElement = jasmine.createSpyObj('Element', ['getRootNode']);
       mockElement.getRootNode.and.returnValue(mockRootNode);
       Object.setPrototypeOf(mockElement, HTMLElement.prototype);
-      await Graph.createProvider($.host.el.getId(), mockElement);
+      await TestGraph.set($.host.el.getId(), mockElement);
 
       await menu.onTriggeredByChanged_();
       assert(mockRootNode.querySelector).to.haveBeenCalledWith(triggeredBy);
@@ -100,13 +99,13 @@ describe('tool.Menu', () => {
       const triggeredBy = 'triggeredBy';
       spyOn(Persona, 'getValue').and.returnValue(triggeredBy);
 
-      Graph.createProvider($triggeredByRegistration, null);
+      TestGraph.set($triggeredByRegistration, null);
 
       const mockRootNode = jasmine.createSpyObj('RootNode', ['querySelector']);
       const mockElement = jasmine.createSpyObj('Element', ['getRootNode']);
       mockElement.getRootNode.and.returnValue(mockRootNode);
       Object.setPrototypeOf(mockElement, HTMLElement.prototype);
-      await Graph.createProvider($.host.el.getId(), mockElement);
+      await TestGraph.set($.host.el.getId(), mockElement);
 
       await assert(menu.onTriggeredByChanged_()).to.rejectWithError(/Cannot run query selector/);
     });
@@ -164,13 +163,13 @@ describe('tool.Menu', () => {
       const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = parentWidth;
 
-      Graph.createProvider($.host.fitParentWidth.getId(), true);
+      TestGraph.set($.host.fitParentWidth.getId(), true);
 
       const anchorPoint = AnchorLocation.BOTTOM_LEFT;
-      Graph.createProvider($.host.anchorPoint.getId(), anchorPoint);
+      TestGraph.set($.host.anchorPoint.getId(), anchorPoint);
 
       const anchorTarget = AnchorLocation.TOP_RIGHT;
-      Graph.createProvider($.host.anchorTarget.getId(), anchorTarget);
+      TestGraph.set($.host.anchorTarget.getId(), anchorTarget);
 
       const menuContentStyle = Mocks.object('menuContentStyle');
       const menuContent = Mocks.object('menuContent');
@@ -180,7 +179,7 @@ describe('tool.Menu', () => {
       element.firstElementChild = menuContent;
       element.parentElement = parentElement;
       Object.setPrototypeOf(element, HTMLElement.prototype);
-      Graph.createProvider($.host.el.getId(), element);
+      TestGraph.set($.host.el.getId(), element);
 
       await menu['setOverlayVisible_'](true, Graph.getTimestamp());
       assert(mockOverlayService.showOverlay).to.haveBeenCalledWith(
@@ -198,9 +197,9 @@ describe('tool.Menu', () => {
       const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = 123;
 
-      Graph.createProvider($.host.fitParentWidth.getId(), false);
-      Graph.createProvider($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
-      Graph.createProvider($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
+      TestGraph.set($.host.fitParentWidth.getId(), false);
+      TestGraph.set($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
+      TestGraph.set($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
 
       const menuContentStyle = Mocks.object('menuContentStyle');
       const menuContent = Mocks.object('menuContent');
@@ -210,30 +209,30 @@ describe('tool.Menu', () => {
       element.firstElementChild = menuContent;
       element.parentElement = parentElement;
       Object.setPrototypeOf(element, HTMLElement.prototype);
-      Graph.createProvider($.host.el.getId(), element);
+      TestGraph.set($.host.el.getId(), element);
 
       await menu['setOverlayVisible_'](true, Graph.getTimestamp());
       assert(menuContentStyle.width).toNot.beDefined();
     });
 
     it('should reject if there are no parent elements', async () => {
-      Graph.createProvider($.host.fitParentWidth.getId(), false);
-      Graph.createProvider($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
-      Graph.createProvider($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
+      TestGraph.set($.host.fitParentWidth.getId(), false);
+      TestGraph.set($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
+      TestGraph.set($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
 
       const element = Mocks.object('element');
       element.parentElement = null;
       Object.setPrototypeOf(element, HTMLElement.prototype);
-      Graph.createProvider($.host.el.getId(), element);
+      TestGraph.set($.host.el.getId(), element);
 
       await assert(menu['setOverlayVisible_'](true, Graph.getTimestamp()))
           .to.rejectWithError(/No parent element/i);
     });
 
     it('should resolve if there are no menu contents', async () => {
-      Graph.createProvider($.host.fitParentWidth.getId(), true);
-      Graph.createProvider($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
-      Graph.createProvider($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
+      TestGraph.set($.host.fitParentWidth.getId(), true);
+      TestGraph.set($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
+      TestGraph.set($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
 
       const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = 123;
@@ -242,15 +241,15 @@ describe('tool.Menu', () => {
       element.parentElement = parentElement;
       element.firstElementChild = null;
       Object.setPrototypeOf(element, HTMLElement.prototype);
-      Graph.createProvider($.host.el.getId(), element);
+      TestGraph.set($.host.el.getId(), element);
 
       await menu['setOverlayVisible_'](true, Graph.getTimestamp());
     });
 
     it(`should hide the overlay if set to hide`, async () => {
-      Graph.createProvider($.host.fitParentWidth.getId(), false);
-      Graph.createProvider($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
-      Graph.createProvider($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
+      TestGraph.set($.host.fitParentWidth.getId(), false);
+      TestGraph.set($.host.anchorPoint.getId(), AnchorLocation.BOTTOM_LEFT);
+      TestGraph.set($.host.anchorTarget.getId(), AnchorLocation.TOP_RIGHT);
 
       const parentElement = Mocks.object('parentElement');
       parentElement.clientWidth = 123;
@@ -258,7 +257,7 @@ describe('tool.Menu', () => {
       const element = Mocks.object('element');
       element.parentElement = parentElement;
       Object.setPrototypeOf(element, HTMLElement.prototype);
-      Graph.createProvider($.host.el.getId(), element);
+      TestGraph.set($.host.el.getId(), element);
 
       await menu['setOverlayVisible_'](false, Graph.getTimestamp());
       assert(mockOverlayService.hideOverlay).to.haveBeenCalledWith(menu['id_']);

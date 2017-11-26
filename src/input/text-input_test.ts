@@ -14,13 +14,12 @@ describe('input.TextInput', () => {
   beforeEach(() => {
     input = new TextInput(Mocks.object('ThemeService'));
     TestDispose.add(input);
-    TestGraph.setup(Graph);
   });
 
   describe('getInputEl_', () => {
     it(`should return the correct element`, async () => {
       const inputEl = Mocks.object('inputEl');
-      TestGraph.set($.input.el.getId(), input, inputEl);
+      TestGraph.set($.input.el.getId(), inputEl);
 
       assert(await input['getInputEl_'](Graph.getTimestamp())).to.equal(inputEl);
     });
