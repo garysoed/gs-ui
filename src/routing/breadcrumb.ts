@@ -11,7 +11,7 @@ import {
   ElementWithTagType,
   HasPropertiesType,
   IterableOfType,
-  StringType} from 'external/gs_tools/src/check';
+  StringType } from 'external/gs_tools/src/check';
 import { nodeIn } from 'external/gs_tools/src/graph';
 import { ImmutableList } from 'external/gs_tools/src/immutable';
 import { inject } from 'external/gs_tools/src/inject';
@@ -72,11 +72,22 @@ export function crumbGetter(element: Element): CrumbData | null {
   };
 }
 
-export function crumbSetter(data: CrumbData, element: Element, index: number, count: number): void {
+export function crumbSetter(
+    data: CrumbData | null,
+    element: Element,
+    index: number,
+    count: number): void {
   const linkEl = element.querySelector('a');
   if (linkEl === null) {
     throw new Error('Link element not found');
   }
+
+  if (!data) {
+    linkEl.href = '';
+    linkEl.textContent = '';
+    return;
+  }
+
   linkEl.href = `#${data.url}`;
   linkEl.textContent = data.name;
 

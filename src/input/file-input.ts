@@ -93,7 +93,7 @@ export class FileInput extends BaseThemedElement2 {
       return true;
     }
     const mimeTypesSet = new Set(mimeTypesArray);
-    return ImmutableList.of(dataTransfer.items)
+    return ImmutableList.of<DataTransferItem>(dataTransfer.items)
         .every((item: DataTransferItem) => {
           return mimeTypesSet.has(item.type);
         });

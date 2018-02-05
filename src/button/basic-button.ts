@@ -22,7 +22,7 @@ import {
   onDom,
   render,
   resolveSelectors,
-  shadowHostSelector} from 'external/gs_tools/src/persona';
+  shadowHostSelector } from 'external/gs_tools/src/persona';
 
 import { BaseThemedElement2 } from '../common';
 import { ThemeService } from '../theming';

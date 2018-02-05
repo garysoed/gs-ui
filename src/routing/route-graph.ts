@@ -6,7 +6,7 @@ import {
   IterableOfType,
   NullableType,
   StringType,
-  TupleOfType} from 'external/gs_tools/src/check';
+  TupleOfType } from 'external/gs_tools/src/check';
 import { Graph, staticId } from 'external/gs_tools/src/graph';
 import { ImmutableMap, ImmutableSet } from 'external/gs_tools/src/immutable';
 import { $location, navigateToHash } from 'external/gs_tools/src/ui';

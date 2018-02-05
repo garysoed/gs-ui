@@ -8,7 +8,7 @@ import {
   AnimationEventDetail,
   dom,
   onDom,
-  onLifecycle} from 'external/gs_tools/src/webc';
+  onLifecycle } from 'external/gs_tools/src/webc';
 
 import { BaseThemedElement2 } from '../common/base-themed-element2';
 import { ThemeService } from '../theming/theme-service';

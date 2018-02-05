@@ -33,7 +33,7 @@ import {
   Persona,
   render,
   resolveSelectors,
-  shadowHostSelector} from 'external/gs_tools/src/persona';
+  shadowHostSelector } from 'external/gs_tools/src/persona';
 import { QuerySelectorType } from 'external/gs_tools/src/ui';
 import { Log } from 'external/gs_tools/src/util';
 

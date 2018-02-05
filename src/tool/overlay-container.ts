@@ -30,7 +30,7 @@ import {
   customElement,
   dom,
   domOut,
-  onDom} from 'external/gs_tools/src/webc';
+  onDom } from 'external/gs_tools/src/webc';
 import { onLifecycle } from 'external/gs_tools/src/webc/on-lifecycle';
 
 import { WINDOW_BUS } from '../common';

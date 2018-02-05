@@ -3,7 +3,7 @@ import {
   DispatchFn,
   Disposable,
   Event,
-  Parser} from 'external/gs_tools/src/interfaces';
+  Parser } from 'external/gs_tools/src/interfaces';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import {
   attributeSelector,
@@ -13,7 +13,7 @@ import {
   Persona,
   render,
   resolveSelectors,
-  shadowHostSelector} from 'external/gs_tools/src/persona';
+  shadowHostSelector } from 'external/gs_tools/src/persona';
 
 import { Graph, GraphTime, instanceId, nodeIn } from 'external/gs_tools/src/graph';
 import { BaseThemedElement2 } from '../common';

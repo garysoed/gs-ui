@@ -7,7 +7,7 @@ import {
   Event,
   MonadSetter,
   MonadValue,
-  Parser} from 'external/gs_tools/src/interfaces';
+  Parser } from 'external/gs_tools/src/interfaces';
 import { BooleanParser, StringParser } from 'external/gs_tools/src/parse';
 import { dom, domOut, onDom, onLifecycle, Util } from 'external/gs_tools/src/webc';
 
