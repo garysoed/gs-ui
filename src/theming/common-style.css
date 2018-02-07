@@ -22,6 +22,7 @@ a[disabled], .gs-action[disabled] {
 h1 {
   font-size: 3rem;
   font-weight: var(--gsFontWeightLight);
+  line-height: 4.5rem;
 }
 
 h2 {

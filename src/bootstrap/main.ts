@@ -90,13 +90,17 @@ export class Main extends BaseDisposable {
    *
    * @param theme The theme to apply to the app.
    */
-  bootstrap(theme: Theme = DEFAULT_THEME_, customElements: gs.ICtor<BaseDisposable>[] = []): void {
+  bootstrap(
+      theme: Theme = DEFAULT_THEME_,
+      customElements: gs.ICtor<BaseDisposable>[] = [],
+      document: Document = window.document): void {
     const ctors = ImmutableSet.of(DEFAULT_ELEMENTS_).addAll(ImmutableSet.of(customElements));
     for (const ctor of ctors) {
       this.registrar_.register(ctor);
     }
 
     this.themeService_.install(theme);
+    this.themeService_.applyTheme(document);
   }
 
   get injector(): Injector {
